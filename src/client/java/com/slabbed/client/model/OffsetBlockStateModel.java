@@ -143,6 +143,14 @@ public final class OffsetBlockStateModel implements BlockStateModel, FabricBlock
             }
         }
 
+        // A straight rail whose connected neighbour sits at another seat is drawn on its fitted
+        // profile so the two drawn rails meet (RailSlopeGeometry). It takes this emitter directly
+        // and applies the seat itself; false for every other block and for a profile vanilla
+        // already draws, which then take the ordinary path below.
+        if (RailSlopeGeometry.emitIfFitted(fabricWrapped, emitter, view, pos, state, dy, random, cullTest)) {
+            return;
+        }
+
         QuadEmitter out = dy != 0.0f ? YOffsetEmitter.wrap(emitter, dy) : emitter;
         fabricWrapped.emitQuads(out, view, pos, state, random, cullTest);
     }

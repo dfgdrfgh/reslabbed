@@ -129,11 +129,12 @@ jar that lies about its own contents is a release defect even when every entry i
 ### Main mixins (class-level; `com/slabbed/mixin/` is a mixed package)
 
 Every row below is declared in `slabbed.mixins.json`. The config and the archive agree exactly:
-23 direct members here plus `torch/TorchBlockMixin`, and the config lists exactly those 24. There is
+24 direct members here plus `torch/TorchBlockMixin`, and the config lists exactly those 25. There is
 no inert, undeclared mixin shipping on this line.
 
 | Entry | Reason |
 | --- | --- |
+| `com/slabbed/mixin/BaseRailBlockSlopeShapeMixin` | A rail's outline and raycast box are sized from the slope it is drawn with, so a lowered rail rising to its neighbour can be targeted where it is drawn (maintainer ruling, 2026-09-28). |
 | `com/slabbed/mixin/BlockItemPlacementIntentMixin` | Captures placement intent for the placement law. |
 | `com/slabbed/mixin/BlockOnPlacedAnchorMixin` | Writes the dy anchor on placement. |
 | `com/slabbed/mixin/BlockOnStateReplacedAnchorMixin` | Clears the dy anchor on state replacement. |
@@ -201,6 +202,7 @@ None of these four does file I/O, and none allocates per block or per frame.
 | `com/slabbed/util/SlabbedOffsetRaycast` | Offset-aware nearest-hit raycast — the targeting overhaul. |
 | `com/slabbed/util/SlabbedServerHitValidation` | Server-side hit validation for offset placement; the sole consumer of `ServerInteractBlockHitToleranceMixin`'s widened tolerance. |
 | `com/slabbed/util/SlabbedAuditBridge` | The deliberate release-safe boundary, and the reason the excluded harnesses can stay excluded: shipped code (`Slabbed`, `SlabAnchorAttachment`, `BlockItemPlacementIntentMixin`, `SlabdyClientCommands`) calls THIS, never `com.slabbed.dev.audit.**` or `com.slabbed.debug.**` directly, so those packages leave the jar without a single hard link breaking. In a release build `RECORDER_CLASS` resolves to null once at clinit and every method is a null-check return. That single cached resolve — rather than a `Class.forName` per call — is deliberate: `isRecorderEnabled()` is polled every client tick, and per-tick reflection by string name is the exact shape of the lag that has shipped twice on this project. This is architecture keeping diagnostics OUT of the jar, not diagnostics leaking in. |
+| `com/slabbed/util/RailSlopeProfile` | The drawn profile of a straight rail — each end fitted to the seat of the rail it connects to; the one rule the client geometry and the outline box are both computed from. |
 
 ## How exclusion and approval interact
 
