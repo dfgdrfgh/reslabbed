@@ -33,7 +33,9 @@
     "BlockOnStateReplacedAnchorMixin",
     "FencePaneSlabConnectionMixin",
     "WallSlabConnectionMixin",
-    "BaseRailBlockSlopeShapeMixin"
+    "BaseRailBlockSlopeShapeMixin",
+    "PoweredRailVisualSignalMixin",
+    "LoweredRailSupportNeighborMixin"
   ],
   "client": [],
   "injectors": { "defaultRequire": 1 }

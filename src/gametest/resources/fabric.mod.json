@@ -66,7 +66,8 @@
       "com.slabbed.test.NormalDepthContractTest",
       "com.slabbed.test.StateChangeAnchorTest",
       "com.slabbed.test.HangingLoadDeferralTest",
-      "com.slabbed.test.RailSlopeProfileTest"
+      "com.slabbed.test.RailSlopeProfileTest",
+      "com.slabbed.test.RailVisualSignalTest"
     ],
     "fabric-client-gametest": [
       "com.slabbed.test.ExposedStairFaceClientGameTest",
