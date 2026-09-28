@@ -1,4 +1,4 @@
-## [Unreleased] - Minecraft 1.20.1 (Forge)
+## [0.5.2-beta.4] - Minecraft 1.20.1 (Forge)
 
 See LAW.md — this changelog does not redefine the law.
 
