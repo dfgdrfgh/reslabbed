@@ -6,7 +6,7 @@ latest file, see [Modrinth](https://modrinth.com/mod/slabbed) or
 [CurseForge](https://www.curseforge.com/minecraft/mc-mods/slabbed).
 See LAW.md — this doc does not redefine the law.
 
-## [Unreleased] — 1.21.11 (Fabric)
+## [0.5.2-alpha.27] — 1.21.11 (Fabric) — 2026-09-28
 
 ### Fixed
 
