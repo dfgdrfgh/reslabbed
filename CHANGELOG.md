@@ -1,4 +1,4 @@
-## [Unreleased] - Minecraft 1.21.1 (NeoForge)
+## [0.5.2-alpha.24] - Minecraft 1.21.1 (NeoForge)
 
 See LAW.md — this changelog does not redefine the law.
 
