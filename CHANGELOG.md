@@ -20,6 +20,14 @@ See LAW.md — this changelog does not redefine the law.
   already does (maintainer ruling, 2026-09-28). Minecarts still ride the grid and re-seat cell by
   cell; following the drawn slope is a separate change.
 
+- **Powered rails on lowered blocks take power from what touches them.** A powered rail on a slab
+  sits one grid cell above the slab but is drawn inside the slab's cell, so a torch, wire or lever
+  standing beside the slab, visibly touching the rail, was a diagonal to the game and never powered
+  it, and an unpowered powered rail is a brake. A lowered powered rail now also listens at the cell it
+  is drawn in — beside it and under it, so a torch under the slab works like a torch under a full
+  block — both for its own power and when it passes power along a chain of powered rails, and a
+  change beside the slab reaches the rail. A rail drawn in its own cell behaves exactly as before.
+
 ## [0.5.2-alpha.21] - Minecraft 1.21.1 (NeoForge)
 
 Version note: alpha.21 is the next free number in the shared alpha series across all Slabbed lines.
