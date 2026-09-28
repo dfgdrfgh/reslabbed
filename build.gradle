@@ -440,6 +440,7 @@ sourceSets {
             include("com/slabbed/anchor/PlacementDyAttachmentCapacityTest.java")
             include("com/slabbed/test/RailSlopeProfileTest.java")
             include("com/slabbed/test/RailVisualSignalTest.java")
+            include("com/slabbed/test/RedstoneWireVisualStepTest.java")
             include("com/slabbed/test/RailSlopeRenderClientGameTest.java")
             include("com/slabbed/test/SlabRigGameTestSeams.java")
             include("com/slabbed/client/PlacementDyPredictionJournalGameTestAccess.java")

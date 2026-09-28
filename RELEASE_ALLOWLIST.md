@@ -115,6 +115,7 @@ anything. The split above puts the fine granularity only where a leak has actual
 | `com/slabbed/mixin/LivingEntityLoweredScaffoldingMixin` | Scaffolding movement over lowered geometry. |
 | `com/slabbed/mixin/RedstoneTorchParticleMixin` | Particle origin follows the lowered block. |
 | `com/slabbed/mixin/RedstoneWireBlockMixin` | Redstone wire connection/support over lowered slabs. |
+| `com/slabbed/mixin/RedstoneWireEvaluatorVisualStepMixin` | A redstone wire beside a lowered half-step also reads the wire drawn on the slab next to it, so dust carries power down a lowered half-step as well as up (maintainer ruling, 2026-09-28). |
 | `com/slabbed/mixin/PaintingRememberedSeatMixin` | Painting remembered seat persisted in save data. |
 | `com/slabbed/mixin/ScaffoldingLoweredStandMixin` | Scaffolding standing layer gated at the lowered drawn top. |
 | `com/slabbed/mixin/ServerInteractBlockHitToleranceMixin` | Server-side hit tolerance for offset targeting. |
@@ -170,6 +171,7 @@ anything. The split above puts the fine granularity only where a leak has actual
 | `com/slabbed/util/PlacementVerificationVerdict` | Placement verification result type. |
 | `com/slabbed/util/RailSlopeProfile` | The rail slope-fitting rule: a straight rail's drawn end heights fit the rail it connects to (maintainer ruling, 2026-09-28). Pure and server-loadable; a stored seat is read, never written. |
 | `com/slabbed/util/RailVisualSignal` | The cell a lowered rail is drawn in and the redstone arriving at that cell — the read the powered-rail hooks share (maintainer ruling, 2026-09-28). Pure and server-loadable; a stored seat is read, never written. |
+| `com/slabbed/util/WireVisualSignal` | The wire drawn beside a lowered redstone wire — the read the wire evaluator hook shares (maintainer ruling, 2026-09-28). Pure and server-loadable; a stored seat is read, never written. |
 | `com/slabbed/util/SlabEnsembleCoherence` | Combined-slab ensemble coherence law. |
 | `com/slabbed/util/SlabSupport` | Support-surface resolution. |
 | `com/slabbed/util/SlabbedOffsetColliderClip` | Neighbour-aware COLLIDER clip supplement (sight, shelter, projectiles follow the drawn body). |

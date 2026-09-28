@@ -110,7 +110,8 @@
       "com.slabbed.anchor.FrozenFlatAttachmentCapacityTest",
       "com.slabbed.anchor.PlacementDyAttachmentCapacityTest",
       "com.slabbed.test.RailSlopeProfileTest",
-      "com.slabbed.test.RailVisualSignalTest"
+      "com.slabbed.test.RailVisualSignalTest",
+      "com.slabbed.test.RedstoneWireVisualStepTest"
     ],
     "fabric-client-gametest": [
       "com.slabbed.test.PlacementDyPredictionClientGameTest",
