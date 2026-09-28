@@ -138,6 +138,7 @@ sourceSets {
                     "com/slabbed/test/OpenMinus1MeasurementTest.java",
                     "com/slabbed/test/P6InteractionParityTest.java",
                     "com/slabbed/test/P7VisualParityTest.java",
+                    "com/slabbed/test/RailSlopeProfileTest.java",
                     "com/slabbed/test/SlabHeightStepCullTest.java",
                     "com/slabbed/test/SlabPlacementHeightLifecycleTest.java",
                     "com/slabbed/test/SlabPlacementHeightPersistenceSyncTest.java",

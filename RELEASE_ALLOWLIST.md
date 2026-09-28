@@ -71,6 +71,7 @@ com/slabbed/client/model/OffsetBlockStateModel$RenderContextInfo.class
 com/slabbed/client/model/OffsetBlockStateModel$RenderOffsetSample.class
 com/slabbed/client/model/OffsetBlockStateModel$StepCullSample.class
 com/slabbed/client/model/OffsetBlockStateModel.class
+com/slabbed/client/model/RailSlopeGeometry.class
 com/slabbed/command/
 com/slabbed/command/DeepDyCommand$CallerKey.class
 com/slabbed/command/DeepDyCommand$ConfirmationStore.class
@@ -83,6 +84,7 @@ com/slabbed/compat/terrainslabs/TerrainSlabsCompat$1.class
 com/slabbed/compat/terrainslabs/TerrainSlabsCompat.class
 com/slabbed/mixin/
 com/slabbed/mixin/AbstractArrowOffsetClipMixin.class
+com/slabbed/mixin/BaseRailBlockSlopeShapeMixin.class
 com/slabbed/mixin/BlockCollisionsLoweredAboveMixin.class
 com/slabbed/mixin/BlockItemPlacementIntentMixin$1.class
 com/slabbed/mixin/BlockItemPlacementIntentMixin$2.class
@@ -141,6 +143,9 @@ com/slabbed/util/PlacementVerificationVerdict$ComponentStatus.class
 com/slabbed/util/PlacementVerificationVerdict$FinalVerdict.class
 com/slabbed/util/PlacementVerificationVerdict$Result.class
 com/slabbed/util/PlacementVerificationVerdict.class
+com/slabbed/util/RailSlopeProfile$1.class
+com/slabbed/util/RailSlopeProfile$Profile.class
+com/slabbed/util/RailSlopeProfile.class
 com/slabbed/util/RuntimeDiagnostics.class
 com/slabbed/util/SlabEnsembleCoherence$Kind.class
 com/slabbed/util/SlabEnsembleCoherence$Verdict.class
@@ -233,6 +238,7 @@ com/slabbed/client/model/OffsetBlockStateModel$RenderContextInfo.class
 com/slabbed/client/model/OffsetBlockStateModel$RenderOffsetSample.class
 com/slabbed/client/model/OffsetBlockStateModel$StepCullSample.class
 com/slabbed/client/model/OffsetBlockStateModel.class
+com/slabbed/client/model/RailSlopeGeometry.class
 com/slabbed/command/
 com/slabbed/command/DeepDyCommand$CallerKey.class
 com/slabbed/command/DeepDyCommand$ConfirmationStore.class
@@ -245,6 +251,7 @@ com/slabbed/compat/terrainslabs/TerrainSlabsCompat$1.class
 com/slabbed/compat/terrainslabs/TerrainSlabsCompat.class
 com/slabbed/mixin/
 com/slabbed/mixin/AbstractArrowOffsetClipMixin.class
+com/slabbed/mixin/BaseRailBlockSlopeShapeMixin.class
 com/slabbed/mixin/BlockCollisionsLoweredAboveMixin.class
 com/slabbed/mixin/BlockItemPlacementIntentMixin$1.class
 com/slabbed/mixin/BlockItemPlacementIntentMixin$2.class
@@ -303,6 +310,9 @@ com/slabbed/util/PlacementVerificationVerdict$ComponentStatus.class
 com/slabbed/util/PlacementVerificationVerdict$FinalVerdict.class
 com/slabbed/util/PlacementVerificationVerdict$Result.class
 com/slabbed/util/PlacementVerificationVerdict.class
+com/slabbed/util/RailSlopeProfile$1.class
+com/slabbed/util/RailSlopeProfile$Profile.class
+com/slabbed/util/RailSlopeProfile.class
 com/slabbed/util/RuntimeDiagnostics.class
 com/slabbed/util/SlabEnsembleCoherence$Kind.class
 com/slabbed/util/SlabEnsembleCoherence$Verdict.class
@@ -367,6 +377,7 @@ com/slabbed/client/SlabbedModelLoadingPlugin.java
 com/slabbed/client/model/
 com/slabbed/client/model/ChainCeilingGeometry.java
 com/slabbed/client/model/OffsetBlockStateModel.java
+com/slabbed/client/model/RailSlopeGeometry.java
 com/slabbed/client/runtime/
 com/slabbed/command/
 com/slabbed/command/DeepDyCommand.java
@@ -380,6 +391,7 @@ com/slabbed/init/.gitkeep
 com/slabbed/mixin/
 com/slabbed/mixin/.gitkeep
 com/slabbed/mixin/AbstractArrowOffsetClipMixin.java
+com/slabbed/mixin/BaseRailBlockSlopeShapeMixin.java
 com/slabbed/mixin/BlockCollisionsLoweredAboveMixin.java
 com/slabbed/mixin/BlockItemPlacementIntentMixin.java
 com/slabbed/mixin/BlockOnPlacedAnchorMixin.java
@@ -423,6 +435,7 @@ com/slabbed/util/BuildStamp.java
 com/slabbed/util/HangingSeatDyHolder.java
 com/slabbed/util/PlacementDepthPolicy.java
 com/slabbed/util/PlacementVerificationVerdict.java
+com/slabbed/util/RailSlopeProfile.java
 com/slabbed/util/RuntimeDiagnostics.java
 com/slabbed/util/SlabEnsembleCoherence.java
 com/slabbed/util/SlabSupport.java
