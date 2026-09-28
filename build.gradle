@@ -139,6 +139,7 @@ sourceSets {
                     "com/slabbed/test/NeverPopBreadthTest.java",
                     "com/slabbed/test/P6InteractionParityTest.java",
                     "com/slabbed/test/P7VisualParityTest.java",
+                    "com/slabbed/test/RailSlopeProfileTest.java",
                     "com/slabbed/test/SlabPlacementHeightPersistenceSyncTest.java",
                     "com/slabbed/test/SlabPlacementHeightLifecycleTest.java",
                     "com/slabbed/test/SlabPlacementHeightResolverTest.java",

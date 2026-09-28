@@ -3,6 +3,7 @@ import com.slabbed.Slabbed;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.client.ClientDy;
 import com.slabbed.compat.CompatHooks;
+import com.slabbed.util.RailSlopeProfile;
 import com.slabbed.util.RuntimeDiagnostics;
 import com.slabbed.util.SlabbedDiagnosticsBridge;
 import com.slabbed.util.SlabSupport;
@@ -104,6 +105,8 @@ public final class OffsetBlockStateModel extends BakedModelWrapper<BakedModel> {
         private int stepFaceBits;
         private boolean chainAlternateGeometry;
         private boolean modelBakeRecorded;
+        // Null for every block but a straight rail whose fitted profile differs from vanilla's.
+        private RailSlopeProfile.Profile railProfile;
 
         RenderContextInfo(BlockAndTintGetter view, BlockPos pos, BlockState state) {
             this.view = view;
@@ -136,6 +139,7 @@ public final class OffsetBlockStateModel extends BakedModelWrapper<BakedModel> {
                 }
             }
             stepFaceBits = bits;
+            railProfile = RailSlopeGeometry.fittedProfile(view, pos, state);
             resolved = true;
         }
 
@@ -352,7 +356,10 @@ public final class OffsetBlockStateModel extends BakedModelWrapper<BakedModel> {
         // step-face cull relaxation get NO render context — getQuads then passes the base
         // quads through untouched, so ordinary flush terrain pays no per-block derivation,
         // no resolver walk, and no quad work. Armed diagnostics always keep their context.
+        // A rail always keeps its context: a FLUSH ramp climbing onto a lowered rail is drawn on its
+        // fitted profile while its own seat is 0, and this screen only bounds seat and cull work.
         if (!SlabSupport.mayNeedMeshOffsetWork(view, pos, state)
+                && !RailSlopeGeometry.mayFit(state)
                 && !slabbed$diagnosticArmedAt(pos)) {
             return baseData;
         }
@@ -553,6 +560,14 @@ public final class OffsetBlockStateModel extends BakedModelWrapper<BakedModel> {
                     stepCullFacesCleared,
                     clearedFaces.length() == 0 ? "none" : clearedFaces.toString(),
                     reason);
+        }
+        // A straight rail whose connected neighbour sits at another seat is drawn on its fitted
+        // profile so the two drawn rails meet (RailSlopeGeometry): rebuilt copies that already carry
+        // the seat, so they skip the translate below. Null for every other block and for a profile
+        // vanilla already draws, which take the ordinary translate.
+        RailSlopeProfile.Profile railProfile = context.railProfile;
+        if (railProfile != null && !quads.isEmpty()) {
+            return RailSlopeGeometry.fit(quads, railProfile, dy);
         }
         return dy == 0.0f || quads.isEmpty() ? quads : translateQuads(quads, dy);
     }

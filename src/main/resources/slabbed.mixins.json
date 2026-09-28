@@ -15,6 +15,7 @@
     "BlockCollisionsLoweredAboveMixin",
     "SlabSupportBlockMixin",
     "SlabSupportStateMixin",
+    "BaseRailBlockSlopeShapeMixin",
     "TorchParticleAccessor",
     "TorchParticleMixin",
     "RedstoneTorchParticleMixin",

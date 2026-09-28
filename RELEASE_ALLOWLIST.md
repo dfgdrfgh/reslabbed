@@ -52,6 +52,7 @@ com/slabbed/client/model/OffsetBlockStateModel$RenderContextInfo.class
 com/slabbed/client/model/OffsetBlockStateModel$RenderOffsetSample.class
 com/slabbed/client/model/OffsetBlockStateModel$StepCullSample.class
 com/slabbed/client/model/OffsetBlockStateModel.class
+com/slabbed/client/model/RailSlopeGeometry.class
 com/slabbed/compat/
 com/slabbed/compat/CompatSlabSurfaceKind.class
 com/slabbed/compat/CompatHooks.class
@@ -79,6 +80,7 @@ com/slabbed/command/DeepDyCommand$ConfirmationStore.class
 com/slabbed/command/DeepDyCommand.class
 com/slabbed/mixin/
 com/slabbed/mixin/AbstractArrowOffsetClipMixin.class
+com/slabbed/mixin/BaseRailBlockSlopeShapeMixin.class
 com/slabbed/mixin/ExplosionOcclusionOffsetClipMixin.class
 com/slabbed/mixin/LivingEntitySightOffsetClipMixin.class
 com/slabbed/mixin/BlockCollisionsLoweredAboveMixin.class
@@ -144,6 +146,9 @@ com/slabbed/util/SlabbedDiagnosticsBridge.class
 com/slabbed/util/SlabdyRowFormatter.class
 com/slabbed/util/PlacementDepthPolicy$Decision.class
 com/slabbed/util/PlacementDepthPolicy.class
+com/slabbed/util/RailSlopeProfile$1.class
+com/slabbed/util/RailSlopeProfile$Profile.class
+com/slabbed/util/RailSlopeProfile.class
 com/slabbed/util/RuntimeDiagnostics.class
 com/slabbed/util/SlabSupport$1.class
 com/slabbed/util/SlabSupport$AttachmentRole.class
@@ -192,6 +197,7 @@ com/slabbed/client/SlabbedModelLoadingPlugin.java
 com/slabbed/client/model/
 com/slabbed/client/model/ChainCeilingGeometry.java
 com/slabbed/client/model/OffsetBlockStateModel.java
+com/slabbed/client/model/RailSlopeGeometry.java
 com/slabbed/client/runtime/
 com/slabbed/compat/
 com/slabbed/compat/CompatSlabSurfaceKind.java
@@ -217,6 +223,7 @@ com/slabbed/init/.gitkeep
 com/slabbed/mixin/
 com/slabbed/mixin/.gitkeep
 com/slabbed/mixin/AbstractArrowOffsetClipMixin.java
+com/slabbed/mixin/BaseRailBlockSlopeShapeMixin.java
 com/slabbed/mixin/ExplosionOcclusionOffsetClipMixin.java
 com/slabbed/mixin/LivingEntitySightOffsetClipMixin.java
 com/slabbed/mixin/BlockCollisionsLoweredAboveMixin.java
@@ -255,6 +262,7 @@ com/slabbed/mixin/torch/
 com/slabbed/mixin/torch/TorchBlockMixin.java
 com/slabbed/util/
 com/slabbed/util/PlacementDepthPolicy.java
+com/slabbed/util/RailSlopeProfile.java
 com/slabbed/util/RuntimeDiagnostics.java
 com/slabbed/util/BuildStamp.java
 com/slabbed/util/HangingSeatDyHolder.java
