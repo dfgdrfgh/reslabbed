@@ -141,6 +141,7 @@ sourceSets {
                     "com/slabbed/test/P7VisualParityTest.java",
                     "com/slabbed/test/RailSlopeProfileTest.java",
                     "com/slabbed/test/RailVisualSignalTest.java",
+                    "com/slabbed/test/RedstoneWireVisualStepTest.java",
                     "com/slabbed/test/SlabPlacementHeightPersistenceSyncTest.java",
                     "com/slabbed/test/SlabPlacementHeightLifecycleTest.java",
                     "com/slabbed/test/SlabPlacementHeightResolverTest.java",

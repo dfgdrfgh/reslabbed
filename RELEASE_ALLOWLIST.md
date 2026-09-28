@@ -110,6 +110,7 @@ com/slabbed/mixin/LoweredRailSupportNeighborMixin.class
 com/slabbed/mixin/PoweredRailVisualSignalMixin.class
 com/slabbed/mixin/RedstoneTorchParticleMixin.class
 com/slabbed/mixin/RedstoneWireBlockMixin.class
+com/slabbed/mixin/RedstoneWireBlockVisualStepMixin.class
 com/slabbed/mixin/ServerInteractBlockHitToleranceMixin.class
 com/slabbed/mixin/SlabSupportBlockMixin.class
 com/slabbed/mixin/SlabSupportStateMixin.class
@@ -163,6 +164,7 @@ com/slabbed/util/SlabbedOffsetColliderClip.class
 com/slabbed/util/SlabbedOffsetRaycast$NearestCollector.class
 com/slabbed/util/SlabbedOffsetRaycast.class
 com/slabbed/util/SlabbedServerHitValidation.class
+com/slabbed/util/WireVisualSignal.class
 slabbed.mixins.json
 slabbed.sable.mixins.json
 slabbed.client.mixins.json
@@ -247,6 +249,7 @@ com/slabbed/mixin/LoweredRailSupportNeighborMixin.java
 com/slabbed/mixin/PoweredRailVisualSignalMixin.java
 com/slabbed/mixin/RedstoneTorchParticleMixin.java
 com/slabbed/mixin/RedstoneWireBlockMixin.java
+com/slabbed/mixin/RedstoneWireBlockVisualStepMixin.java
 com/slabbed/mixin/ServerInteractBlockHitToleranceMixin.java
 com/slabbed/mixin/SlabSupportBlockMixin.java
 com/slabbed/mixin/SlabSupportStateMixin.java
@@ -280,6 +283,7 @@ com/slabbed/util/SlabSupport.java
 com/slabbed/util/SlabbedOffsetColliderClip.java
 com/slabbed/util/SlabbedOffsetRaycast.java
 com/slabbed/util/SlabbedServerHitValidation.java
+com/slabbed/util/WireVisualSignal.java
 slabbed.client.mixins.json
 slabbed.mixins.json
 slabbed.sable.mixins.json
