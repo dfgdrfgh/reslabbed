@@ -23,6 +23,7 @@
     {"path": "com/slabbed/test/P7VisualParityTest.java", "classification": "registered_server"},
     {"path": "com/slabbed/test/RailSlopeProfileTest.java", "classification": "registered_server"},
     {"path": "com/slabbed/test/RailVisualSignalTest.java", "classification": "registered_server"},
+    {"path": "com/slabbed/test/RedstoneWireVisualStepTest.java", "classification": "registered_server"},
     {"path": "com/slabbed/test/SlabHeightStepCullTest.java", "classification": "registered_server"},
     {"path": "com/slabbed/test/SlabPlacementHeightLifecycleTest.java", "classification": "registered_server"},
     {"path": "com/slabbed/test/SlabPlacementHeightPersistenceSyncTest.java", "classification": "registered_server"},

@@ -28,6 +28,7 @@
     "WallTorchParticleMixin",
     "LivingEntityLoweredScaffoldingMixin",
     "RedstoneWireBlockMixin",
+    "RedstoneWireVisualStepMixin",
     "BlockItemPlacementIntentMixin",
     "ServerInteractBlockHitToleranceMixin",
     "BlockOnPlacedAnchorMixin",
