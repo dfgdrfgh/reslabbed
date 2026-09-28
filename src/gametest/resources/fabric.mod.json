@@ -109,7 +109,8 @@
       "com.slabbed.test.SlabTestKitCommandsTest",
       "com.slabbed.anchor.FrozenFlatAttachmentCapacityTest",
       "com.slabbed.anchor.PlacementDyAttachmentCapacityTest",
-      "com.slabbed.test.RailSlopeProfileTest"
+      "com.slabbed.test.RailSlopeProfileTest",
+      "com.slabbed.test.RailVisualSignalTest"
     ],
     "fabric-client-gametest": [
       "com.slabbed.test.PlacementDyPredictionClientGameTest",
