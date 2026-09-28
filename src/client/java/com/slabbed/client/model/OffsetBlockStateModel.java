@@ -98,6 +98,13 @@ public final class OffsetBlockStateModel implements BlockStateModel {
         // per-quad one re-resolving it for every emitted quad). Lazy, so the early-exit behaviour of
         // the step-seam probe and the "dy != 0 short-circuits it entirely" ordering are unchanged.
         SeamState seam = new SeamState(view, pos, state, dy, cullTest);
+        // A straight rail whose connected neighbour sits at another seat is drawn on its fitted
+        // profile so the two drawn rails meet (RailSlopeGeometry). It takes the section's own emitter
+        // and applies the seat itself; false for every other block and for a profile vanilla already
+        // draws, which then take the ordinary path below.
+        if (RailSlopeGeometry.emitIfFitted(fabricWrapped, emitter, view, pos, state, dy, random, seam)) {
+            return;
+        }
         boolean stepSeam = dy != 0.0f || seam.anyMismatchedNeighborDy();
         QuadEmitter out = stepSeam ? YOffsetEmitter.wrapWithTransform(emitter, dy, seam) : emitter;
         fabricWrapped.emitQuads(out, view, pos, state, random, seam);

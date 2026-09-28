@@ -93,6 +93,7 @@ anything. The split above puts the fine granularity only where a leak has actual
 
 | Entry | Reason |
 | --- | --- |
+| `com/slabbed/mixin/BaseRailBlockSlopeShapeMixin` | A rail's outline/raycast box follows the fitted slope profile it is drawn with (maintainer ruling, 2026-09-28). |
 | `com/slabbed/mixin/BlockCollisionsLoweredAboveMixin` | Collision against a lowered slab above. |
 | `com/slabbed/mixin/BlockItemPlacementIntentMixin` | Captures placement intent for the WYSIWYG placement law. |
 | `com/slabbed/mixin/BlockOnPlacedAnchorMixin` | Writes the anchor on placement. |
@@ -165,6 +166,7 @@ anything. The split above puts the fine granularity only where a leak has actual
 | `com/slabbed/util/HangingSeatDyHolder` | Duck interface exposing a hung decoration's remembered seat. |
 | `com/slabbed/util/PlacementIntentState` | Placement intent carried across the use-on path. |
 | `com/slabbed/util/PlacementVerificationVerdict` | Placement verification result type. |
+| `com/slabbed/util/RailSlopeProfile` | The rail slope-fitting rule: a straight rail's drawn end heights fit the rail it connects to (maintainer ruling, 2026-09-28). Pure and server-loadable; a stored seat is read, never written. |
 | `com/slabbed/util/SlabEnsembleCoherence` | Combined-slab ensemble coherence law. |
 | `com/slabbed/util/SlabSupport` | Support-surface resolution. |
 | `com/slabbed/util/SlabbedOffsetColliderClip` | Neighbour-aware COLLIDER clip supplement (sight, shelter, projectiles follow the drawn body). |

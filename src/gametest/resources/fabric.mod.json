@@ -108,7 +108,8 @@
       "com.slabbed.test.SlabTestKitPaletteTest",
       "com.slabbed.test.SlabTestKitCommandsTest",
       "com.slabbed.anchor.FrozenFlatAttachmentCapacityTest",
-      "com.slabbed.anchor.PlacementDyAttachmentCapacityTest"
+      "com.slabbed.anchor.PlacementDyAttachmentCapacityTest",
+      "com.slabbed.test.RailSlopeProfileTest"
     ],
     "fabric-client-gametest": [
       "com.slabbed.test.PlacementDyPredictionClientGameTest",
@@ -116,7 +117,8 @@
       "com.slabbed.test.ModelStaleSentinelSelfCheckClientGameTest",
       "com.slabbed.client.SlabModelStaleSentinelClientThrottleClientGameTest",
       "com.slabbed.test.LeverParticleFrozenAnchorClientGameTest",
-      "com.slabbed.test.DevDiagnosticsCompanionLoadsClientGameTest"
+      "com.slabbed.test.DevDiagnosticsCompanionLoadsClientGameTest",
+      "com.slabbed.test.RailSlopeRenderClientGameTest"
     ]
   },
   "mixins": [

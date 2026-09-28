@@ -5,6 +5,7 @@
   "plugin": "com.slabbed.mixin.SlabbedMixinConfigPlugin",
   "mixins": [
     "AbstractArrowOffsetClipMixin",
+    "BaseRailBlockSlopeShapeMixin",
     "BlockCollisionsLoweredAboveMixin",
     "BlockItemPlacementIntentMixin",
     "BlockOnPlacedAnchorMixin",
