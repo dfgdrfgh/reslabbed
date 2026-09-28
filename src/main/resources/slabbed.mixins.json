@@ -35,7 +35,8 @@
     "WallSlabConnectionMixin",
     "BaseRailBlockSlopeShapeMixin",
     "PoweredRailVisualSignalMixin",
-    "LoweredRailSupportNeighborMixin"
+    "LoweredRailSupportNeighborMixin",
+    "RedstoneWireEvaluatorVisualStepMixin"
   ],
   "client": [],
   "injectors": { "defaultRequire": 1 }

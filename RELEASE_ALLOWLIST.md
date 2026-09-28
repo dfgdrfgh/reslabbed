@@ -129,7 +129,7 @@ jar that lies about its own contents is a release defect even when every entry i
 ### Main mixins (class-level; `com/slabbed/mixin/` is a mixed package)
 
 Every row below is declared in `slabbed.mixins.json`. The config and the archive agree exactly:
-26 direct members here plus `torch/TorchBlockMixin`, and the config lists exactly those 27. There is
+27 direct members here plus `torch/TorchBlockMixin`, and the config lists exactly those 28. There is
 no inert, undeclared mixin shipping on this line.
 
 | Entry | Reason |
@@ -152,6 +152,7 @@ no inert, undeclared mixin shipping on this line.
 | `com/slabbed/mixin/PoweredRailVisualSignalMixin` | A powered rail seated on a lowered block is also powered by what touches the row it is drawn in, in its own update and in the rail-to-rail chain check (maintainer ruling, 2026-09-28). |
 | `com/slabbed/mixin/RedstoneTorchParticleMixin` | Particle origin tracks the lowered block. |
 | `com/slabbed/mixin/RedstoneWireBlockMixin` | Redstone wire connection and support over lowered slabs. |
+| `com/slabbed/mixin/RedstoneWireEvaluatorVisualStepMixin` | A wire beside a lowered half-step also reads the wire drawn on the slab next to it, in both wire evaluators' shared incoming-signal read (maintainer ruling, 2026-09-28). |
 | `com/slabbed/mixin/ServerInteractBlockHitToleranceMixin` | Server-side hit tolerance for offset targeting. |
 | `com/slabbed/mixin/SlabSupportBlockMixin` | Slab support surface. |
 | `com/slabbed/mixin/SlabSupportStateMixin` | Slab support state. |
@@ -206,6 +207,7 @@ None of these four does file I/O, and none allocates per block or per frame.
 | `com/slabbed/util/SlabbedAuditBridge` | The deliberate release-safe boundary, and the reason the excluded harnesses can stay excluded: shipped code (`Slabbed`, `SlabAnchorAttachment`, `BlockItemPlacementIntentMixin`, `SlabdyClientCommands`) calls THIS, never `com.slabbed.dev.audit.**` or `com.slabbed.debug.**` directly, so those packages leave the jar without a single hard link breaking. In a release build `RECORDER_CLASS` resolves to null once at clinit and every method is a null-check return. That single cached resolve — rather than a `Class.forName` per call — is deliberate: `isRecorderEnabled()` is polled every client tick, and per-tick reflection by string name is the exact shape of the lag that has shipped twice on this project. This is architecture keeping diagnostics OUT of the jar, not diagnostics leaking in. |
 | `com/slabbed/util/RailSlopeProfile` | The drawn profile of a straight rail — each end fitted to the seat of the rail it connects to; the one rule the client geometry and the outline box are both computed from. |
 | `com/slabbed/util/RailVisualSignal` | The cell a lowered rail is drawn in and the redstone arriving at that row — the read the powered-rail hooks share. |
+| `com/slabbed/util/WireVisualSignal` | The wire drawn inside a neighbouring cell and the one-block reach of a wire's read — the read the wire evaluator hook uses. |
 
 ## How exclusion and approval interact
 
