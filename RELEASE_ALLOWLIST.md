@@ -108,6 +108,8 @@ com/slabbed/mixin/HangingSignAttachedMixin.class
 com/slabbed/mixin/LeverParticleMixin.class
 com/slabbed/mixin/LivingEntityLoweredScaffoldingMixin.class
 com/slabbed/mixin/LivingEntitySightOffsetClipMixin.class
+com/slabbed/mixin/LoweredRailSupportNeighborMixin.class
+com/slabbed/mixin/PoweredRailVisualSignalMixin.class
 com/slabbed/mixin/RedstoneTorchParticleMixin.class
 com/slabbed/mixin/RedstoneWireBlockMixin.class
 com/slabbed/mixin/ServerInteractBlockHitToleranceMixin.class
@@ -146,6 +148,7 @@ com/slabbed/util/PlacementVerificationVerdict.class
 com/slabbed/util/RailSlopeProfile$1.class
 com/slabbed/util/RailSlopeProfile$Profile.class
 com/slabbed/util/RailSlopeProfile.class
+com/slabbed/util/RailVisualSignal.class
 com/slabbed/util/RuntimeDiagnostics.class
 com/slabbed/util/SlabEnsembleCoherence$Kind.class
 com/slabbed/util/SlabEnsembleCoherence$Verdict.class
@@ -275,6 +278,8 @@ com/slabbed/mixin/HangingSignAttachedMixin.class
 com/slabbed/mixin/LeverParticleMixin.class
 com/slabbed/mixin/LivingEntityLoweredScaffoldingMixin.class
 com/slabbed/mixin/LivingEntitySightOffsetClipMixin.class
+com/slabbed/mixin/LoweredRailSupportNeighborMixin.class
+com/slabbed/mixin/PoweredRailVisualSignalMixin.class
 com/slabbed/mixin/RedstoneTorchParticleMixin.class
 com/slabbed/mixin/RedstoneWireBlockMixin.class
 com/slabbed/mixin/ServerInteractBlockHitToleranceMixin.class
@@ -313,6 +318,7 @@ com/slabbed/util/PlacementVerificationVerdict.class
 com/slabbed/util/RailSlopeProfile$1.class
 com/slabbed/util/RailSlopeProfile$Profile.class
 com/slabbed/util/RailSlopeProfile.class
+com/slabbed/util/RailVisualSignal.class
 com/slabbed/util/RuntimeDiagnostics.class
 com/slabbed/util/SlabEnsembleCoherence$Kind.class
 com/slabbed/util/SlabEnsembleCoherence$Verdict.class
@@ -406,6 +412,8 @@ com/slabbed/mixin/HangingSignAttachedMixin.java
 com/slabbed/mixin/LeverParticleMixin.java
 com/slabbed/mixin/LivingEntityLoweredScaffoldingMixin.java
 com/slabbed/mixin/LivingEntitySightOffsetClipMixin.java
+com/slabbed/mixin/LoweredRailSupportNeighborMixin.java
+com/slabbed/mixin/PoweredRailVisualSignalMixin.java
 com/slabbed/mixin/RedstoneTorchParticleMixin.java
 com/slabbed/mixin/RedstoneWireBlockMixin.java
 com/slabbed/mixin/ServerInteractBlockHitToleranceMixin.java
@@ -436,6 +444,7 @@ com/slabbed/util/HangingSeatDyHolder.java
 com/slabbed/util/PlacementDepthPolicy.java
 com/slabbed/util/PlacementVerificationVerdict.java
 com/slabbed/util/RailSlopeProfile.java
+com/slabbed/util/RailVisualSignal.java
 com/slabbed/util/RuntimeDiagnostics.java
 com/slabbed/util/SlabEnsembleCoherence.java
 com/slabbed/util/SlabSupport.java
