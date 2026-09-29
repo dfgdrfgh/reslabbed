@@ -7,6 +7,7 @@
     "HangingEntityRememberedSeatMixin",
     "ItemFrameWysiwygMixin",
     "PaintingRememberedSeatMixin",
+    "SynchedEntityDataBuilderHangSeatMixin",
     "CandleParticleMixin",
     "LeverParticleMixin",
     "CarpetBlockMixin",

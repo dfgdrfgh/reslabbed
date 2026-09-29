@@ -104,6 +104,7 @@ com/slabbed/mixin/HangingSignAttachedMixin.class
 com/slabbed/mixin/HangingEntityRememberedSeatMixin.class
 com/slabbed/mixin/ItemFrameWysiwygMixin.class
 com/slabbed/mixin/PaintingRememberedSeatMixin.class
+com/slabbed/mixin/SynchedEntityDataBuilderHangSeatMixin.class
 com/slabbed/mixin/LivingEntityLoweredScaffoldingMixin.class
 com/slabbed/mixin/LeverParticleMixin.class
 com/slabbed/mixin/LoweredRailSupportNeighborMixin.class
@@ -243,6 +244,7 @@ com/slabbed/mixin/HangingSignAttachedMixin.java
 com/slabbed/mixin/HangingEntityRememberedSeatMixin.java
 com/slabbed/mixin/ItemFrameWysiwygMixin.java
 com/slabbed/mixin/PaintingRememberedSeatMixin.java
+com/slabbed/mixin/SynchedEntityDataBuilderHangSeatMixin.java
 com/slabbed/mixin/LivingEntityLoweredScaffoldingMixin.java
 com/slabbed/mixin/LeverParticleMixin.java
 com/slabbed/mixin/LoweredRailSupportNeighborMixin.java

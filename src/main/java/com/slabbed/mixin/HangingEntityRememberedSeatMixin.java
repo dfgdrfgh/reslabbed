@@ -127,6 +127,14 @@ public abstract class HangingEntityRememberedSeatMixin extends BlockAttachedEnti
         this.slabbed$hangSeatDeclared = true;
     }
 
+    @Override
+    public void slabbed$reserveUndeclaredHangSeatSlot(SynchedEntityData.Builder builder, SynchedEntityData.DataItem<?>[] itemsById) {
+        int id = SLABBED$HANG_DY.id();
+        if (id < itemsById.length && itemsById[id] == null) {
+            builder.define(SLABBED$HANG_DY, SLABBED$UNSET);
+        }
+    }
+
     /**
      * The ONE derivation, at the moment the decoration learns which way it faces: both the item's
      * hang path and the load path set the facing with the position already known. The load path

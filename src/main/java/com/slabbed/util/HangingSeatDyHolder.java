@@ -35,6 +35,14 @@ public interface HangingSeatDyHolder {
     void slabbed$defineHangSeat(SynchedEntityData.Builder builder);
 
     /**
+     * Fills the seat's synced slot with the unset value when no hook declared it. The slot is
+     * allocated on {@code HangingEntity} itself, so every subclass's synched data must hold it or
+     * the entity cannot be built. The fill does NOT declare the seat: a hung class that never
+     * forwards the declaration keeps vanilla behaviour.
+     */
+    void slabbed$reserveUndeclaredHangSeatSlot(SynchedEntityData.Builder builder, SynchedEntityData.DataItem<?>[] itemsById);
+
+    /**
      * Bridge: the ONE derivation, called from each hung class's facing setter once the position
      * and the facing are both known. Does nothing when a seat already exists, while save data is
      * being read, or while the decoration's or its support's chunk is not loaded yet (a later

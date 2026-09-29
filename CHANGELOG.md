@@ -1,3 +1,17 @@
+## [Unreleased] - Minecraft 1.21.1 (NeoForge)
+
+See LAW.md — this changelog does not redefine the law.
+
+### Fixes
+
+- **Wall-hung things from other mods can be placed again.** Slabbed remembers the height a painting
+  or item frame was hung at by adding one synced value to every wall-hung entity. Only vanilla
+  paintings and item frames filled that value in, so a hung entity from another mod (Create:
+  Simulated's Contraption Diagram, for example) was left with a gap in its synced data, and the game
+  refused to create it at all. The gap is now filled with an empty value when nothing else claims
+  it. Other mods' hung entities keep their own vanilla behaviour; paintings and item frames are
+  unchanged.
+
 ## [0.5.2-alpha.24] - Minecraft 1.21.1 (NeoForge)
 
 See LAW.md — this changelog does not redefine the law.
