@@ -2,6 +2,7 @@ package com.slabbed.mixin;
 
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.compat.CompatHooks;
+import com.slabbed.compat.relativeblocks.RelativeBlocksCompat;
 import com.slabbed.compat.CompatSlabSurfaceKind;
 import com.slabbed.util.SlabSupport;
 import net.minecraft.core.BlockPos;
@@ -352,6 +353,10 @@ public abstract class SlabSupportStateMixin {
         if (slabbed$isRenderZeroedConnectionBlock(self)) {
             return;
         }
+        // Mirrors the outline: a cluster's shape already carries its members' dy.
+        if (RelativeBlocksCompat.isCluster(self)) {
+            return;
+        }
 
         double yOff = SlabSupport.getYOffset(world, pos, self);
         if (yOff != 0.0) {
@@ -505,6 +510,13 @@ public abstract class SlabSupportStateMixin {
         // Fence/wall/pane render un-lowered; keep their outline un-offset to match
         // (else the authoritative nearest-hit raycast targets a phantom shape below).
         if (slabbed$isRenderZeroedConnectionBlock(self)) {
+            return;
+        }
+
+        // A Relatively Placed Blocks cluster builds its outline from its members' own shapes at this
+        // same cell, and each member shape is already lowered here. Moving the union again would
+        // put the outline a second dy below the drawing.
+        if (RelativeBlocksCompat.isCluster(self)) {
             return;
         }
 

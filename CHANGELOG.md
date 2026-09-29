@@ -12,6 +12,13 @@ See LAW.md — this changelog does not redefine the law.
   it. Other mods' hung entities keep their own vanilla behaviour; paintings and item frames are
   unchanged.
 
+- **Relatively Placed Blocks clusters sit on lowered blocks.** With Relatively Placed Blocks, putting
+  a second small block into a space swaps the first one for a combined block that holds both. On a
+  lowered block that combined block was drawn at normal grid height, floating half a block above the
+  slab under it. The space now keeps the height the first block was placed at, the combined block
+  is drawn and outlined at that height (including with Sodium), and taking blocks back out keeps it
+  too. Without that mod nothing changes.
+
 ## [0.5.2-alpha.24] - Minecraft 1.21.1 (NeoForge)
 
 See LAW.md — this changelog does not redefine the law.

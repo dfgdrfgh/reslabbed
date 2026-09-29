@@ -1,5 +1,6 @@
 package com.slabbed.client;
 
+import com.slabbed.compat.relativeblocks.RelativeBlocksCompat;
 import com.slabbed.Slabbed;
 import com.slabbed.client.model.ChainCeilingGeometry;
 import com.slabbed.client.model.OffsetBlockStateModel;
@@ -80,6 +81,9 @@ public final class SlabbedModelLoadingPlugin {
     }
 
     static BakedModel wrapModel(ModelResourceLocation id, BakedModel model) {
+        if (isNamedClusterAdapter(model)) {
+            return new OffsetBlockStateModel(model);
+        }
         if (model == null
                 || ChainCeilingGeometry.isModelLocation(id)
                 || ModelResourceLocation.INVENTORY_VARIANT.equals(id.getVariant())
@@ -104,6 +108,17 @@ public final class SlabbedModelLoadingPlugin {
     private static boolean isNamedVanillaComposite(BakedModel model) {
         return model.getClass() == WeightedBakedModel.class
                 || model.getClass() == MultiPartBakedModel.class;
+    }
+
+    /**
+     * Relatively Placed Blocks' cluster model is a dynamic wrapper, so the policy above would skip
+     * it, and it draws its members from their own models with EMPTY model data: nothing else
+     * carries the cell's dy onto its quads, and a cluster standing on a lowered cell would draw at
+     * grid height while its outline lowers. It is adopted by exact class name only; the nested-
+     * wrapper rule in {@link OffsetBlockStateModel} keeps its wrapped members from shifting twice.
+     */
+    private static boolean isNamedClusterAdapter(BakedModel model) {
+        return model != null && RelativeBlocksCompat.CLUSTER_MODEL_CLASS.equals(model.getClass().getName());
     }
 
     private static boolean usesExternalQuadEmitter(BakedModel model) {

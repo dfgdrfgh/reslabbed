@@ -32,3 +32,12 @@ type="required"
 versionRange="${minecraft_version_range}"
 ordering="NONE"
 side="BOTH"
+
+# Optional. Slabbed must bake after Relatively Placed Blocks so its model pass sees (and wraps) the
+# cluster model that mod installs; without the mod this entry does nothing.
+[[dependencies.${mod_id}]]
+modId="relativeblocks"
+type="optional"
+versionRange="*"
+ordering="AFTER"
+side="BOTH"

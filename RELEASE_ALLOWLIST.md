@@ -57,6 +57,8 @@ com/slabbed/compat/
 com/slabbed/compat/CompatSlabSurfaceKind.class
 com/slabbed/compat/CompatHooks.class
 com/slabbed/compat/CompatHooks$1.class
+com/slabbed/compat/relativeblocks/
+com/slabbed/compat/relativeblocks/RelativeBlocksCompat.class
 com/slabbed/compat/terrainslabs/
 com/slabbed/compat/terrainslabs/TerrainSlabsCompat$1.class
 com/slabbed/compat/terrainslabs/TerrainSlabsCompat.class
@@ -208,6 +210,8 @@ com/slabbed/client/runtime/
 com/slabbed/compat/
 com/slabbed/compat/CompatSlabSurfaceKind.java
 com/slabbed/compat/CompatHooks.java
+com/slabbed/compat/relativeblocks/
+com/slabbed/compat/relativeblocks/RelativeBlocksCompat.java
 com/slabbed/compat/terrainslabs/
 com/slabbed/compat/terrainslabs/TerrainSlabsCompat.java
 com/slabbed/compat/sable/
