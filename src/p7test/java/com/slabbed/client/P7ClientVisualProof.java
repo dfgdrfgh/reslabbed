@@ -410,6 +410,7 @@ public final class P7ClientVisualProof {
         boolean singleOwner = near(fallbackShift, EXPECTED_DY);
         BoundedResult bounded = boundedViewCheck(loweredState, current.lowered());
         AllocationResult allocation = allocationCheck(loweredState, current.lowered());
+        markerPollAllocationCheck(minecraft,current.lowered());
         String reason = firstFailure(numeric, model, singleOwner, cullGreen, bounded.green(), allocation.green());
         return new Result(
                 numeric,
@@ -475,6 +476,39 @@ public final class P7ClientVisualProof {
                 ? "geometric_numeric"
                 : (!model ? "geometric_model_or_mesh" : (!screen ? "mesh_screen" : "green"));
         return new GeometricResult(numeric, model, screen, factAbsent, clientDy, outlineMinY, rayHit, reason);
+    }
+
+    /** Unchanged marker data must not be copied each poll; changed in-place data must still refresh. */
+    private static void markerPollAllocationCheck(Minecraft minecraft,BlockPos pos) {
+        var chunk=minecraft.level.getChunkAt(pos);
+        var type=com.slabbed.anchor.SlabAnchorAttachment.ANCHOR_TYPE;
+        var original=chunk.getExistingDataOrNull(type.get());
+        var markers=new it.unimi.dsi.fastutil.longs.LongOpenHashSet();
+        int x=chunk.getPos().getMinBlockX(),z=chunk.getPos().getMinBlockZ();
+        for (int i=0;i<1000;i++) markers.add(new BlockPos(x+i%16,64+i/256,z+(i/16)%16).asLong());
+        try {
+            var poll=SlabAnchorClientSync.class.getDeclaredMethod("pollAttachmentChange",Minecraft.class,
+                    net.minecraft.world.level.chunk.LevelChunk.class,java.util.function.Supplier.class);
+            poll.setAccessible(true);chunk.setData(type.get(),markers);
+            poll.invoke(null,minecraft,chunk,type);
+            for (int i=0;i<256;i++) poll.invoke(null,minecraft,chunk,type);
+            var bean=(com.sun.management.ThreadMXBean)ManagementFactory.getThreadMXBean();
+            if (!bean.isThreadAllocatedMemoryEnabled()) bean.setThreadAllocatedMemoryEnabled(true);
+            long thread=Thread.currentThread().threadId(),before=bean.getThreadAllocatedBytes(thread);
+            for (int i=0;i<1000;i++) poll.invoke(null,minecraft,chunk,type);
+            long bytes=(bean.getThreadAllocatedBytes(thread)-before)/1000;
+            Slabbed.LOGGER.info("[MARKER_POLL_PROOF] bytes_per_call={} markers=1000",bytes);
+            if (bytes>512) throw new IllegalStateException("unchanged_marker_copy_allocation_"+bytes);
+            long changed=new BlockPos(x+1,70,z+1).asLong();markers.add(changed);
+            poll.invoke(null,minecraft,chunk,type);
+            var field=SlabAnchorClientSync.class.getDeclaredField("ATTACHMENT_SNAPSHOTS");field.setAccessible(true);
+            var snapshots=(java.util.Map<?,?>)field.get(null);
+            boolean refreshed=snapshots.values().stream().anyMatch(value ->
+                    value instanceof it.unimi.dsi.fastutil.longs.LongOpenHashSet set && set.contains(changed));
+            if (!refreshed) throw new IllegalStateException("in_place_marker_change_not_refreshed");
+            Slabbed.LOGGER.info("[MARKER_POLL_PROOF] GREEN unchanged_allocation=true changed_data=true");
+        } catch (ReflectiveOperationException e) { throw new IllegalStateException("marker_poll_proof",e); }
+        finally { if (original==null) chunk.removeData(type.get());else chunk.setData(type.get(),original); }
     }
 
     private static double fallbackRenderShift(
