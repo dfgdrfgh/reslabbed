@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 BUILD_FILE = ROOT / "build.gradle"
 SOURCE_ROOT = ROOT / "src" / "gametest" / "java"
 INVENTORY_FILE = ROOT / "tools" / "gametest-inventory.json"
-EXPECTED_EXECUTABLE_COUNT = 320
+EXPECTED_EXECUTABLE_COUNT = 322
 REQUIRED_LAW_TEST_PATH = "com/slabbed/test/NeighborUpdateInvarianceTest.java"
 EXPECTED_REGISTERED_SERVER_PATHS = frozenset(
     {
@@ -37,6 +37,7 @@ EXPECTED_REGISTERED_SERVER_PATHS = frozenset(
         "com/slabbed/test/P7VisualParityTest.java",
         "com/slabbed/test/SlabPlacementHeightPersistenceSyncTest.java",
         "com/slabbed/test/SlabPlacementHeightLifecycleTest.java",
+        "com/slabbed/test/StateChangeAnchorTest.java",
         "com/slabbed/test/SlabPlacementHeightResolverTest.java",
         "com/slabbed/test/SlabPlacementHeightSchemaTest.java",
         "com/slabbed/test/SlabbedHotPathAllocationRegressionTest.java",

@@ -1,5 +1,11 @@
 package com.slabbed.anchor;
 
+import net.minecraft.world.phys.shapes.Shapes;
+
+import net.minecraft.world.phys.shapes.BooleanOp;
+
+import net.minecraft.world.level.EmptyBlockGetter;
+
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import com.mojang.serialization.Codec;
@@ -651,7 +657,31 @@ public final class SlabAnchorAttachment {
         if (consumeMatchingToolTransition(world, pos, oldState, newState)) {
             return true;
         }
-        return isExplicitInPlacePlacementTruthTransition(oldState, newState);
+        return isExplicitInPlacePlacementTruthTransition(oldState, newState)
+                || isSameShapeTransform(oldState,newState);
+    }
+
+    /** A kind-only transform retains the authored occupant's shape and height (LAW.md). */
+    public static boolean isSameShapeTransform(BlockState oldState, BlockState newState) {
+        if (oldState == null || newState == null
+                || !oldState.hasProperty(BlockStateProperties.SLAB_TYPE)
+                || !newState.hasProperty(BlockStateProperties.SLAB_TYPE)) {
+            return false;
+        }
+        if (oldState == null || newState == null || oldState.isAir() || newState.isAir()
+                || !newState.getFluidState().isEmpty() || oldState.is(newState.getBlock())) {
+            return false;
+        }
+        VoxelShape before = oldState.getCollisionShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO);
+        VoxelShape after = newState.getCollisionShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO);
+        if (before.isEmpty() || after.isEmpty()) {
+            before = oldState.getShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO);
+            after = newState.getShape(EmptyBlockGetter.INSTANCE, BlockPos.ZERO);
+            if (before.isEmpty() || after.isEmpty()) {
+                return false;
+            }
+        }
+        return !Shapes.joinIsNotEmpty(before, after, BooleanOp.NOT_SAME);
     }
 
     private static boolean isExplicitInPlacePlacementTruthTransition(

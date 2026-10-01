@@ -200,6 +200,10 @@
     {
       "path": "com/slabbed/test/ThirdPartyHungEntitySyncedDataTest.java",
       "classification": "registered_server"
+    },
+    {
+      "path": "com/slabbed/test/StateChangeAnchorTest.java",
+      "classification": "registered_server"
     }
   ]
 }
