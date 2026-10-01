@@ -1,3 +1,13 @@
+## [0.6.1-alpha+1.21.11]
+
+See LAW.md — this changelog does not redefine the law.
+
+- Fence posts now meet a nearby slab ceiling across a half-block gap. The post keeps its placed height, and its visible connection can be targeted correctly.
+- Placing a fitting post beneath a lowered slab now uses the available space correctly.
+- Direct block replacements clear the departed block's height, so a later placement cannot inherit it.
+
+Release labels now use major.minor.patch plus a maturity label, without numbered alpha or beta counters.
+
 # Changelog
 
 All notable, player-facing changes are listed here. Slabbed ships a separate file per
