@@ -223,11 +223,16 @@ public final class P7ClientVisualProof {
                 return;
             }
             BlockPos fence=current.fence();
+            Vec3 fenceStart=new Vec3(fence.getX()-1.0d,fence.getY()+1.25d,fence.getZ()+0.5d);
+            BlockHitResult fenceHit=SlabbedOffsetRaycast.raycast(minecraft.level,fenceStart,
+                    fenceStart.add(2.0d,0.0d,0.0d),CollisionContext.empty());
+            boolean targetsFence=fenceHit.getType()==net.minecraft.world.phys.HitResult.Type.BLOCK
+                    && fenceHit.getBlockPos().equals(fence);
             if (fenceProofPhase==0) {
                 if (!minecraft.level.getBlockState(fence.above()).is(Blocks.OAK_SLAB)) return;
                 Bounds post=renderBounds(minecraft,minecraft.getBlockRenderer().getBlockModel(
                         minecraft.level.getBlockState(fence)),minecraft.level.getBlockState(fence),fence);
-                if (!near(post.minY(),0.0d) || !near(post.maxY(),1.5d)) {
+                if (!near(post.minY(),0.0d) || !near(post.maxY(),1.5d) || !targetsFence) {
                     fail(minecraft,"fence_connection_vertices");
                     return;
                 }
@@ -241,12 +246,12 @@ public final class P7ClientVisualProof {
             if (!minecraft.level.getBlockState(fence.above()).isAir()) return;
             Bounds post=renderBounds(minecraft,minecraft.getBlockRenderer().getBlockModel(
                     minecraft.level.getBlockState(fence)),minecraft.level.getBlockState(fence),fence);
-            if (!near(post.minY(),0.0d) || !near(post.maxY(),1.0d)
+            if (!near(post.minY(),0.0d) || !near(post.maxY(),1.0d) || targetsFence
                     || !near(SlabPlacementHeightAttachment.storedOffset(minecraft.level,fence),0.0d)) {
                 fail(minecraft,"fence_connection_removal");
                 return;
             }
-            Slabbed.LOGGER.info("[FENCE_CLIENT_GEOMETRY_PROOF] connected=true removal=true stored_seat=true");
+            Slabbed.LOGGER.info("[FENCE_CLIENT_GEOMETRY_PROOF] connected=true removal=true targeting=true stored_seat=true");
             write("p7-client.ok",
                     "numeric=true model=true single_owner=true cull=true bounded=true allocation=true geometric=true\n");
             terminal = true;

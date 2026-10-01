@@ -63,7 +63,9 @@ public final class FenceCeilingConnectionTest {
             throw new GameTestAssertException("the existing post must meet the top-slab underside");
         }
         Vec3 start=new Vec3(post.getX()-1.0d,post.getY()+1.25d,post.getZ()+0.5d);
-        if (shape.clip(start,start.add(2.0d,0.0d,0.0d),post)==null) {
+        var hit=com.slabbed.util.SlabbedOffsetRaycast.raycast(w,start,start.add(2.0d,0.0d,0.0d),
+                net.minecraft.world.phys.shapes.CollisionContext.empty());
+        if (hit.getType()!=net.minecraft.world.phys.HitResult.Type.BLOCK || !hit.getBlockPos().equals(post)) {
             throw new GameTestAssertException("the extended post must be targetable");
         }
         w.setBlock(owner,Blocks.AIR.defaultBlockState(),2);
