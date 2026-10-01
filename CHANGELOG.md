@@ -11,6 +11,9 @@ See LAW.md — this changelog does not redefine the law.
 - Refresh the first rendered frame immediately after a predicted placement.
 - Reduce repeated client work by avoiding copies of unchanged height-marker data.
 
+- Correct Sable single-block object lighting above lowered solid surfaces.
+- Grass flicker at chunk boundaries remains under investigation; [#87](https://github.com/peetsamods/slabbed/issues/87) remains open.
+
 Release labels now use major.minor.patch plus a maturity label, without numbered alpha or beta counters.
 
 ## [0.5.2-alpha.2] - Minecraft 1.21.1 (NeoForge)
