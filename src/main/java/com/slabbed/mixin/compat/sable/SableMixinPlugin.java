@@ -58,9 +58,14 @@ public final class SableMixinPlugin implements IMixinConfigPlugin {
     public static final String BLOCK_CHANGE_METHOD = BLOCK_CHANGE + BLOCK_CHANGE_DESC;
 
     private boolean supported;
+    private boolean singleBlockLightSupported;
 
     @Override
     public void onLoad(String mixinPackage) {
+        String lightView = "dev/ryanhcode/sable/sublevel/render/vanilla/SingleBlockSubLevelWrapper";
+        singleBlockLightSupported = hasField(lightView, "globalPos", "Lnet/minecraft/core/BlockPos$MutableBlockPos;")
+                && hasMethod(lightView, "setup", "(Lnet/minecraft/client/multiplayer/ClientLevel;DDD"
+                        + "Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/level/block/state/BlockState;)V");
         boolean present = resourceExists(PIPELINE);
         this.supported = present
                 && methodCalls(PIPELINE, SECTION_ADDITION, SECTION_ADDITION_DESC)
@@ -99,6 +104,9 @@ public final class SableMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
+        if (mixinClassName.endsWith(".SableSingleBlockLightMixin")) {
+            return singleBlockLightSupported;
+        }
         return this.supported;
     }
 

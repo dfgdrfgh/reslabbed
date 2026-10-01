@@ -1,6 +1,7 @@
 package com.slabbed.test;
 
 import com.slabbed.compat.sable.SablePhysicsHeight;
+import com.slabbed.compat.sable.SableLightSampling;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
@@ -43,6 +44,37 @@ public final class SablePhysicsHeightCellTest {
 
     private static final String TEMPLATE = "empty";
     private static final double EPS = 1.0e-6d;
+
+    /** REACH: sample the grid cell, or shift the queried outline twice, and one control fails. */
+    @GameTest(templateNamespace = "fabric-gametest-api-v1", template = TEMPLATE)
+    public void lightSampleLeavesOnlyTheExposedPartOfALoweredCell(GameTestHelper ctx) {
+        ServerLevel level = ctx.getLevel();
+        Player player = ctx.makeMockPlayer(GameType.SURVIVAL);
+        floor(ctx);
+        BlockPos slab = ctx.absolutePos(new BlockPos(2, 2, 2));
+        BlockPos lowered = slab.above();
+        BlockPos flush = ctx.absolutePos(new BlockPos(5, 2, 2));
+        use(ctx, player, Blocks.STONE_SLAB, slab.below(), slab.getY());
+        use(ctx, player, Blocks.STONE, slab, slab.getY() + 0.5d);
+        use(ctx, player, Blocks.STONE, flush.below(), flush.getY());
+
+        BlockPos.MutableBlockPos exposed = lowered.mutable();
+        SableLightSampling.adjust(level, exposed, lowered.getY() + 0.997d);
+        if (!exposed.equals(lowered.above())) {
+            throw new GameTestAssertException("exposed space above lowered stone must use the adjacent light cell");
+        }
+        BlockPos.MutableBlockPos interior = lowered.mutable();
+        SableLightSampling.adjust(level, interior, lowered.getY() + 0.25d);
+        if (!interior.equals(lowered)) {
+            throw new GameTestAssertException("the already-shifted outline must keep solid interiors in shadow");
+        }
+        BlockPos.MutableBlockPos ordinary = flush.mutable();
+        SableLightSampling.adjust(level, ordinary, flush.getY() + 0.997d);
+        if (!ordinary.equals(flush)) {
+            throw new GameTestAssertException("flush stone must keep its original light sample");
+        }
+        ctx.succeed();
+    }
 
     @GameTest(templateNamespace = "fabric-gametest-api-v1", template = TEMPLATE)
     public void loweredBlockCollidesWhereItIsDrawn(GameTestHelper ctx) {

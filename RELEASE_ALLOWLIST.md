@@ -63,6 +63,7 @@ com/slabbed/compat/sable/
 com/slabbed/compat/sable/SableCellColliderSource.class
 com/slabbed/compat/sable/SableCellKey.class
 com/slabbed/compat/sable/SableHitGeometry.class
+com/slabbed/compat/sable/SableLightSampling.class
 com/slabbed/compat/sable/SablePhysicsHeight$CellCollision.class
 com/slabbed/compat/sable/SablePhysicsHeight$Memo.class
 com/slabbed/compat/sable/SablePhysicsHeight.class
@@ -71,6 +72,7 @@ com/slabbed/mixin/compat/
 com/slabbed/mixin/compat/sable/
 com/slabbed/mixin/compat/sable/SableColliderBakeryCellMixin.class
 com/slabbed/mixin/compat/sable/SableMixinPlugin.class
+com/slabbed/mixin/compat/sable/SableSingleBlockLightMixin.class
 com/slabbed/mixin/compat/sable/SablePhysicsSystemRefreshMixin.class
 com/slabbed/mixin/compat/sable/SableRapierPipelineHeightMixin.class
 com/slabbed/compat/terrainslabs/
@@ -222,10 +224,12 @@ com/slabbed/mixin/compat/sable/
 com/slabbed/compat/sable/SableCellColliderSource.java
 com/slabbed/compat/sable/SableCellKey.java
 com/slabbed/compat/sable/SableHitGeometry.java
+com/slabbed/compat/sable/SableLightSampling.java
 com/slabbed/compat/sable/SablePhysicsHeight.java
 com/slabbed/compat/sable/SablePlacementRefresh.java
 com/slabbed/mixin/compat/sable/SableColliderBakeryCellMixin.java
 com/slabbed/mixin/compat/sable/SableMixinPlugin.java
+com/slabbed/mixin/compat/sable/SableSingleBlockLightMixin.java
 com/slabbed/mixin/compat/sable/SablePhysicsSystemRefreshMixin.java
 com/slabbed/mixin/compat/sable/SableRapierPipelineHeightMixin.java
 com/slabbed/compat/terrainslabs/

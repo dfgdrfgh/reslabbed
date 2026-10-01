@@ -8,6 +8,9 @@
     "SablePhysicsSystemRefreshMixin",
     "SableRapierPipelineHeightMixin"
   ],
+  "client": [
+    "SableSingleBlockLightMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   }
