@@ -185,7 +185,8 @@ public final class SlabbedOffsetRaycast {
                 dy = SlabSupport.getYOffset(world, pos, state);
                 dyMemo.put(key, dy);
             }
-            if (dy == 0.0 && !SlabSupport.isVerticalChainDirectlyUnderCeilingSupport(world, pos, state)) {
+            if (dy == 0.0 && !SlabSupport.isVerticalChainDirectlyUnderCeilingSupport(world, pos, state)
+                    && FenceCeilingConnection.postTop(world,pos,state,dy)<=1.0d) {
                 return; // covered when the DDA visits this position as a primary cell
             }
             shapeTested.add(key);

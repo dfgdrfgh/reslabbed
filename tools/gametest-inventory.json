@@ -51,6 +51,7 @@
     {"path": "com/slabbed/test/TerrainSlabsHeadlessClassifierTest.java", "classification": "registered_server"},
     {"path": "com/slabbed/test/UpFaceEdgeCombineGuardTest.java", "classification": "registered_server"},
     {"path": "com/slabbed/test/VanillaDownstreamOwnershipTest.java", "classification": "registered_server"},
-    {"path": "com/slabbed/test/WallSignAboveSlabTest.java", "classification": "registered_server"}
+    {"path": "com/slabbed/test/WallSignAboveSlabTest.java", "classification": "registered_server"},
+    {"path": "com/slabbed/test/FenceCeilingConnectionTest.java", "classification": "registered_server"}
   ]
 }

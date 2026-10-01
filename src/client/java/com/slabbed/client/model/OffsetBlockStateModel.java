@@ -106,6 +106,7 @@ public final class OffsetBlockStateModel extends BakedModelWrapper<BakedModel> {
         private boolean modelBakeRecorded;
         // Null for every block but a straight rail whose fitted profile differs from vanilla's.
         private RailSlopeProfile.Profile railProfile;
+        private float fencePostTop;
 
         RenderContextInfo(BlockAndTintGetter view, BlockPos pos, BlockState state) {
             this.view = view;
@@ -139,6 +140,7 @@ public final class OffsetBlockStateModel extends BakedModelWrapper<BakedModel> {
             }
             stepFaceBits = bits;
             railProfile = RailSlopeGeometry.fittedProfile(view, pos, state);
+            fencePostTop=FenceCeilingGeometry.postTop(view,pos,state,dy);
             resolved = true;
         }
 
@@ -360,6 +362,7 @@ public final class OffsetBlockStateModel extends BakedModelWrapper<BakedModel> {
         // cull work.
         if (!SlabSupport.mayNeedMeshOffsetWork(view, pos, state)
                 && !RailSlopeGeometry.mayFit(state)
+                && !FenceCeilingGeometry.mayConnect(state)
                 && !slabbed$diagnosticArmedAt(pos)) {
             return baseData;
         }
@@ -564,6 +567,9 @@ public final class OffsetBlockStateModel extends BakedModelWrapper<BakedModel> {
         // profile so the two drawn rails meet (RailSlopeGeometry). It applies the seat itself, in
         // place of the translate below, so no quad is shifted twice; null for every other block
         // and for a profile vanilla already draws, which keep the ordinary seat translate.
+        if (context.fencePostTop>1.0f && !quads.isEmpty()) {
+            return FenceCeilingGeometry.connect(quads,dy,context.fencePostTop);
+        }
         RailSlopeProfile.Profile railProfile = context.railProfile;
         if (railProfile != null && !quads.isEmpty()) {
             return RailSlopeGeometry.fit(quads, railProfile, dy);

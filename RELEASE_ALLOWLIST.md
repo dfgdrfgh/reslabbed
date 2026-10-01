@@ -149,6 +149,8 @@ com/slabbed/util/PlacementVerificationVerdict.class
 com/slabbed/util/RailSlopeProfile$1.class
 com/slabbed/util/RailSlopeProfile$Profile.class
 com/slabbed/util/RailSlopeProfile.class
+com/slabbed/util/FenceCeilingConnection.class
+com/slabbed/client/model/FenceCeilingGeometry.class
 com/slabbed/util/RailVisualSignal.class
 com/slabbed/util/RuntimeDiagnostics.class
 com/slabbed/util/SlabEnsembleCoherence$Kind.class
@@ -321,6 +323,8 @@ com/slabbed/util/PlacementVerificationVerdict.class
 com/slabbed/util/RailSlopeProfile$1.class
 com/slabbed/util/RailSlopeProfile$Profile.class
 com/slabbed/util/RailSlopeProfile.class
+com/slabbed/util/FenceCeilingConnection.class
+com/slabbed/client/model/FenceCeilingGeometry.class
 com/slabbed/util/RailVisualSignal.class
 com/slabbed/util/RuntimeDiagnostics.class
 com/slabbed/util/SlabEnsembleCoherence$Kind.class
@@ -449,6 +453,8 @@ com/slabbed/util/HangingSeatDyHolder.java
 com/slabbed/util/PlacementDepthPolicy.java
 com/slabbed/util/PlacementVerificationVerdict.java
 com/slabbed/util/RailSlopeProfile.java
+com/slabbed/util/FenceCeilingConnection.java
+com/slabbed/client/model/FenceCeilingGeometry.java
 com/slabbed/util/RailVisualSignal.java
 com/slabbed/util/RuntimeDiagnostics.java
 com/slabbed/util/SlabEnsembleCoherence.java
