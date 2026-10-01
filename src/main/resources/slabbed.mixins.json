@@ -31,7 +31,11 @@
     "WallSlabConnectionMixin",
     "AbstractArrowOffsetClipMixin",
     "LivingEntitySightOffsetClipMixin",
-    "ExplosionOcclusionOffsetClipMixin"
+    "ExplosionOcclusionOffsetClipMixin",
+    "BaseRailBlockSlopeShapeMixin",
+    "LoweredRailSupportNeighborMixin",
+    "PoweredRailVisualSignalMixin",
+    "RedstoneWireBlockVisualStepMixin"
   ],
   "client": [],
   "injectors": {

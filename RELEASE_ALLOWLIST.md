@@ -145,6 +145,16 @@ com/slabbed/util/SlabbedOffsetRaycast.class
 com/slabbed/util/SlabbedServerHitValidation.class
 slabbed.mixins.json
 slabbed.client.mixins.json
+com/slabbed/util/RailSlopeProfile$1.class
+com/slabbed/util/RailSlopeProfile$Profile.class
+com/slabbed/util/RailSlopeProfile.class
+com/slabbed/util/RailVisualSignal.class
+com/slabbed/util/WireVisualSignal.class
+com/slabbed/client/model/RailSlopeGeometry.class
+com/slabbed/mixin/BaseRailBlockSlopeShapeMixin.class
+com/slabbed/mixin/LoweredRailSupportNeighborMixin.class
+com/slabbed/mixin/PoweredRailVisualSignalMixin.class
+com/slabbed/mixin/RedstoneWireBlockVisualStepMixin.class
 ```
 <!-- release-allowlist:runtime:end -->
 
@@ -245,5 +255,13 @@ com/slabbed/util/SlabbedOffsetRaycast.java
 com/slabbed/util/SlabbedServerHitValidation.java
 slabbed.client.mixins.json
 slabbed.mixins.json
+com/slabbed/util/RailSlopeProfile.java
+com/slabbed/util/RailVisualSignal.java
+com/slabbed/util/WireVisualSignal.java
+com/slabbed/client/model/RailSlopeGeometry.java
+com/slabbed/mixin/BaseRailBlockSlopeShapeMixin.java
+com/slabbed/mixin/LoweredRailSupportNeighborMixin.java
+com/slabbed/mixin/PoweredRailVisualSignalMixin.java
+com/slabbed/mixin/RedstoneWireBlockVisualStepMixin.java
 ```
 <!-- release-allowlist:sources:end -->

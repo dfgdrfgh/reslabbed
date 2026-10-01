@@ -2,6 +2,7 @@ package com.slabbed.client.model;
 import com.slabbed.Slabbed;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.client.ClientDy;
+import com.slabbed.util.RailSlopeProfile;
 import com.slabbed.util.RuntimeDiagnostics;
 import com.slabbed.util.SlabbedDiagnosticsBridge;
 import com.slabbed.util.SlabSupport;
@@ -103,6 +104,7 @@ public final class OffsetBlockStateModel extends BakedModelWrapper<BakedModel> {
         private int stepFaceBits;
         private boolean chainAlternateGeometry;
         private boolean modelBakeRecorded;
+        private RailSlopeProfile.Profile railProfile;
 
         RenderContextInfo(BlockAndTintGetter view, BlockPos pos, BlockState state) {
             this.view = view;
@@ -135,6 +137,7 @@ public final class OffsetBlockStateModel extends BakedModelWrapper<BakedModel> {
                 }
             }
             stepFaceBits = bits;
+            railProfile = RailSlopeGeometry.fittedProfile(view, pos, state);
             resolved = true;
         }
 
@@ -352,6 +355,7 @@ public final class OffsetBlockStateModel extends BakedModelWrapper<BakedModel> {
         // quads through untouched, so ordinary flush terrain pays no per-block derivation,
         // no resolver walk, and no quad work. Armed diagnostics always keep their context.
         if (!SlabSupport.mayNeedMeshOffsetWork(view, pos, state)
+                && !RailSlopeGeometry.mayFit(state)
                 && !slabbed$diagnosticArmedAt(pos)) {
             return baseData;
         }
@@ -551,6 +555,9 @@ public final class OffsetBlockStateModel extends BakedModelWrapper<BakedModel> {
                     stepCullFacesCleared,
                     clearedFaces.length() == 0 ? "none" : clearedFaces.toString(),
                     reason);
+        }
+        if (context.railProfile != null && !quads.isEmpty()) {
+            return RailSlopeGeometry.fit(quads, context.railProfile, dy);
         }
         return dy == 0.0f || quads.isEmpty() ? quads : translateQuads(quads, dy);
     }
