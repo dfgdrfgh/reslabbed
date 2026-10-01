@@ -348,6 +348,12 @@ public final class SlabPlacementDyAttachment {
         if (chunk == null) {
             return;
         }
+        clear(chunk,pos);
+    }
+
+    /** Clears a placement fact from the chunk that owns the write, without loading another chunk. */
+    public static void clear(WorldChunk chunk,BlockPos pos) {
+        if (chunk==null || pos==null || chunk.getWorld().isClient()) return;
         Long2ByteOpenHashMap existing = chunk.getAttached(PLACEMENT_DY_TYPE);
         if (existing == null || !existing.containsKey(pos.asLong())) {
             return;

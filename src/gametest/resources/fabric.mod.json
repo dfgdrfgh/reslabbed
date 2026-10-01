@@ -65,6 +65,7 @@
       "com.slabbed.client.BetaNoticeSuite",
       "com.slabbed.test.NormalDepthContractTest",
       "com.slabbed.test.StateChangeAnchorTest",
+      "com.slabbed.test.NonNotifyingRemovalHeightTest",
       "com.slabbed.test.HangingLoadDeferralTest",
       "com.slabbed.test.RailSlopeProfileTest",
       "com.slabbed.test.FenceCeilingConnectionTest",

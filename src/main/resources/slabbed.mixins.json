@@ -30,7 +30,7 @@
     "BlockItemPlacementIntentMixin",
     "ServerInteractBlockHitToleranceMixin",
     "BlockOnPlacedAnchorMixin",
-    "BlockOnStateReplacedAnchorMixin",
+    "WorldChunkOccupantChangeAnchorMixin",
     "FencePaneSlabConnectionMixin",
     "WallSlabConnectionMixin",
     "BaseRailBlockSlopeShapeMixin",

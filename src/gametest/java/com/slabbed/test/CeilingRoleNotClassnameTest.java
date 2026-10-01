@@ -32,7 +32,7 @@ import net.minecraft.util.math.Direction;
  * <p>This class pins BOTH halves, because the half that must not move is the dangerous one:
  * <ol>
  *   <li><b>Floor-mounted subjects now lock</b> — a floor lever, a floor button and a standing chain
- *       on a lowered support anchor at placement and survive their support being broken.</li>
+ *       on a lowered support anchor at placement and keep their height when the support becomes a full block.</li>
  *   <li><b>Genuine hangers are untouched</b> — a hanging lantern under a lowered block still tracks
  *       it down to -0.5 and still refuses an anchor; a CEILING lever, a CEILING bell, a
  *       down-pointing stalactite, a hung chain and a TOP-half trapdoor under a ceiling are all
@@ -40,10 +40,11 @@ import net.minecraft.util.math.Direction;
  *       ruling, and this change is precisely the one that could have broken it.</li>
  * </ol>
  *
- * <p>Supports are removed with {@code setBlockState(AIR)} rather than {@code breakBlock} for the
- * same reason {@code DecorativeObjectSupportAnchorTest} does it: a floor lever legitimately cannot
- * survive losing its support, and vanilla removing the block is the LAW 1 carve-out, not the pop
- * under test. What is under test is the HEIGHT of a subject that is still there.
+ * <p>The support is changed from a bottom slab to a full block. Vanilla can remove a floor lever
+ * or button when its support becomes air, so an air cell cannot serve as an invariance subject.
+ * Replacing the lowered surface keeps the subject alive and makes the unstored resolver move from
+ * -0.5 to zero; the anchor must prevent that move (LAW.md).
+
  */
 public final class CeilingRoleNotClassnameTest {
 
@@ -67,7 +68,7 @@ public final class CeilingRoleNotClassnameTest {
         assertRoleIsStanding(ctx, w, leverPos, "a FLOOR lever");
 
         SlabAnchorAttachment.addAnchor(w, leverPos, w.getBlockState(leverPos));
-        assertLocksAndSurvivesSupportRemoval(ctx, w, leverPos, slabPos, "floor lever");
+        assertLocksAndSurvivesSupportChange(ctx, w, leverPos, slabPos, "floor lever");
         ctx.complete();
     }
 
@@ -86,7 +87,7 @@ public final class CeilingRoleNotClassnameTest {
         assertRoleIsStanding(ctx, w, buttonPos, "a FLOOR button");
 
         SlabAnchorAttachment.addAnchor(w, buttonPos, w.getBlockState(buttonPos));
-        assertLocksAndSurvivesSupportRemoval(ctx, w, buttonPos, slabPos, "floor button");
+        assertLocksAndSurvivesSupportChange(ctx, w, buttonPos, slabPos, "floor button");
         ctx.complete();
     }
 
@@ -107,7 +108,7 @@ public final class CeilingRoleNotClassnameTest {
         assertRoleIsStanding(ctx, w, chainPos, "a chain standing with air above");
 
         SlabAnchorAttachment.addAnchor(w, chainPos, w.getBlockState(chainPos));
-        assertLocksAndSurvivesSupportRemoval(ctx, w, chainPos, slabPos, "standing chain");
+        assertLocksAndSurvivesSupportChange(ctx, w, chainPos, slabPos, "standing chain");
         ctx.complete();
     }
 
@@ -129,7 +130,7 @@ public final class CeilingRoleNotClassnameTest {
         assertRoleIsStanding(ctx, w, trapdoorPos, "a TOP-half trapdoor with air above");
 
         SlabAnchorAttachment.addAnchor(w, trapdoorPos, w.getBlockState(trapdoorPos));
-        assertLocksAndSurvivesSupportRemoval(ctx, w, trapdoorPos, slabPos, "TOP-half trapdoor");
+        assertLocksAndSurvivesSupportChange(ctx, w, trapdoorPos, slabPos, "TOP-half trapdoor");
         ctx.complete();
     }
 
@@ -297,9 +298,9 @@ public final class CeilingRoleNotClassnameTest {
 
     /**
      * The lane-C contract: the subject reads -0.5, holds a real anchor, and still reads -0.5 after
-     * its support below is gone. Without the anchor this is the -0.5 -> 0.0 pop.
+     * its support below becomes a full block. Without the anchor this is the -0.5 -> 0.0 pop.
      */
-    private static void assertLocksAndSurvivesSupportRemoval(
+    private static void assertLocksAndSurvivesSupportChange(
             TestContext ctx, ServerWorld w, BlockPos subject, BlockPos support, String what) {
         double before = SlabSupport.getYOffset(w, subject, w.getBlockState(subject));
         ctx.assertTrue(Math.abs(before + 0.5) <= EPS,
@@ -308,11 +309,13 @@ public final class CeilingRoleNotClassnameTest {
                 "THE FIX: a " + what + " hangs from nothing, so it must anchor at placement like "
                         + "any other object resting on a lowered support");
 
-        w.setBlockState(support, Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
+        w.setBlockState(support, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
+        ctx.assertTrue(!w.getBlockState(subject).isAir(),
+                "premise: invariance needs a surviving subject; actual="+w.getBlockState(subject));
         double after = SlabSupport.getYOffset(w, subject, w.getBlockState(subject));
         ctx.assertTrue(Math.abs(after + 0.5) <= EPS,
                 "never-pop violation: the " + what + " popped from -0.5 to " + after
-                        + " after its support was removed, though it was never re-placed");
+                        + " after its support changed, though it was never re-placed");
     }
 
     /**

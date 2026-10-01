@@ -137,6 +137,7 @@ no inert, undeclared mixin shipping on this line.
 | `com/slabbed/mixin/BaseRailBlockSlopeShapeMixin` | A rail's outline and raycast box are sized from the slope it is drawn with, so a lowered rail rising to its neighbour can be targeted where it is drawn (maintainer ruling, 2026-09-28). |
 | `com/slabbed/mixin/BlockItemPlacementIntentMixin` | Captures placement intent for the placement law. |
 | `com/slabbed/mixin/BlockOnPlacedAnchorMixin` | Writes the dy anchor on placement. |
+| `com/slabbed/mixin/WorldChunkOccupantChangeAnchorMixin` | Clears departed height facts through the chunk write even without neighbor notifications. |
 | `com/slabbed/mixin/BlockOnStateReplacedAnchorMixin` | Clears the dy anchor on state replacement. |
 | `com/slabbed/mixin/BrewingStandParticleMixin` | Particle origin tracks the lowered block. |
 | `com/slabbed/mixin/CandleParticleMixin` | Particle origin tracks the lowered block. |

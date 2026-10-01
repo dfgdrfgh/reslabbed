@@ -395,6 +395,12 @@ public final class SlabAnchorAttachment {
         if (chunk == null) {
             return;
         }
+        removeAnchor(chunk,pos);
+    }
+
+    /** Removes departed placement-owned data through the already supplied chunk (LAW.md). */
+    public static void removeAnchor(WorldChunk chunk,BlockPos pos) {
+        if (chunk==null || pos==null || chunk.getWorld().isClient()) return;
         // Freeze-on-place flat marker clears when the piece itself is broken/replaced
         // (onStateReplaced calls removeAnchor for every removal), so a fresh placement in
         // the same spot re-evaluates from scratch.
@@ -413,7 +419,7 @@ public final class SlabAnchorAttachment {
         }
         // The stored magnitude belongs to the anchor and dies with it: the cell is being emptied or
         // handed to a piece that must be measured from scratch.
-        SlabPlacementDyAttachment.clear(world, pos);
+        SlabPlacementDyAttachment.clear(chunk, pos);
         LongOpenHashSet existing = chunk.getAttached(ANCHOR_TYPE);
         if (existing == null || existing.isEmpty()) {
             if (TRACE) {
