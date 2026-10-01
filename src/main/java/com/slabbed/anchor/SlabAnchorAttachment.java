@@ -11,6 +11,7 @@ import java.util.function.Supplier;
 import com.mojang.serialization.Codec;
 import com.slabbed.Slabbed;
 import com.slabbed.compat.CompatHooks;
+import com.slabbed.compat.relativeblocks.RelativeBlocksCompat;
 import com.slabbed.util.SlabSupport;
 import com.slabbed.util.RuntimeDiagnostics;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
@@ -655,6 +656,9 @@ public final class SlabAnchorAttachment {
             return false;
         }
         if (consumeMatchingToolTransition(world, pos, oldState, newState)) {
+            return true;
+        }
+        if (RelativeBlocksCompat.isClusterMembershipChange(oldState, newState)) {
             return true;
         }
         return isExplicitInPlacePlacementTruthTransition(oldState, newState)

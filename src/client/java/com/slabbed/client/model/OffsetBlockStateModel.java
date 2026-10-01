@@ -2,6 +2,7 @@ package com.slabbed.client.model;
 import com.slabbed.Slabbed;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.client.ClientDy;
+import com.slabbed.compat.CompatHooks;
 import com.slabbed.util.RailSlopeProfile;
 import com.slabbed.util.RuntimeDiagnostics;
 import com.slabbed.util.SlabbedDiagnosticsBridge;
@@ -50,6 +51,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 @SuppressWarnings({"RedundantSuppression", "DataFlowIssue"})
 public final class OffsetBlockStateModel extends BakedModelWrapper<BakedModel> {
     private static final ModelProperty<RenderContextInfo> SLABBED_RENDER_CONTEXT = new ModelProperty<>();
+    /** How many Slabbed wrappers are currently producing quads on this thread. */
+    private static final ThreadLocal<int[]> SLABBED_WRAPPER_DEPTH = ThreadLocal.withInitial(() -> new int[1]);
+
     private static final ThreadLocal<Deque<RenderContextInfo>> SLABBED_RENDER_CONTEXT_FALLBACK =
             new ThreadLocal<>();
     // Render-path trace flags read ONCE at class-load (not per block). Each gates a diagnostic that
@@ -397,9 +401,23 @@ public final class OffsetBlockStateModel extends BakedModelWrapper<BakedModel> {
             ModelData modelData,
             RenderType renderType
     ) {
-        List<BakedQuad> baseQuads = super.getQuads(state, side, random, modelData, renderType);
+        int[] depth = SLABBED_WRAPPER_DEPTH.get();
+        List<BakedQuad> baseQuads;
+        depth[0]++;
+        try {
+            baseQuads = super.getQuads(state, side, random, modelData, renderType);
+        } finally {
+            depth[0]--;
+        }
+        if (depth[0] > 0) {
+            // Drawn inside another Slabbed wrapper (a composite that renders other blocks' models
+            // for its own cell): the OUTERMOST wrapper owns the cell's dy. Shifting here too would
+            // move these quads twice.
+            return baseQuads;
+        }
         RenderContextInfo renderContext = slabbed$renderContext(modelData);
-        if (renderContext == null || state == null) {
+        if (renderContext == null || state == null
+                || CompatHooks.shouldSkipOffsetView(renderContext.view())) {
             return baseQuads;
         }
         return slabbed$neoForgeQuads(

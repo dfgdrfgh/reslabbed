@@ -204,6 +204,10 @@
     {
       "path": "com/slabbed/test/StateChangeAnchorTest.java",
       "classification": "registered_server"
+    },
+    {
+      "path": "com/slabbed/test/Issue34PonderRenderViewProof.java",
+      "classification": "registered_server"
     }
   ]
 }

@@ -596,6 +596,33 @@ public final class SlabPlacementHeightResolverTest {
         ctx.succeed();
     }
 
+    @GameTest(templateNamespace = "fabric-gametest-api-v1", template = TEMPLATE)
+    public void expiredPredictionRequestsOneRedrawButAuthoritativeForgetDoesNot(GameTestHelper ctx) {
+        long expired = ctx.absolutePos(new BlockPos(3, 2, 3)).asLong();
+        long confirmed = ctx.absolutePos(new BlockPos(4, 2, 3)).asLong();
+        List<Long> redraws = new ArrayList<>();
+        ClientRenderDyPrediction.clear();
+        ClientRenderDyPrediction.installExpiryHook(redraws::add);
+        try {
+            ClientRenderDyPrediction.record(expired, -1);
+            ClientRenderDyPrediction.record(confirmed, -2);
+            ClientRenderDyPrediction.forget(confirmed);
+            for (int tick = 0; tick < 39; tick++) {
+                ClientRenderDyPrediction.advanceTick();
+            }
+            ctx.assertTrue(redraws.isEmpty(), "an active prediction must not expire early");
+            ClientRenderDyPrediction.advanceTick();
+            ctx.assertTrue(redraws.equals(List.of(expired)),
+                    "expiry must redraw exactly its cell; an authoritative forget needs no expiry redraw");
+            ClientRenderDyPrediction.advanceTick();
+            ctx.assertTrue(redraws.equals(List.of(expired)), "expiry redraw must fire only once");
+        } finally {
+            ClientRenderDyPrediction.clear();
+            ClientRenderDyPrediction.installExpiryHook(null);
+        }
+        ctx.succeed();
+    }
+
     private record BoundedRegionView(ServerLevel delegate, BlockPos centre, int radius)
             implements BlockGetter {
         private boolean inside(BlockPos pos) {

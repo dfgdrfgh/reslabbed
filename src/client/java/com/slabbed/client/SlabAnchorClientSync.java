@@ -280,7 +280,9 @@ public final class SlabAnchorClientSync {
                 if (SlabAnchorAttachment.isCompoundVisibleAttachmentType(attachmentType.get())) {
                     scheduleCompoundVisibleRenderRefresh(mc, rerenderPos, current, attachmentType);
                 } else {
-                    mc.levelRenderer.setBlockDirty(rerenderPos, current, current);
+                    mc.levelRenderer.setBlocksDirty(
+                            rerenderPos.getX(), rerenderPos.getY(), rerenderPos.getZ(),
+                            rerenderPos.getX(), rerenderPos.getY(), rerenderPos.getZ());
                 }
             }
         }

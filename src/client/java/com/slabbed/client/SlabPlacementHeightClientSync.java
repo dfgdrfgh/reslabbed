@@ -62,6 +62,16 @@ public final class SlabPlacementHeightClientSync {
                     pos.getX() - 1, pos.getY() - 1, pos.getZ() - 1,
                     pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1);
         });
+        ClientRenderDyPrediction.installExpiryHook(packed -> {
+            Minecraft minecraft = Minecraft.getInstance();
+            if (minecraft.level == null || minecraft.levelRenderer == null) {
+                return;
+            }
+            BlockPos pos = BlockPos.of(packed);
+            minecraft.levelRenderer.setBlocksDirty(
+                    pos.getX() - 1, pos.getY() - 1, pos.getZ() - 1,
+                    pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1);
+        });
         SlabPlacementHeightAttachment.installClientRenderHalfStepsLookup(packed -> {
             RenderSnapshotState published = RENDER_SNAPSHOTS;
             if (published.level() != Minecraft.getInstance().level) {

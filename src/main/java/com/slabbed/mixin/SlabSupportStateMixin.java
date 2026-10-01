@@ -2,6 +2,7 @@ package com.slabbed.mixin;
 
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.compat.CompatHooks;
+import com.slabbed.compat.relativeblocks.RelativeBlocksCompat;
 import com.slabbed.compat.CompatSlabSurfaceKind;
 import com.slabbed.util.SlabSupport;
 import com.slabbed.util.FenceCeilingConnection;
@@ -322,6 +323,10 @@ public abstract class SlabSupportStateMixin {
             at = @At("RETURN"), cancellable = true)
     private void slabbed$offsetRaycast(BlockGetter world, BlockPos pos,
                                        CallbackInfoReturnable<VoxelShape> cir) {
+        if (CompatHooks.shouldSkipOffsetView(world)) {
+            return;
+        }
+
         BlockState self = (BlockState) (Object) this;
         VoxelShape shape = cir.getReturnValue();
         if (slabbed$isTopHalfTrapdoor(self) && (shape == null || shape.isEmpty())) {
@@ -347,6 +352,10 @@ public abstract class SlabSupportStateMixin {
         // Fence/wall/pane render un-lowered (see OffsetBlockStateModel.emitBlockQuads);
         // their raycast shape must match, so do not offset it. Mirrors the render path.
         if (slabbed$isRenderZeroedConnectionBlock(self)) {
+            return;
+        }
+        // Mirrors the outline: a cluster's shape already carries its members' dy.
+        if (RelativeBlocksCompat.isCluster(self)) {
             return;
         }
 
@@ -468,6 +477,10 @@ public abstract class SlabSupportStateMixin {
             at = @At("RETURN"), cancellable = true)
     private void slabbed$offsetOutline(BlockGetter world, BlockPos pos, CollisionContext ctx,
                                        CallbackInfoReturnable<VoxelShape> cir) {
+        if (CompatHooks.shouldSkipOffsetView(world)) {
+            return;
+        }
+
         // Server-side background shape queries must never enter offset resolution: that path reads
         // chunk attachments and support state, which may synchronously request a server-owned chunk.
         // Keep the legacy named-worker fallback for non-server worlds whose owner is unavailable.
@@ -498,6 +511,13 @@ public abstract class SlabSupportStateMixin {
         // Fence/wall/pane render un-lowered; keep their outline un-offset to match
         // (else the authoritative nearest-hit raycast targets a phantom shape below).
         if (slabbed$isRenderZeroedConnectionBlock(self)) {
+            return;
+        }
+
+        // A Relatively Placed Blocks cluster builds its outline from its members' own shapes at this
+        // same cell, and each member shape is already lowered here. Moving the union again would
+        // put the outline a second dy below the drawing.
+        if (RelativeBlocksCompat.isCluster(self)) {
             return;
         }
 
