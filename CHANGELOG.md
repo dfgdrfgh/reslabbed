@@ -1,3 +1,13 @@
+## [0.6.1-alpha+1.20.1-forge]
+
+See LAW.md — this changelog does not redefine the law.
+
+- Fence posts now meet a nearby slab ceiling across a half-block gap. The post keeps its placed height, and its visible connection can be targeted correctly.
+- Placing a fitting post beneath a lowered slab now uses the available space correctly.
+- Reduce repeated client work by avoiding copies of unchanged height-marker data.
+
+Release labels now use major.minor.patch plus a maturity label, without numbered alpha or beta counters.
+
 ## [0.5.2-beta.4] - Minecraft 1.20.1 (Forge)
 
 See LAW.md — this changelog does not redefine the law.
