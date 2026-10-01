@@ -204,14 +204,97 @@ public final class LandingResolver {
                     && actualTarget.equals(aim.ownerPos().down());
             landingDy = flushTopVerticalChainBridge
                     ? 0.0d
-                    : aim.ownerPos().getY() + aim.ownerVisibleDy() + bottomPlaneOffset(aim.ownerState())
-                            - (actualTarget.getY() + 1.0d);
+                    : clampToUndersideLimit(world,actualTarget,finalState,
+                            aim.ownerPos().getY()+aim.ownerVisibleDy()+bottomPlaneOffset(aim.ownerState())
+                                    -(actualTarget.getY()+1.0d));
         } else {
             landingDy = aim.ownerVisibleDy() + aim.ownerPos().getY() - actualTarget.getY();
         }
         return Double.isFinite(landingDy)
                 ? new PlacementResolution(actualTarget, landingDy, false)
                 : null;
+    }
+
+    /** Placement-time fit only; existing seats are never changed (LAW.md). */
+    private static double clampToUndersideLimit(
+            BlockView world, BlockPos target, BlockState finalState, double aimDy) {
+        if (world == null || !Double.isFinite(aimDy) || Math.abs(aimDy) <= 1.0e-6d) {
+            return aimDy;
+        }
+        double clamped = aimDy;
+        while (Math.abs(clamped) > 1.0e-6d
+                && undersideLandingIncreasesOverlap(world, target, finalState, clamped)) {
+            // Step toward 0.0 and never overshoot: at grid height the candidate sits at the vanilla
+            // baseline, so the overlap predicate is false by construction and the loop terminates.
+            clamped = aimDy > 0.0d
+                    ? Math.max(clamped - 0.5d, 0.0d)
+                    : Math.min(clamped + 0.5d, 0.0d);
+        }
+        return clamped;
+    }
+
+    private static boolean undersideLandingIncreasesOverlap(
+            BlockView world, BlockPos target, BlockState finalState, double dy) {
+        BlockPos abovePos = target.up();
+        BlockState aboveState = world.getBlockState(abovePos);
+        if (!aboveState.isAir()
+                && collisionEnvelopeIncreasesOverlap(
+                        finalState, target, dy,
+                        aboveState, abovePos, visibleOwnerDy(world, abovePos, aboveState))) {
+            return true;
+        }
+        BlockPos belowPos = target.down();
+        BlockState belowState = world.getBlockState(belowPos);
+        return !belowState.isAir()
+                && collisionEnvelopeIncreasesOverlap(
+                        belowState, belowPos, visibleOwnerDy(world, belowPos, belowState),
+                        finalState, target, dy);
+    }
+
+    private static boolean collisionEnvelopeIncreasesOverlap(
+            BlockState firstState,BlockPos firstPos,double firstDy,
+            BlockState secondState,BlockPos secondPos,double secondDy) {
+        net.minecraft.util.shape.VoxelShape firstBody=SlabSupport.withRawShapeProbe(() ->
+                firstState.getCollisionShape(net.minecraft.world.EmptyBlockView.INSTANCE,BlockPos.ORIGIN));
+        net.minecraft.util.shape.VoxelShape secondBody=SlabSupport.withRawShapeProbe(() ->
+                secondState.getCollisionShape(net.minecraft.world.EmptyBlockView.INSTANCE,BlockPos.ORIGIN));
+
+        for (net.minecraft.util.math.Box firstBox : firstBody.getBoundingBoxes()) {
+            for (net.minecraft.util.math.Box secondBox : secondBody.getBoundingBoxes()) {
+                double xDepth = Math.min(
+                        firstBox.maxX + firstPos.getX(),
+                        secondBox.maxX + secondPos.getX())
+                        - Math.max(
+                        firstBox.minX + firstPos.getX(),
+                        secondBox.minX + secondPos.getX());
+                double zDepth = Math.min(
+                        firstBox.maxZ + firstPos.getZ(),
+                        secondBox.maxZ + secondPos.getZ())
+                        - Math.max(
+                        firstBox.minZ + firstPos.getZ(),
+                        secondBox.minZ + secondPos.getZ());
+                if (xDepth <= 1.0e-6d || zDepth <= 1.0e-6d) {
+                    continue;
+                }
+
+                double vanillaYDepth = Math.min(
+                        firstBox.maxY + firstPos.getY(),
+                        secondBox.maxY + secondPos.getY())
+                        - Math.max(
+                        firstBox.minY + firstPos.getY(),
+                        secondBox.minY + secondPos.getY());
+                double translatedYDepth = Math.min(
+                        firstBox.maxY + firstPos.getY() + firstDy,
+                        secondBox.maxY + secondPos.getY() + secondDy)
+                        - Math.max(
+                        firstBox.minY + firstPos.getY() + firstDy,
+                        secondBox.minY + secondPos.getY() + secondDy);
+                if (translatedYDepth > 1.0e-6d && translatedYDepth > vanillaYDepth + 1.0e-6d) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public static double visibleOwnerDy(BlockView world, BlockPos ownerPos, BlockState ownerState) {

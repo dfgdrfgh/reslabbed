@@ -67,6 +67,7 @@
       "com.slabbed.test.StateChangeAnchorTest",
       "com.slabbed.test.HangingLoadDeferralTest",
       "com.slabbed.test.RailSlopeProfileTest",
+      "com.slabbed.test.FenceCeilingConnectionTest",
       "com.slabbed.test.RailVisualSignalTest",
       "com.slabbed.test.RedstoneWireVisualStepTest"
     ],
@@ -79,7 +80,8 @@
       "com.slabbed.test.AuthoredTerrainPlacementClientGameTest",
       "com.slabbed.test.TerrainSlabsCustomSurfaceClientGameTest",
       "com.slabbed.test.LeverParticleFrozenAnchorClientGameTest",
-      "com.slabbed.test.RailSlopeRenderClientGameTest"
+      "com.slabbed.test.RailSlopeRenderClientGameTest",
+      "com.slabbed.test.FenceCeilingRenderClientGameTest"
     ]
   },
   "mixins": [

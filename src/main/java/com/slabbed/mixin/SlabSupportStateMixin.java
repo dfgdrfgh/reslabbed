@@ -1,6 +1,7 @@
 package com.slabbed.mixin;
 
 import com.slabbed.util.SlabSupport;
+import com.slabbed.util.FenceCeilingConnection;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -207,6 +208,9 @@ public abstract class SlabSupportStateMixin {
 
         double yOff = SlabSupport.getVisualYOffset(world, pos, self);
         if (yOff == 0.0) {
+            VoxelShape shape=cir.getReturnValue();
+            VoxelShape connected=FenceCeilingConnection.outline(world,pos,self,yOff,shape);
+            if (connected!=shape) cir.setReturnValue(connected);
             return;
         }
 
@@ -217,6 +221,6 @@ public abstract class SlabSupportStateMixin {
         if (slabbed$isLoweredFloorTorch(self, yOff)) {
             shape = SLABBED$COMFORT_TORCH_SHAPE;
         }
-        cir.setReturnValue(shape.offset(0.0, yOff, 0.0));
+        cir.setReturnValue(FenceCeilingConnection.outline(world,pos,self,yOff,shape.offset(0.0,yOff,0.0)));
     }
 }

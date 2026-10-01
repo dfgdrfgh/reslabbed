@@ -151,6 +151,9 @@ public final class OffsetBlockStateModel implements BlockStateModel, FabricBlock
             return;
         }
 
+        if (FenceCeilingGeometry.emitIfConnected(fabricWrapped,emitter,view,pos,state,dy,random,cullTest)) {
+            return;
+        }
         QuadEmitter out = dy != 0.0f ? YOffsetEmitter.wrap(emitter, dy) : emitter;
         fabricWrapped.emitQuads(out, view, pos, state, random, cullTest);
     }
