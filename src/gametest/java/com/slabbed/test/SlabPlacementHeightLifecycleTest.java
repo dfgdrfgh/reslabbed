@@ -1154,4 +1154,17 @@ public final class SlabPlacementHeightLifecycleTest {
         facts.put(pos.asLong(), (byte) halfSteps);
         chunk.setData(SlabPlacementHeightAttachment.PLACEMENT_DY_TYPE.get(), facts);
     }
+
+    @GameTest(template="empty")
+    public void directChunkDepartureClearsTheStoredFact(GameTestHelper ctx) {
+        var world=ctx.getLevel();var pos=ctx.absolutePos(new BlockPos(2,2,2));
+        world.setBlock(pos,Blocks.OAK_PLANKS.defaultBlockState(),3);
+        SlabPlacementHeightAttachment.putHalfSteps(world.getChunkAt(pos),pos,-1);
+        ctx.assertTrue(SlabPlacementHeightAttachment.storedOffset(world,pos)==-0.5d,"premise: stored lowered fact");
+        world.getChunkAt(pos).setBlockState(pos,Blocks.AIR.defaultBlockState(),false);
+        ctx.assertTrue(Double.isNaN(SlabPlacementHeightAttachment.storedOffset(world,pos)),"direct chunk departure must clear the fact");
+        world.getChunkAt(pos).setBlockState(pos,Blocks.STONE.defaultBlockState(),false);
+        ctx.assertTrue(Double.isNaN(SlabPlacementHeightAttachment.storedOffset(world,pos)),"a replacement must not inherit the fact");
+        ctx.succeed();
+    }
 }
