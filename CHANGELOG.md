@@ -1,67 +1,17 @@
-## [Unreleased]
+## [0.6.1-alpha+1.21.1]
 
-### Placement
+See LAW.md — this changelog does not redefine the law.
 
-- Placing onto a dirt path or farmland converts it to dirt first (maintainer
-  ruling, 2026-09-01), so the placed block sits at normal height instead of
-  settling onto the trampled block's slightly-lower face. Vanilla does this
-  only for solid full blocks; Slabbed extends it to every placement it
-  manages. Plantings that need the trampled block — seeds on farmland — are
-  untouched, and a conversion whose placement falls through is rolled back.
-- Side placements are true WYSIWYG at any depth (maintainer ruling,
-  2026-09-01): a slab — or a fence, wall, or pane — placed against a lowered
-  block's visible side face lands at exactly the height of the face you aimed
-  at, whether that is −0.5, −1.0, or anywhere down to the −3.0 envelope.
-  Previously only a −0.5 face was followed, and deeper side placements landed
-  at normal grid height. Faces at heights the placement store cannot represent
-  (a slab seated on an enchanting table's top, for example) are unaffected and
-  land exactly as before.
-- A deep side placement lands on the real surface, never inside it (maintainer
-  ruling, 2026-09-02). When the landing cell has solid ground directly under
-  it, the slab now seats on that ground — flush over a full block, exactly
-  where a click on the ground itself would put it — instead of being recorded
-  a full block deep inside the dirt. Side placements over open air keep
-  following the aim all the way down.
+- Fence posts now meet a nearby slab ceiling across a half-block gap. The post keeps its placed height, and its visible connection can be targeted correctly.
+- Placing a fitting post beneath a lowered slab now uses the available space correctly.
+- Deep side placements follow the aimed face and stop at the actual landing surface.
+- Placing supported blocks on farmland or dirt paths converts the support to dirt when appropriate; crops retain their farmland.
+- Tilling or shovelling a lowered block preserves its placed height.
+- Lowered campfire particles now rise from the visible fire.
+- Refresh the first rendered frame immediately after a predicted placement.
+- Reduce repeated client work by avoiding copies of unchanged height-marker data.
 
-### Rendering and physics
-
-- Campfire crackle, smoke column, and cooking smoke emit from the campfire's
-  drawn height, joining torches, levers, and candles. A lowered campfire
-  previously smoked and crackled from the air above itself.
-- Item frames, glow item frames, and paintings hang on their support's drawn
-  face, and each one remembers the height it was hung at (maintainer ruling,
-  2026-09-13). A decoration aimed at a lowered block's visible face previously
-  hung a full block above it, and paintings were not covered at all. The
-  height is decided once, when the decoration is hung, saved with the world,
-  and never read back from the wall: rebuilding the wall behind a frame at a
-  different height moves the wall, not the frame. Frames and paintings from an
-  older save take their height from their wall once, the first time they load,
-  and keep it from then on. Only the clickable box and the drawing move; the
-  entity's real position stays on the grid, so support checks keep judging the
-  right block.
-
-### Rendering fixes behind deep placements
-
-- Close the client-prediction render race behind deep placement snaps: the
-  first drawn frame after a deep placement could briefly read the wrong
-  height until the server round trip corrected it. The placement's predicted
-  height now forces its own render refresh the moment it is recorded.
-
-### Height resolution
-
-- A chain hanging below an ordinary (non-slab) lowered block now follows that
-  block's exact drop, matching what already hung correctly further down the
-  same chain (maintainer ruling, 2026-09-01). Previously the chain segment
-  itself stayed at grid height, so the lowered block above visibly descended
-  into it. A chain under a lowered TOP/DOUBLE slab is unaffected: that case
-  keeps its own dedicated flush treatment.
-
-### Verification
-
-- Enlarge the shared GameTest template so the sight and vacated-band rows,
-  which place their scenes beyond the old template depth, sit inside the
-  region the framework clears and spaces. Their unshifted-block control arms
-  can no longer be satisfied by a neighbouring test's structure.
+Release labels now use major.minor.patch plus a maturity label, without numbered alpha or beta counters.
 
 ## [0.5.2-alpha.2] - Minecraft 1.21.1 (NeoForge)
 
