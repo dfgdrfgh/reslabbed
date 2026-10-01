@@ -6,10 +6,10 @@ identical copy for tools that read that name; edit both together.
 ## The two laws
 
 1. **LAW 1 — placement is permanent.** Read `LAW.md` before touching anything in the placement or
-   height-resolution path. `LAW.md` is supreme; no other doc may redefine it. Its enforcement is
-   `NeighborUpdateInvarianceTest` (the S-2 gate), which is **blocking by default** — a violation
-   fails the build. `-Dslabbed.lawGate=false` downgrades to a printed inventory and is only for
-   fixing a deliberate new RED forward, never for landing one.
+   height-resolution path. `LAW.md` is supreme; no other doc may redefine it. Maintained platform branches enforce it with
+   `NeighborUpdateInvarianceTest`. This historical default snapshot does not contain that test;
+   a build here must never be described as passing the S-2 gate. A placement change must bring
+   the applicable native invariance proof with it before it can be considered release-ready.
 
 2. **The discretion law (maintainer ruling, 2026-08-07) — this repo is public and stays
    impersonal.** No personal names, no machine-local usernames or absolute home-directory paths,
@@ -34,9 +34,9 @@ Keep the "do not re-add X" guard comments — they are anti-regression tripwires
   wrong count is a false green.
 - Never write the literal `@GameTest` token in comments of registered test classes — the count
   script counts occurrences.
-- The release jar is gated by a closed-world allowlist (`RELEASE_ALLOWLIST.md`) checked during
-  `build`; debug/dev tooling ships in every jar default-off, but the file-writing audit/recorder
-  packages never ship.
+- Maintained release candidates require the closed-world artifact allowlist and hygiene gates.
+  `RELEASE_ALLOWLIST.md` is absent from this historical default snapshot, so its ordinary build
+  does not establish artifact purity. Use the verified platform candidate for release work.
 
 ## Commit hygiene
 
@@ -44,3 +44,9 @@ Keep the "do not re-add X" guard comments — they are anti-regression tripwires
 vocabulary must reference LAW.md), S-4 (`LAW-PREFLIGHT: n|y` trailer on `src/main` commits), S-5
 (behavior commits require a fresh entry in the local out-of-repo ledger), S-6 (discretion — see
 above). S-3 (a keyword regex) was retired 2026-08-07; do not reintroduce it.
+
+## Release labels
+
+Use `MAJOR.MINOR.PATCH-alpha` or `MAJOR.MINOR.PATCH-beta`, without routine numbered channel counters.
+Keep established platform identifiers in `+metadata`. A matching core is a behavioral parity claim:
+assign it only after the applicable platform proof passes. Published versions are immutable.
