@@ -213,10 +213,11 @@ public final class SlabAnchorClientSync {
     ) {
         AttachmentSnapshotKey key = new AttachmentSnapshotKey(chunk.getPos().toLong(), attachmentType);
         LongOpenHashSet oldSet = ATTACHMENT_SNAPSHOTS.get(key);
-        LongOpenHashSet newSet = copyAttachmentSet(SlabbedClientMirror.markerOrNull(chunk, attachmentType));
-        if (attachmentSetsEqual(oldSet, newSet)) {
+        LongOpenHashSet currentSet = SlabbedClientMirror.markerOrNull(chunk, attachmentType);
+        if (attachmentSetsEqual(oldSet, currentSet)) {
             return;
         }
+        LongOpenHashSet newSet = copyAttachmentSet(currentSet);
 
         logReloadJumpSync("attachedSetPoll", chunk, attachmentType, oldSet, newSet);
         scheduleRerendersForSet(mc, oldSet, attachmentType);
