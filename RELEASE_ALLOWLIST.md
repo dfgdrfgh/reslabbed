@@ -148,6 +148,8 @@ slabbed.client.mixins.json
 com/slabbed/util/RailSlopeProfile$1.class
 com/slabbed/util/RailSlopeProfile$Profile.class
 com/slabbed/util/RailSlopeProfile.class
+com/slabbed/util/FenceCeilingConnection.class
+com/slabbed/client/model/FenceCeilingGeometry.class
 com/slabbed/util/RailVisualSignal.class
 com/slabbed/util/WireVisualSignal.class
 com/slabbed/client/model/RailSlopeGeometry.class
@@ -256,6 +258,8 @@ com/slabbed/util/SlabbedServerHitValidation.java
 slabbed.client.mixins.json
 slabbed.mixins.json
 com/slabbed/util/RailSlopeProfile.java
+com/slabbed/util/FenceCeilingConnection.java
+com/slabbed/client/model/FenceCeilingGeometry.java
 com/slabbed/util/RailVisualSignal.java
 com/slabbed/util/WireVisualSignal.java
 com/slabbed/client/model/RailSlopeGeometry.java

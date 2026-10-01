@@ -105,6 +105,7 @@ public final class OffsetBlockStateModel extends BakedModelWrapper<BakedModel> {
         private boolean chainAlternateGeometry;
         private boolean modelBakeRecorded;
         private RailSlopeProfile.Profile railProfile;
+        private float fencePostTop;
 
         RenderContextInfo(BlockAndTintGetter view, BlockPos pos, BlockState state) {
             this.view = view;
@@ -138,6 +139,7 @@ public final class OffsetBlockStateModel extends BakedModelWrapper<BakedModel> {
             }
             stepFaceBits = bits;
             railProfile = RailSlopeGeometry.fittedProfile(view, pos, state);
+            fencePostTop = FenceCeilingGeometry.postTop(view, pos, state, dy);
             resolved = true;
         }
 
@@ -356,6 +358,7 @@ public final class OffsetBlockStateModel extends BakedModelWrapper<BakedModel> {
         // no resolver walk, and no quad work. Armed diagnostics always keep their context.
         if (!SlabSupport.mayNeedMeshOffsetWork(view, pos, state)
                 && !RailSlopeGeometry.mayFit(state)
+                && !FenceCeilingGeometry.mayConnect(state)
                 && !slabbed$diagnosticArmedAt(pos)) {
             return baseData;
         }
@@ -555,6 +558,9 @@ public final class OffsetBlockStateModel extends BakedModelWrapper<BakedModel> {
                     stepCullFacesCleared,
                     clearedFaces.length() == 0 ? "none" : clearedFaces.toString(),
                     reason);
+        }
+        if (context.fencePostTop > 1.0f && !quads.isEmpty()) {
+            return FenceCeilingGeometry.connect(quads, dy, context.fencePostTop);
         }
         if (context.railProfile != null && !quads.isEmpty()) {
             return RailSlopeGeometry.fit(quads, context.railProfile, dy);

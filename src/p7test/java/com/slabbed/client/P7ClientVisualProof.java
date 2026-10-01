@@ -70,6 +70,7 @@ public final class P7ClientVisualProof {
     private static boolean factPhaseGreen;
     private static boolean geometricSamplesArmed;
     private static boolean terminal;
+    private static int fenceProofPhase;
     private static int ticks;
     private static int samplesArmedTick;
     private static int geometricSamplesArmedTick;
@@ -221,6 +222,31 @@ public final class P7ClientVisualProof {
                 fail(minecraft, result.reason());
                 return;
             }
+            BlockPos fence=current.fence();
+            if (fenceProofPhase==0) {
+                if (!minecraft.level.getBlockState(fence.above()).is(Blocks.OAK_SLAB)) return;
+                Bounds post=renderBounds(minecraft,minecraft.getBlockRenderer().getBlockModel(
+                        minecraft.level.getBlockState(fence)),minecraft.level.getBlockState(fence),fence);
+                if (!near(post.minY(),0.0d) || !near(post.maxY(),1.5d)) {
+                    fail(minecraft,"fence_connection_vertices");
+                    return;
+                }
+                net.minecraft.client.Screenshot.grab(minecraft.gameDirectory,"fence-ceiling-connected.png",
+                        minecraft.getMainRenderTarget(), ignored -> { });
+                fenceProofPhase=1;
+                minecraft.getSingleplayerServer().execute(() -> minecraft.getSingleplayerServer().overworld()
+                        .setBlock(fence.above(),Blocks.AIR.defaultBlockState(),Block.UPDATE_ALL));
+                return;
+            }
+            if (!minecraft.level.getBlockState(fence.above()).isAir()) return;
+            Bounds post=renderBounds(minecraft,minecraft.getBlockRenderer().getBlockModel(
+                    minecraft.level.getBlockState(fence)),minecraft.level.getBlockState(fence),fence);
+            if (!near(post.minY(),0.0d) || !near(post.maxY(),1.0d)
+                    || !near(SlabPlacementHeightAttachment.storedOffset(minecraft.level,fence),0.0d)) {
+                fail(minecraft,"fence_connection_removal");
+                return;
+            }
+            Slabbed.LOGGER.info("[FENCE_CLIENT_GEOMETRY_PROOF] connected=true removal=true stored_seat=true");
             write("p7-client.ok",
                     "numeric=true model=true single_owner=true cull=true bounded=true allocation=true geometric=true\n");
             terminal = true;
@@ -293,7 +319,21 @@ public final class P7ClientVisualProof {
                         || !SlabPlacementHeightAttachment.putHalfSteps(world.getChunkAt(flat), flat, 0)) {
                     throw new IllegalStateException("fixture_fact_write_failed");
                 }
-                fixture = new Fixture(lowered, flat, geometric);
+                BlockPos fence = lowered.east(5);
+                world.setBlock(fence.below(), Blocks.STONE.defaultBlockState(), Block.UPDATE_ALL);
+                world.setBlock(fence, Blocks.OAK_FENCE.defaultBlockState(), Block.UPDATE_ALL);
+                world.setBlock(fence.above(), Blocks.OAK_SLAB.defaultBlockState()
+                        .setValue(net.minecraft.world.level.block.SlabBlock.TYPE,
+                                net.minecraft.world.level.block.state.properties.SlabType.TOP), Block.UPDATE_ALL);
+                SlabPlacementHeightAttachment.putHalfSteps(world.getChunkAt(fence), fence, 0);
+                SlabPlacementHeightAttachment.putHalfSteps(world.getChunkAt(fence.above()), fence.above(), 0);
+                if (!players.isEmpty()) {
+                    ServerPlayer player=players.getFirst();
+                    BlockPos camera=fence.north(4);
+                    world.setBlock(camera.below(),Blocks.STONE.defaultBlockState(),Block.UPDATE_ALL);
+                    player.teleportTo(world,camera.getX()+0.5d,camera.getY(),camera.getZ()+0.5d,0.0f,10.0f);
+                }
+                fixture = new Fixture(lowered, flat, geometric, fence);
             } catch (RuntimeException exception) {
                 serverFailure = exception.getClass().getSimpleName();
             }
@@ -306,6 +346,10 @@ public final class P7ClientVisualProof {
                 || !minecraft.level.getBlockState(current.flat()).is(Blocks.STONE)
                 || !minecraft.level.getBlockState(current.geometric()).is(Blocks.STONE)
                 || !SlabSupport.isBottomSlab(minecraft.level.getBlockState(current.geometric().below()))) {
+            return false;
+        }
+        if (!minecraft.level.getBlockState(current.fence()).is(Blocks.OAK_FENCE)
+                || !near(SlabPlacementHeightAttachment.storedOffset(minecraft.level,current.fence()),0.0d)) {
             return false;
         }
         return near(SlabPlacementHeightAttachment.storedOffset(minecraft.level, current.lowered()), EXPECTED_DY)
@@ -669,7 +713,7 @@ public final class P7ClientVisualProof {
     private interface RegionViewB extends BlockAndTintGetter {
     }
 
-    private record Fixture(BlockPos lowered, BlockPos flat, BlockPos geometric) {
+    private record Fixture(BlockPos lowered, BlockPos flat, BlockPos geometric, BlockPos fence) {
     }
 
     private record Bounds(double minY, double maxY) {

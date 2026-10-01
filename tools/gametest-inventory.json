@@ -192,6 +192,10 @@
     {
       "path": "com/slabbed/test/VanillaDownstreamOwnershipTest.java",
       "classification": "registered_server"
+    },
+    {
+      "path": "com/slabbed/test/FenceCeilingConnectionTest.java",
+      "classification": "registered_server"
     }
   ]
 }
