@@ -208,6 +208,10 @@
     {
       "path": "com/slabbed/test/Issue34PonderRenderViewProof.java",
       "classification": "registered_server"
+    },
+    {
+      "path": "com/slabbed/test/SablePhysicsHeightCellTest.java",
+      "classification": "registered_server"
     }
   ]
 }
