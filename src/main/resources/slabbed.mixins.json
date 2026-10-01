@@ -5,6 +5,7 @@
   "mixins": [
     "HangingSignAttachedMixin",
     "HangingEntityRememberedSeatMixin",
+    "SynchedEntityDataBuilderHangSeatMixin",
     "ItemFrameWysiwygMixin",
     "PaintingRememberedSeatMixin",
     "CandleParticleMixin",

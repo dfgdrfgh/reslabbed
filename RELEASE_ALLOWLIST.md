@@ -88,6 +88,7 @@ com/slabbed/mixin/ChainBlockNeighborSurvivalMixin.class
 com/slabbed/mixin/FencePaneSlabConnectionMixin.class
 com/slabbed/mixin/HangingSignAttachedMixin.class
 com/slabbed/mixin/HangingEntityRememberedSeatMixin.class
+com/slabbed/mixin/SynchedEntityDataBuilderHangSeatMixin.class
 com/slabbed/mixin/ItemFrameWysiwygMixin.class
 com/slabbed/mixin/PaintingRememberedSeatMixin.class
 com/slabbed/mixin/LivingEntityLoweredScaffoldingMixin.class
@@ -218,6 +219,7 @@ com/slabbed/mixin/ChainBlockNeighborSurvivalMixin.java
 com/slabbed/mixin/FencePaneSlabConnectionMixin.java
 com/slabbed/mixin/HangingSignAttachedMixin.java
 com/slabbed/mixin/HangingEntityRememberedSeatMixin.java
+com/slabbed/mixin/SynchedEntityDataBuilderHangSeatMixin.java
 com/slabbed/mixin/ItemFrameWysiwygMixin.java
 com/slabbed/mixin/PaintingRememberedSeatMixin.java
 com/slabbed/mixin/LivingEntityLoweredScaffoldingMixin.java

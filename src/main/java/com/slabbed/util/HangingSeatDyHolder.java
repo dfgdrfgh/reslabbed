@@ -34,6 +34,9 @@ public interface HangingSeatDyHolder {
     /** Bridge: declares the synced seat field. Called from each hung class's synched-data hook. */
     void slabbed$defineHangSeat(SynchedEntityData.Builder builder);
 
+    /** Reserves an unset synced slot for an undeclared subclass without opting it into stored seats. */
+    void slabbed$reserveUndeclaredHangSeatSlot(SynchedEntityData.Builder builder, SynchedEntityData.DataItem<?>[] itemsById);
+
     /**
      * Bridge: the ONE derivation, called from each hung class's facing setter once the position
      * and the facing are both known. Does nothing when a seat already exists.

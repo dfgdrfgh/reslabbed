@@ -126,6 +126,7 @@ sourceSets {
                     "com/slabbed/test/DySpecificationTest.java",
                     "com/slabbed/test/HangingSeatRememberedTest.java",
                     "com/slabbed/test/HangingLoadDeferralTest.java",
+                    "com/slabbed/test/ThirdPartyHungEntitySyncedDataTest.java",
                     "com/slabbed/test/RailSlopeProfileTest.java",
                     "com/slabbed/test/FenceCeilingConnectionTest.java",
                     "com/slabbed/test/RailVisualSignalTest.java",
