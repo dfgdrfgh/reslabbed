@@ -11,6 +11,9 @@ no new features beyond that. The 26.1.2 line is frozen after this release unless
   material swaps and block replacements, deep side placement, hanging decorations that keep their
   seat and never stall a chunk load, farmland and path handling, and the Terrain Slabs, Sodium and
   Lithium compatibility work.
+- Beds placed on lowered supports settle at the right height straight away on your screen. On 26.1.2
+  the game itself only adds the second half of a bed on the server, so Slabbed now adds it on the
+  client too, the way 26.2 does; without that the bed flashed at full height until the server replied.
 - Sulfur spikes do not exist on 26.1.2, so that part of the stored-height coverage is absent here.
 - Requires Fabric Loader 0.19.5 or newer and Fabric API 0.155.3+26.1.2 or newer.
 
