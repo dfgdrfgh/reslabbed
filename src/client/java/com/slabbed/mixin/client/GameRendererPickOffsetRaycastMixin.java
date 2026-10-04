@@ -11,19 +11,17 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 /**
- * The single ownership rule for Slabbed crosshair targeting on Minecraft 1.21.9 and 1.21.10.
+ * The single ownership rule for Slabbed crosshair targeting on Minecraft 1.21.5.
  *
- * <p>Counterpart of {@link ClientPickOffsetRaycastMixin}: up to 1.21.10 the client pick is
- * {@code GameRenderer.updateCrosshairTarget} → {@code findCrosshairTarget} (intermediary
- * {@code method_56153}), where the block portion is a single
- * {@code camera.raycast(reach, tickDelta, false)} call. This redirect replaces only that
- * block raycast with the offset-aware nearest-hit raycast and preserves the vanilla
- * block-vs-entity merge and reach clamp.
+ * <p>The client pick is {@code GameRenderer.updateCrosshairTarget} → {@code findCrosshairTarget},
+ * where the block portion is a single {@code camera.raycast(reach, tickDelta, false)} call. This
+ * redirect replaces only that block raycast with the offset-aware nearest-hit raycast and preserves
+ * the vanilla block-vs-entity merge and reach clamp.
  *
- * <p>The target is named by its intermediary name because this jar is compiled against 1.21.11,
- * where the method no longer exists. {@link com.slabbed.mixin.SlabbedMixinConfigPlugin} applies
- * this mixin only below 1.21.11 and the lambda-based one from 1.21.11 on, so exactly one pick
- * mixin is ever active.
+ * <p>The target is named by its Yarn name: this jar is compiled against a version that still has
+ * the method, so the remapper carries the name into production, and the development client (Yarn
+ * names at runtime, no refmap for raw intermediary strings) resolves it too. The 1.21.9–1.21.11 jar,
+ * compiled against 1.21.11 where the method is gone, has to spell the intermediary name instead.
  */
 @Mixin(GameRenderer.class)
 public abstract class GameRendererPickOffsetRaycastMixin {
@@ -33,7 +31,7 @@ public abstract class GameRendererPickOffsetRaycastMixin {
             Boolean.parseBoolean(System.getProperty("slabbed.offsetRaycast", "true"));
 
     @Redirect(
-            method = "method_56153",
+            method = "findCrosshairTarget",
             at = @At(
                     value = "INVOKE",
                     target = "Lnet/minecraft/entity/Entity;raycast(DFZ)Lnet/minecraft/util/hit/HitResult;"
