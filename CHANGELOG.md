@@ -1,3 +1,20 @@
+## [0.6.2-alpha+1.21.9-1.21.11]
+
+See LAW.md — this changelog does not redefine the law.
+
+One file now covers Minecraft 1.21.9, 1.21.10 and 1.21.11 on Fabric. Behaviour is unchanged from
+0.6.1-alpha; this release is about running the same build on three game versions.
+
+- Minecraft 1.21.9 and 1.21.10 are now supported. The crosshair pick, the Lithium collision seam and
+  the `/slabdev` permission check differ between those versions and 1.21.11, and the build chooses
+  the right one when the game starts.
+- On 1.21.9 and 1.21.10, Sodium 0.6 and 0.7 keep exposed height-step faces visible, matching the
+  Sodium 0.8 behaviour on 1.21.11.
+- Known gaps on 1.21.9 and 1.21.10: Better Block Entities 1.2.0 has a different structure and is not
+  yet aligned with lowered placements; Countered's Terrain Slabs has no build for these two versions,
+  so that compatibility is untested there.
+- Requires Fabric Loader 0.16 or newer and Fabric API 0.134.1 or newer.
+
 ## [0.6.1-alpha+1.21.11]
 
 See LAW.md — this changelog does not redefine the law.

@@ -5,8 +5,6 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.command.permission.Permission;
-import net.minecraft.command.permission.PermissionLevel;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
@@ -46,7 +44,7 @@ public class SlabbedDevCommands {
     private static void registerAll(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(
                 literal("slabdev")
-                        .requires(src -> src.getPermissions().hasPermission(new Permission.Level(PermissionLevel.GAMEMASTERS)))
+                        .requires(com.slabbed.util.SlabbedPermissions::isGamemaster)
                         .then(literal("audit")
                                 .then(argument("category", StringArgumentType.word())
                                         .executes(SlabbedDevCommands::runAudit)))

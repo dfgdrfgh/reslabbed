@@ -1,6 +1,7 @@
 {
   "required": true,
   "package": "com.slabbed.mixin",
+  "plugin": "com.slabbed.mixin.SlabbedMixinConfigPlugin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "HangingSignAttachedMixin",
@@ -16,6 +17,7 @@
     "LithiumStoredPlacementContextMixin",
     "LithiumStoredPlacementShapeMixin",
     "LithiumStoredPlacementPosMixin",
+    "LithiumStoredPlacementSingleSweeperMixin",
     "ScaffoldingStoredPlacementStandMixin",
     "TorchParticleAccessor",
     "TorchParticleMixin",

@@ -21,8 +21,6 @@ import net.minecraft.block.enums.BlockHalf;
 import net.minecraft.block.enums.DoubleBlockHalf;
 import net.minecraft.block.enums.SlabType;
 import net.minecraft.command.CommandSource;
-import net.minecraft.command.permission.Permission;
-import net.minecraft.command.permission.PermissionLevel;
 import net.minecraft.item.Item;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.RegistryKey;
@@ -1100,8 +1098,7 @@ public final class SlabRigCommand {
     private static void registerAll(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(
                 literal("slabrig")
-                        .requires(src -> src.getPermissions().hasPermission(
-                                new Permission.Level(PermissionLevel.GAMEMASTERS)))
+                        .requires(com.slabbed.util.SlabbedPermissions::isGamemaster)
                         .executes(SlabRigCommand::listCases)
                         .then(literal("list").executes(SlabRigCommand::listCases))
                         .then(literal("all").executes(SlabRigCommand::buildAll))

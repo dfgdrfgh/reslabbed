@@ -3,8 +3,6 @@ package com.slabbed.dev;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.minecraft.command.permission.Permission;
-import net.minecraft.command.permission.PermissionLevel;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
@@ -42,8 +40,7 @@ public final class SlabbedLab {
     private static void registerAll(CommandDispatcher<ServerCommandSource> dispatcher) {
         dispatcher.register(
                 literal("slablab")
-                        .requires(src -> src.getPermissions().hasPermission(
-                                new Permission.Level(PermissionLevel.GAMEMASTERS)))
+                        .requires(com.slabbed.util.SlabbedPermissions::isGamemaster)
                         .executes(ctx -> {
                             ctx.getSource().sendFeedback(
                                     () -> Text.literal("[slablab] slabbed lab bootstrap ready."),

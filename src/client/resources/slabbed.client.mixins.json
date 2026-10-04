@@ -1,6 +1,7 @@
 {
   "required": true,
   "package": "com.slabbed.mixin.client",
+  "plugin": "com.slabbed.mixin.SlabbedMixinConfigPlugin",
   "compatibilityLevel": "JAVA_21",
   "client": [
     "BlockEntityOffsetMixin",
@@ -12,12 +13,14 @@
     "SodiumBlockOriginAccessor",
     "BlockRenderInfoCullMixin",
     "SodiumBlockRenderContextCullMixin",
+    "SodiumLegacyBlockRenderContextCullMixin",
     "SodiumInsetTopLightingMixin",
     "ContinuityOverlayHeightMixin",
     "CarpetDyShapeMixin",
     "ItemFrameDrawnFaceRenderMixin",
     "PaintingDrawnFaceRenderMixin",
     "ClientPickOffsetRaycastMixin",
+    "GameRendererPickOffsetRaycastMixin",
     "MinecartRenderOffsetMixin",
     "SlabbedDependentRerenderMixin",
     "WorldRendererImportantRemeshInvoker"
