@@ -46,7 +46,7 @@ public abstract class ServerInteractBlockHitToleranceMixin {
                 || !(pos instanceof BlockPos blockPos)) {
             return Vec3d.ofCenter(pos);
         }
-        ServerWorld world = this.player.getEntityWorld();
+        ServerWorld world = this.player.getWorld();
         if (world == null) {
             return Vec3d.ofCenter(pos);
         }

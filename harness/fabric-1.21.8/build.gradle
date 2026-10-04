@@ -1,0 +1,11 @@
+plugins {
+    id 'fabric-loom' version '1.14-SNAPSHOT'
+}
+
+// Loom's task classes are visible only to the script that declares the plugin, so they are
+// handed to the shared harness body through project properties.
+ext.loomRemapJarTask = net.fabricmc.loom.task.RemapJarTask
+ext.loomServerProductionRunTask = net.fabricmc.loom.task.prod.ServerProductionRunTask
+ext.loomClientProductionRunTask = net.fabricmc.loom.task.prod.ClientProductionRunTask
+
+apply from: "../fabric-production-harness.gradle"

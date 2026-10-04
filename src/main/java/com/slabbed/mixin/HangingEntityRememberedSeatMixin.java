@@ -114,7 +114,7 @@ public abstract class HangingEntityRememberedSeatMixin extends BlockAttachedEnti
         }
         // The restored variant can put a painting's center in a different chunk from its attachment.
         BlockPos entityPos = this.getBlockPos();
-        if (this.getEntityWorld() instanceof ServerWorld world && world.getServer().isOnThread()
+        if (this.getWorld() instanceof ServerWorld world && world.getServer().isOnThread()
                 && world.getChunkManager().getWorldChunk(entityPos.getX() >> 4, entityPos.getZ() >> 4) != null
                 && this.slabbed$tryMintHangSeat()) {
             this.updateAttachmentPosition();
@@ -135,7 +135,7 @@ public abstract class HangingEntityRememberedSeatMixin extends BlockAttachedEnti
                 || this.getAttachedBlockPos() == null || this.getHorizontalFacing() == null) {
             return false;
         }
-        if (!(this.getEntityWorld() instanceof ServerWorld world) || !world.getServer().isOnThread()) {
+        if (!(this.getWorld() instanceof ServerWorld world) || !world.getServer().isOnThread()) {
             return false;
         }
         BlockPos attachedPos = this.getAttachedBlockPos();
@@ -194,7 +194,7 @@ public abstract class HangingEntityRememberedSeatMixin extends BlockAttachedEnti
      */
     @Inject(method = "onTrackedDataSet(Lnet/minecraft/entity/data/TrackedData;)V", at = @At("TAIL"))
     private void slabbed$relayoutOnClientSeatSync(TrackedData<?> data, CallbackInfo ci) {
-        if (SLABBED$HANG_DY.equals(data) && this.getEntityWorld() != null && this.getEntityWorld().isClient()
+        if (SLABBED$HANG_DY.equals(data) && this.getWorld() != null && this.getWorld().isClient()
                 && this.getAttachedBlockPos() != null && this.getHorizontalFacing() != null) {
             this.updateAttachmentPosition();
         }

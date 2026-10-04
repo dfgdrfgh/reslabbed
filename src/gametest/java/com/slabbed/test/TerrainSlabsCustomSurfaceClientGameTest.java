@@ -149,7 +149,7 @@ public final class TerrainSlabsCustomSurfaceClientGameTest implements FabricClie
                 world.setBlockState(chestPos, Blocks.CHEST.getDefaultState(), Block.NOTIFY_LISTENERS);
 
                 world.setBlockState(UNDERSIDE_SUPPORT_POS, top, Block.NOTIFY_LISTENERS);
-                world.setBlockState(chainPos, Blocks.IRON_CHAIN.getDefaultState()
+                world.setBlockState(chainPos, Blocks.CHAIN.getDefaultState()
                         .with(ChainBlock.AXIS, Direction.Axis.Y), Block.NOTIFY_LISTENERS);
 
                 world.setBlockState(GHOST_SUPPORT_POS, bottom, Block.NOTIFY_LISTENERS);
@@ -472,7 +472,7 @@ public final class TerrainSlabsCustomSurfaceClientGameTest implements FabricClie
         boolean ceilingSupport = SlabSupport.isCeilingSupportBottomSurface(mc.world, supportPos);
         ShapeFacts shape = shapeFacts(mc, chainPos, chain, chainPos.getY() + 0.75d);
         String fields = commonSupportFields(mc, supportPos, support)
-                + commonSubjectFields(mc, "minecraft:iron_chain", chainPos, chain, chainDy, shape)
+                + commonSubjectFields(mc, "minecraft:chain", chainPos, chain, chainDy, shape)
                 + " undersideFullSquare=" + undersideFullSquare
                 + " ceilingSupportBottomSurface=" + ceilingSupport
                 + " expectedCustomKind=TOP_LIKE expectedChainDy=0.5 expectedUndersideFullSquare=true";

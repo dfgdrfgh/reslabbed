@@ -3761,7 +3761,7 @@ public final class SlabbedLabClientGameTest implements FabricClientGameTest {
         // ── Case A: chain on top of the lowered 1S slab ─────────────────
         singleplayer.getServer().runOnServer(server -> {
             server.getOverworld().setBlockState(topPos,
-                    Blocks.IRON_CHAIN.getDefaultState().with(net.minecraft.block.ChainBlock.AXIS, Direction.Axis.Y),
+                    Blocks.CHAIN.getDefaultState().with(net.minecraft.block.ChainBlock.AXIS, Direction.Axis.Y),
                     Block.NOTIFY_LISTENERS);
         });
         for (int i = 0; i < 2; i++) {
@@ -4013,7 +4013,7 @@ public final class SlabbedLabClientGameTest implements FabricClientGameTest {
         singleplayer.getClientWorld().waitForChunksRender();
         singleplayer.getServer().runOnServer(server -> {
             server.getOverworld().setBlockState(stackTopPos,
-                    Blocks.IRON_CHAIN.getDefaultState().with(net.minecraft.block.ChainBlock.AXIS, Direction.Axis.Y),
+                    Blocks.CHAIN.getDefaultState().with(net.minecraft.block.ChainBlock.AXIS, Direction.Axis.Y),
                     Block.NOTIFY_LISTENERS);
         });
         for (int i = 0; i < 2; i++) ctx.waitTick();
@@ -4101,7 +4101,7 @@ public final class SlabbedLabClientGameTest implements FabricClientGameTest {
         singleplayer.getClientWorld().waitForChunksRender();
         singleplayer.getServer().runOnServer(server -> {
             server.getOverworld().setBlockState(eChainPos,
-                    Blocks.IRON_CHAIN.getDefaultState().with(net.minecraft.block.ChainBlock.AXIS, Direction.Axis.Y),
+                    Blocks.CHAIN.getDefaultState().with(net.minecraft.block.ChainBlock.AXIS, Direction.Axis.Y),
                     Block.NOTIFY_LISTENERS);
         });
         for (int i = 0; i < 2; i++) ctx.waitTick();
@@ -4374,7 +4374,7 @@ public final class SlabbedLabClientGameTest implements FabricClientGameTest {
         @SuppressWarnings("unchecked")
         AtomicReference<String>[] aRefs = new AtomicReference[]{
                 caseATopState, caseATopDy, caseATopVisualY, caseATopDyPost, caseATopVisualYPost};
-        captureCase.accept(aRefs, Blocks.IRON_CHAIN.getDefaultState()
+        captureCase.accept(aRefs, Blocks.CHAIN.getDefaultState()
                 .with(net.minecraft.block.ChainBlock.AXIS, Direction.Axis.Y));
         try {
             double pre  = Double.parseDouble(caseATopDy.get());
@@ -4597,7 +4597,7 @@ public final class SlabbedLabClientGameTest implements FabricClientGameTest {
         });
         singleplayer.getServer().runOnServer(server -> server.getOverworld().setBlockState(
                 chainPos,
-                Blocks.IRON_CHAIN.getDefaultState().with(net.minecraft.block.ChainBlock.AXIS, Direction.Axis.Y),
+                Blocks.CHAIN.getDefaultState().with(net.minecraft.block.ChainBlock.AXIS, Direction.Axis.Y),
                 Block.NOTIFY_LISTENERS));
         for (int i = 0; i < 2; i++) ctx.waitTick();
         singleplayer.getClientWorld().waitForChunksRender();
@@ -5955,7 +5955,7 @@ public final class SlabbedLabClientGameTest implements FabricClientGameTest {
                 knownScreenshotFiles,
                 artifacts,
                 "chain_on_fb_on_bs_no_rescue_targeting",
-                Blocks.IRON_CHAIN.getDefaultState().with(net.minecraft.block.ChainBlock.AXIS, Direction.Axis.Y),
+                Blocks.CHAIN.getDefaultState().with(net.minecraft.block.ChainBlock.AXIS, Direction.Axis.Y),
                 new BlockPos(32, 0, 0),
                 "Chain must not be promoted as an owner-style rescue target above the slab hit.");
     }

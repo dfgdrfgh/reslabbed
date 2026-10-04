@@ -66,9 +66,9 @@ public final class AttachmentCapacitySuite {
         }
 
         if (overflow != null) {
-            ctx.throwGameTestException(
+            ctx.throwGameTestException(net.minecraft.text.Text.literal(
                     "Issue #38 RED: 2,048 exact markers overflow the current frozen_flat sync: "
-                            + overflow.getMessage());
+                            + overflow.getMessage()));
             return;
         }
         ctx.complete();

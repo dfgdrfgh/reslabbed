@@ -4,7 +4,7 @@ on:
   pull_request:
   push:
     branches:
-      - "port/fabric-1.21.11-**"
+      - "port/fabric-1.21.8-**"
   workflow_dispatch:
 
 permissions:
@@ -78,7 +78,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        version: ["1.21.9", "1.21.10", "1.21.11"]
+        version: ["1.21.6", "1.21.7", "1.21.8"]
 
     steps:
       - name: Check out source
@@ -105,7 +105,7 @@ jobs:
         run: |
           curl -sSfL -o /tmp/intermediary.tiny "https://raw.githubusercontent.com/FabricMC/intermediary/master/mappings/${{ matrix.version }}.tiny"
           ./gradlew --no-daemon --console=plain -p harness/fabric-${{ matrix.version }} downloadOfficialClientJar
-          python3 tools/linkage-scan.py build/libs/*+1.21.9-1.21.11.jar /tmp/intermediary.tiny harness/fabric-${{ matrix.version }}/build/official-client.jar --allow-class 'com/slabbed/util/SlabbedPermissions$ModernCheck'
+          python3 tools/linkage-scan.py build/libs/*+1.21.6-1.21.8.jar /tmp/intermediary.tiny harness/fabric-${{ matrix.version }}/build/official-client.jar
 
       - name: Server GameTests on ${{ matrix.version }} (default leg)
         run: ./gradlew --no-daemon --stacktrace --console=plain -p harness/fabric-${{ matrix.version }} runGameTest verifyHarnessGameTestCount -Pleg=default

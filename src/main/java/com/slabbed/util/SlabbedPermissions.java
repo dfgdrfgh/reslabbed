@@ -1,8 +1,6 @@
 package com.slabbed.util;
 
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.command.permission.Permission;
-import net.minecraft.command.permission.PermissionLevel;
 import net.minecraft.server.command.ServerCommandSource;
 
 import java.lang.invoke.MethodHandle;
@@ -12,48 +10,34 @@ import java.lang.invoke.MethodType;
 /**
  * Gamemaster permission check that resolves on every Minecraft version this jar declares.
  *
- * <p>Minecraft 1.21.11 replaced {@code ServerCommandSource.hasPermissionLevel(int)} with the
- * permission-set API. One jar covers 1.21.9 through 1.21.11, so the check is chosen at class
- * initialization: the legacy method is looked up through the loader's mapping resolver (its
- * intermediary name is stable across the covered versions) and used when present; otherwise the
- * permission-set API is used. The modern branch lives in a nested class so that no 1.21.11-only
- * type is resolved on a version that lacks it.
+ * <p>Every version from 1.21.6 to 1.21.8 has {@code ServerCommandSource.hasPermissionLevel(int)}; the
+ * method is looked up once through the loader's mapping resolver by its intermediary name, which is
+ * stable across the covered versions, so the check never names a Yarn spelling that could drift.
+ * (1.21.11 replaced this method with the permission-set API; that version is served by another jar.)
  */
 public final class SlabbedPermissions {
 
-    private static final MethodHandle LEGACY_HAS_PERMISSION_LEVEL = resolveLegacy();
+    private static final MethodHandle HAS_PERMISSION_LEVEL = resolve();
 
     private SlabbedPermissions() {}
 
     /** True when the source may run maintainer-level commands (vanilla permission level 2). */
     public static boolean isGamemaster(ServerCommandSource source) {
-        if (LEGACY_HAS_PERMISSION_LEVEL != null) {
-            try {
-                return (boolean) LEGACY_HAS_PERMISSION_LEVEL.invoke(source, 2);
-            } catch (Throwable t) {
-                throw new IllegalStateException("Slabbed: legacy permission check failed", t);
-            }
+        try {
+            return (boolean) HAS_PERMISSION_LEVEL.invoke(source, 2);
+        } catch (Throwable t) {
+            throw new IllegalStateException("Slabbed: permission check failed", t);
         }
-        return ModernCheck.isGamemaster(source);
     }
 
-    private static MethodHandle resolveLegacy() {
+    private static MethodHandle resolve() {
         try {
             String runtimeName = FabricLoader.getInstance().getMappingResolver().mapMethodName(
                     "intermediary", "net.minecraft.class_2168", "method_9259", "(I)Z");
             return MethodHandles.publicLookup().findVirtual(ServerCommandSource.class, runtimeName,
                     MethodType.methodType(boolean.class, int.class));
         } catch (NoSuchMethodException | IllegalAccessException e) {
-            return null;
-        }
-    }
-
-    /** Resolved only when the legacy method is absent, i.e. on 1.21.11 and later. */
-    private static final class ModernCheck {
-        private ModernCheck() {}
-
-        static boolean isGamemaster(ServerCommandSource source) {
-            return source.getPermissions().hasPermission(new Permission.Level(PermissionLevel.GAMEMASTERS));
+            throw new IllegalStateException("Slabbed: ServerCommandSource.hasPermissionLevel(int) is missing", e);
         }
     }
 }

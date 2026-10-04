@@ -27,7 +27,7 @@ public abstract class MinecartRenderOffsetMixin {
                                               MinecartEntityRenderState state,
                                               float tickDelta,
                                               CallbackInfo ci) {
-        World world = entity.getEntityWorld();
+        World world = entity.getWorld();
         if (world == null) {
             return;
         }

@@ -36,7 +36,7 @@ public final class SlabbedDiagnosticsTest {
         BlockState bottomSlab = Blocks.OAK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM);
         BlockState topSlab = Blocks.OAK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP);
         BlockState bed = Blocks.WHITE_BED.getDefaultState();
-        BlockState chain = Blocks.IRON_CHAIN.getDefaultState();
+        BlockState chain = Blocks.CHAIN.getDefaultState();
         BlockState lantern = Blocks.LANTERN.getDefaultState();
 
         // Base-0 block, outline followed the dy → no flag.
@@ -134,7 +134,7 @@ public final class SlabbedDiagnosticsTest {
                 net.minecraft.text.Text.literal("cave air is air too — the gate is isAir(), not an id comparison"));
         ctx.assertTrue(SlabbedDiagnostics.smooshRisk(Blocks.LANTERN.getDefaultState(), floor),
                 net.minecraft.text.Text.literal("THE GATE MUST NOT SILENCE THE FLAG: a real decoration at the floor still flags"));
-        ctx.assertTrue(SlabbedDiagnostics.smooshRisk(Blocks.IRON_CHAIN.getDefaultState(), floor),
+        ctx.assertTrue(SlabbedDiagnostics.smooshRisk(Blocks.CHAIN.getDefaultState(), floor),
                 net.minecraft.text.Text.literal("the two non-air SMOOSH rows of run 9e925ab0 were iron_chain — they must survive "
                         + "the narrowing"));
         ctx.complete();
@@ -142,7 +142,7 @@ public final class SlabbedDiagnosticsTest {
 
     @GameTest(structure = "fabric-gametest-api-v1:empty")
     public void gapDetectorFiresOnChainLanternDyMismatch(TestContext ctx) {
-        BlockState chain = Blocks.IRON_CHAIN.getDefaultState();
+        BlockState chain = Blocks.CHAIN.getDefaultState();
         BlockState lantern = Blocks.LANTERN.getDefaultState();
         BlockState stone = Blocks.STONE.getDefaultState();
         ctx.assertTrue(SlabbedDiagnostics.dyDiscontinuity(chain, lantern, -0.5, 0.0),

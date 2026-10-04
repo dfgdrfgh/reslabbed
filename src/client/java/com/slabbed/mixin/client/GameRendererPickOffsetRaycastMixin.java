@@ -46,6 +46,6 @@ public abstract class GameRendererPickOffsetRaycastMixin {
         Vec3d eye = camera.getCameraPosVec(tickDelta);
         Vec3d look = camera.getRotationVec(tickDelta);
         Vec3d end = eye.add(look.x * maxDistance, look.y * maxDistance, look.z * maxDistance);
-        return SlabbedOffsetRaycast.raycast(camera.getEntityWorld(), eye, end, ShapeContext.of(camera));
+        return SlabbedOffsetRaycast.raycast(camera.getWorld(), eye, end, ShapeContext.of(camera));
     }
 }

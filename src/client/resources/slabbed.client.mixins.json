@@ -7,23 +7,23 @@
     "BlockEntityOffsetMixin",
     "CreateFlyBlockEntityVisualAccessor",
     "CreateFlyContainerOffsetMixin",
-    "BetterBlockEntitiesMeshOffsetMixin",
-    "BetterBlockEntitiesRenderOffsetMixin",
-    "SodiumRenderContextAccessor",
     "SodiumBlockOriginAccessor",
     "BlockRenderInfoCullMixin",
-    "SodiumBlockRenderContextCullMixin",
+    "SodiumLegacyRenderContextAccessor",
+    "SodiumBlockEmitterContextAccessor",
+    "BetterBlockEntitiesLegacyMeshOffsetMixin",
     "SodiumLegacyBlockRenderContextCullMixin",
     "SodiumInsetTopLightingMixin",
     "ContinuityOverlayHeightMixin",
     "CarpetDyShapeMixin",
     "ItemFrameDrawnFaceRenderMixin",
     "PaintingDrawnFaceRenderMixin",
-    "ClientPickOffsetRaycastMixin",
     "GameRendererPickOffsetRaycastMixin",
     "MinecartRenderOffsetMixin",
     "SlabbedDependentRerenderMixin",
     "WorldRendererImportantRemeshInvoker"
   ],
-  "injectors": { "defaultRequire": 1 }
+  "injectors": {
+    "defaultRequire": 1
+  }
 }

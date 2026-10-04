@@ -38,7 +38,7 @@ public final class ChainUnderLoweredFullBlockCapTest {
     private static final double EPS = 1.0e-6;
 
     private static BlockState yChain() {
-        return Blocks.IRON_CHAIN.getDefaultState().with(Properties.AXIS, Direction.Axis.Y);
+        return Blocks.CHAIN.getDefaultState().with(Properties.AXIS, Direction.Axis.Y);
     }
 
     private static BlockState hangingLantern() {

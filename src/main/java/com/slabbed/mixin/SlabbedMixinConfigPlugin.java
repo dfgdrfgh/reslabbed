@@ -45,10 +45,8 @@ import java.util.Set;
  */
 public final class SlabbedMixinConfigPlugin implements IMixinConfigPlugin {
 
-    static final String MODERN_PICK_MIXIN = "com.slabbed.mixin.client.ClientPickOffsetRaycastMixin";
     static final String LEGACY_PICK_MIXIN = "com.slabbed.mixin.client.GameRendererPickOffsetRaycastMixin";
     static final String LITHIUM_SINGLE_SWEEPER_MIXIN = "com.slabbed.mixin.LithiumStoredPlacementSingleSweeperMixin";
-    static final String MODERN_PICK_VERSION_RANGE = ">=1.21.11";
 
     static final String LITHIUM_SWEEPER_CLASS =
             "net/caffeinemc/mods/lithium/common/entity/movement/ChunkAwareBlockCollisionSweeper";
@@ -60,17 +58,14 @@ public final class SlabbedMixinConfigPlugin implements IMixinConfigPlugin {
 
     private static final Logger LOGGER = LoggerFactory.getLogger("slabbed/mixin");
 
-    private boolean modernPick;
     private boolean lithiumSingleSweeper;
 
     @Override
     public void onLoad(String mixinPackage) {
-        this.modernPick = minecraftMatches(MODERN_PICK_VERSION_RANGE);
         boolean splitPresent = resourcePresent(LITHIUM_SPLIT_SWEEPER_CLASS);
         this.lithiumSingleSweeper = !splitPresent
                 && methodCallsEndOfData(LITHIUM_SWEEPER_CLASS, SWEEPER_ENTRY_METHOD);
-        LOGGER.info("Slabbed mixin selection: crosshair pick = {}, Lithium sweeper layout = {}",
-                this.modernPick ? "ClientPlayerEntity (1.21.11+)" : "GameRenderer (1.21.10 and older)",
+        LOGGER.info("Slabbed mixin selection: crosshair pick = GameRenderer, Lithium sweeper layout = {}",
                 splitPresent ? "split (0.21+)" : (this.lithiumSingleSweeper ? "single" : "absent"));
     }
 
@@ -81,17 +76,11 @@ public final class SlabbedMixinConfigPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        return !withheld(mixinClassName, this.modernPick, this.lithiumSingleSweeper);
+        return !withheld(mixinClassName, this.lithiumSingleSweeper);
     }
 
     /** The whole decision as a pure function, so it can be unit-tested without Mixin. */
-    static boolean withheld(String mixinClassName, boolean modernPick, boolean lithiumSingleSweeper) {
-        if (MODERN_PICK_MIXIN.equals(mixinClassName)) {
-            return !modernPick;
-        }
-        if (LEGACY_PICK_MIXIN.equals(mixinClassName)) {
-            return modernPick;
-        }
+    static boolean withheld(String mixinClassName, boolean lithiumSingleSweeper) {
         if (LITHIUM_SINGLE_SWEEPER_MIXIN.equals(mixinClassName)) {
             return !lithiumSingleSweeper;
         }

@@ -673,7 +673,7 @@ public final class OffsetRaycastTargetingTest {
         BlockPos bTop = bFb.up();
         world.setBlockState(bTop, Blocks.OAK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP), Block.NOTIFY_LISTENERS);
         BlockPos bChain = bTop.up();
-        world.setBlockState(bChain, Blocks.IRON_CHAIN.getDefaultState(), Block.NOTIFY_LISTENERS);
+        world.setBlockState(bChain, Blocks.CHAIN.getDefaultState(), Block.NOTIFY_LISTENERS);
         double bChainDy = SlabSupport.getYOffset(world, bChain, world.getBlockState(bChain));
         ctx.assertTrue(bChainDy == -0.5,
                 net.minecraft.text.Text.literal("chain on a lowered TOP slab must follow it down (was floating at 0.0), got " + bChainDy));

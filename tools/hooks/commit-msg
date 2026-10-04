@@ -50,7 +50,7 @@ fi
 # behavior-touching commit (ledger mtime vs that commit's time) — same rule as before, the
 # bookkeeping just moved out of the tracked tree.
 if [ -n "$BEHAVIOR" ]; then
-  NOTES_DIR="${SLABBED_NOTES:-$HOME/CascadeProjects/Slabbed-notes/parity-1.21.11}"
+  NOTES_DIR="${SLABBED_NOTES:-$HOME/CascadeProjects/Slabbed-notes/parity-1.21.8}"
   LEDGER_FILE="$NOTES_DIR/LIVE_LEDGER.md"
   if [ ! -f "$LEDGER_FILE" ]; then
     fail "S-5: local ledger not found at $LEDGER_FILE.

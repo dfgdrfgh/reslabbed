@@ -67,7 +67,7 @@ public final class SmooshUnderTerrainSlabsTest {
     }
 
     private static BlockState yAxisChain() {
-        return Blocks.IRON_CHAIN.getDefaultState().with(ChainBlock.AXIS, Direction.Axis.Y);
+        return Blocks.CHAIN.getDefaultState().with(ChainBlock.AXIS, Direction.Axis.Y);
     }
 
     // THE FIX (RED without it = 0.5): hanging roots under a TS TOP slab hang flush.

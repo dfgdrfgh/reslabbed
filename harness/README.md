@@ -20,11 +20,11 @@ the EXACT release jar (plus the test kit, which carries the dev-only classes the
 
 ```bash
 ./gradlew build remapTestkitJar                      # from the line root: release jar + test kit
-V=fabric-1.21.10   # also fabric-1.21.9 and fabric-1.21.11
+V=fabric-1.21.7   # also fabric-1.21.6 and fabric-1.21.8
 ./gradlew -p harness/$V runGameTest verifyHarnessGameTestCount -Pleg=default
 ./gradlew -p harness/$V runGameTest verifyHarnessGameTestCount -Pleg=deepdy -Dslabbed.deepDyAlphabet=true
 ./gradlew -p harness/$V runProductionClientGameTest verifyHarnessClientLeg
-python3 tools/linkage-scan.py build/libs/<jar> <intermediary.tiny> <official client jar> --allow-class 'com/slabbed/util/SlabbedPermissions$ModernCheck'
+python3 tools/linkage-scan.py build/libs/<jar> <intermediary.tiny> <official client jar>
 ```
 
 Receipts land in `harness/<version>/build/harness-receipts/`. Each harness is its own Gradle build

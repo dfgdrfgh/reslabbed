@@ -58,7 +58,7 @@ public final class SlabTestKit {
         // Floor / ceiling light-emitters that sit on a support surface.
         add(ids, "minecraft:torch");
         add(ids, "minecraft:lantern");
-        add(ids, "minecraft:iron_chain");
+        add(ids, "minecraft:chain");
         add(ids, "minecraft:flower_pot");
         // Doors / trapdoors — half-height + full-height attach behaviour.
         add(ids, "minecraft:oak_door");

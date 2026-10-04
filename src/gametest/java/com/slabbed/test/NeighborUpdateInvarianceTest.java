@@ -501,7 +501,7 @@ public final class NeighborUpdateInvarianceTest {
                 double supportDy = dy(w, support);
                 ctx.assertTrue(Math.abs(supportDy + 0.5) <= EPS,
                         net.minecraft.text.Text.literal("premise: the chain's support must render -0.5, got " + supportDy));
-                place(ctx, Blocks.IRON_CHAIN.asItem(), support, Direction.UP, 0.0);
+                place(ctx, Blocks.CHAIN.asItem(), support, Direction.UP, 0.0);
                 return support.up();
             }),
             // #9 — lane B (new, 2026-08-06 S-2 matrix repair): an ordinary full block beside a -1.0

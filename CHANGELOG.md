@@ -1,3 +1,20 @@
+## [0.6.2-alpha+1.21.6-1.21.8]
+
+See LAW.md — this changelog does not redefine the law.
+
+One file covers Minecraft 1.21.6, 1.21.7 and 1.21.8 on Fabric. This is the first Slabbed release for
+these three versions; the behaviour is the 0.6.1-alpha feature set as shipped for 1.21.9 and newer.
+
+- Everything Slabbed does on 1.21.9–1.21.11 now applies here: placed blocks keep the height they were
+  placed at, with targeting, outlines, collision, models, particles, block entities, hanging
+  decorations, rails and redstone following that height.
+- Sodium 0.6 and 0.7 keep exposed height-step faces visible; Lithium 0.17 and 0.18 collide with
+  lowered blocks where they are drawn; Better Block Entities 1.0–1.2 draws its chests, shulker boxes,
+  bells and pots at the lowered height.
+- Copper chains do not exist on these versions, so the chain support work covers iron chains only.
+- Requires Fabric Loader 0.16 or newer and Fabric API 0.128 or newer (0.128.2 on 1.21.6, 0.129 on
+  1.21.7, 0.136 on 1.21.8 are the builds this release was proven with).
+
 ## [0.6.2-alpha+1.21.9-1.21.11]
 
 See LAW.md — this changelog does not redefine the law.

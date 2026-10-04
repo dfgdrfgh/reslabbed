@@ -102,7 +102,7 @@ public final class CeilingRoleNotClassnameTest {
 
         w.setBlockState(slabPos, Blocks.BIRCH_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                 Block.NOTIFY_LISTENERS);
-        w.setBlockState(chainPos, Blocks.IRON_CHAIN.getDefaultState(), Block.NOTIFY_LISTENERS);
+        w.setBlockState(chainPos, Blocks.CHAIN.getDefaultState(), Block.NOTIFY_LISTENERS);
         ctx.assertTrue(w.getBlockState(chainPos.up()).isAir(),
                 net.minecraft.text.Text.literal("premise: the standing chain must have OPEN AIR above it, or it is a hung chain"));
         assertRoleIsStanding(ctx, w, chainPos, "a chain standing with air above");
@@ -194,7 +194,7 @@ public final class CeilingRoleNotClassnameTest {
 
         loweredCantileveredSupport(ctx, w, slabPos, dirtPos, supportPos);
 
-        w.setBlockState(chainPos, Blocks.IRON_CHAIN.getDefaultState(), Block.NOTIFY_LISTENERS);
+        w.setBlockState(chainPos, Blocks.CHAIN.getDefaultState(), Block.NOTIFY_LISTENERS);
         ctx.assertTrue(SlabSupport.isCeilingAttached(w, chainPos, w.getBlockState(chainPos)),
                 net.minecraft.text.Text.literal("a chain with a real block above it hangs from that block and must stay "
                         + "ceiling-attached — the world query must answer YES here"));
@@ -204,7 +204,7 @@ public final class CeilingRoleNotClassnameTest {
 
         // A second chain BELOW the first is still hung: the walk steps over same-family members and
         // is answered by the run's terminator, not by its first cell.
-        w.setBlockState(lanternPos, Blocks.IRON_CHAIN.getDefaultState(), Block.NOTIFY_LISTENERS);
+        w.setBlockState(lanternPos, Blocks.CHAIN.getDefaultState(), Block.NOTIFY_LISTENERS);
         ctx.assertTrue(SlabSupport.isCeilingAttached(w, lanternPos, w.getBlockState(lanternPos)),
                 net.minecraft.text.Text.literal("the second chain down a hung run must also read as hanging — the run walk must "
                         + "step over the chain above it and find the block that caps the run"));

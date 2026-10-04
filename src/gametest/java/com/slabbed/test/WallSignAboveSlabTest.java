@@ -99,7 +99,7 @@ public final class WallSignAboveSlabTest {
         ctx.assertTrue(world.getBlockState(wallC).isOf(Blocks.STONE) && Math.abs(wallCDy + 0.5d) <= EPS,
                 net.minecraft.text.Text.literal("premise: the wall block must be lowered onto the slab: " + rc + " dy=" + wallCDy
                         + " wallC=" + world.getBlockState(wallC) + " slabC=" + world.getBlockState(slabC)
-                        + " builderPos=" + builder.getEntityPos() + " slabC=" + slabC));
+                        + " builderPos=" + builder.getPos() + " slabC=" + slabC));
         BlockPos signC = hangSign(ctx, player, wallC);
 
         double a = seatOf(world, signA);
