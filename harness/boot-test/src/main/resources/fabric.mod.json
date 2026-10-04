@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "id": "slabbed_harness",
+  "version": "1.0.0",
+  "name": "Slabbed harness boot test",
+  "environment": "*",
+  "entrypoints": {
+    "fabric-client-gametest": [
+      "com.slabbed.harness.HarnessBootClientGameTest"
+    ]
+  },
+  "depends": { "slabbed": "*" }
+}

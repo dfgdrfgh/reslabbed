@@ -739,3 +739,79 @@ publishing {
         // fetching dependencies.
     }
 }
+
+// ── Test kit for the per-version production harness (NOT a release artifact) ─────────────────
+// One jar covers several Minecraft versions, and each covered version must run the full GameTest
+// suite against the EXACT release jar. The suite depends on the dev-only classes that the hygiene
+// gate strips from the release jar (SlabTestKit, the /slabrig rig, the audit harness, ...), so
+// those classes are packaged here as a separate intermediary-mapped jar that the harness loads
+// beside the release jar. Nothing in build/testkit/ is published; the release allowlist gate reads
+// only remapJar/remapSourcesJar. See harness/README.md.
+tasks.register("testkitJar", Jar) {
+    archiveClassifier = "testkit-dev"
+    destinationDirectory = layout.buildDirectory.dir("testkit")
+    from(sourceSets.main.output) { include(slabbedHygieneExcludes("class")) }
+    from(sourceSets.client.output) { include(slabbedHygieneExcludes("class")) }
+    from(layout.projectDirectory.file("harness/testkit.fabric.mod.json")) {
+        rename { "fabric.mod.json" }
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+tasks.register("remapTestkitJar", net.fabricmc.loom.task.RemapJarTask) {
+    dependsOn("testkitJar")
+    inputFile = tasks.named("testkitJar", Jar).flatMap { it.archiveFile }
+    archiveClassifier = "testkit"
+    destinationDirectory = layout.buildDirectory.dir("testkit")
+    classpath.from(sourceSets.main.compileClasspath, sourceSets.client.compileClasspath)
+    addNestedDependencies = false
+}
+
+// The harness's server legs run in a Loom development environment. At remap time Loom marks every
+// class of the client source set as client-only, twice: the manifest's client-only entry list and a
+// class-level @Environment(CLIENT) annotation. A dedicated server, dev or production, refuses to
+// load such a class. The server GameTest suite deliberately exercises client helpers (ClientDy,
+// the beta-notice gate, the carpet client-dy authority rows), which the line's own dev run can do
+// only because it runs on the unmarked source-set output. This copy of the release jar therefore
+// removes exactly those two Loom-added markers and nothing else: every entry is otherwise
+// byte-identical, and the class-level annotation strip touches no code. It is for the harness's
+// server legs only; the production client leg and the linkage scan use the release jar itself.
+tasks.register("harnessReleaseJar") {
+    dependsOn("remapJar")
+    def source = tasks.named("remapJar").flatMap { it.archiveFile }
+    def target = layout.buildDirectory.file("testkit/${project.archives_base_name}-${project.version}-harness.jar")
+    inputs.file(source)
+    outputs.file(target)
+    doLast {
+        def out = target.get().asFile
+        out.parentFile.mkdirs()
+        new java.util.zip.ZipFile(source.get().asFile).withCloseable { zip ->
+            new java.util.zip.ZipOutputStream(new FileOutputStream(out)).withCloseable { zos ->
+                for (entry in zip.entries()) {
+                    byte[] bytes = entry.directory ? new byte[0] : zip.getInputStream(entry).bytes
+                    if (entry.name == "META-INF/MANIFEST.MF") {
+                        def manifest = new java.util.jar.Manifest(new ByteArrayInputStream(bytes))
+                        manifest.mainAttributes.remove(new java.util.jar.Attributes.Name("Fabric-Loom-Client-Only-Entries"))
+                        manifest.mainAttributes.remove(new java.util.jar.Attributes.Name("Fabric-Loom-Split-Environment"))
+                        def baos = new ByteArrayOutputStream(); manifest.write(baos); bytes = baos.toByteArray()
+                    }
+                    if (entry.name.startsWith("com/slabbed/") && entry.name.endsWith(".class")) {
+                        def node = new org.objectweb.asm.tree.ClassNode()
+                        new org.objectweb.asm.ClassReader(bytes).accept(node, 0)
+                        boolean changed = false
+                        if (node.visibleAnnotations != null) {
+                            changed = node.visibleAnnotations.removeIf { it.desc == "Lnet/fabricmc/api/Environment;" }
+                        }
+                        if (changed) {
+                            def writer = new org.objectweb.asm.ClassWriter(0)
+                            node.accept(writer)
+                            bytes = writer.toByteArray()
+                        }
+                    }
+                    def copy = new java.util.zip.ZipEntry(entry.name); copy.time = entry.time
+                    zos.putNextEntry(copy); zos.write(bytes); zos.closeEntry()
+                }
+            }
+        }
+    }
+}
+tasks.named("remapTestkitJar").configure { finalizedBy("harnessReleaseJar") }

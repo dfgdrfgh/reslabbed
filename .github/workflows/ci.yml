@@ -66,3 +66,59 @@ jobs:
             build/run/gameTest/logs/
           if-no-files-found: ignore
           retention-days: 7
+
+  # One jar, several Minecraft versions: every declared version runs the full server suite against
+  # the release jar built above (see harness/README.md). The build version itself is covered by
+  # the verify job.
+  harness:
+    name: Harness ${{ matrix.version }}
+    needs: verify
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        version: ["1.21.9", "1.21.10", "1.21.11"]
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Set up Java 21
+        uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5.6.0
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
+        with:
+          cache-provider: basic
+          cache-read-only: ${{ github.event_name == 'pull_request' }}
+
+      - name: Build the release jar, test kit and harness copy
+        run: ./gradlew --no-daemon --stacktrace --console=plain remapJar remapTestkitJar
+
+      - name: Linkage scan against ${{ matrix.version }}
+        run: |
+          curl -sSfL -o /tmp/intermediary.tiny "https://raw.githubusercontent.com/FabricMC/intermediary/master/mappings/${{ matrix.version }}.tiny"
+          ./gradlew --no-daemon --console=plain -p harness/fabric-${{ matrix.version }} downloadOfficialClientJar
+          python3 tools/linkage-scan.py build/libs/*+1.21.9-1.21.11.jar /tmp/intermediary.tiny harness/fabric-${{ matrix.version }}/build/official-client.jar --allow-class 'com/slabbed/util/SlabbedPermissions$ModernCheck'
+
+      - name: Server GameTests on ${{ matrix.version }} (default leg)
+        run: ./gradlew --no-daemon --stacktrace --console=plain -p harness/fabric-${{ matrix.version }} runGameTest verifyHarnessGameTestCount -Pleg=default
+
+      - name: Server GameTests on ${{ matrix.version }} (deep dy alphabet leg)
+        run: ./gradlew --no-daemon --stacktrace --console=plain -p harness/fabric-${{ matrix.version }} runGameTest verifyHarnessGameTestCount -Pleg=deepdy -Dslabbed.deepDyAlphabet=true
+
+      - name: Upload harness logs on failure
+        if: failure()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: harness-${{ matrix.version }}-logs
+          path: |
+            harness/fabric-${{ matrix.version }}/build/run/gameTest/logs/
+          if-no-files-found: ignore
+          retention-days: 7

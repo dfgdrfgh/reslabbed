@@ -1,0 +1,194 @@
+// Shared body of every Fabric per-version harness. Applied by harness/<version>/build.gradle after
+// its plugins block, which also exposes Loom's task classes as project.loom*Task properties.
+// Reads from gradle.properties: minecraft_version, yarn_mappings, loader_version, fabric_version,
+// slabbed_jar (the harness copy for the dev server legs), slabbed_release_jar (the release jar
+// itself, for the production client leg and the linkage scan) and slabbed_testkit, all relative
+// to the harness directory.
+//
+// Two kinds of leg, both against the release jar built on the line's own version:
+//
+//  * Server GameTest legs (default and deep-dy-alphabet) run in Loom's development environment
+//    for THIS version: Loom remaps the release jar and the test kit from intermediary to this
+//    version's named mappings, exactly as it does for any mod dependency, and the shared
+//    src/gametest sources are compiled against this version. Vanilla's own GameTest runner cannot
+//    parse the test annotation in a production (intermediary) runtime, so the server suite is a
+//    dev-environment proof; the production-side guarantee for the same bytes comes from
+//    tools/linkage-scan.py and from the production client leg below.
+//
+//  * The production client leg boots a real client on this version from the intermediary jars
+//    with `-Dfabric.client.gametest`, so every client mixin must apply (`defaultRequire 1`) and
+//    the client GameTest entrypoints run on the shipped bytes.
+
+loom {
+    splitEnvironmentSourceSets()
+}
+
+fabricApi {
+    configureTests {
+        createSourceSet = true
+        modId = "slabbed_gametest"
+    }
+}
+
+sourceSets {
+    // The harness's own mod: the production boot test (client) and its descriptor.
+    main {
+        java.srcDirs = []
+        resources.srcDirs = [file("../boot-test/src/main/resources")]
+    }
+    client {
+        java.srcDirs = [file("../boot-test/src/client/java")]
+        resources.srcDirs = []
+    }
+    gametest {
+        java.srcDirs = [file("../../src/gametest/java")]
+        resources.srcDirs = [file("../../src/gametest/resources")]
+    }
+}
+
+repositories {
+    maven { name = "Fabric"; url = "https://maven.fabricmc.net/" }
+    mavenCentral()
+}
+
+configurations {
+    productionMods
+    // The umbrella jar nests every runtime module but not the two test-API modules; resolve them
+    // through the umbrella's own dependency list so no module version is hand-pinned.
+    productionTestApis
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    modClientImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    modImplementation files(project.slabbed_jar)
+    modImplementation files(project.slabbed_testkit)
+    modClientImplementation files(project.slabbed_jar)
+    modClientImplementation files(project.slabbed_testkit)
+    productionMods("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}") { transitive = false }
+    productionTestApis("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
+}
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.release = 21
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+// ── Server GameTest legs (development environment for this version) ───────────────────────────
+tasks.matching { it.name == "runGameTest" }.configureEach {
+    outputs.upToDateWhen { false }
+    jvmArguments.addAll(["-Dmixin.debug.verify=true"])
+    jvmArguments.addAll(
+            providers.systemProperty("slabbed.deepDyAlphabet")
+                    .map { v -> ["-Dslabbed.deepDyAlphabet=" + v] }
+                    .orElse([])
+    )
+    doFirst {
+        // A stale run dir silently drops tests; every leg starts from nothing.
+        delete(file("build/run/gameTest"))
+    }
+}
+
+def expectedSuiteCount = {
+    def proc = new ProcessBuilder("python3", "tools/expected-gametest-count.py")
+            .directory(file("../.."))
+            .redirectErrorStream(true).start()
+    def out = proc.inputStream.text
+    if (proc.waitFor() != 0) throw new GradleException("expected-gametest-count failed:\n" + out)
+    def m = (out =~ /expected suite count (\d+)/)
+    if (!m.find()) throw new GradleException("could not parse expected count from: " + out)
+    return m.group(1) as int
+}
+
+// Run after a server leg: `./gradlew -p harness/<v> runGameTest verifyHarnessGameTestCount -Pleg=default`
+// and again with `-Dslabbed.deepDyAlphabet=true -Pleg=deepdy`. Writes a receipt per leg.
+tasks.register("verifyHarnessGameTestCount") {
+    mustRunAfter("runGameTest")
+    doLast {
+        String leg = project.findProperty("leg") ?: "default"
+        int expected = expectedSuiteCount()
+        def log = file("build/run/gameTest/logs/latest.log")
+        if (!log.exists()) throw new GradleException("${leg}: no build/run/gameTest/logs/latest.log — runGameTest did not run.")
+        def text = log.text
+        def mm = (text =~ /All (\d+) required tests passed/)
+        if (!mm.find()) throw new GradleException("${leg}: no 'required tests passed' line — the suite did not complete.")
+        int reported = mm.group(1) as int
+        if (reported != expected) throw new GradleException("${leg}: FALSE GREEN — reported ${reported}, expected ${expected}.")
+        if (text.contains("Mixin apply failed") || text.contains("MixinApplyError") || text.contains("InjectionError")) {
+            throw new GradleException("${leg}: mixin apply/injection errors in logs/latest.log.")
+        }
+        def receipts = file("build/harness-receipts"); receipts.mkdirs()
+        new File(receipts, "server-${leg}.txt").text = "minecraft=${project.minecraft_version}\nleg=${leg}\nreported=${reported}\nexpected=${expected}\njar=${file(project.slabbed_jar).name}\n"
+        logger.lifecycle("verifyHarnessGameTestCount[${leg}] (${project.minecraft_version}): OK — ${reported}/${expected}")
+    }
+}
+
+// ── Production client leg (intermediary jars, real client) ────────────────────────────────────
+// The server GameTest jar stays out of this leg on purpose: vanilla's test runner cannot parse the
+// test annotation in a production runtime. The harness mod (this project's own remapped jar,
+// which Loom adds to the run) carries the boot test instead.
+tasks.register("runProductionClientGameTest", project.loomClientProductionRunTask) {
+    dependsOn("remapJar")
+    mods.from(files(project.slabbed_release_jar))
+    mods.from(configurations.productionMods)
+    mods.from(configurations.productionTestApis.filter {
+        it.name.startsWith("fabric-gametest-api-v1") || it.name.startsWith("fabric-client-gametest-api-v1")
+    })
+    // Optional compatibility set: `-PextraMods=<dir>` adds every jar in that directory (for example
+    // this version's Sodium, Lithium and Better Block Entities) so their Slabbed seams must apply.
+    def extraMods = providers.gradleProperty("extraMods")
+    if (extraMods.isPresent()) {
+        def extraDir = file(extraMods.get())
+        if (!extraDir.isDirectory()) throw new GradleException("extraMods is not a directory: " + extraDir)
+        mods.from(fileTree(dir: extraDir, include: "*.jar"))
+    }
+    runDir = layout.projectDirectory.dir("run-client")
+    jvmArgs.addAll([
+            "-Dfabric.client.gametest",
+            "-Dmixin.debug.verify=true",
+    ])
+    outputs.upToDateWhen { false }
+    doFirst {
+        def dir = layout.projectDirectory.dir("run-client").asFile
+        delete(dir)
+        dir.mkdirs()
+        logger.lifecycle("production client mods: " + mods.files.collect { it.name }.sort().join(", "))
+    }
+}
+
+tasks.register("verifyHarnessClientLeg") {
+    mustRunAfter("runProductionClientGameTest")
+    doLast {
+        def log = file("run-client/logs/latest.log")
+        if (!log.exists()) throw new GradleException("client: no run-client/logs/latest.log — the production client did not run.")
+        def text = log.text
+        if (text.contains("Mixin apply failed") || text.contains("MixinApplyError") || text.contains("InjectionError")) {
+            throw new GradleException("client: mixin apply/injection errors in logs/latest.log.")
+        }
+        if (!text.contains("Slabbed mixin selection")) throw new GradleException("client: the Slabbed mixin config plugin never reported its selection.")
+        if (!text.contains("HARNESS_BOOT | PASS")) throw new GradleException("client: the boot test did not pass (no HARNESS_BOOT | PASS line).")
+        def receipts = file("build/harness-receipts"); receipts.mkdirs()
+        new File(receipts, "client.txt").text = "minecraft=${project.minecraft_version}\njar=${file(project.slabbed_release_jar).name}\n" +
+                "extraMods=" + (providers.gradleProperty("extraMods").getOrElse("none")) + "\n" +
+                (text.readLines().findAll { it.contains("Slabbed mixin selection") || it.contains("HARNESS_BOOT") || (it.contains("Loading ") && it.contains(" mods")) }.join("\n")) + "\n"
+        logger.lifecycle("verifyHarnessClientLeg (${project.minecraft_version}): OK")
+    }
+}
+
+// ── Official client jar for the linkage scan (CI) ─────────────────────────────────────────────
+// tools/linkage-scan.py needs this version's obfuscated client jar for the class hierarchy. Loom
+// already downloaded it into its cache; this task copies it to a stable path.
+tasks.register("downloadOfficialClientJar") {
+    doLast {
+        def cache = new File(gradle.gradleUserHomeDir, "caches/fabric-loom/${project.minecraft_version}/minecraft-client.jar")
+        if (!cache.exists()) throw new GradleException("Loom has not fetched ${cache}; run any Loom task first.")
+        copy { from cache; into layout.buildDirectory.dir("."); rename { "official-client.jar" } }
+    }
+}

@@ -9,7 +9,9 @@ identical copy for tools that read that name; edit both together.
    height-resolution path. `LAW.md` is supreme; no other doc may redefine it. Its enforcement is
    `NeighborUpdateInvarianceTest` (the S-2 gate), which is **blocking by default** — a violation
    fails the build. `-Dslabbed.lawGate=false` downgrades to a printed inventory and is only for
-   fixing a deliberate new RED forward, never for landing one.
+   fixing a deliberate new RED forward, never for landing one. A green S-2 row proves nothing
+   unless a mutation provably reaches that subject — every new subject names its mutation in a
+   comment.
 
 2. **The discretion law (maintainer ruling, 2026-08-07) — this repo is public and stays
    impersonal.** No personal names, no machine-local usernames or absolute home-directory paths,
@@ -40,6 +42,10 @@ Keep the "do not re-add X" guard comments — they are anti-regression tripwires
   dir silently drops tests and still prints green).
 - The reported count MUST match `python3 tools/expected-gametest-count.py`. A green with the
   wrong count is a false green.
+- This line ships ONE jar for several Minecraft versions. A green on the build version is not a
+  green on the others: run every leg in `harness/` for every declared version (server suite on each
+  version, production client boot on each version) and `tools/linkage-scan.py` against each
+  version, before any parity or release claim. See `harness/README.md`.
 - Never write the literal `@GameTest` token in comments of registered test classes — the count
   script counts occurrences.
 - The release jar is gated by a closed-world allowlist (`RELEASE_ALLOWLIST.md`) checked during
