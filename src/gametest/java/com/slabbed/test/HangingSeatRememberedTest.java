@@ -13,11 +13,7 @@ import net.minecraft.entity.decoration.ItemFrameEntity;
 import net.minecraft.entity.decoration.painting.PaintingEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.storage.NbtReadView;
-import net.minecraft.storage.NbtWriteView;
-import net.minecraft.storage.WriteView;
 import net.minecraft.test.TestContext;
-import net.minecraft.util.ErrorReporter;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
@@ -77,12 +73,10 @@ public final class HangingSeatRememberedTest {
         double wallNow = com.slabbed.util.SlabSupport.getYOffset(world, wall, world.getBlockState(wall));
         ctx.assertTrue(Math.abs(wallNow) <= EPS, net.minecraft.text.Text.literal("premise: the rebuilt wall must read flush, got " + wallNow));
         // Save and reload the frame: the seat is the frame's own fact and comes back verbatim.
-        WriteView output = NbtWriteView.create(ErrorReporter.EMPTY, world.getRegistryManager());
-        frame.saveData(output);
-        NbtCompound saved = ((NbtWriteView) output).getNbt();
+        NbtCompound saved = frame.writeNbt(new NbtCompound());
         ItemFrameEntity reloaded = EntityType.ITEM_FRAME.create(world, SpawnReason.LOAD);
         ctx.assertTrue(reloaded != null, net.minecraft.text.Text.literal("premise: could not create the reloaded frame"));
-        reloaded.readData(NbtReadView.create(ErrorReporter.EMPTY, world.getRegistryManager(), saved));
+        reloaded.readNbt(saved);
         world.spawnEntity(reloaded);
         Box reloadedBox = reloaded.getBoundingBox();
         ctx.assertTrue(Math.abs(seatOf(reloaded) + 0.5d) <= EPS && Math.abs(reloadedBox.minY - hungBox.minY) <= EPS,
@@ -143,13 +137,11 @@ public final class HangingSeatRememberedTest {
         BlockPos wallRel = new BlockPos(2, 3, 2);
         BlockPos wall = loweredWall(ctx, wallRel);
         ItemFrameEntity frame = new ItemFrameEntity(world, wall.offset(Direction.EAST), Direction.EAST);
-        WriteView output = NbtWriteView.create(ErrorReporter.EMPTY, world.getRegistryManager());
-        frame.saveData(output);
-        NbtCompound saved = ((NbtWriteView) output).getNbt();
+        NbtCompound saved = frame.writeNbt(new NbtCompound());
         saved.remove("slabbed:hang_dy"); // an old save: no remembered seat
         ItemFrameEntity old = EntityType.ITEM_FRAME.create(world, SpawnReason.LOAD);
         ctx.assertTrue(old != null, net.minecraft.text.Text.literal("premise: could not create the frame"));
-        old.readData(NbtReadView.create(ErrorReporter.EMPTY, world.getRegistryManager(), saved));
+        old.readNbt(saved);
         world.spawnEntity(old);
         ctx.assertTrue(Math.abs(seatOf(old) + 0.5d) <= EPS,
                 net.minecraft.text.Text.literal("a frame with no saved seat must mint one from its wall on load (-0.5), got " + seatOf(old)));

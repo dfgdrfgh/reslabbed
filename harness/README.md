@@ -20,7 +20,7 @@ the EXACT release jar (plus the test kit, which carries the dev-only classes the
 
 ```bash
 ./gradlew build remapTestkitJar                      # from the line root: release jar + test kit
-V=fabric-1.21.7   # also fabric-1.21.6 and fabric-1.21.8
+V=fabric-1.21.5
 ./gradlew -p harness/$V runGameTest verifyHarnessGameTestCount -Pleg=default
 ./gradlew -p harness/$V runGameTest verifyHarnessGameTestCount -Pleg=deepdy -Dslabbed.deepDyAlphabet=true
 ./gradlew -p harness/$V runProductionClientGameTest verifyHarnessClientLeg

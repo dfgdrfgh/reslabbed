@@ -73,7 +73,7 @@ public final class LegacySlabRemeshClientGameTest implements FabricClientGameTes
                 BlockPos pos = source.east(x);
                 var state = mc.world.getBlockState(pos);
                 double fresh = SlabSupport.getYOffset(mc.world, pos, state);
-                var region = builder.build(mc.world, ChunkSectionPos.from(pos).asLong());
+                var region = builder.build(mc.world, ChunkSectionPos.from(pos));
                 require(region != null, "render region must exist");
                 double visual = SlabSupport.getVisualYOffset(region, pos, state);
                 System.out.println("[legacy-slab-remesh] distance=" + x

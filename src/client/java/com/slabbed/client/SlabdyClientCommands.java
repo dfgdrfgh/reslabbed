@@ -8,7 +8,8 @@ import com.slabbed.util.SlabbedAuditBridge;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.HudLayerRegistrationCallback;
+import net.fabricmc.fabric.api.client.rendering.v1.IdentifiedLayer;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -79,12 +80,12 @@ public final class SlabdyClientCommands {
                                         .executes(SlabdyClientCommands::runRecord)
                                         .then(literal("on").executes(SlabdyClientCommands::runRecordOn))
                                         .then(literal("off").executes(SlabdyClientCommands::runRecordOff)))));
-        // HudRenderCallback is @Deprecated (and dead) in fabric-rendering-v1 16.x — the reason
-        // the overlay never showed. Register through the current HudElementRegistry instead;
-        // addLast draws our element after all vanilla HUD elements (on top), every frame.
-        HudElementRegistry.addLast(
-                Identifier.of("slabbed", "target_dy_overlay"),
-                SlabdyClientCommands::renderOverlay);
+        // Fabric API 0.128 (1.21.5) registers HUD layers through HudLayerRegistrationCallback; the
+        // HudElementRegistry the newer lines use arrived with 1.21.6. addLayer draws our layer after
+        // the vanilla ones (on top), every frame.
+        HudLayerRegistrationCallback.EVENT.register(layeredDrawer -> layeredDrawer.addLayer(
+                IdentifiedLayer.of(Identifier.of("slabbed", "target_dy_overlay"),
+                        SlabdyClientCommands::renderOverlay)));
         // While the recorder is enabled, capture a full SlabbedDiagnostics sample every time
         // the crosshair target changes — deduped so look-drift doesn't spam the log. This is
         // the enriched capture (visual triad + DODO/smoosh/gap/triad-mismatch flags), and it

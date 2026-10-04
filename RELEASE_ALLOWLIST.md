@@ -203,6 +203,7 @@ None of these four does file I/O, and none allocates per block or per frame.
 | --- | --- |
 | `com/slabbed/util/SlabSupport` | Support-surface resolution and the visual Y offset — the core of the feature. |
 | `com/slabbed/util/HangingSeatDyHolder` | Duck interface exposing a hung decoration's remembered seat. |
+| `com/slabbed/util/HangingSeatMechanics` | Duck interface on hung decorations: seat mint once the facing is known, and the box moved onto its grid cell for vanilla's attachment-survival check (1.21.5: the item frame overrides both without chaining to the base class, so it drives them itself). |
 | `com/slabbed/util/DependentRemeshQueue` | Pure section-keyed queue policy for coalescing and budgeting client dependent-mesh refreshes. No client, file or network access. |
 | `com/slabbed/util/DependentSlabRemeshRegions` | Selects connected slab dependencies and occupied columns for bounded visual-cache refreshes. No file or network access. |
 | `com/slabbed/util/SlabbedOffsetRaycast` | Offset-aware nearest-hit raycast — the targeting overhaul. |

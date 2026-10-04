@@ -6,7 +6,7 @@
 
 [![Modrinth](https://img.shields.io/badge/Modrinth-Download-00AF5C?logo=modrinth&logoColor=white)](https://modrinth.com/mod/slabbed)
 [![CurseForge](https://img.shields.io/badge/CurseForge-Download-F16436?logo=curseforge&logoColor=white)](https://www.curseforge.com/minecraft/mc-mods/slabbed)
-[![Minecraft](https://img.shields.io/badge/Minecraft-1.21.1%20%7C%201.21.6--1.21.11%20%7C%2026.x-62B47A)](https://modrinth.com/mod/slabbed/versions)
+[![Minecraft](https://img.shields.io/badge/Minecraft-1.21.1%20%7C%201.21.5--1.21.11%20%7C%2026.x-62B47A)](https://modrinth.com/mod/slabbed/versions)
 [![Loader](https://img.shields.io/badge/Loader-Fabric%20%7C%20NeoForge-DBD0B4)](https://modrinth.com/mod/slabbed/versions)
 [![License](https://img.shields.io/badge/License-GPL--3.0-blue)](LICENSE)
 
@@ -45,7 +45,8 @@ Other partial blocks (stairs, fences, walls, trapdoors, panes) are intentionally
 | Minecraft | Loader(s) | Java |
 |:---|:---|:---|
 | 1.21.1 | Fabric · NeoForge | 21 |
-| 1.21.6 / 1.21.7 / 1.21.8 (one file, this branch) | Fabric | 21 |
+| 1.21.5 (this branch) | Fabric | 21 |
+| 1.21.6 / 1.21.7 / 1.21.8 (one file) | Fabric | 21 |
 | 1.21.9 / 1.21.10 / 1.21.11 (one file) | Fabric | 21 |
 | 26.1 / 26.1.2 / 26.2 | Fabric | 25 |
 

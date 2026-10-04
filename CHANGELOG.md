@@ -1,3 +1,19 @@
+## [0.6.2-alpha+1.21.5]
+
+See LAW.md — this changelog does not redefine the law.
+
+The first Slabbed build for Minecraft 1.21.5 on Fabric, with the same behaviour as the 1.21.6–1.21.8 file.
+
+- Everything Slabbed does on 1.21.6 and newer now applies on 1.21.5: placed blocks keep the height
+  they were placed at, with targeting, outlines, collision, models, particles, block entities, hanging
+  decorations, rails and redstone following that height.
+- Item frames and paintings remember their seat the same way; on 1.21.5 the remembered seat is stored
+  per decoration type because the game keeps their synced data separate here. Saved worlds use the
+  same key as every other version.
+- Better Block Entities and Create Fly have no 1.21.5 builds, so those compatibility hooks stay idle;
+  Sodium 0.6 and Lithium 0.16 are supported in principle but were not exercised live for this build.
+- Requires Fabric Loader 0.16 or newer and Fabric API 0.128 or newer.
+
 ## [0.6.2-alpha+1.21.6-1.21.8]
 
 See LAW.md — this changelog does not redefine the law.

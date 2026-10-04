@@ -135,7 +135,7 @@ public final class ScreenshotCaptureService {
         Path gameDir = currentCapture.gameDir();
 
         try {
-            ScreenshotRecorder.takeScreenshot(framebuffer, 1, image -> {
+            ScreenshotRecorder.takeScreenshot(framebuffer, image -> {
                 try (image) {
                     image.writeTo(outputPath);
                     ClipboardCopyResult clipboardResult = copyToClipboard(image, outputPath);

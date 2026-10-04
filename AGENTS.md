@@ -42,10 +42,9 @@ Keep the "do not re-add X" guard comments — they are anti-regression tripwires
   dir silently drops tests and still prints green).
 - The reported count MUST match `python3 tools/expected-gametest-count.py`. A green with the
   wrong count is a false green.
-- This line ships ONE jar for several Minecraft versions. A green on the build version is not a
-  green on the others: run every leg in `harness/` for every declared version (server suite on each
-  version, production client boot on each version) and `tools/linkage-scan.py` against each
-  version, before any parity or release claim. See `harness/README.md`.
+- This line ships the 1.21.5 jar, built from the ranged 1.21.6–1.21.8 line's source. Prove the EXACT
+  release jar with the `harness/fabric-1.21.5` legs (server suite, production client boot) and
+  `tools/linkage-scan.py` against 1.21.5 before any parity or release claim. See `harness/README.md`.
 - Never write the literal `@GameTest` token in comments of registered test classes — the count
   script counts occurrences.
 - The release jar is gated by a closed-world allowlist (`RELEASE_ALLOWLIST.md`) checked during

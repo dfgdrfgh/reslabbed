@@ -1,16 +1,14 @@
 package com.slabbed.mixin;
 
 import com.slabbed.util.HangingSeatDyHolder;
+import com.slabbed.util.HangingSeatMechanics;
 import com.slabbed.util.SlabSupport;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.data.DataTracker;
-import net.minecraft.entity.data.TrackedData;
-import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.decoration.AbstractDecorationEntity;
 import net.minecraft.entity.decoration.BlockAttachedEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.storage.ReadView;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
@@ -46,16 +44,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * migration, not a re-derivation.
  */
 @Mixin(AbstractDecorationEntity.class)
-public abstract class HangingEntityRememberedSeatMixin extends BlockAttachedEntity implements HangingSeatDyHolder {
+public abstract class HangingEntityRememberedSeatMixin extends BlockAttachedEntity implements HangingSeatMechanics {
 
-    /** Raw bits of the seat; NaN bits mean "not minted yet". Synced so the client box and drawing agree. */
-    @Unique
-    private static final TrackedData<Long> SLABBED$HANG_DY =
-            DataTracker.registerData(AbstractDecorationEntity.class, TrackedDataHandlerRegistry.LONG);
-
-    @Unique
-    private static final long SLABBED$UNSET = Double.doubleToRawLongBits(Double.NaN);
-
+    // 1.21.5 shape of the remembered seat. The seat VALUE (a synced long) lives in the two concrete
+    // classes (ItemFrameWysiwygMixin, PaintingRememberedSeatMixin): on this version the base class
+    // declares no tracked data of its own, and frames and paintings each define their own trackers
+    // with nothing in between to chain to. The MECHANICS live here, where every decoration shares
+    // them: the seat is minted when the facing is set (setFacing here; the frame's own override
+    // calls in through HangingSeatMechanics) — never on an earlier layout, because the base class
+    // starts with a default facing and a painting's variant lays the box out before the real facing
+    // arrives — the box is offset by it, survival is judged on the grid cell, and a loaded entity
+    // without a saved seat mints one once its chunk is present, never waiting on a chunk (cross-port law).
     @Unique
     private boolean slabbed$readingData;
 
@@ -69,50 +68,19 @@ public abstract class HangingEntityRememberedSeatMixin extends BlockAttachedEnti
     @Shadow
     protected abstract void updateAttachmentPosition();
 
-    @Override
-    public double slabbed$hangSeatDy() {
-        double dy = Double.longBitsToDouble(this.getDataTracker().get(SLABBED$HANG_DY));
-        return Double.isFinite(dy) ? dy : 0.0d;
+    @Unique
+    private HangingSeatDyHolder slabbed$seat() {
+        return (HangingSeatDyHolder) this;
     }
 
     @Override
-    public boolean slabbed$hasHangSeat() {
-        return Double.isFinite(Double.longBitsToDouble(this.getDataTracker().get(SLABBED$HANG_DY)));
-    }
-
-    @Override
-    public void slabbed$restoreHangSeatDy(double dy) {
-        this.getDataTracker().set(SLABBED$HANG_DY, Double.doubleToRawLongBits(Double.isFinite(dy) ? dy : 0.0d));
-    }
-
-    @Inject(method = "initDataTracker(Lnet/minecraft/entity/data/DataTracker$Builder;)V", at = @At("TAIL"))
-    private void slabbed$defineHangSeat(DataTracker.Builder builder, CallbackInfo ci) {
-        builder.add(SLABBED$HANG_DY, SLABBED$UNSET);
-    }
-
-    /**
-     * The ONE derivation, at the moment the decoration learns which way it faces: both the item's
-     * hang path and the load path set the raw direction with the position already known, and the
-     * box is laid out right after. Server thread only, with both decoration and support chunks available:
-     * entity loading must never wait on the chunk whose loading it is completing. An unfinished
-     * support defers the mint to a later tick, not to a guessed "flush" seat. A saved seat restored
-     * by the per-class read hook wins over this mint.
-     */
-    @Inject(method = "setFacingInternal(Lnet/minecraft/util/math/Direction;)V", at = @At("TAIL"))
-    private void slabbed$mintSeatOnDirection(CallbackInfo ci) {
-        this.slabbed$tryMintHangSeat();
-    }
-
-    /** NBT loading may run inside chunk promotion; only restore saved seats until it finishes. */
-    @Override
-    public void readData(ReadView input) {
+    public void readNbt(NbtCompound nbt) {
         this.slabbed$readingData = true;
         try {
-            super.readData(input);
+            super.readNbt(nbt);
         } finally {
             this.slabbed$readingData = false;
         }
-        // The restored variant can put a painting's center in a different chunk from its attachment.
         BlockPos entityPos = this.getBlockPos();
         if (this.getWorld() instanceof ServerWorld world && world.getServer().isOnThread()
                 && world.getChunkManager().getWorldChunk(entityPos.getX() >> 4, entityPos.getZ() >> 4) != null
@@ -129,9 +97,21 @@ public abstract class HangingEntityRememberedSeatMixin extends BlockAttachedEnti
         super.tick();
     }
 
+    @Override
+    public boolean slabbed$mintSeatIfMissing() {
+        return this.slabbed$tryMintHangSeat();
+    }
+
+    @Inject(method = "setFacing(Lnet/minecraft/util/math/Direction;)V", at = @At("TAIL"))
+    private void slabbed$mintSeatOnDirection(CallbackInfo ci) {
+        if (this.slabbed$tryMintHangSeat()) {
+            this.updateAttachmentPosition();
+        }
+    }
+
     @Unique
     private boolean slabbed$tryMintHangSeat() {
-        if (this.slabbed$readingData || this.slabbed$hasHangSeat()
+        if (this.slabbed$readingData || this.slabbed$seat().slabbed$hasHangSeat()
                 || this.getAttachedBlockPos() == null || this.getHorizontalFacing() == null) {
             return false;
         }
@@ -149,54 +129,47 @@ public abstract class HangingEntityRememberedSeatMixin extends BlockAttachedEnti
         }
         BlockState support = supportChunk.getBlockState(supportPos);
         double dy = SlabSupport.getYOffset(world, supportPos, support);
-        this.slabbed$restoreHangSeatDy(Double.isFinite(dy) ? dy : 0.0d);
+        this.slabbed$seat().slabbed$restoreHangSeatDy(Double.isFinite(dy) ? dy : 0.0d);
         return true;
     }
 
-    /** Apply the remembered seat to the freshly laid-out box; the position set just before stays on the grid. */
     @Inject(method = "updateAttachmentPosition()V", at = @At("TAIL"))
     private void slabbed$hangBoxOnRememberedSeat(CallbackInfo ci) {
-        double dy = this.slabbed$hangSeatDy();
+        double dy = this.slabbed$seat().slabbed$hangSeatDy();
         if (Math.abs(dy) >= 1.0e-6d) {
             this.setBoundingBox(this.getBoundingBox().offset(0.0d, dy, 0.0d));
         }
     }
 
-    /**
-     * Popping law is untouched: a painting judges the GRID cells behind it, where its wall actually
-     * is, not the cells behind its drawn box. The box is unshifted for the check and restored after.
-     * (Item frames override {@code canStayAttached} on their own grid cell and never reach this.)
-     */
     @Unique
     private Box slabbed$shiftedBoxDuringSurvival;
 
-    @Inject(method = "canStayAttached()Z", at = @At("HEAD"))
-    private void slabbed$judgeSurvivalOnGridCells(CallbackInfoReturnable<Boolean> cir) {
-        double dy = this.slabbed$hangSeatDy();
+    @Override
+    public void slabbed$beginSurvivalOnGrid() {
+        double dy = this.slabbed$seat().slabbed$hangSeatDy();
         if (Math.abs(dy) >= 1.0e-6d) {
             slabbed$shiftedBoxDuringSurvival = this.getBoundingBox();
             this.setBoundingBox(slabbed$shiftedBoxDuringSurvival.offset(0.0d, -dy, 0.0d));
         }
     }
 
-    @Inject(method = "canStayAttached()Z", at = @At("RETURN"))
-    private void slabbed$restoreShiftedBoxAfterSurvival(CallbackInfoReturnable<Boolean> cir) {
+    @Override
+    public void slabbed$endSurvivalOnGrid() {
         if (slabbed$shiftedBoxDuringSurvival != null) {
             this.setBoundingBox(slabbed$shiftedBoxDuringSurvival);
             slabbed$shiftedBoxDuringSurvival = null;
         }
     }
 
-    /**
-     * The CLIENT lays its box out from the spawn packet before the seat arrives; re-lay it when it
-     * does. Server side the layout that follows the mint already applies it — relaying there would
-     * nest inside that layout and shift the box twice.
-     */
-    @Inject(method = "onTrackedDataSet(Lnet/minecraft/entity/data/TrackedData;)V", at = @At("TAIL"))
-    private void slabbed$relayoutOnClientSeatSync(TrackedData<?> data, CallbackInfo ci) {
-        if (SLABBED$HANG_DY.equals(data) && this.getWorld() != null && this.getWorld().isClient()
-                && this.getAttachedBlockPos() != null && this.getHorizontalFacing() != null) {
-            this.updateAttachmentPosition();
-        }
+    // Paintings reach the base-class survival check; item frames override it without chaining and
+    // call the same pair from their own hooks (ItemFrameWysiwygMixin).
+    @Inject(method = "canStayAttached()Z", at = @At("HEAD"))
+    private void slabbed$judgeSurvivalOnGridCells(CallbackInfoReturnable<Boolean> cir) {
+        this.slabbed$beginSurvivalOnGrid();
+    }
+
+    @Inject(method = "canStayAttached()Z", at = @At("RETURN"))
+    private void slabbed$restoreShiftedBoxAfterSurvival(CallbackInfoReturnable<Boolean> cir) {
+        this.slabbed$endSurvivalOnGrid();
     }
 }

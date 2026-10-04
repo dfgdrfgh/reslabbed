@@ -15,10 +15,7 @@ import net.minecraft.entity.decoration.painting.PaintingVariants;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.storage.NbtReadView;
-import net.minecraft.storage.NbtWriteView;
 import net.minecraft.test.TestContext;
-import net.minecraft.util.ErrorReporter;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
@@ -52,9 +49,7 @@ public final class HangingLoadDeferralTest {
         ctx.assertTrue(Math.abs(((HangingSeatDyHolder) original).slabbed$hangSeatDy() + 0.5) < 1.0e-6,
                 net.minecraft.text.Text.literal("premise: original decoration must be lowered"));
         Box originalBox = original.getBoundingBox();
-        NbtWriteView output = NbtWriteView.create(ErrorReporter.EMPTY, world.getRegistryManager());
-        original.saveData(output);
-        NbtCompound nbt = output.getNbt();
+        NbtCompound nbt = original.writeNbt(new NbtCompound());
         if (!savedSeat) nbt.remove("slabbed:hang_dy");
         AbstractDecorationEntity restored = painting
                 ? EntityType.PAINTING.create(world, SpawnReason.LOAD)
@@ -62,7 +57,7 @@ public final class HangingLoadDeferralTest {
         ctx.assertTrue(restored != null, net.minecraft.text.Text.literal("premise: restored entity exists"));
         PendingHangChunkProbe.begin(world.getChunkManager());
         try {
-            restored.readData(NbtReadView.create(ErrorReporter.EMPTY, world.getRegistryManager(), nbt));
+            restored.readNbt(nbt);
             ctx.assertTrue(PendingHangChunkProbe.blockingReads == 0,
                     net.minecraft.text.Text.literal("NBT restoration entered the blocking chunk API " + PendingHangChunkProbe.blockingReads + " times"));
             ctx.assertTrue(PendingHangChunkProbe.nonblockingReads > 0,

@@ -34,7 +34,7 @@ public final class GapFillerOverlay {
         World world = client.world;
         if (world == null) return;
 
-        Vec3d camPos = client.gameRenderer.getCamera().getCameraPos();
+        Vec3d camPos = client.gameRenderer.getCamera().getPos();
         int camX = (int) Math.floor(camPos.x);
         int camY = (int) Math.floor(camPos.y);
         int camZ = (int) Math.floor(camPos.z);
