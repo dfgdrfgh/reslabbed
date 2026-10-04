@@ -43,7 +43,7 @@ public final class SlabRigHangingCatalogTest {
     // items, both in the excluded partition with the explicit no-hanging-route reason. Any other
     // change to this hash still demands the same delta-inspection before touching this constant.
     private static final String EXPECTED_26_2_CATALOG_HASH =
-            "2a82519cce2936367791a96c0bdf3a750bdc269d0eb0d982357a962f31409a1d";
+            "edf7afbc577143add67dfce4045c2fd1fd8b1b29ee7a437945acbf5421fed270";
 
     @GameTest(structure = "fabric-gametest-api-v1:empty")
     public void hangingRuntimeSnapshotBindsFullPaintingRegistry(GameTestHelper helper) {
@@ -56,7 +56,7 @@ public final class SlabRigHangingCatalogTest {
             throw helper.assertionException("RIG-3B1 runtime snapshot/order/hash changed across repeats");
         }
         if (first.paintingVariantCount() != 51 || first.randomPlaceableCount() != 47) {
-            throw helper.assertionException("26.2 painting registry expected full=51 #placeable=47, got full="
+            throw helper.assertionException("26.1.2 painting registry expected full=51 #placeable=47, got full="
                     + first.paintingVariantCount() + " placeable=" + first.randomPlaceableCount());
         }
         if (!first.runtimeContentSha256().equals(BuildStamp.RUNTIME_CONTENT_SHA256)
@@ -116,7 +116,7 @@ public final class SlabRigHangingCatalogTest {
         Set<String> expectedUntagged = Set.of(
                 "minecraft:earth", "minecraft:fire", "minecraft:water", "minecraft:wind");
         if (!untagged.equals(expectedUntagged)) {
-            throw helper.assertionException("26.2 exact non-random painting set changed: " + untagged);
+            throw helper.assertionException("26.1.2 exact non-random painting set changed: " + untagged);
         }
         SlabRigHangingArtifacts.PaintingEntry kebab = painting(first, "minecraft:kebab");
         SlabRigHangingArtifacts.PaintingEntry burningSkull = painting(first, "minecraft:burning_skull");
@@ -234,16 +234,16 @@ public final class SlabRigHangingCatalogTest {
                 throw helper.assertionException("RIG-3 item appears twice: " + item.id());
             }
         }
-        if (snapshot.items().size() != 163) {
-            throw helper.assertionException("RIG-3 primary hanging/attachment union expected 163 items, got "
+        if (snapshot.items().size() != 162) {
+            throw helper.assertionException("RIG-3 primary hanging/attachment union expected 162 items, got "
                     + snapshot.items().size());
         }
         long blockItems = snapshot.items().stream().filter(SlabRigHangingCatalog.CatalogItem::blockItem).count();
-        // 1376 = 1374 vanilla-runtime exclusions + the two compat-eligibility twin fixture items
+        // 1346 = 1344 vanilla-runtime exclusions + the two compat-eligibility twin fixture items
         // (BlockItems registered so rows can drive the real placement transaction; both excluded
         // here with the explicit no-hanging-route reason).
-        if (blockItems != 159L || snapshot.items().size() - blockItems != 4L
-                || snapshot.excludedItems().size() != 1376) {
+        if (blockItems != 158L || snapshot.items().size() - blockItems != 4L
+                || snapshot.excludedItems().size() != 1346) {
             throw helper.assertionException("RIG-3 primary/remainder cardinality changed: block="
                     + blockItems + " entity=" + (snapshot.items().size() - blockItems)
                     + " excluded=" + snapshot.excludedItems().size());
@@ -283,7 +283,7 @@ public final class SlabRigHangingCatalogTest {
         expect(helper, counts, SlabRigHangingCatalog.Family.ROD, 9);
         expect(helper, counts, SlabRigHangingCatalog.Family.AMETHYST_CLUSTER, 4);
         expect(helper, counts, SlabRigHangingCatalog.Family.MULTIFACE, 3);
-        expect(helper, counts, SlabRigHangingCatalog.Family.SPELEOTHEM, 2);
+        expect(helper, counts, SlabRigHangingCatalog.Family.SPELEOTHEM, 1);
         expect(helper, counts, SlabRigHangingCatalog.Family.CEILING_GROWTH, 5);
         expect(helper, counts, SlabRigHangingCatalog.Family.WALL_ATTACHMENT, 4);
         expect(helper, counts, SlabRigHangingCatalog.Family.WALL_CARPET_STATE, 1);
@@ -291,7 +291,7 @@ public final class SlabRigHangingCatalogTest {
         expect(helper, counts, SlabRigHangingCatalog.Family.SHELF, 12);
         expect(helper, counts, SlabRigHangingCatalog.Family.LEASH_KNOT_ENTITY, 1);
         if (!snapshot.catalogHash().equals(EXPECTED_26_2_CATALOG_HASH)) {
-            throw helper.assertionException("RIG-3 26.2 golden catalog hash changed: expected="
+            throw helper.assertionException("RIG-3 26.1.2 golden catalog hash changed: expected="
                     + EXPECTED_26_2_CATALOG_HASH + " actual=" + snapshot.catalogHash());
         }
         System.out.println("RIG3-CATALOG | hash=" + snapshot.catalogHash()
@@ -361,7 +361,7 @@ public final class SlabRigHangingCatalogTest {
         expect(helper, counts, SlabRigHangingCatalog.Family.ROD, 240);
         expect(helper, counts, SlabRigHangingCatalog.Family.AMETHYST_CLUSTER, 96);
         expect(helper, counts, SlabRigHangingCatalog.Family.MULTIFACE, 441);
-        expect(helper, counts, SlabRigHangingCatalog.Family.SPELEOTHEM, 48);
+        expect(helper, counts, SlabRigHangingCatalog.Family.SPELEOTHEM, 24);
         expect(helper, counts, SlabRigHangingCatalog.Family.CEILING_GROWTH, 2359);
         expect(helper, counts, SlabRigHangingCatalog.Family.WALL_ATTACHMENT, 145);
         expect(helper, counts, SlabRigHangingCatalog.Family.WALL_CARPET_STATE, 416);
@@ -389,7 +389,7 @@ public final class SlabRigHangingCatalogTest {
         expectSubjectRoutes(helper, snapshot, "minecraft:end_rod", 48);
         expectSubjectRoutes(helper, snapshot, "minecraft:oak_shelf", 288);
         expectSubjectRoutes(helper, snapshot, "minecraft:lead", 1);
-        if (snapshot.routes().size() != 38_740 || snapshot.chainTerminalRoutes().size() != 9732) {
+        if (snapshot.routes().size() != 38_716 || snapshot.chainTerminalRoutes().size() != 9712) {
             throw helper.assertionException("RIG-3 route/terminal expansion changed: routes="
                     + snapshot.routes().size() + " terminals=" + snapshot.chainTerminalRoutes().size());
         }
@@ -693,7 +693,7 @@ public final class SlabRigHangingCatalogTest {
     public void chainAndTopologyAxesReachTheBoundary(GameTestHelper helper) {
         SlabRigHangingCatalog.Snapshot snapshot = SlabRigHangingCatalog.snapshot();
         if (snapshot.chainMaterials().size() != 9) {
-            throw helper.assertionException("expected every 26.2 chain material (9), got "
+            throw helper.assertionException("expected every 26.1.2 chain material (9), got "
                     + snapshot.chainMaterials().size());
         }
         if (!snapshot.chainLengths().equals(List.of(1, 2, 3, 5, 16))) {
@@ -733,8 +733,8 @@ public final class SlabRigHangingCatalogTest {
             throw helper.assertionException("RIG-3 ceiling support frames lost a slab owner form: "
                     + SlabRigHangingCatalog.ceilingSupportFrames());
         }
-        if (snapshot.totalCases() != 124_632_832L || snapshot.pageCount() != 7_789_552) {
-            throw helper.assertionException("RIG-3 exact 26.2 case/page cardinality changed: cases="
+        if (snapshot.totalCases() != 124_380_416L || snapshot.pageCount() != 7_773_776) {
+            throw helper.assertionException("RIG-3 exact 26.1.2 case/page cardinality changed: cases="
                     + snapshot.totalCases() + " pages=" + snapshot.pageCount());
         }
         helper.succeed();
@@ -800,7 +800,7 @@ public final class SlabRigHangingCatalogTest {
                 "schema\tslabbed-rig-hanging-catalog-v1",
                 "case_index_contract_version\trig3-case-index-v1",
                 "page_size\t16",
-                "page_count\t7789552",
+                "page_count\t7773776",
                 "case_kind_order\tDIRECT,CHAIN_ONLY,CHAIN_TERMINAL",
                 "case_axes_DIRECT\troute,topology",
                 "case_axes_CHAIN_ONLY\tchain_pattern,chain_support_frame,topology",
@@ -959,8 +959,8 @@ public final class SlabRigHangingCatalogTest {
                         "case_axes_CHAIN_ONLY\tchain_support_frame,chain_pattern,topology"),
                 "within-kind axis order");
         requireHashMutation(helper, snapshot, canonicalBody,
-                canonicalBody.replace("page_size\t16\npage_count\t7789552",
-                        "page_size\t8\npage_count\t15579104"),
+                canonicalBody.replace("page_size\t16\npage_count\t7773776",
+                        "page_size\t8\npage_count\t15547552"),
                 "page geometry");
         helper.succeed();
     }

@@ -511,7 +511,7 @@ public final class LandingRuleLawTest {
         double[] headStored = new double[]{Double.NaN};
         BlockPos[] parts = new BlockPos[2];
         withFrozen(() -> {
-            place(h, Items.BED.red(), center, Direction.UP, 0.0);
+            place(h, Items.RED_BED, center, Direction.UP, 0.0);
             BlockPos foot = center.above();
             BlockState footState = w.getBlockState(foot);
             if (!(footState.getBlock() instanceof BedBlock)) {
@@ -608,7 +608,7 @@ public final class LandingRuleLawTest {
         world.setBlock(support.east(), Blocks.STONE.defaultBlockState(), 3);
         forceStore(world, support, -1.0d);
         forceStore(world, support.east(), -1.0d);
-        ItemStack overridden = new ItemStack(Items.BED.red());
+        ItemStack overridden = new ItemStack(Items.RED_BED);
         overridden.set(DataComponents.BLOCK_STATE, BlockItemStateProperties.EMPTY.with(
                 BlockStateProperties.HORIZONTAL_FACING, Direction.EAST));
         withFrozen(() -> placeStack(h, overridden, support, Direction.UP, 0.0d));
@@ -633,20 +633,23 @@ public final class LandingRuleLawTest {
         BlockPos support = h.absolutePos(new BlockPos(3, 4, 3));
         world.setBlock(support, Blocks.STONE.defaultBlockState(), 3);
         world.setBlock(support.east(), Blocks.STONE.defaultBlockState(), 3);
-        ItemStack malformed = new ItemStack(Items.BED.red());
+        ItemStack malformed = new ItemStack(Items.RED_BED);
         malformed.set(DataComponents.BLOCK_STATE, BlockItemStateProperties.EMPTY
                 .with(BlockStateProperties.HORIZONTAL_FACING, Direction.EAST)
                 .with(BlockStateProperties.BED_PART, BedPart.HEAD));
         placeStack(h, malformed, support, Direction.UP, 0.0d);
         BlockPos primary = support.above();
         BlockPos secondary = primary.east();
+        // On 26.1.x vanilla places only the forced head and leaves the partner cell empty (26.2 placed a
+        // second head there); the law clause is the same on both: Slabbed writes neither cell.
         if (!(world.getBlockState(primary).getBlock() instanceof BedBlock)
-                || !(world.getBlockState(secondary).getBlock() instanceof BedBlock)
+                || !world.getBlockState(secondary).isAir()
                 || world.getBlockState(primary).getValue(BlockStateProperties.BED_PART) != BedPart.HEAD
-                || world.getBlockState(secondary).getValue(BlockStateProperties.BED_PART) != BedPart.HEAD
                 || !Double.isNaN(storedDy(world, primary))
                 || !Double.isNaN(storedDy(world, secondary))) {
-            throw h.assertionException(primary, "malformed same-part bed must write neither cell");
+            throw h.assertionException(primary, "malformed same-part bed must write neither cell; primary="
+                    + world.getBlockState(primary) + " secondary=" + world.getBlockState(secondary)
+                    + " storedPrimary=" + storedDy(world, primary) + " storedSecondary=" + storedDy(world, secondary));
         }
         c3Pass(h, "landing_rule_law_test_bed_malformed_pair_writes_neither_cell");
     }
@@ -734,7 +737,7 @@ public final class LandingRuleLawTest {
                 Blocks.STONE_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.DOUBLE),
                 Blocks.CHEST.defaultBlockState()
         };
-        BlockState[] heldPairs = {Blocks.OAK_DOOR.defaultBlockState(), Blocks.BED.red().defaultBlockState()};
+        BlockState[] heldPairs = {Blocks.OAK_DOOR.defaultBlockState(), Blocks.RED_BED.defaultBlockState()};
         for (BlockState ownerState : owners) {
             for (double depth : new double[]{-1.0d, -2.0d}) {
                 for (BlockState held : heldPairs) {
@@ -827,7 +830,7 @@ public final class LandingRuleLawTest {
         long publicationProbe = trackPublications
                 ? SlabAnchorAttachment.beginC3PublicationProbeForTests(primary, partner)
                 : -1L;
-        ItemStack bed = new ItemStack(Items.BED.red());
+        ItemStack bed = new ItemStack(Items.RED_BED);
         bed.set(DataComponents.BLOCK_STATE, BlockItemStateProperties.EMPTY.with(
                 BlockStateProperties.HORIZONTAL_FACING, Direction.EAST));
         try {
@@ -1034,7 +1037,7 @@ public final class LandingRuleLawTest {
                         + emptyStored + " live=" + emptyLive);
             }
 
-            Player mock = h.makeMockServerPlayer(GameType.SURVIVAL);
+            Player mock = com.slabbed.test.TestPlayers.survivalServerPlayer(h);
             if (!(mock instanceof ServerPlayer player)) {
                 throw h.assertionException(pot, "premise: real-use fixture did not create a ServerPlayer");
             }
@@ -1772,7 +1775,7 @@ public final class LandingRuleLawTest {
                 true);
         double heldBlockBedActivation = LandingHitValidationPolicy.shiftedCenterDy(
                 owner,
-                Blocks.BED.red().defaultBlockState(),
+                Blocks.RED_BED.defaultBlockState(),
                 ownerDy,
                 Direction.UP,
                 packetLikeHit,
@@ -1990,7 +1993,7 @@ public final class LandingRuleLawTest {
                         + "stored=" + storedBefore + " live=" + liveBefore);
             }
 
-            Player mock = h.makeMockServerPlayer(GameType.SURVIVAL);
+            Player mock = com.slabbed.test.TestPlayers.survivalServerPlayer(h);
             if (!(mock instanceof ServerPlayer player)) {
                 throw h.assertionException(target, "premise: direct-use fixture did not create a ServerPlayer");
             }
@@ -2060,7 +2063,7 @@ public final class LandingRuleLawTest {
                         + " live=" + liveDy(w, controlTarget));
             }
 
-            Player mock = h.makeMockServerPlayer(GameType.SURVIVAL);
+            Player mock = com.slabbed.test.TestPlayers.survivalServerPlayer(h);
             if (!(mock instanceof ServerPlayer player)) {
                 throw h.assertionException(controlTarget, "wrong-red premise: control did not create a ServerPlayer");
             }
@@ -2166,7 +2169,7 @@ public final class LandingRuleLawTest {
                             + " target shape at dy=-1.5 must intersect candidate bottom oak slab at P dy=-2.5");
                 }
 
-                Player mock = h.makeMockServerPlayer(GameType.SURVIVAL);
+                Player mock = com.slabbed.test.TestPlayers.survivalServerPlayer(h);
                 if (!(mock instanceof ServerPlayer player)) {
                     throw h.assertionException(target, "wrong-red premise: " + fixtureNames[i]
                             + " fixture did not create a ServerPlayer");
@@ -2330,7 +2333,7 @@ public final class LandingRuleLawTest {
                         + " openDepth=" + controlOpenDepth);
             }
 
-            Player controlMock = h.makeMockServerPlayer(GameType.SURVIVAL);
+            Player controlMock = com.slabbed.test.TestPlayers.survivalServerPlayer(h);
             if (!(controlMock instanceof ServerPlayer controlPlayer)) {
                 throw h.assertionException(controlLower, "wrong-green premise: equal-dy control did not create a "
                         + "ServerPlayer");
@@ -2378,7 +2381,7 @@ public final class LandingRuleLawTest {
                         + storedControlUpperAfter + " upperLive=" + liveControlUpperAfter);
             }
 
-            Player mock = h.makeMockServerPlayer(GameType.SURVIVAL);
+            Player mock = com.slabbed.test.TestPlayers.survivalServerPlayer(h);
             if (!(mock instanceof ServerPlayer player)) {
                 throw h.assertionException(lower, "wrong-red premise: fixture did not create a ServerPlayer");
             }
@@ -2755,7 +2758,7 @@ public final class LandingRuleLawTest {
         Vec3 visibleUpHit = new Vec3(owner.getX() + 0.5d, supportTopBefore, owner.getZ() + 0.5d);
 
         InteractionResult result = null;
-        Player mock = h.makeMockServerPlayer(GameType.SURVIVAL);
+        Player mock = com.slabbed.test.TestPlayers.survivalServerPlayer(h);
         if (mock instanceof ServerPlayer player) {
             result = test32UseItemOn(h, fireItem, owner, Direction.UP, visibleUpHit, player);
         } else {
@@ -2875,7 +2878,7 @@ public final class LandingRuleLawTest {
             Direction face,
             Vec3 hit
     ) {
-        Player mock = h.makeMockServerPlayer(GameType.SURVIVAL);
+        Player mock = com.slabbed.test.TestPlayers.survivalServerPlayer(h);
         if (!(mock instanceof ServerPlayer player)) {
             return null;
         }
@@ -3655,7 +3658,7 @@ public final class LandingRuleLawTest {
                         "TEST43 baseline-delta authority: translated candidate/upper pair must be unsafe");
             }
 
-            Player mock = h.makeMockServerPlayer(GameType.SURVIVAL);
+            Player mock = com.slabbed.test.TestPlayers.survivalServerPlayer(h);
             if (!(mock instanceof ServerPlayer player)) {
                 throw h.assertionException(candidate, "TEST43 premise: fixture did not create a ServerPlayer");
             }
@@ -3749,7 +3752,7 @@ public final class LandingRuleLawTest {
             ItemStack controlHeld = new ItemStack(Items.POINTED_DRIPSTONE);
             controlHeld.set(DataComponents.BLOCK_STATE, BlockItemStateProperties.EMPTY
                     .with(PointedDripstoneBlock.TIP_DIRECTION, Direction.DOWN));
-            Player controlMock = h.makeMockServerPlayer(GameType.SURVIVAL);
+            Player controlMock = com.slabbed.test.TestPlayers.survivalServerPlayer(h);
             if (!(controlMock instanceof ServerPlayer controlPlayer)) {
                 throw h.assertionException(controlOwner, "TEST43 control premise: fixture did not create a ServerPlayer");
             }
@@ -3809,7 +3812,7 @@ public final class LandingRuleLawTest {
                     ItemStack held = new ItemStack(Items.POINTED_DRIPSTONE);
                     held.set(DataComponents.BLOCK_STATE, BlockItemStateProperties.EMPTY
                             .with(PointedDripstoneBlock.TIP_DIRECTION, direction));
-                    Player mock = h.makeMockServerPlayer(GameType.SURVIVAL);
+                    Player mock = com.slabbed.test.TestPlayers.survivalServerPlayer(h);
                     if (!(mock instanceof ServerPlayer player)) {
                         throw h.assertionException(owner, "TEST43 side premise: fixture did not create a ServerPlayer");
                     }

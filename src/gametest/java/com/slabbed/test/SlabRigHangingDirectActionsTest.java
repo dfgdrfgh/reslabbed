@@ -204,7 +204,7 @@ public final class SlabRigHangingDirectActionsTest {
     }
 
     private static ServerPlayer mockServerPlayer(GameTestHelper helper) {
-        if (!(helper.makeMockServerPlayer(GameType.SURVIVAL) instanceof ServerPlayer player)) {
+        if (!(com.slabbed.test.TestPlayers.survivalServerPlayer(helper) instanceof ServerPlayer player)) {
             throw helper.assertionException("GameTest did not provide a server-backed mock player");
         }
         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.DIAMOND, 3));
@@ -216,7 +216,7 @@ public final class SlabRigHangingDirectActionsTest {
 
     private static void assertReservedAir(GameTestHelper helper, ServerLevel world,
                                           SlabRigHangingDirectFixture.AbsolutePage page) {
-        if (page.plan().routeIndex() != 6143 || page.plan().topologyIndex() != 42
+        if (page.plan().routeIndex() != 6137 || page.plan().topologyIndex() != 42
                 || page.plan().selectorPage() != 1 || page.cases().size() != 16
                 || page.reservedCells().size() != 16 * 68
                 || page.clearOwnedCells().size() != 16 * 52

@@ -8,7 +8,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntitySpawnReason;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
@@ -280,7 +280,7 @@ public final class RailVisualSignalTest {
         ServerLevel level = helper.getLevel();
         AbstractMinecart cart = AbstractMinecart.createMinecart(level,
                 start.getX() + 0.5d, start.getY() + RAIL_LIFT, start.getZ() + 0.5d,
-                EntityTypes.MINECART, EntitySpawnReason.SPAWN_ITEM_USE, ItemStack.EMPTY, null);
+                EntityType.MINECART, EntitySpawnReason.SPAWN_ITEM_USE, ItemStack.EMPTY, null);
         if (cart == null) {
             throw helper.assertionException("premise: could not create a minecart");
         }

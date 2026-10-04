@@ -54,7 +54,7 @@ public final class Slabbed2612CollisionDepthTest {
         // helper.spawn takes STRUCTURE-RELATIVE coordinates (the first version passed absolutes and
         // the arrow spawned twelve million blocks away). loweredStone's block sits at rel (2,2,2).
         net.minecraft.world.entity.projectile.arrow.AbstractArrow arrow =
-                helper.spawn(net.minecraft.world.entity.EntityTypes.ARROW,
+                helper.spawn(net.minecraft.world.entity.EntityType.ARROW,
                         new net.minecraft.world.phys.Vec3(0.5d, 1.75d, 2.5d));
         arrow.setNoGravity(true);
         arrow.setDeltaMovement(new net.minecraft.world.phys.Vec3(0.8d, 0.0d, 0.0d));
@@ -88,7 +88,7 @@ public final class Slabbed2612CollisionDepthTest {
     public void aRealSnowballImpactsTheDrawnLowerHalf(GameTestHelper helper) {
         loweredStone(helper);
         net.minecraft.world.entity.projectile.throwableitemprojectile.Snowball ball =
-                helper.spawn(net.minecraft.world.entity.EntityTypes.SNOWBALL,
+                helper.spawn(net.minecraft.world.entity.EntityType.SNOWBALL,
                         new net.minecraft.world.phys.Vec3(0.5d, 1.75d, 2.5d));
         ball.setNoGravity(true);
         ball.setDeltaMovement(new net.minecraft.world.phys.Vec3(0.8d, 0.0d, 0.0d));
@@ -161,7 +161,7 @@ public final class Slabbed2612CollisionDepthTest {
         // An entity's position is its FEET: the quarter-block box then spans rel y 1.625-1.875,
         // centred in the hang band (rel 1.5-2.0), with the blast centre at the band's middle.
         net.minecraft.world.entity.projectile.throwableitemprojectile.Snowball victim =
-                helper.spawn(net.minecraft.world.entity.EntityTypes.SNOWBALL,
+                helper.spawn(net.minecraft.world.entity.EntityType.SNOWBALL,
                         new net.minecraft.world.phys.Vec3(4.5d, 1.625d, 2.5d));
         victim.setNoGravity(true);
         victim.setDeltaMovement(net.minecraft.world.phys.Vec3.ZERO);
@@ -253,7 +253,7 @@ public final class Slabbed2612CollisionDepthTest {
         ServerLevel level = helper.getLevel();
         BlockPos abs = loweredStone(helper);
         net.minecraft.world.entity.item.ItemEntity probe =
-                helper.spawn(net.minecraft.world.entity.EntityTypes.ITEM,
+                helper.spawn(net.minecraft.world.entity.EntityType.ITEM,
                         new net.minecraft.world.phys.Vec3(2.5d, 1.7d, 2.5d));
         probe.setItem(new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.STONE));
         probe.setNoGravity(true);
@@ -295,7 +295,7 @@ public final class Slabbed2612CollisionDepthTest {
     public void aSmallEntityPushedThroughTheHangBandStopsAtTheDrawnBody(GameTestHelper helper) {
         BlockPos abs = loweredStone(helper);
         net.minecraft.world.entity.item.ItemEntity mover =
-                helper.spawn(net.minecraft.world.entity.EntityTypes.ITEM,
+                helper.spawn(net.minecraft.world.entity.EntityType.ITEM,
                         new net.minecraft.world.phys.Vec3(0.5d, 1.7d, 2.5d));
         mover.setItem(new net.minecraft.world.item.ItemStack(net.minecraft.world.item.Items.STONE));
         mover.setNoGravity(true);

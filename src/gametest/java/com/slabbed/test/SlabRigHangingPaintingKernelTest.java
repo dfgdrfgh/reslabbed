@@ -31,7 +31,7 @@ import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.decoration.painting.Painting;
 import net.minecraft.world.entity.decoration.painting.PaintingVariant;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -89,7 +89,7 @@ public final class SlabRigHangingPaintingKernelTest {
                 catalog, world.registryAccess());
         SlabRigHangingPaintingPlan.Universe universe = SlabRigHangingPaintingPlan.snapshot(catalog, runtime);
         SlabRigHangingPaintingPlan.PagePlan plannerPage = SlabRigHangingPaintingPlan.page(
-                universe, 6143, 42, 1);
+                universe, 6137, 42, 1);
         AdaptedPage adapted = adaptPlannerPage(helper, plannerPage);
         SlabRigHangingKernelArtifacts.PagePlan artifactPage = artifactPage(adapted);
         SlabRigHangingKernelArtifacts.RunIdentity run = new SlabRigHangingKernelArtifacts.RunIdentity(
@@ -180,7 +180,7 @@ public final class SlabRigHangingPaintingKernelTest {
                 catalog, world.registryAccess());
         SlabRigHangingPaintingPlan.Universe universe = SlabRigHangingPaintingPlan.snapshot(catalog, runtime);
         SlabRigHangingPaintingPlan.PagePlan plannerPage = SlabRigHangingPaintingPlan.page(
-                universe, 6143, 42, 1);
+                universe, 6137, 42, 1);
         AdaptedPage adapted = adaptPlannerPage(helper, plannerPage);
         SlabRigHangingKernelArtifacts.RunIdentity run = new SlabRigHangingKernelArtifacts.RunIdentity(
                 plannerPage.planHash(), testBuildSha(), BuildStamp.RUNTIME_CONTENT_SHA256,
@@ -203,7 +203,7 @@ public final class SlabRigHangingPaintingKernelTest {
             } catch (IOException expected) {
                 // Required fail-before-world path.
             }
-            if (!owned.isEmpty() || !world.getEntities(EntityTypes.PAINTING, painting -> true).isEmpty()) {
+            if (!owned.isEmpty() || !world.getEntities(EntityType.PAINTING, painting -> true).isEmpty()) {
                 throw helper.assertionException("failed PLANNED publication installed world/entity ownership");
             }
             for (BlockPos pos : adapted.reservedCells()) {
@@ -455,9 +455,9 @@ public final class SlabRigHangingPaintingKernelTest {
     /** Converts the pure planner's one relative page into one finite absolute disposable-world board. */
     private static AdaptedPage adaptPlannerPage(GameTestHelper helper,
                                                 SlabRigHangingPaintingPlan.PagePlan page) {
-        if (page.routeIndex() != 6143 || page.topologyIndex() != 42 || page.selectorPage() != 1
+        if (page.routeIndex() != 6137 || page.topologyIndex() != 42 || page.selectorPage() != 1
                 || page.cases().size() != SlabRigHangingPaintingPlan.PAGE_SIZE) {
-            throw helper.assertionException("kernel adapter accepts only route6143/topology42/page1");
+            throw helper.assertionException("kernel adapter accepts only route6137/topology42/page1");
         }
         BlockPos origin = helper.absolutePos(new BlockPos(8, 3, 8));
         List<AdaptedCase> cases = new ArrayList<>(page.cases().size());
@@ -863,7 +863,7 @@ public final class SlabRigHangingPaintingKernelTest {
 
     private static List<PaintingEvidence> allPaintingEvidence(GameTestHelper helper,
                                                               ServerLevel world) {
-        return world.getEntities(EntityTypes.PAINTING, painting -> true).stream()
+        return world.getEntities(EntityType.PAINTING, painting -> true).stream()
                 .map(painting -> inspectPainting(helper, painting))
                 .sorted(Comparator.comparing(entry -> entry.uuid().toString())).toList();
     }
@@ -874,7 +874,7 @@ public final class SlabRigHangingPaintingKernelTest {
      */
     private static void quarantineNewPaintingUuids(ServerLevel world, Set<UUID> before,
                                                    OwnedFixture owned) {
-        List<UUID> created = world.getEntities(EntityTypes.PAINTING, painting -> true).stream()
+        List<UUID> created = world.getEntities(EntityType.PAINTING, painting -> true).stream()
                 .map(Entity::getUUID).filter(uuid -> !before.contains(uuid)).sorted().toList();
         owned.entityUuids.addAll(created);
     }
@@ -935,7 +935,7 @@ public final class SlabRigHangingPaintingKernelTest {
     }
 
     private static ServerPlayer mockServerPlayer(GameTestHelper helper) {
-        if (!(helper.makeMockServerPlayer(GameType.SURVIVAL) instanceof ServerPlayer player)) {
+        if (!(com.slabbed.test.TestPlayers.survivalServerPlayer(helper) instanceof ServerPlayer player)) {
             throw helper.assertionException("GameTest did not provide a server-backed mock player");
         }
         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.DIAMOND, 3));
@@ -1251,7 +1251,7 @@ public final class SlabRigHangingPaintingKernelTest {
                     alreadyAbsentEntities.add(uuid);
                     continue;
                 }
-                if (entity.getType() != EntityTypes.PAINTING) {
+                if (entity.getType() != EntityType.PAINTING) {
                     throw new IllegalStateException("owned UUID changed type; refusing deletion: " + uuid);
                 }
                 entity.discard();

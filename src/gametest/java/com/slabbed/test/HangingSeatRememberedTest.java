@@ -10,7 +10,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.EntitySpawnReason;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.world.entity.decoration.painting.Painting;
 import net.minecraft.world.level.block.Blocks;
@@ -82,7 +82,7 @@ public final class HangingSeatRememberedTest {
         TagValueOutput output = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, level.registryAccess());
         frame.saveWithoutId(output);
         CompoundTag saved = output.buildResult();
-        ItemFrame reloaded = EntityTypes.ITEM_FRAME.create(level, EntitySpawnReason.LOAD);
+        ItemFrame reloaded = EntityType.ITEM_FRAME.create(level, EntitySpawnReason.LOAD);
         if (reloaded == null) {
             throw helper.assertionException("premise: could not create the reloaded frame");
         }
@@ -159,7 +159,7 @@ public final class HangingSeatRememberedTest {
         frame.saveWithoutId(output);
         CompoundTag saved = output.buildResult();
         saved.remove("slabbed:hang_dy"); // an old save: no remembered seat
-        ItemFrame old = EntityTypes.ITEM_FRAME.create(level, EntitySpawnReason.LOAD);
+        ItemFrame old = EntityType.ITEM_FRAME.create(level, EntitySpawnReason.LOAD);
         if (old == null) {
             throw helper.assertionException("premise: could not create the frame");
         }

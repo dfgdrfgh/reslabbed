@@ -1,3 +1,19 @@
+## [0.6.2-alpha+26.1.2]
+
+See LAW.md — this changelog does not redefine the law.
+
+This is a one-time refresh of the Minecraft 26.1.2 build. The last public 26.1 file was
+`0.4.2-beta.2`; this release brings 26.1.2 up to the same behaviour as `0.6.1-alpha` on 26.2, with
+no new features beyond that. The 26.1.2 line is frozen after this release unless demand returns.
+
+- Everything listed under `0.6.1-alpha+26.2` and the earlier 0.5.x / 0.6.0 notes below now applies on
+  26.1.2: lowered fence posts, rails and redstone on lowered slabs, remembered heights through
+  material swaps and block replacements, deep side placement, hanging decorations that keep their
+  seat and never stall a chunk load, farmland and path handling, and the Terrain Slabs, Sodium and
+  Lithium compatibility work.
+- Sulfur spikes do not exist on 26.1.2, so that part of the stored-height coverage is absent here.
+- Requires Fabric Loader 0.19.5 or newer and Fabric API 0.155.3+26.1.2 or newer.
+
 ## [0.6.1-alpha+26.2]
 
 See LAW.md — this changelog does not redefine the law.

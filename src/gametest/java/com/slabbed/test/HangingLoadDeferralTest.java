@@ -12,7 +12,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.EntitySpawnReason;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.decoration.HangingEntity;
 import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.world.entity.decoration.painting.Painting;
@@ -85,8 +85,8 @@ public final class HangingLoadDeferralTest {
             nbt.remove("slabbed:hang_dy");
         }
         HangingEntity restored = painting
-                ? EntityTypes.PAINTING.create(level, EntitySpawnReason.LOAD)
-                : EntityTypes.ITEM_FRAME.create(level, EntitySpawnReason.LOAD);
+                ? EntityType.PAINTING.create(level, EntitySpawnReason.LOAD)
+                : EntityType.ITEM_FRAME.create(level, EntitySpawnReason.LOAD);
         if (restored == null) {
             throw helper.assertionException("premise: restored entity exists");
         }

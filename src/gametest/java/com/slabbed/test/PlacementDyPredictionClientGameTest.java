@@ -676,11 +676,11 @@ public final class PlacementDyPredictionClientGameTest implements FabricClientGa
 
             singleplayer.getServer().computeOnServer(server -> {
                 ServerPlayer player = server.getPlayerList().getPlayers().getFirst();
-                player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.BED.red(), 4));
+                player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.RED_BED, 4));
                 player.inventoryMenu.sendAllDataToRemote();
                 return true;
             });
-            waitForHeldAndOwner(context, Items.BED.red(), fixture.bedOwner());
+            waitForHeldAndOwner(context, Items.RED_BED, fixture.bedOwner());
             useOnRecorderOwner(context, fixture.bedOwner());
             context.waitFor(client -> recorderAction(
                     recorderDir, "client", "minecraft:red_bed", fixture.bedOwner()) != null, 400);

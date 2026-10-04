@@ -22,7 +22,7 @@ public final class RecorderManifestRedactionTest {
 
     @GameTest(structure = "fabric-gametest-api-v1:empty")
     public void redactsAllFiveSensitiveLaunchArgs(GameTestHelper helper) {
-        String command = "net.minecraft.client.main.Main --username TestPlayer --version 26.2 "
+        String command = "net.minecraft.client.main.Main --username TestPlayer --version 26.1.2 "
                 + "--accessToken eyJhbGciOiJSUzI1NiJ9.super-secret-jwt-token "
                 + "--uuid 11112222333344445555666677778888 "
                 + "--xuid 9999888877776666 "
@@ -47,7 +47,7 @@ public final class RecorderManifestRedactionTest {
 
         // Non-sensitive args must be preserved verbatim.
         assertPresent(helper, redacted, "--username TestPlayer");
-        assertPresent(helper, redacted, "--version 26.2");
+        assertPresent(helper, redacted, "--version 26.1.2");
         assertPresent(helper, redacted, "--userType msa");
         helper.succeed();
     }

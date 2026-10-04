@@ -19,7 +19,7 @@ import net.minecraft.world.level.block.state.BlockState;
  * section mesh (see {@code OffsetBlockStateModel#slabbed$modelDy}, which reads the render-region view
  * on the mesh thread). That mesh only rebuilds when the section is marked dirty. The vanilla client
  * dirty path for a single block change ({@code ClientLevel.sendBlockUpdated} →
- * {@code LevelExtractor.blockChanged} → an internal {@code setBlockDirty} that loops only ±1 BLOCK
+ * {@code LevelRenderer.blockChanged} → an internal {@code setBlockDirty} that loops only ±1 BLOCK
  * around the changed position) therefore dirties, in the common mid-section case, ONLY the changed
  * block's own section.
  *
@@ -94,7 +94,7 @@ public final class SlabGeometricRemeshScheduler {
      * case, which is by definition at the block the player just interacted with).
      *
      * <p>So Slabbed issues its own dirties as IMPORTANT via
-     * {@code LevelExtractorImportantDirtyAccessor} (the private {@code setSectionDirty(x,y,z,true)}
+     * {@code LevelRendererImportantDirtyAccessor} (the private {@code setSectionDirty(x,y,z,true)}
      * overload Sodium {@code @Overwrite}s), not via the {@code important == false} public path. This is a
      * priority change to ONLY Slabbed's own dirty calls; it must remain {@code true} for the fix to hold.
      * Pinned by {@code GeometricRemeshSchedulerTest.slabbedRequestsImportantRebuild}. This constant is the
@@ -179,7 +179,7 @@ public final class SlabGeometricRemeshScheduler {
      * side/owner-top anchor attachment changes on the client.
      *
      * <p>{@code ClientLevel.setSectionRangeDirty} takes SECTION coordinates, not block coordinates — it
-     * forwards straight to {@code LevelExtractor.setSectionDirty} with no {@code >>4} conversion
+     * forwards straight to {@code LevelRenderer.setSectionDirty} with no {@code >>4} conversion
      * (confirmed via bytecode). Feeding it raw block coords (the pre-{@code 4df516ab} bug) dirtied a
      * 27-section box ~16× too far from the block — e.g. block x=100 dirtied SECTIONS 99..101 (blocks
      * 1584..1631), nowhere near the actual anchor — so the compound-visible mesh could stay stale, the

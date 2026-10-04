@@ -271,7 +271,7 @@ public final class Slabbed2612DyFingerprintTest {
         ServerLevel level = helper.getLevel();
         BlockPos b = new BlockPos(2, 2, 2);
         helper.setBlock(b.below(), bottomSlab());
-        helper.setBlock(b, Blocks.CARPET.white().defaultBlockState());
+        helper.setBlock(b, Blocks.WHITE_CARPET.defaultBlockState());
         fingerprint(helper, level, b, "thin_layer_carpet", -0.5);
         helper.succeed();
     }
@@ -293,10 +293,10 @@ public final class Slabbed2612DyFingerprintTest {
         ServerLevel level = helper.getLevel();
         BlockPos foot = new BlockPos(2, 2, 2);
         BlockPos head = foot.east();   // FOOT.relative(facing=EAST) = head
-        BlockState footState = Blocks.BED.red().defaultBlockState()
+        BlockState footState = Blocks.RED_BED.defaultBlockState()
                 .setValue(BlockStateProperties.BED_PART, BedPart.FOOT)
                 .setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.EAST);
-        BlockState headState = Blocks.BED.red().defaultBlockState()
+        BlockState headState = Blocks.RED_BED.defaultBlockState()
                 .setValue(BlockStateProperties.BED_PART, BedPart.HEAD)
                 .setValue(BlockStateProperties.HORIZONTAL_FACING, Direction.EAST);
         helper.setBlock(foot.below(), bottomSlab());                    // slab under FOOT only

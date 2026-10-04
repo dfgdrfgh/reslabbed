@@ -706,7 +706,7 @@ public final class NeighborUpdateInvarianceTest {
         world.setBlock(support.east(), Blocks.STONE.defaultBlockState(), Block.UPDATE_ALL);
         PlacementCaptureBoundaryGameTest.forceStore(world, support, -1.0d);
         PlacementCaptureBoundaryGameTest.forceStore(world, support.east(), -1.0d);
-        ItemStack bed = new ItemStack(Items.BED.red());
+        ItemStack bed = new ItemStack(Items.RED_BED);
         bed.set(DataComponents.BLOCK_STATE, BlockItemStateProperties.EMPTY.with(
                 BlockStateProperties.HORIZONTAL_FACING, Direction.EAST));
         boolean previous = SlabAnchorAttachment.FROZEN_DY_ENABLED;

@@ -1,12 +1,12 @@
 package com.slabbed.client;
 
 import com.slabbed.client.SlabGeometricRemeshScheduler.SectionBox;
-import com.slabbed.mixin.client.ClientLevelLevelExtractorAccessor;
-import com.slabbed.mixin.client.LevelExtractorImportantDirtyAccessor;
+import com.slabbed.mixin.client.ClientLevelLevelRendererAccessor;
+import com.slabbed.mixin.client.LevelRendererImportantDirtyAccessor;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.renderer.extract.LevelExtractor;
+import net.minecraft.client.renderer.LevelRenderer;
 
 /**
  * Single authority for issuing Slabbed's own client section re-mesh as an <b>IMPORTANT</b>
@@ -14,7 +14,7 @@ import net.minecraft.client.renderer.extract.LevelExtractor;
  * refresh dirty their {@link SectionBox} with the same priority.
  *
  * <p>See {@link SlabGeometricRemeshScheduler#REQUEST_IMPORTANT_REBUILD} and
- * {@link LevelExtractorImportantDirtyAccessor} for why {@code important == true} matters (it is decisive
+ * {@link LevelRendererImportantDirtyAccessor} for why {@code important == true} matters (it is decisive
  * under Sodium: {@code false} lands in Sodium's deferred, per-frame-budgeted queue — the ~30-second-snap
  * delay — while {@code true} reaches its near-immediate presentation path for a near-camera section).
  * Falls back to nothing extra on vanilla beyond a harmless {@code isDirtyFromPlayer = true}.
@@ -39,11 +39,11 @@ public final class SlabImportantRemesh {
         if (level == null) {
             return;
         }
-        LevelExtractor extractor = ((ClientLevelLevelExtractorAccessor) level).slabbed$levelExtractor();
-        if (extractor == null) {
+        LevelRenderer renderer = ((ClientLevelLevelRendererAccessor) level).slabbed$levelRenderer();
+        if (renderer == null) {
             return;
         }
-        LevelExtractorImportantDirtyAccessor accessor = (LevelExtractorImportantDirtyAccessor) extractor;
+        LevelRendererImportantDirtyAccessor accessor = (LevelRendererImportantDirtyAccessor) renderer;
         boolean important = SlabGeometricRemeshScheduler.REQUEST_IMPORTANT_REBUILD;
         for (int sx = box.minX(); sx <= box.maxX(); sx++) {
             for (int sy = box.minY(); sy <= box.maxY(); sy++) {

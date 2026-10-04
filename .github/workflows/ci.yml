@@ -4,7 +4,7 @@ on:
   pull_request:
   push:
     branches:
-      - "port/mc-26.2-**"
+      - "port/mc-26.1.2-**"
   workflow_dispatch:
 
 permissions:
@@ -26,7 +26,7 @@ jobs:
         with:
           persist-credentials: false
 
-      # MC 26.2's named jar is class-file version 69, so javac must run under JDK 25 even though
+      # MC 26.1.2's named jar is class-file version 69, so javac must run under JDK 25 even though
       # this project still targets release 21 bytecode. The repo's ./gradlew25 wrapper resolves 25
       # through the macOS-only /usr/libexec/java_home, so CI uses plain ./gradlew and lets
       # setup-java provide the JDK instead.

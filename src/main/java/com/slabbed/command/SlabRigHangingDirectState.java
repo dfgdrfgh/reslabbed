@@ -46,14 +46,20 @@ public final class SlabRigHangingDirectState {
     public static final String LEGACY_EXECUTION_CONTRACT =
             "rig3b2b1-route6143-topology42-selectorpage1-v1";
     public static final String EXECUTION_CONTRACT =
-            "rig3b3a-route6143-topology42-selectorpages1-4-v2";
+            "rig3b3a-route6137-topology42-selectorpages1-4-v2";
     public static final String NO_PREDECESSOR = "NONE";
     public static final String NO_VALUE = "NONE";
     public static final String PROVENANCE =
             "AUTO_ITEM_USEON_EXPLICIT_STACK_NULL_PLAYER_PROXY";
     public static final String PLAYER_PROOF = "ABSENT";
     public static final String CLIENT_PROOF = "ABSENT";
-    public static final int ROUTE_INDEX = 6143;
+    public static final int ROUTE_INDEX = 6137;
+    /**
+     * Route index frozen into the clear-only v1 grammar. The v1 contract was recorded on a game version
+     * whose hash-ordered painting route list placed the SBSBS route at 6143; the grammar is closed, so
+     * its bytes keep that index while live v2 state uses this version's {@link #ROUTE_INDEX}.
+     */
+    public static final int LEGACY_ROUTE_INDEX = 6143;
     public static final int TOPOLOGY_INDEX = 42;
     public static final int MIN_SELECTOR_PAGE = 1;
     public static final int MAX_SELECTOR_PAGE = 4;
@@ -70,17 +76,24 @@ public final class SlabRigHangingDirectState {
 
     /** Exact on-disk grammar and owner-key namespace. Legacy bytes remain clear-only. */
     public enum Format {
-        LEGACY_V1(LEGACY_SCHEMA, LEGACY_EXECUTION_CONTRACT, true),
-        VARIABLE_V2(SCHEMA, EXECUTION_CONTRACT, false);
+        LEGACY_V1(LEGACY_SCHEMA, LEGACY_EXECUTION_CONTRACT, LEGACY_ROUTE_INDEX, true),
+        VARIABLE_V2(SCHEMA, EXECUTION_CONTRACT, ROUTE_INDEX, false);
 
         private final String schema;
         private final String executionContract;
+        private final int routeIndex;
         private final boolean legacy;
 
-        Format(String schema, String executionContract, boolean legacy) {
+        Format(String schema, String executionContract, int routeIndex, boolean legacy) {
             this.schema = schema;
             this.executionContract = executionContract;
+            this.routeIndex = routeIndex;
             this.legacy = legacy;
+        }
+
+        /** Route index the execution contract of this grammar is bound to. */
+        public int routeIndex() {
+            return routeIndex;
         }
 
         public String schema() {
@@ -265,10 +278,12 @@ public final class SlabRigHangingDirectState {
             requireSha256(universeHash, "universeHash");
             requireSha256(planHash, "planHash");
             requireText(semanticPageId, "semanticPageId");
-            if (routeIndex != ROUTE_INDEX || topologyIndex != TOPOLOGY_INDEX
+            if ((routeIndex != ROUTE_INDEX && routeIndex != LEGACY_ROUTE_INDEX)
+                    || topologyIndex != TOPOLOGY_INDEX
                     || selectorPage < MIN_SELECTOR_PAGE || selectorPage > MAX_SELECTOR_PAGE) {
                 throw new IllegalArgumentException(
-                        "production direct state accepts only route 6143/topology 42/pages 1..4");
+                        "production direct state accepts only route 6137 (legacy v1: 6143)"
+                                + "/topology 42/pages 1..4");
             }
             if (caseCount <= 0 || caseCount > SlabRigHangingPaintingPlan.PAGE_SIZE) {
                 throw new IllegalArgumentException(
@@ -740,6 +755,10 @@ public final class SlabRigHangingDirectState {
         int selectorPage = parseInt(reader.singleton("selector_page"), "selector_page");
         int caseCount = format.legacy ? LEGACY_CASE_COUNT
                 : parseInt(reader.singleton("case_count"), "case_count");
+        int routeIndex = parseInt(reader.singleton("route_index"), "route_index");
+        if (routeIndex != format.routeIndex) {
+            throw new IllegalArgumentException("route_index does not match the schema's execution contract");
+        }
         RunIdentity run = new RunIdentity(reader.singleton("run_id"),
                 parseUuid(reader.singleton("run_nonce"), "run_nonce"),
                 reader.singleton("build_git_sha"), reader.singleton("runtime_content_sha256"),
@@ -747,7 +766,7 @@ public final class SlabRigHangingDirectState {
                 reader.singleton("topology_catalog_hash"), reader.singleton("rig3b1_execution_identity"),
                 reader.singleton("painting_registry_hash"), reader.singleton("universe_hash"),
                 reader.singleton("plan_hash"), unescape(reader.singleton("semantic_page_id")),
-                parseInt(reader.singleton("route_index"), "route_index"),
+                routeIndex,
                 parseInt(reader.singleton("topology_index"), "topology_index"),
                 selectorPage, caseCount,
                 parseBoolean(reader.singleton("frozen_dy_enabled"), "frozen_dy_enabled"),

@@ -2162,7 +2162,8 @@ public final class SlabRigHangingDirectExecutor {
                 .filter(SlabRigHangingDirectState.TickCredit::loaded)
                 .mapToInt(SlabRigHangingDirectState.TickCredit::observedEntityTicks)
                 .min().orElse(0);
-        return "Slabbed direct 6143/42/" + state.run().selectorPage()
+        return "Slabbed direct " + state.run().routeIndex() + "/" + state.run().topologyIndex()
+                + "/" + state.run().selectorPage()
                 + " schema=" + (state.format().legacy() ? "legacy-v1-clear-only" : "v2")
                 + " phase=" + state.phase()
                 + " run=" + state.run().runId().substring(0, 12)

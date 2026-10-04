@@ -1,23 +1,23 @@
 package com.slabbed.mixin.client;
 
-import net.minecraft.client.renderer.extract.LevelExtractor;
+import net.minecraft.client.renderer.LevelRenderer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
 /**
- * Exposes {@code LevelExtractor}'s private
+ * Exposes {@code LevelRenderer}'s private
  * {@code setSectionDirty(int x, int y, int z, boolean important)} overload so Slabbed's client re-mesh
  * paths can request an IMPORTANT (near-immediate) rebuild instead of the deferred default.
  *
  * <h2>Why this exists (the 30-second-snap delay)</h2>
- * In 26.2 all client section-dirty scheduling funnels through {@code LevelExtractor}. The public
+ * On 26.1.x all client section-dirty scheduling funnels through {@code LevelRenderer}. The public
  * entrypoints Slabbed was using — {@code ClientLevel.setSectionRangeDirty} → {@code
- * LevelExtractor.setSectionRangeDirty} → {@code setSectionDirty(x,y,z)} — hardcode the {@code important}
- * flag to {@code false} (see {@code LevelExtractor.setSectionDirty(III)}, which calls the 4-arg overload
+ * LevelRenderer.setSectionRangeDirty} → {@code setSectionDirty(x,y,z)} — hardcode the {@code important}
+ * flag to {@code false} (see {@code LevelRenderer.setSectionDirty(III)}, which calls the 4-arg overload
  * with a constant {@code false}). On VANILLA that flag only distinguishes "dirty from player" ordering
  * and the section still rebuilds within a frame or two regardless, so it was invisible.
  *
- * <p>But under <b>Sodium</b> (present in the live-test profile), {@code LevelExtractor.setSectionDirty(III Z)}
+ * <p>But under <b>Sodium</b> (present in the live-test profile), {@code LevelRenderer.setSectionDirty(III Z)}
  * is {@code @Overwrite}n to route straight into {@code SodiumWorldRenderer.scheduleRebuildForChunk(x,y,z,important)}
  * → {@code RenderSectionManager.scheduleRebuild(...)}. There the {@code important} flag is decisive:
  * only {@code important == true} AND a near-camera section produces {@code ChunkUpdateTypes.IMPORTANT},
@@ -38,8 +38,8 @@ import org.spongepowered.asm.mixin.gen.Invoker;
  * <p>Sodium's overwrite of this overload is {@code private}, so this invoker dispatches (via the
  * mixin-merged method body) to Sodium's version when Sodium is loaded, and to vanilla's otherwise.
  */
-@Mixin(LevelExtractor.class)
-public interface LevelExtractorImportantDirtyAccessor {
+@Mixin(LevelRenderer.class)
+public interface LevelRendererImportantDirtyAccessor {
 
     @Invoker("setSectionDirty")
     void slabbed$setSectionDirtyImportant(int x, int y, int z, boolean important);
