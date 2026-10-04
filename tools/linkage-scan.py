@@ -9,10 +9,18 @@ and every mixin refmap entry, against the target version's intermediary names an
 hierarchy, and fails on anything unresolved.
 
 Usage:
-    python3 tools/linkage-scan.py <release-jar> <intermediary-tiny> <official-game-jar> [--allow-class PREFIX ...]
+    python3 tools/linkage-scan.py <release-jar> <intermediary-tiny|-> <official-game-jar> [--allow-class PREFIX ...]
+                                  [--lib <jar> ...]
 
-  intermediary-tiny: mappings/<version>.tiny from the FabricMC intermediary repository
-  official-game-jar: the obfuscated client jar for the version (Loom keeps one under its cache)
+  intermediary-tiny: mappings/<version>.tiny from the FabricMC intermediary repository, or "-" for a
+                     game version that ships under the names the mod was compiled against (Minecraft
+                     26.1 and newer carry Mojang names in the shipped jar, so no mapping is needed)
+  official-game-jar: the shipped client jar for the version (Loom keeps one under its cache)
+  --lib:             a library jar whose classes are also in scope (identity names): references to
+                     net/fabricmc/fabric/api/ owners are then resolved against it too, and a Fabric API
+                     bundle's nested META-INF/jars/*.jar are read as well. Give the Fabric API build the
+                     target version actually runs with, so an API seam (a renamed interface member)
+                     fails here like a game seam does.
   --allow-class:     a class (internal name prefix) that is deliberately isolated and only ever
                      loaded on a version where its references resolve, e.g. a nested class that
                      holds the newest-version branch of a version-switched helper. Each such class
@@ -76,6 +84,8 @@ def parse_class(data):
 
 def load_tiny(path):
     cls_map = {}; methods = {}; fields = {}
+    if path == '-':
+        return cls_map, methods, fields, (lambda d: d)
     lines = open(path, encoding='utf-8').read().splitlines()
     for ln in lines[1:]:
         p = ln.split('\t')
@@ -91,11 +101,52 @@ def load_tiny(path):
     return cls_map, methods, fields, remap_desc
 
 literal = {}
-def load_hierarchy(game_jar, cls_map, remap_desc):
+jdk_cache = {}
+jdk_supers = {}
+def jdk_members(cls):
+    """(name, desc) pairs of a JDK class, read once through `javap -s -p` on the running JDK."""
+    if cls in jdk_cache: return jdk_cache[cls]
+    import subprocess
+    members = set(); name = None
+    try:
+        out = subprocess.run(['javap', '-s', '-p', cls.replace('/', '.')], capture_output=True, text=True, timeout=60).stdout
+    except Exception:
+        out = ''
+    for ln in out.splitlines():
+        ln = ln.strip()
+        if ln.startswith('descriptor:') and name is not None:
+            members.add((name, ln.split(':', 1)[1].strip())); name = None
+        elif ln.endswith(';') and not ln.startswith(('Compiled', 'public class', 'public interface', 'public final class',
+                                                     'public abstract class', 'class ', 'interface ', 'final class', 'abstract class')):
+            sig = ln[:-1].split(' throws ')[0]
+            if '(' in sig:
+                head = sig.split('(')[0].split()
+                name = head[-1] if head else None
+                if name and '<' in name and name.endswith('>'): name = None
+                if name and name.endswith(cls.rsplit('/', 1)[-1].rsplit('$', 1)[-1]) and ' ' not in sig.split('(')[0].strip().replace(name, '', 1).strip():
+                    name = '<init>'  # constructor: javap prints the simple class name
+            else:
+                name = sig.split()[-1]
+    jdk_cache[cls] = members
+    supers = []
+    for ln in out.splitlines():
+        if ln.startswith(('public ', 'final ', 'abstract ', 'class ', 'interface ')) and ('extends' in ln or 'implements' in ln):
+            import re as _re
+            for tok in _re.findall(r'[A-Za-z_$][\w$.]*', ln.split('{')[0]):
+                if '.' in tok and tok != cls.replace('/', '.'):
+                    supers.append(tok.split('<')[0].replace('.', '/'))
+    jdk_supers[cls] = supers
+    return members
+
+def load_hierarchy(game_jar, cls_map, remap_desc, sup=None, nested=True):
     """official-named game jar -> {intermediary class: [intermediary supertypes]} and set of all classes."""
-    sup = {}
+    import io
+    sup = {} if sup is None else sup
     with zipfile.ZipFile(game_jar) as z:
         for n in z.namelist():
+            if nested and n.startswith('META-INF/jars/') and n.endswith('.jar'):
+                load_hierarchy(io.BytesIO(z.read(n)), cls_map, remap_desc, sup, nested=False)
+                continue
             if not n.endswith('.class'): continue
             try: this, s, ifs, _, members = parse_class(z.read(n))
             except Exception: continue
@@ -108,13 +159,21 @@ def load_hierarchy(game_jar, cls_map, remap_desc):
 
 def main():
     args = [a for a in sys.argv[1:]]
-    allowed = []
+    allowed = []; libs = []
     while '--allow-class' in args:
         i = args.index('--allow-class'); allowed.append(args[i+1]); del args[i:i+2]
+    while '--lib' in args:
+        i = args.index('--lib'); libs.append(args[i+1]); del args[i:i+2]
     mod_jar, tiny, game_jar = args[:3]
     cls_map, methods, fields, remap_desc = load_tiny(tiny)
     sup = load_hierarchy(game_jar, cls_map, remap_desc)
+    for lib in libs:
+        load_hierarchy(lib, {}, lambda d: d, sup)
     all_classes = set(sup.keys()) | set(cls_map.values())
+    # The game jar also carries Mojang's own client libraries (com/mojang/blaze3d, math, ...); every
+    # package it ships under com/mojang/ is in scope too, so a renamed enum constant there fails here.
+    mojang_pkgs = sorted({'/'.join(c.split('/')[:3]) + '/' for c in sup if c.startswith('com/mojang/') and c.count('/') >= 3})
+    scope = ('net/minecraft/',) + tuple(mojang_pkgs) + (('net/fabricmc/fabric/api/',) if libs else ())
     def member_exists(owner, name, desc, kind):
         if 'net/fabricmc/' in desc: return True  # Fabric interface injection
         seen = set(); stack = [owner]
@@ -122,12 +181,20 @@ def main():
             c = stack.pop()
             if c in seen: continue
             seen.add(c)
-            if not c.startswith('net/minecraft/'): return True  # JDK / library supertype: out of scope
+            if c.startswith(('java/', 'javax/', 'jdk/')):
+                if (name, desc) in jdk_members(c): return True
+                continue  # a JDK supertype that lacks the member proves nothing; keep walking
+            if not c.startswith(scope):
+                if c in sup: pass  # a lib class we loaded: keep walking its members below
+                else: return True  # third-party library supertype: out of scope
             table = fields if kind == 'field' else methods
             if (name, desc) in table.get(c, ()): return True
             if (name, desc) in literal.get((kind, c), ()): return True
             if kind != 'field' and name in ('ordinal','values','valueOf','name','compareTo','getClass','hashCode','equals','toString','clone'): return True
-            stack.extend(sup.get(c, []))
+            if c in sup: stack.extend(sup[c])
+            elif c.startswith(('java/', 'javax/', 'jdk/')):
+                jdk_members(c)
+                stack.extend(jdk_supers.get(c, []))
         return False
     problems = []
     checked = 0
@@ -140,19 +207,19 @@ def main():
                 if r[0] == 'class':
                     c = r[1].lstrip('[')
                     if c.startswith('L'): c = c[1:-1]
-                    if c.startswith('net/minecraft/') and c not in all_classes:
+                    if c.startswith(scope) and c not in all_classes:
                         problems.append(f'{n}: class {c}'); checked += 1
-                    elif c.startswith('net/minecraft/'): checked += 1
+                    elif c.startswith(scope): checked += 1
                 elif r[0] in ('field','method','imethod'):
                     owner = r[1]
-                    if not owner.startswith('net/minecraft/'): continue
+                    if not owner.startswith(scope): continue
                     checked += 1
                     if owner not in all_classes:
                         problems.append(f'{n}: {r[0]} owner missing {owner}.{r[2]}{r[3]}'); continue
                     if r[2] == '<init>':
-                        if (r[2], r[3]) not in methods.get(owner, ()):
-                            # constructors are not in intermediary tiny (unmapped names); accept
-                            pass
+                        # constructors are not in intermediary tiny; the game jar's own member table has them
+                        if ('<init>', r[3]) not in literal.get(('method', owner), ()):
+                            problems.append(f'{n}: constructor {owner}.<init>{r[3]}')
                         continue
                     if not member_exists(owner, r[2], r[3], 'field' if r[0]=='field' else 'method'):
                         problems.append(f'{n}: {r[0]} {owner}.{r[2]}{r[3]}')
