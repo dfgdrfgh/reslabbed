@@ -40,11 +40,11 @@ public final class AuditFixesTest {
 
         double carrierDy = SlabSupport.getYOffset(w, carrierPos, w.getBlockState(carrierPos));
         ctx.assertTrue(Math.abs(carrierDy + 0.5) <= EPS,
-                "setup: " + name + " on a TS slab should lower to -0.5, got " + carrierDy);
+                net.minecraft.text.Text.literal("setup: " + name + " on a TS slab should lower to -0.5, got " + carrierDy));
         double topDy = SlabSupport.getYOffset(w, top, w.getBlockState(top));
         ctx.assertTrue(Math.abs(topDy - carrierDy) <= EPS,
-                "a full cube on a lowered " + name + " must share its dy " + carrierDy
-                        + " (GH#22 curated-carrier gap); got " + topDy);
+                net.minecraft.text.Text.literal("a full cube on a lowered " + name + " must share its dy " + carrierDy
+                        + " (GH#22 curated-carrier gap); got " + topDy));
         ctx.complete();
     }
 
@@ -75,12 +75,12 @@ public final class AuditFixesTest {
         double fenceDy = SlabSupport.getYOffset(w, fencePos, w.getBlockState(fencePos));
         double gateDy = SlabSupport.getYOffset(w, gatePos, w.getBlockState(gatePos));
         ctx.assertTrue(Math.abs(fenceDy) <= EPS && Math.abs(gateDy + 0.5) <= EPS,
-                "setup: fence should be flush 0.0 (got " + fenceDy + ") and gate lowered -0.5 (got " + gateDy + ")");
+                net.minecraft.text.Text.literal("setup: fence should be flush 0.0 (got " + fenceDy + ") and gate lowered -0.5 (got " + gateDy + ")"));
         ctx.assertTrue(
                 SlabSupport.isSteppedConnectingNeighbor(w, fencePos, w.getBlockState(fencePos),
                         gatePos, w.getBlockState(gatePos)),
-                "a fence next to a height-stepped fence GATE must be a stepped connecting neighbor "
-                        + "(gate was silently dropped from the connecting family)");
+                net.minecraft.text.Text.literal("a fence next to a height-stepped fence GATE must be a stepped connecting neighbor "
+                        + "(gate was silently dropped from the connecting family)"));
         ctx.complete();
     }
 

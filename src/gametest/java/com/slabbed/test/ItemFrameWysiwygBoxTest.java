@@ -60,24 +60,24 @@ public final class ItemFrameWysiwygBoxTest {
         // The box carries the support's drawn height...
         ctx.assertTrue(Math.abs((loweredBox.minY - controlBox.minY) + 0.5) <= EPS
                         && Math.abs((loweredBox.maxY - controlBox.maxY) + 0.5) <= EPS,
-                "frame box beside a -0.5 support must sit exactly 0.5 below the flush control's box; got minY delta "
-                        + (loweredBox.minY - controlBox.minY) + " maxY delta " + (loweredBox.maxY - controlBox.maxY));
+                net.minecraft.text.Text.literal("frame box beside a -0.5 support must sit exactly 0.5 below the flush control's box; got minY delta "
+                        + (loweredBox.minY - controlBox.minY) + " maxY delta " + (loweredBox.maxY - controlBox.maxY)));
         // ...while the entity position does not differ (the no-position-shift invariant).
         ctx.assertTrue(Math.abs(lowered.getY() - control.getY()) <= EPS,
-                "frame entity Y must stay at grid height; lowered frame Y "
-                        + lowered.getY() + " vs control " + control.getY());
+                net.minecraft.text.Text.literal("frame entity Y must stay at grid height; lowered frame Y "
+                        + lowered.getY() + " vs control " + control.getY()));
         // And both frames still judge their real supports.
         ctx.assertTrue(lowered.canStayAttached() && control.canStayAttached(),
-                "both frames must survive on their supports (lowered=" + lowered.canStayAttached()
-                        + " control=" + control.canStayAttached() + ")");
+                net.minecraft.text.Text.literal("both frames must survive on their supports (lowered=" + lowered.canStayAttached()
+                        + " control=" + control.canStayAttached() + ")"));
         // Cross-version tripwire (sibling-line finding, 2026-09-02): on some MC versions the
         // entity xyz is re-derived FROM the box, so a box shift feeds back into the position on
         // a later recalculation. Re-assert the split after a few ticks, not only at spawn.
         ctx.runAtTick(5, () -> {
             ctx.assertTrue(Math.abs(lowered.getY() - control.getY()) <= EPS,
-                    "frame entity Y drifted after ticks — a deferred recalculation derived the "
+                    net.minecraft.text.Text.literal("frame entity Y drifted after ticks — a deferred recalculation derived the "
                             + "position from the shifted box; lowered Y " + lowered.getY()
-                            + " vs control " + control.getY());
+                            + " vs control " + control.getY()));
             ctx.complete();
         });
     }
@@ -97,8 +97,8 @@ public final class ItemFrameWysiwygBoxTest {
         Box box = frame.getBoundingBox();
         double boxCenterY = (box.minY + box.maxY) / 2.0;
         ctx.assertTrue(Math.abs(boxCenterY - frame.getY()) <= EPS,
-                "flush-support frame box must stay centred on the entity position; center "
-                        + boxCenterY + " vs entity Y " + frame.getY());
+                net.minecraft.text.Text.literal("flush-support frame box must stay centred on the entity position; center "
+                        + boxCenterY + " vs entity Y " + frame.getY()));
         ctx.complete();
     }
 }

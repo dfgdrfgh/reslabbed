@@ -49,50 +49,50 @@ public final class SlabbedLabFixtureTest {
 
         // --- 1. Place the basic fixture (all 3 lanes, pre-verified air) ---
         PlaceResult placed = SlabbedLabFixtures.placeBasicFixture(world, origin);
-        ctx.assertTrue(placed.ok(), "placeBasicFixture failed: " + placed.error());
+        ctx.assertTrue(placed.ok(), net.minecraft.text.Text.literal("placeBasicFixture failed: " + placed.error()));
 
         // --- 2. Assert each lane placed with its exact expected state ---
 
         LaneStatus fullInit = SlabbedLabFixtures.queryStatus(world, origin, "FULL").get(0);
         ctx.assertTrue(fullInit.supportMatch(),
-                "FULL initial mismatch: expected " + fullInit.expectedSupport()
-                        + ", got " + fullInit.actualSupport());
+                net.minecraft.text.Text.literal("FULL initial mismatch: expected " + fullInit.expectedSupport()
+                        + ", got " + fullInit.actualSupport()));
 
         LaneStatus bottomInit = SlabbedLabFixtures.queryStatus(world, origin, "BOTTOM_SLAB").get(0);
         ctx.assertTrue(bottomInit.supportMatch(),
-                "BOTTOM_SLAB initial mismatch: expected " + bottomInit.expectedSupport()
-                        + ", got " + bottomInit.actualSupport());
+                net.minecraft.text.Text.literal("BOTTOM_SLAB initial mismatch: expected " + bottomInit.expectedSupport()
+                        + ", got " + bottomInit.actualSupport()));
 
         LaneStatus topInit = SlabbedLabFixtures.queryStatus(world, origin, "TOP_SLAB").get(0);
         ctx.assertTrue(topInit.supportMatch(),
-                "TOP_SLAB initial mismatch: expected " + topInit.expectedSupport()
-                        + ", got " + topInit.actualSupport());
+                net.minecraft.text.Text.literal("TOP_SLAB initial mismatch: expected " + topInit.expectedSupport()
+                        + ", got " + topInit.actualSupport()));
 
         // --- 3. Break FULL lane support (stone → air, NOTIFY_ALL) ---
         PlaceResult broke = SlabbedLabFixtures.breakSupport(world, origin, "FULL");
-        ctx.assertTrue(broke.ok(), "breakSupport(FULL) failed: " + broke.error());
+        ctx.assertTrue(broke.ok(), net.minecraft.text.Text.literal("breakSupport(FULL) failed: " + broke.error()));
 
         BlockPos fullSupportPos = origin; // FULL lane = origin + (0,0,0)
         ctx.assertTrue(
                 world.getBlockState(fullSupportPos).isAir(),
-                "FULL support should be air after breakSupport");
+                net.minecraft.text.Text.literal("FULL support should be air after breakSupport"));
 
         // --- 4. Restore FULL lane support (air → stone, NOTIFY_ALL) ---
         PlaceResult restored = SlabbedLabFixtures.restoreSupport(world, origin, "FULL");
-        ctx.assertTrue(restored.ok(), "restoreSupport(FULL) failed: " + restored.error());
+        ctx.assertTrue(restored.ok(), net.minecraft.text.Text.literal("restoreSupport(FULL) failed: " + restored.error()));
 
         ctx.assertTrue(
                 world.getBlockState(fullSupportPos).isOf(Blocks.STONE),
-                "FULL support should be stone after restoreSupport");
+                net.minecraft.text.Text.literal("FULL support should be stone after restoreSupport"));
 
         // --- 5. Neighbor-update pulse on FULL, then assert support is still stable ---
         PlaceResult pulse = SlabbedLabFixtures.neighborUpdatePulse(world, origin, "FULL");
-        ctx.assertTrue(pulse.ok(), "neighborUpdatePulse(FULL) failed: " + pulse.error());
+        ctx.assertTrue(pulse.ok(), net.minecraft.text.Text.literal("neighborUpdatePulse(FULL) failed: " + pulse.error()));
 
         LaneStatus postPulse = SlabbedLabFixtures.queryStatus(world, origin, "FULL").get(0);
         ctx.assertTrue(postPulse.supportMatch(),
-                "FULL support should still match after pulse: expected "
-                        + postPulse.expectedSupport() + ", got " + postPulse.actualSupport());
+                net.minecraft.text.Text.literal("FULL support should still match after pulse: expected "
+                        + postPulse.expectedSupport() + ", got " + postPulse.actualSupport()));
 
         ctx.complete();
     }
@@ -121,7 +121,7 @@ public final class SlabbedLabFixtureTest {
 
         // Place the 3-lane fixture; BOTTOM_SLAB support lands at origin+(2,0,0).
         PlaceResult placed = SlabbedLabFixtures.placeBasicFixture(world, origin);
-        ctx.assertTrue(placed.ok(), "placeBasicFixture failed: " + placed.error());
+        ctx.assertTrue(placed.ok(), net.minecraft.text.Text.literal("placeBasicFixture failed: " + placed.error()));
 
         // Place a composter directly above the BOTTOM_SLAB lane support.
         // Composter.getRaycastShape returns VoxelShapes.fullCube() (non-empty, minY=0.0).
@@ -130,7 +130,7 @@ public final class SlabbedLabFixtureTest {
         world.setBlockState(testPos, Blocks.COMPOSTER.getDefaultState(), Block.NOTIFY_LISTENERS);
 
         BlockState testState = world.getBlockState(testPos);
-        ctx.assertTrue(testState.isOf(Blocks.COMPOSTER), "composter not present at test position");
+        ctx.assertTrue(testState.isOf(Blocks.COMPOSTER), net.minecraft.text.Text.literal("composter not present at test position"));
 
         VoxelShape outline = testState.getOutlineShape(world, testPos, ShapeContext.absent());
         VoxelShape raycast = testState.getRaycastShape(world, testPos);
@@ -140,12 +140,12 @@ public final class SlabbedLabFixtureTest {
 
         // Prove the offset is applied (not vacuously equal at the unshifted 0.0).
         ctx.assertTrue(outlineMinY < 0.0,
-                "outline not slabbed-offset: expected minY < 0, got " + outlineMinY);
+                net.minecraft.text.Text.literal("outline not slabbed-offset: expected minY < 0, got " + outlineMinY));
 
         // Parity: raycast offset must equal outline offset.
         ctx.assertTrue(outlineMinY == raycastMinY,
-                "outline/raycast parity broken: outline minY=" + outlineMinY
-                        + ", raycast minY=" + raycastMinY);
+                net.minecraft.text.Text.literal("outline/raycast parity broken: outline minY=" + outlineMinY
+                        + ", raycast minY=" + raycastMinY));
 
         ctx.complete();
     }
@@ -168,28 +168,28 @@ public final class SlabbedLabFixtureTest {
         BlockPos origin = ctx.getAbsolutePos(BlockPos.ORIGIN);
 
         PlaceResult placed = SlabbedLabFixtures.placeBasicFixture(world, origin);
-        ctx.assertTrue(placed.ok(), "placeBasicFixture failed: " + placed.error());
+        ctx.assertTrue(placed.ok(), net.minecraft.text.Text.literal("placeBasicFixture failed: " + placed.error()));
 
         BlockPos testPos = origin.add(2, 1, 0); // above BOTTOM_SLAB lane
         world.setBlockState(testPos, Blocks.JUKEBOX.getDefaultState(), Block.NOTIFY_LISTENERS);
 
         BlockState state = world.getBlockState(testPos);
-        ctx.assertTrue(state.isOf(Blocks.JUKEBOX), "jukebox not present at test position");
+        ctx.assertTrue(state.isOf(Blocks.JUKEBOX), net.minecraft.text.Text.literal("jukebox not present at test position"));
 
         double dy = SlabSupport.getYOffset(world, testPos, state);
         ctx.assertTrue(dy == -0.5,
-                "jukebox above BOTTOM_SLAB should lower; dy=" + dy
-                + " (isSlabSitCandidate BlockEntityProvider path regressed)");
+                net.minecraft.text.Text.literal("jukebox above BOTTOM_SLAB should lower; dy=" + dy
+                + " (isSlabSitCandidate BlockEntityProvider path regressed)"));
 
         VoxelShape outline = state.getOutlineShape(world, testPos, ShapeContext.absent());
         double minY = outline.getBoundingBox().minY;
         ctx.assertTrue(minY == -0.5,
-                "jukebox outline minY should be -0.5, got " + minY);
+                net.minecraft.text.Text.literal("jukebox outline minY should be -0.5, got " + minY));
 
         // Contract: isLoweredBlockEntityVisual must agree for every BE block.
         ctx.assertTrue(
                 SlabSupport.isLoweredBlockEntityVisual(world, testPos, state),
-                "isLoweredBlockEntityVisual must be true for jukebox above BOTTOM_SLAB");
+                net.minecraft.text.Text.literal("isLoweredBlockEntityVisual must be true for jukebox above BOTTOM_SLAB"));
 
         ctx.complete();
     }
@@ -208,20 +208,20 @@ public final class SlabbedLabFixtureTest {
         BlockPos origin = ctx.getAbsolutePos(BlockPos.ORIGIN);
 
         PlaceResult placed = SlabbedLabFixtures.placeBasicFixture(world, origin);
-        ctx.assertTrue(placed.ok(), "placeBasicFixture failed: " + placed.error());
+        ctx.assertTrue(placed.ok(), net.minecraft.text.Text.literal("placeBasicFixture failed: " + placed.error()));
 
         BlockPos testPos = origin.add(2, 1, 0); // above BOTTOM_SLAB lane
         world.setBlockState(testPos, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
 
         BlockState state = world.getBlockState(testPos);
-        ctx.assertTrue(state.isOf(Blocks.STONE), "stone not present at test position");
+        ctx.assertTrue(state.isOf(Blocks.STONE), net.minecraft.text.Text.literal("stone not present at test position"));
 
         double dy = SlabSupport.getYOffset(world, testPos, state);
-        ctx.assertTrue(dy == -0.5, "stone should lower over slab column; dy=" + dy);
+        ctx.assertTrue(dy == -0.5, net.minecraft.text.Text.literal("stone should lower over slab column; dy=" + dy));
 
         VoxelShape outline = state.getOutlineShape(world, testPos, ShapeContext.absent());
         ctx.assertTrue(outline.getBoundingBox().minY == -0.5,
-                "stone outline minY should be -0.5, got " + outline.getBoundingBox().minY);
+                net.minecraft.text.Text.literal("stone outline minY should be -0.5, got " + outline.getBoundingBox().minY));
 
         ctx.complete();
     }
@@ -246,10 +246,10 @@ public final class SlabbedLabFixtureTest {
         BlockState support = world.getBlockState(loweredSupportPos);
         ctx.assertTrue(
                 SlabAnchorAttachment.isAnchored(world, loweredSupportPos),
-                "fixture invalid: lowered support was not anchored");
+                net.minecraft.text.Text.literal("fixture invalid: lowered support was not anchored"));
         ctx.assertTrue(
                 SlabSupport.getYOffset(world, loweredSupportPos, support) == -0.5,
-                "fixture invalid: lowered support dy should be -0.5");
+                net.minecraft.text.Text.literal("fixture invalid: lowered support dy should be -0.5"));
 
         world.setBlockState(
                 placedSlabPos,
@@ -259,11 +259,11 @@ public final class SlabbedLabFixtureTest {
         BlockState placed = world.getBlockState(placedSlabPos);
         double dy = SlabSupport.getYOffset(world, placedSlabPos, placed);
         ctx.assertTrue(dy == -0.5,
-                "oak slab above anchored lowered support should inherit dy=-0.5, got " + dy);
+                net.minecraft.text.Text.literal("oak slab above anchored lowered support should inherit dy=-0.5, got " + dy));
 
         VoxelShape outline = placed.getOutlineShape(world, placedSlabPos, ShapeContext.absent());
         ctx.assertTrue(outline.getBoundingBox().minY == -0.5,
-                "oak slab outline minY should be -0.5, got " + outline.getBoundingBox().minY);
+                net.minecraft.text.Text.literal("oak slab outline minY should be -0.5, got " + outline.getBoundingBox().minY));
 
         ctx.complete();
     }
@@ -290,7 +290,7 @@ public final class SlabbedLabFixtureTest {
         BlockState support = world.getBlockState(loweredDoubleSlabPos);
         double supportDy = SlabSupport.getYOffset(world, loweredDoubleSlabPos, support);
         ctx.assertTrue(supportDy == -0.5,
-                "fixture invalid: lowered double slab support dy should be -0.5, got " + supportDy);
+                net.minecraft.text.Text.literal("fixture invalid: lowered double slab support dy should be -0.5, got " + supportDy));
 
         world.setBlockState(
                 placedSlabPos,
@@ -300,12 +300,12 @@ public final class SlabbedLabFixtureTest {
         BlockState placed = world.getBlockState(placedSlabPos);
         double dy = SlabSupport.getYOffset(world, placedSlabPos, placed);
         ctx.assertTrue(dy == -0.5,
-                "oak slab above lowered double slab should inherit dy=-0.5, got " + dy);
+                net.minecraft.text.Text.literal("oak slab above lowered double slab should inherit dy=-0.5, got " + dy));
 
         VoxelShape outline = placed.getOutlineShape(world, placedSlabPos, ShapeContext.absent());
         ctx.assertTrue(outline.getBoundingBox().minY == -0.5,
-                "oak slab above lowered double slab outline minY should be -0.5, got "
-                        + outline.getBoundingBox().minY);
+                net.minecraft.text.Text.literal("oak slab above lowered double slab outline minY should be -0.5, got "
+                        + outline.getBoundingBox().minY));
 
         ctx.complete();
     }
@@ -338,13 +338,13 @@ public final class SlabbedLabFixtureTest {
         double connectorDy = SlabSupport.getYOffset(world, connectorSlabPos, connector);
         double perpendicularDy = SlabSupport.getYOffset(world, perpendicularSlabPos, perpendicular);
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(world, connectorSlabPos),
-                "fixture invalid: connector side slab should be placement-anchored");
+                net.minecraft.text.Text.literal("fixture invalid: connector side slab should be placement-anchored"));
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(world, perpendicularSlabPos),
-                "fixture invalid: perpendicular side slab should be placement-anchored");
+                net.minecraft.text.Text.literal("fixture invalid: perpendicular side slab should be placement-anchored"));
         ctx.assertTrue(connectorDy == -0.5,
-                "fixture invalid: connector side slab should start lowered, got " + connectorDy);
+                net.minecraft.text.Text.literal("fixture invalid: connector side slab should start lowered, got " + connectorDy));
         ctx.assertTrue(perpendicularDy == -0.5,
-                "fixture invalid: perpendicular side slab should start lowered, got " + perpendicularDy);
+                net.minecraft.text.Text.literal("fixture invalid: perpendicular side slab should start lowered, got " + perpendicularDy));
 
         world.breakBlock(connectorSlabPos, false);
 
@@ -354,15 +354,15 @@ public final class SlabbedLabFixtureTest {
                 after.isOf(Blocks.OAK_SLAB)
                         && after.contains(SlabBlock.TYPE)
                         && after.get(SlabBlock.TYPE) == SlabType.TOP,
-                "perpendicular slab should remain a TOP oak slab after connector break, got " + after);
+                net.minecraft.text.Text.literal("perpendicular slab should remain a TOP oak slab after connector break, got " + after));
         ctx.assertTrue(afterDy == -0.5,
-                "perpendicular lowered side slab should persist dy=-0.5 after connector break, got " + afterDy);
+                net.minecraft.text.Text.literal("perpendicular lowered side slab should persist dy=-0.5 after connector break, got " + afterDy));
 
         VoxelShape outline = after.getOutlineShape(world, perpendicularSlabPos, ShapeContext.absent());
         ctx.assertTrue(
                 outline.getBoundingBox().minY == 0.0 && outline.getBoundingBox().maxY == 0.5,
-                "perpendicular TOP slab outline should stay lowered at [0.0, 0.5] after connector break, got ["
-                        + outline.getBoundingBox().minY + ", " + outline.getBoundingBox().maxY + "]");
+                net.minecraft.text.Text.literal("perpendicular TOP slab outline should stay lowered at [0.0, 0.5] after connector break, got ["
+                        + outline.getBoundingBox().minY + ", " + outline.getBoundingBox().maxY + "]"));
 
         ctx.complete();
     }
@@ -395,20 +395,20 @@ public final class SlabbedLabFixtureTest {
         double loweredTopDy = SlabSupport.getYOffset(world, loweredTopSlabPos, loweredTopSlab);
         double perpendicularDy = SlabSupport.getYOffset(world, perpendicularSlabPos, perpendicular);
         ctx.assertTrue(loweredTopDy == -0.5,
-                "fixture invalid: lowered top slab should start dy=-0.5, got " + loweredTopDy);
+                net.minecraft.text.Text.literal("fixture invalid: lowered top slab should start dy=-0.5, got " + loweredTopDy));
         ctx.assertTrue(perpendicularDy == -0.5,
-                "perpendicular slab from lowered slab edge should start dy=-0.5, got " + perpendicularDy);
+                net.minecraft.text.Text.literal("perpendicular slab from lowered slab edge should start dy=-0.5, got " + perpendicularDy));
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(world, perpendicularSlabPos),
-                "perpendicular slab from lowered slab edge should be placement-anchored");
+                net.minecraft.text.Text.literal("perpendicular slab from lowered slab edge should be placement-anchored"));
 
         world.breakBlock(loweredTopSlabPos, false);
 
         BlockState after = world.getBlockState(perpendicularSlabPos);
         double afterDy = SlabSupport.getYOffset(world, perpendicularSlabPos, after);
         ctx.assertTrue(after.isOf(Blocks.OAK_SLAB),
-                "perpendicular slab should remain after lowered top slab break, got " + after);
+                net.minecraft.text.Text.literal("perpendicular slab should remain after lowered top slab break, got " + after));
         ctx.assertTrue(afterDy == -0.5,
-                "perpendicular slab should persist dy=-0.5 after lowered top slab break, got " + afterDy);
+                net.minecraft.text.Text.literal("perpendicular slab should persist dy=-0.5 after lowered top slab break, got " + afterDy));
 
         ctx.complete();
     }
@@ -438,11 +438,11 @@ public final class SlabbedLabFixtureTest {
         double sideSlabDy = SlabSupport.getYOffset(world, bottomSideSlabPos, sideSlab);
         double topBlockDy = SlabSupport.getYOffset(world, topBlockPos, topBlock);
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(world, bottomSideSlabPos),
-                "fixture invalid: bottom side slab should be placement-anchored");
+                net.minecraft.text.Text.literal("fixture invalid: bottom side slab should be placement-anchored"));
         ctx.assertTrue(sideSlabDy == -0.5,
-                "bottom side slab should stay lowered by dy=-0.5, got " + sideSlabDy);
+                net.minecraft.text.Text.literal("bottom side slab should stay lowered by dy=-0.5, got " + sideSlabDy));
         ctx.assertTrue(topBlockDy == -1.0,
-                "block on lowered bottom side slab should keep compound dy=-1.0, got " + topBlockDy);
+                net.minecraft.text.Text.literal("block on lowered bottom side slab should keep compound dy=-1.0, got " + topBlockDy));
 
         ctx.complete();
     }
@@ -465,13 +465,13 @@ public final class SlabbedLabFixtureTest {
         // REAL placement with air below ⇒ dy=0 ⇒ structural stone recorded frozen-flat (not anchored).
         placeWithOnPlaced(world, blockPos, Blocks.STONE.getDefaultState());
         BlockState placed = world.getBlockState(blockPos);
-        ctx.assertTrue(placed.isOf(Blocks.STONE), "stone not present at test position");
+        ctx.assertTrue(placed.isOf(Blocks.STONE), net.minecraft.text.Text.literal("stone not present at test position"));
         ctx.assertTrue(SlabAnchorAttachment.isFrozenFlat(world, blockPos),
-                "stone placed flat (air below) must be recorded frozen-flat by onPlaced");
+                net.minecraft.text.Text.literal("stone placed flat (air below) must be recorded frozen-flat by onPlaced"));
         ctx.assertTrue(!SlabAnchorAttachment.isAnchored(world, blockPos),
-                "flat-placed stone must NOT be anchored (it was never lowered)");
+                net.minecraft.text.Text.literal("flat-placed stone must NOT be anchored (it was never lowered)"));
         ctx.assertTrue(SlabSupport.getYOffset(world, blockPos, placed) == 0.0,
-                "flat-placed stone dy must be 0 before any slab is added");
+                net.minecraft.text.Text.literal("flat-placed stone dy must be 0 before any slab is added"));
 
         // THE VIOLATION: place a bottom slab directly under the now-floating block.
         world.setBlockState(belowPos, Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
@@ -479,12 +479,12 @@ public final class SlabbedLabFixtureTest {
 
         double dy = SlabSupport.getYOffset(world, blockPos, placed);
         ctx.assertTrue(dy == 0.0,
-                "LAW: flat-placed stone must stay dy=0 after a bottom slab is placed under it; got dy=" + dy);
+                net.minecraft.text.Text.literal("LAW: flat-placed stone must stay dy=0 after a bottom slab is placed under it; got dy=" + dy));
 
         VoxelShape outline = placed.getOutlineShape(world, blockPos, ShapeContext.absent());
         ctx.assertTrue(outline.getBoundingBox().minY == 0.0,
-                "flat-placed stone outline minY must stay 0.0 after slab added; got "
-                + outline.getBoundingBox().minY);
+                net.minecraft.text.Text.literal("flat-placed stone outline minY must stay 0.0 after slab added; got "
+                + outline.getBoundingBox().minY));
         ctx.complete();
     }
 
@@ -503,13 +503,13 @@ public final class SlabbedLabFixtureTest {
         world.setBlockState(blockPos, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
         BlockState placed = world.getBlockState(blockPos);
         ctx.assertTrue(!SlabAnchorAttachment.isFrozenFlat(world, blockPos),
-                "setBlockState stone must NOT be frozen-flat (no onPlaced ran)");
+                net.minecraft.text.Text.literal("setBlockState stone must NOT be frozen-flat (no onPlaced ran)"));
 
         world.setBlockState(belowPos, Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                 Block.NOTIFY_ALL);
         double dy = SlabSupport.getYOffset(world, blockPos, placed);
         ctx.assertTrue(dy == -0.5,
-                "control: unfrozen stone over a bottom slab should lower to -0.5; got dy=" + dy);
+                net.minecraft.text.Text.literal("control: unfrozen stone over a bottom slab should lower to -0.5; got dy=" + dy));
         ctx.complete();
     }
 
@@ -532,10 +532,10 @@ public final class SlabbedLabFixtureTest {
 
         double ceiling = SlabSupport.getYOffset(world, base.up(2), world.getBlockState(base.up(2)));
         double roots = SlabSupport.getYOffset(world, base.up(1), world.getBlockState(base.up(1)));
-        ctx.assertTrue(ceiling == 0.0, "ceiling slab should be flush; got " + ceiling);
+        ctx.assertTrue(ceiling == 0.0, net.minecraft.text.Text.literal("ceiling slab should be flush; got " + ceiling));
         ctx.assertTrue(roots == 0.0,
-                "GAP BUG: hanging roots under a flush slab must stay flush (0), not be dragged down by a "
-                + "carrier lower in the column; got " + roots);
+                net.minecraft.text.Text.literal("GAP BUG: hanging roots under a flush slab must stay flush (0), not be dragged down by a "
+                + "carrier lower in the column; got " + roots));
         ctx.complete();
     }
 
@@ -565,7 +565,7 @@ public final class SlabbedLabFixtureTest {
 
         // Place the 3-lane fixture; BOTTOM_SLAB support lands at origin+(2,0,0).
         PlaceResult placed = SlabbedLabFixtures.placeBasicFixture(world, origin);
-        ctx.assertTrue(placed.ok(), "placeBasicFixture failed: " + placed.error());
+        ctx.assertTrue(placed.ok(), net.minecraft.text.Text.literal("placeBasicFixture failed: " + placed.error()));
 
         // Place white carpet directly above the BOTTOM_SLAB lane support.
         // setBlockState bypasses canPlaceAt, so carpet lands regardless of support rules.
@@ -573,8 +573,8 @@ public final class SlabbedLabFixtureTest {
         world.setBlockState(carpetPos, Blocks.WHITE_CARPET.getDefaultState(), Block.NOTIFY_LISTENERS);
 
         BlockState carpetState = world.getBlockState(carpetPos);
-        ctx.assertTrue(carpetState.isOf(Blocks.WHITE_CARPET), "white carpet not present at test position");
-        ctx.assertTrue(carpetState.getBlock() instanceof CarpetBlock, "block is not a CarpetBlock instance");
+        ctx.assertTrue(carpetState.isOf(Blocks.WHITE_CARPET), net.minecraft.text.Text.literal("white carpet not present at test position"));
+        ctx.assertTrue(carpetState.getBlock() instanceof CarpetBlock, net.minecraft.text.Text.literal("block is not a CarpetBlock instance"));
 
         VoxelShape outline = carpetState.getOutlineShape(world, carpetPos, ShapeContext.absent());
         double minY = outline.getBoundingBox().minY;
@@ -582,8 +582,8 @@ public final class SlabbedLabFixtureTest {
         // Server: CarpetDyShapeMixin is client-only; CarpetBlockMixin.slabbed$offsetShape
         // is removed. No server-side offset → minY must be 0.0 (unmodified carpet shape).
         ctx.assertTrue(minY == 0.0,
-                "server carpet outline should be unmodified (minY=0.0), got " + minY
-                + ". If -0.5: server-side offset still active. If -1.0: double-offset.");
+                net.minecraft.text.Text.literal("server carpet outline should be unmodified (minY=0.0), got " + minY
+                + ". If -0.5: server-side offset still active. If -1.0: double-offset."));
 
         ctx.complete();
     }

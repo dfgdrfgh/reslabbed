@@ -59,16 +59,16 @@ public final class SlabConnectionSteppedTest {
         w.setBlockState(connPos, connector, Block.NOTIFY_LISTENERS);
 
         double dy = SlabSupport.getVisualYOffset(w, connPos, w.getBlockState(connPos));
-        ctx.assertTrue(dy < -1.0e-6, label + " on a vanilla bottom slab must resolve a lowered dy, got " + dy);
+        ctx.assertTrue(dy < -1.0e-6, net.minecraft.text.Text.literal(label + " on a vanilla bottom slab must resolve a lowered dy, got " + dy));
 
         VoxelShape outline = w.getBlockState(connPos).getOutlineShape(w, connPos);
-        ctx.assertTrue(!outline.isEmpty(), label + " outline must not be empty");
+        ctx.assertTrue(!outline.isEmpty(), net.minecraft.text.Text.literal(label + " outline must not be empty"));
         Box box = outline.getBoundingBox();
         // The outline is in the block's LOCAL frame; a grid-height connector starts at
         // minY≈0, a correctly-lowered one starts at minY≈dy (≈ -0.5).
         ctx.assertTrue(Math.abs(box.minY - dy) < 1.0e-6,
-                label + " outline minY must follow the lowered dy (" + dy + "), but was " + box.minY
-                        + " — the outline/raycast is NOT tracking the lowered model (GH #21 raycast regression)");
+                net.minecraft.text.Text.literal(label + " outline minY must follow the lowered dy (" + dy + "), but was " + box.minY
+                        + " — the outline/raycast is NOT tracking the lowered model (GH #21 raycast regression)"));
 
         // Clean up so each connector type starts from empty.
         w.setBlockState(connPos, Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
@@ -92,18 +92,18 @@ public final class SlabConnectionSteppedTest {
 
         ctx.assertTrue(
                 SlabSupport.getYOffset(w, loweredFence, w.getBlockState(loweredFence)) < -1.0e-6,
-                "a fence on a vanilla bottom slab must be lowered (getYOffset < 0) so its model "
-                        + "matches its outline (GH #21 — the render half of this needs a live check)");
+                net.minecraft.text.Text.literal("a fence on a vanilla bottom slab must be lowered (getYOffset < 0) so its model "
+                        + "matches its outline (GH #21 — the render half of this needs a live check)"));
 
         BlockState groundFenceState = w.getBlockState(groundFence);
         BlockState loweredFenceState = w.getBlockState(loweredFence);
         ctx.assertTrue(
                 !groundFenceState.get(ConnectingBlock.FACING_PROPERTIES.get(Direction.EAST)),
-                "a ground fence must NOT draw a connector arm toward a fence lowered onto a "
-                        + "VANILLA slab at the same Y (GH #21 height-step regression)");
+                net.minecraft.text.Text.literal("a ground fence must NOT draw a connector arm toward a fence lowered onto a "
+                        + "VANILLA slab at the same Y (GH #21 height-step regression)"));
         ctx.assertTrue(
                 !loweredFenceState.get(ConnectingBlock.FACING_PROPERTIES.get(Direction.WEST)),
-                "the lowered fence must NOT draw a connector arm back toward the ground fence either");
+                net.minecraft.text.Text.literal("the lowered fence must NOT draw a connector arm back toward the ground fence either"));
 
         // Control: a second ground fence at the same height must still connect normally.
         BlockPos groundBase2 = groundBase.west();
@@ -112,7 +112,7 @@ public final class SlabConnectionSteppedTest {
         w.setBlockState(groundFence2, Blocks.OAK_FENCE.getDefaultState(), Block.NOTIFY_LISTENERS);
         ctx.assertTrue(
                 w.getBlockState(groundFence).get(ConnectingBlock.FACING_PROPERTIES.get(Direction.WEST)),
-                "two ground fences at the same height must still connect normally (control)");
+                net.minecraft.text.Text.literal("two ground fences at the same height must still connect normally (control)"));
         ctx.complete();
     }
 
@@ -131,10 +131,10 @@ public final class SlabConnectionSteppedTest {
 
         ctx.assertTrue(
                 SlabSupport.getYOffset(w, loweredPane, w.getBlockState(loweredPane)) < -1.0e-6,
-                "a pane on a vanilla bottom slab must be lowered (getYOffset < 0)");
+                net.minecraft.text.Text.literal("a pane on a vanilla bottom slab must be lowered (getYOffset < 0)"));
         ctx.assertTrue(
                 !w.getBlockState(groundPane).get(ConnectingBlock.FACING_PROPERTIES.get(Direction.EAST)),
-                "a ground pane must NOT connect toward a pane lowered onto a VANILLA slab at the same Y");
+                net.minecraft.text.Text.literal("a ground pane must NOT connect toward a pane lowered onto a VANILLA slab at the same Y"));
         ctx.complete();
     }
 
@@ -153,11 +153,11 @@ public final class SlabConnectionSteppedTest {
 
         ctx.assertTrue(
                 SlabSupport.getYOffset(w, loweredWall, w.getBlockState(loweredWall)) < -1.0e-6,
-                "a wall on a vanilla bottom slab must be lowered (getYOffset < 0)");
+                net.minecraft.text.Text.literal("a wall on a vanilla bottom slab must be lowered (getYOffset < 0)"));
         ctx.assertTrue(
                 w.getBlockState(groundWall).get(WallBlock.WALL_SHAPE_PROPERTIES_BY_DIRECTION.get(Direction.EAST))
                         == WallShape.NONE,
-                "a ground wall must NOT connect toward a wall lowered onto a VANILLA slab at the same Y");
+                net.minecraft.text.Text.literal("a ground wall must NOT connect toward a wall lowered onto a VANILLA slab at the same Y"));
         ctx.complete();
     }
 }

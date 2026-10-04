@@ -76,7 +76,7 @@ public final class RedstonePistonCircuitStabilityTest {
                 "the dust line itself must keep its straight-line SIDE connection between segments");
 
         ctx.assertTrue(!world.getBlockState(pistonPos).get(PistonBlock.EXTENDED),
-                "piston must start retracted before the circuit is powered");
+                net.minecraft.text.Text.literal("piston must start retracted before the circuit is powered"));
 
         BlockPos sourcePos = wire[0].west();
         ctx.runAtTick(1, () ->
@@ -92,7 +92,7 @@ public final class RedstonePistonCircuitStabilityTest {
 
             boolean extended = world.getBlockState(pistonPos).get(PistonBlock.EXTENDED);
             ctx.assertTrue(extended,
-                    "piston fed by the dust line must reach the vanilla-expected EXTENDED state once powered");
+                    net.minecraft.text.Text.literal("piston fed by the dust line must reach the vanilla-expected EXTENDED state once powered"));
             settledExtended[0] = extended;
         });
 
@@ -100,9 +100,9 @@ public final class RedstonePistonCircuitStabilityTest {
             ctx.runAtTick(tick, () -> {
                 boolean extended = world.getBlockState(pistonPos).get(PistonBlock.EXTENDED);
                 ctx.assertTrue(extended == settledExtended[0],
-                        "piston EXTENDED flipped after settling at tick " + tick
+                        net.minecraft.text.Text.literal("piston EXTENDED flipped after settling at tick " + tick
                                 + " (GH #57 unintended-clock symptom): settled=" + settledExtended[0]
-                                + ", now=" + extended);
+                                + ", now=" + extended));
             });
         }
 
@@ -146,7 +146,7 @@ public final class RedstonePistonCircuitStabilityTest {
                 "the dust line itself must keep its straight-line SIDE connection between segments");
 
         ctx.assertTrue(!world.getBlockState(pistonPos).get(PistonBlock.EXTENDED),
-                "piston must start retracted before the circuit is powered");
+                net.minecraft.text.Text.literal("piston must start retracted before the circuit is powered"));
 
         BlockPos sourcePos = wire[0].west();
         ctx.runAtTick(1, () ->
@@ -163,8 +163,8 @@ public final class RedstonePistonCircuitStabilityTest {
 
             boolean extended = world.getBlockState(pistonPos).get(PistonBlock.EXTENDED);
             ctx.assertTrue(extended,
-                    "piston fed by the dust line must reach the vanilla-expected EXTENDED state once powered, "
-                            + "even with a ground-level slab present beside the line");
+                    net.minecraft.text.Text.literal("piston fed by the dust line must reach the vanilla-expected EXTENDED state once powered, "
+                            + "even with a ground-level slab present beside the line"));
             settledExtended[0] = extended;
         });
 
@@ -172,9 +172,9 @@ public final class RedstonePistonCircuitStabilityTest {
             ctx.runAtTick(tick, () -> {
                 boolean extended = world.getBlockState(pistonPos).get(PistonBlock.EXTENDED);
                 ctx.assertTrue(extended == settledExtended[0],
-                        "piston EXTENDED flipped after settling at tick " + tick
+                        net.minecraft.text.Text.literal("piston EXTENDED flipped after settling at tick " + tick
                                 + " with a slab present beside the line (GH #57 unintended-clock symptom): "
-                                + "settled=" + settledExtended[0] + ", now=" + extended);
+                                + "settled=" + settledExtended[0] + ", now=" + extended));
             });
         }
 
@@ -222,6 +222,6 @@ public final class RedstonePistonCircuitStabilityTest {
             String message
     ) {
         WireConnection actual = connectionToward(world, wirePos, direction);
-        ctx.assertTrue(actual == expected, message + "; expected " + expected + ", got " + actual);
+        ctx.assertTrue(actual == expected, net.minecraft.text.Text.literal(message + "; expected " + expected + ", got " + actual));
     }
 }

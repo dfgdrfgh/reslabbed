@@ -50,36 +50,36 @@ public final class SlabRigCatalogSmokeTest {
         BlockPos origin = ctx.getAbsolutePos(BlockPos.ORIGIN);
 
         List<String> names = SlabRigCommand.caseNames();
-        ctx.assertTrue(!names.isEmpty(), "the rig catalog must not be empty");
+        ctx.assertTrue(!names.isEmpty(), net.minecraft.text.Text.literal("the rig catalog must not be empty"));
 
         for (String name : names) {
             SlabRigCommand.RigPlan plan = SlabRigCommand.buildCase(world, origin, name);
-            ctx.assertTrue(plan != null, "case '" + name + "' failed to build at a clear origin");
+            ctx.assertTrue(plan != null, net.minecraft.text.Text.literal("case '" + name + "' failed to build at a clear origin"));
 
             for (Map.Entry<BlockPos, BlockState> cell : plan.cells().entrySet()) {
                 BlockPos rel = cell.getKey().subtract(origin);
                 ctx.assertTrue(inPlot(rel),
-                        "case '" + name + "' plans a cell outside the 8x8x8 plot: relative "
-                                + rel.toShortString());
+                        net.minecraft.text.Text.literal("case '" + name + "' plans a cell outside the 8x8x8 plot: relative "
+                                + rel.toShortString()));
                 ctx.assertTrue(world.getBlockState(cell.getKey()).equals(cell.getValue()),
-                        "case '" + name + "' did not land at " + rel.toShortString()
+                        net.minecraft.text.Text.literal("case '" + name + "' did not land at " + rel.toShortString()
                                 + ": expected " + cell.getValue()
-                                + ", found " + world.getBlockState(cell.getKey()));
+                                + ", found " + world.getBlockState(cell.getKey())));
             }
 
             // A second build over the same footprint must refuse without touching the world.
             int cellsBefore = plan.size();
             ctx.assertTrue(SlabRigCommand.buildCase(world, origin, name) == null,
-                    "case '" + name + "' must refuse to build into its own occupied footprint");
+                    net.minecraft.text.Text.literal("case '" + name + "' must refuse to build into its own occupied footprint"));
 
             SlabRigCommand.ClearReport report = SlabRigCommand.clear(world, plan);
             ctx.assertTrue(report.removed() == cellsBefore && report.keptForeign() == 0,
-                    "case '" + name + "' clear removed " + report.removed() + "/" + cellsBefore
-                            + " cells (kept " + report.keptForeign() + ")");
+                    net.minecraft.text.Text.literal("case '" + name + "' clear removed " + report.removed() + "/" + cellsBefore
+                            + " cells (kept " + report.keptForeign() + ")"));
             for (BlockPos pos : plan.cells().keySet()) {
                 ctx.assertTrue(world.getBlockState(pos).isAir(),
-                        "case '" + name + "' left " + pos.subtract(origin).toShortString()
-                                + " behind after clear: " + world.getBlockState(pos));
+                        net.minecraft.text.Text.literal("case '" + name + "' left " + pos.subtract(origin).toShortString()
+                                + " behind after clear: " + world.getBlockState(pos)));
             }
         }
 
@@ -93,7 +93,7 @@ public final class SlabRigCatalogSmokeTest {
         BlockPos origin = ctx.getAbsolutePos(BlockPos.ORIGIN);
 
         SlabRigCommand.RigPlan plan = SlabRigCommand.buildCase(world, origin, "seat_ladder");
-        ctx.assertTrue(plan != null, "seat_ladder must build at a clear origin");
+        ctx.assertTrue(plan != null, net.minecraft.text.Text.literal("seat_ladder must build at a clear origin"));
 
         // Stand in for a player edit: overwrite one rig cell with a different block.
         BlockPos edited = plan.cells().keySet().iterator().next();
@@ -101,13 +101,13 @@ public final class SlabRigCatalogSmokeTest {
 
         SlabRigCommand.ClearReport report = SlabRigCommand.clear(world, plan);
         ctx.assertTrue(report.keptForeign() == 1,
-                "the edited cell must be reported as kept, got keptForeign=" + report.keptForeign());
+                net.minecraft.text.Text.literal("the edited cell must be reported as kept, got keptForeign=" + report.keptForeign()));
         ctx.assertTrue(world.getBlockState(edited).isOf(Blocks.GOLD_BLOCK),
-                "clear must not remove a cell the player changed; found "
-                        + world.getBlockState(edited));
+                net.minecraft.text.Text.literal("clear must not remove a cell the player changed; found "
+                        + world.getBlockState(edited)));
         ctx.assertTrue(report.removed() == plan.size() - 1,
-                "clear must remove every OTHER rig cell, got " + report.removed()
-                        + " of " + (plan.size() - 1));
+                net.minecraft.text.Text.literal("clear must remove every OTHER rig cell, got " + report.removed()
+                        + " of " + (plan.size() - 1)));
 
         world.setBlockState(edited, Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
         ctx.complete();
@@ -127,9 +127,9 @@ public final class SlabRigCatalogSmokeTest {
                 "lantern_in_trapdoor",     // ledger #4 — interpenetration
         }) {
             ctx.assertTrue(names.contains(required),
-                    "live-ledger symptom case '" + required + "' is missing from the rig catalog");
+                    net.minecraft.text.Text.literal("live-ledger symptom case '" + required + "' is missing from the rig catalog"));
             ctx.assertTrue(SlabRigCommand.caseByName(required) != null,
-                    "case '" + required + "' is listed but not resolvable");
+                    net.minecraft.text.Text.literal("case '" + required + "' is listed but not resolvable"));
         }
         ctx.complete();
     }
@@ -138,18 +138,18 @@ public final class SlabRigCatalogSmokeTest {
     @GameTest(structure = "fabric-gametest-api-v1:empty")
     public void testKitPaletteIdsAllRegistered(TestContext ctx) {
         ctx.assertTrue(SlabTestKit.PALETTE.size() == SlabTestKit.SIZE,
-                "the palette must be padded to exactly " + SlabTestKit.SIZE + " cells, got "
-                        + SlabTestKit.PALETTE.size());
+                net.minecraft.text.Text.literal("the palette must be padded to exactly " + SlabTestKit.SIZE + " cells, got "
+                        + SlabTestKit.PALETTE.size()));
         Identifier air = Identifier.of("minecraft", "air");
         for (Identifier id : SlabTestKit.PALETTE) {
             if (id.equals(air)) {
                 continue;
             }
             ctx.assertTrue(SlabTestKit.isRegistered(id),
-                    "test-kit id " + id + " is not registered in the item registry");
+                    net.minecraft.text.Text.literal("test-kit id " + id + " is not registered in the item registry"));
         }
         ctx.assertTrue(!SlabTestKit.placeableItems().isEmpty(),
-                "the test kit must expose at least one placeable item");
+                net.minecraft.text.Text.literal("the test kit must expose at least one placeable item"));
         ctx.complete();
     }
 
@@ -168,23 +168,23 @@ public final class SlabRigCatalogSmokeTest {
         BlockPos origin = ctx.getAbsolutePos(BlockPos.ORIGIN);
 
         SlabRigCommand.RigPlan plan = SlabRigCommand.buildCase(world, origin, "follower_on_minus_one");
-        ctx.assertTrue(plan != null, "follower_on_minus_one must build at a clear origin");
+        ctx.assertTrue(plan != null, net.minecraft.text.Text.literal("follower_on_minus_one must build at a clear origin"));
 
         // Column x=0: y0 stone, y1 slab, y2 anchored slab, y3 the stripped_jungle_log support.
         BlockPos logPos = origin.add(0, 3, 0);
         ctx.assertTrue(world.getBlockState(logPos).isOf(Blocks.STRIPPED_JUNGLE_LOG),
-                "fixture: the -1.0 support must be the stripped_jungle_log, found "
-                        + world.getBlockState(logPos));
+                net.minecraft.text.Text.literal("fixture: the -1.0 support must be the stripped_jungle_log, found "
+                        + world.getBlockState(logPos)));
         double logDy = com.slabbed.util.SlabSupport.getYOffset(world, logPos, world.getBlockState(logPos));
         ctx.assertTrue(logDy == -1.0,
-                "the rig's -1.0 seat must put its support at dy -1.0 (the live-ledger boundary), got "
-                        + logDy);
+                net.minecraft.text.Text.literal("the rig's -1.0 seat must put its support at dy -1.0 (the live-ledger boundary), got "
+                        + logDy));
 
         BlockPos slabPos = origin.add(0, 2, 0);
         double slabDy = com.slabbed.util.SlabSupport.getYOffset(world, slabPos, world.getBlockState(slabPos));
         ctx.assertTrue(slabDy == -0.5,
-                "the slab carrying the -1.0 support must itself render -0.5 (that asymmetry IS the "
-                        + "symptom geometry), got " + slabDy);
+                net.minecraft.text.Text.literal("the slab carrying the -1.0 support must itself render -0.5 (that asymmetry IS the "
+                        + "symptom geometry), got " + slabDy));
 
         // Measured on this HEAD with the seat above (2026-08-05): the case genuinely reproduces
         // live-ledger #1 headlessly — follower dy over a -1.0 support reads birch_slab -0.5
@@ -209,34 +209,34 @@ public final class SlabRigCatalogSmokeTest {
         BlockPos origin = ctx.getAbsolutePos(BlockPos.ORIGIN);
 
         SlabRigCommand.BuiltRig built = SlabRigCommand.buildMega(world, origin, 2);
-        ctx.assertTrue(built != null, "mega must build at a clear origin");
+        ctx.assertTrue(built != null, net.minecraft.text.Text.literal("mega must build at a clear origin"));
 
         for (Map.Entry<BlockPos, BlockState> cell : built.plan().cells().entrySet()) {
             BlockPos rel = cell.getKey().subtract(origin);
             ctx.assertTrue(inPlot(rel),
-                    "mega plans a cell outside the 8x8x8 plot: relative " + rel.toShortString());
+                    net.minecraft.text.Text.literal("mega plans a cell outside the 8x8x8 plot: relative " + rel.toShortString()));
             ctx.assertTrue(world.getBlockState(cell.getKey()).equals(cell.getValue()),
-                    "mega did not land at " + rel.toShortString() + ": expected " + cell.getValue()
-                            + ", found " + world.getBlockState(cell.getKey()));
+                    net.minecraft.text.Text.literal("mega did not land at " + rel.toShortString() + ": expected " + cell.getValue()
+                            + ", found " + world.getBlockState(cell.getKey())));
         }
 
         // One tally row per support variant, and every variant actually carried the kit columns.
         ctx.assertTrue(built.report().rows().size() == 4,
-                "mega must report one tally row per support variant, got "
-                        + built.report().rows().size());
+                net.minecraft.text.Text.literal("mega must report one tally row per support variant, got "
+                        + built.report().rows().size()));
 
         int cells = built.plan().size();
         ctx.assertTrue(SlabRigCommand.buildMega(world, origin, 2) == null,
-                "mega must refuse to build into its own occupied footprint");
+                net.minecraft.text.Text.literal("mega must refuse to build into its own occupied footprint"));
 
         SlabRigCommand.ClearReport report = SlabRigCommand.clear(world, built.plan());
         ctx.assertTrue(report.removed() == cells && report.keptForeign() == 0,
-                "mega clear removed " + report.removed() + "/" + cells
-                        + " cells (kept " + report.keptForeign() + ")");
+                net.minecraft.text.Text.literal("mega clear removed " + report.removed() + "/" + cells
+                        + " cells (kept " + report.keptForeign() + ")"));
         for (BlockPos pos : built.plan().cells().keySet()) {
             ctx.assertTrue(world.getBlockState(pos).isAir(),
-                    "mega left " + pos.subtract(origin).toShortString() + " behind after clear: "
-                            + world.getBlockState(pos));
+                    net.minecraft.text.Text.literal("mega left " + pos.subtract(origin).toShortString() + " behind after clear: "
+                            + world.getBlockState(pos)));
         }
         ctx.complete();
     }
@@ -255,15 +255,15 @@ public final class SlabRigCatalogSmokeTest {
         BlockPos origin = ctx.getAbsolutePos(BlockPos.ORIGIN);
 
         SlabRigCommand.BuiltRig built = SlabRigCommand.buildMega(world, origin, 0);
-        ctx.assertTrue(built != null, "mega must build at a clear origin");
+        ctx.assertTrue(built != null, net.minecraft.text.Text.literal("mega must build at a clear origin"));
 
         List<SlabRigCommand.DyCheck> checks = built.plan().checks();
         ctx.assertTrue(checks.size() == 4,
-                "mega must self-verify one reference marker per support variant, got " + checks.size());
+                net.minecraft.text.Text.literal("mega must self-verify one reference marker per support variant, got " + checks.size()));
 
         List<String> mismatches = SlabRigCommand.verify(world, built.plan());
         ctx.assertTrue(mismatches.isEmpty(),
-                "mega does not measure what its signs say: " + String.join("; ", mismatches));
+                net.minecraft.text.Text.literal("mega does not measure what its signs say: " + String.join("; ", mismatches)));
 
         SlabRigCommand.clear(world, built.plan());
         ctx.complete();
@@ -292,23 +292,23 @@ public final class SlabRigCatalogSmokeTest {
         BlockPos origin = ctx.getAbsolutePos(BlockPos.ORIGIN);
 
         SlabRigCommand.BuiltRig built = SlabRigCommand.buildMega(world, origin, 0);
-        ctx.assertTrue(built != null, "mega must build at a clear origin");
+        ctx.assertTrue(built != null, net.minecraft.text.Text.literal("mega must build at a clear origin"));
 
         // Row 3 (overhang_and_ceiling), reference column: subject at y+3, ceiling scenery at y+4.
         BlockPos subjectPos = origin.add(2, 3, 6);
         BlockPos ceilingPos = origin.add(2, 4, 6);
         ctx.assertTrue(world.getBlockState(subjectPos).isOf(Blocks.STRIPPED_JUNGLE_LOG),
-                "fixture: row 3's reference subject must be the stripped_jungle_log, found "
-                        + world.getBlockState(subjectPos));
+                net.minecraft.text.Text.literal("fixture: row 3's reference subject must be the stripped_jungle_log, found "
+                        + world.getBlockState(subjectPos)));
         ctx.assertTrue(world.getBlockState(ceilingPos).isOf(Blocks.STONE),
-                "fixture: row 3's ceiling scenery must be stone, found " + world.getBlockState(ceilingPos));
+                net.minecraft.text.Text.literal("fixture: row 3's ceiling scenery must be stone, found " + world.getBlockState(ceilingPos)));
 
         // RED assertion 1: the ceiling scenery must carry the same never-pop anchor a real click
         // on this exact geometry would record. Before the fix this is false — plan.put wrote it
         // with no anchor and no freeze marker.
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(world, ceilingPos),
-                "row 3 ceiling scenery at " + ceilingPos.toShortString()
-                        + " must be anchored like a real click would leave it — it is not");
+                net.minecraft.text.Text.literal("row 3 ceiling scenery at " + ceilingPos.toShortString()
+                        + " must be anchored like a real click would leave it — it is not"));
 
         double ceilingDyBefore = SlabSupport.getYOffset(world, ceilingPos, world.getBlockState(ceilingPos));
 
@@ -323,8 +323,8 @@ public final class SlabRigCatalogSmokeTest {
         // live-derived from the subject's own anchored dy, so removing the subject collapsed the
         // column walk and the ceiling snapped from its lowered dy to flush.
         ctx.assertTrue(Math.abs(ceilingDyAfter - ceilingDyBefore) < 1.0e-6,
-                "breaking the subject below must not move the ceiling scenery: before="
-                        + ceilingDyBefore + " after=" + ceilingDyAfter);
+                net.minecraft.text.Text.literal("breaking the subject below must not move the ceiling scenery: before="
+                        + ceilingDyBefore + " after=" + ceilingDyAfter));
 
         SlabRigCommand.clear(world, built.plan());
         ctx.complete();
@@ -337,24 +337,24 @@ public final class SlabRigCatalogSmokeTest {
         BlockPos origin = ctx.getAbsolutePos(BlockPos.ORIGIN);
 
         SlabRigCommand.BuiltRig built = SlabRigCommand.buildRows(world, origin, 2);
-        ctx.assertTrue(built != null, "rows must build at a clear origin");
+        ctx.assertTrue(built != null, net.minecraft.text.Text.literal("rows must build at a clear origin"));
 
         for (BlockPos pos : built.plan().cells().keySet()) {
             BlockPos rel = pos.subtract(origin);
             ctx.assertTrue(inPlot(rel),
-                    "rows plans a cell outside the 8x8x8 plot: relative " + rel.toShortString());
+                    net.minecraft.text.Text.literal("rows plans a cell outside the 8x8x8 plot: relative " + rel.toShortString()));
         }
         ctx.assertTrue(built.plan().checks().size() == 2,
-                "rows must self-verify one marker per row, got " + built.plan().checks().size());
+                net.minecraft.text.Text.literal("rows must self-verify one marker per row, got " + built.plan().checks().size()));
 
         List<String> mismatches = SlabRigCommand.verify(world, built.plan());
         ctx.assertTrue(mismatches.isEmpty(),
-                "rows does not measure what its signs say: " + String.join("; ", mismatches));
+                net.minecraft.text.Text.literal("rows does not measure what its signs say: " + String.join("; ", mismatches)));
 
         int cells = built.plan().size();
         SlabRigCommand.ClearReport report = SlabRigCommand.clear(world, built.plan());
         ctx.assertTrue(report.removed() == cells && report.keptForeign() == 0,
-                "rows clear removed " + report.removed() + "/" + cells);
+                net.minecraft.text.Text.literal("rows clear removed " + report.removed() + "/" + cells));
         ctx.complete();
     }
 
@@ -372,7 +372,7 @@ public final class SlabRigCatalogSmokeTest {
         BlockPos origin = ctx.getAbsolutePos(BlockPos.ORIGIN);
 
         SlabRigCommand.BuiltRig built = SlabRigCommand.buildMega(world, origin, 0);
-        ctx.assertTrue(built != null, "mega must build at a clear origin");
+        ctx.assertTrue(built != null, net.minecraft.text.Text.literal("mega must build at a clear origin"));
 
         List<Item> kit = SlabTestKit.placeableItems();
         StringBuilder census = new StringBuilder();
@@ -415,13 +415,13 @@ public final class SlabRigCatalogSmokeTest {
 
             // Every variant must seat the great majority of the kit — the whole point of Stage 2.
             ctx.assertTrue(placed >= kit.size() - 5,
-                    "support variant '" + check.label() + "' seats only " + placed + "/" + kit.size()
-                            + " kit objects; refused " + refused);
+                    net.minecraft.text.Text.literal("support variant '" + check.label() + "' seats only " + placed + "/" + kit.size()
+                            + " kit objects; refused " + refused));
         }
 
         // Pinned census: a change here is a real change in what the rig can build. See the internal notes.
         ctx.assertTrue(census.toString().equals(EXPECTED_KIT_CENSUS),
-                "kit census changed.\n  actual:   " + census + "\n  expected: " + EXPECTED_KIT_CENSUS);
+                net.minecraft.text.Text.literal("kit census changed.\n  actual:   " + census + "\n  expected: " + EXPECTED_KIT_CENSUS));
 
         SlabRigCommand.clear(world, built.plan());
         ctx.complete();

@@ -60,8 +60,8 @@ public final class RedstoneWireConnectionTest {
         }
 
         ctx.assertTrue(failures.isEmpty(),
-                "ordinary solid blocks with no redstone on, beside, or below them must remain "
-                        + "disconnected; phantom results: " + failures);
+                net.minecraft.text.Text.literal("ordinary solid blocks with no redstone on, beside, or below them must remain "
+                        + "disconnected; phantom results: " + failures));
         ctx.complete();
     }
 
@@ -179,8 +179,8 @@ public final class RedstoneWireConnectionTest {
                     "flat dust must connect across the visual half-step down to dust lowered on "
                             + slabSupport.getTranslationKey());
             ctx.assertTrue(weakPowerToward(world, wirePos, Direction.EAST) == 15,
-                    "powered flat dust must emit across the visual half-step down to dust lowered on "
-                            + slabSupport.getTranslationKey());
+                    net.minecraft.text.Text.literal("powered flat dust must emit across the visual half-step down to dust lowered on "
+                            + slabSupport.getTranslationKey()));
 
             world.setBlockState(sidePos, Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
             world.setBlockState(sidePos.down(), Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
@@ -239,7 +239,7 @@ public final class RedstoneWireConnectionTest {
         assertConnection(ctx, world, wirePos, Direction.EAST, WireConnection.SIDE,
                 "dust must connect to the observer face vanilla exposes toward it");
         ctx.assertTrue(weakPowerToward(world, wirePos, Direction.EAST) == 15,
-                "powered dust must emit toward the observer face vanilla exposes");
+                net.minecraft.text.Text.literal("powered dust must emit toward the observer face vanilla exposes"));
 
         world.setBlockState(sidePos,
                 Blocks.OBSERVER.getDefaultState().with(Properties.FACING, Direction.NORTH),
@@ -248,7 +248,7 @@ public final class RedstoneWireConnectionTest {
                 "dust must not connect to a perpendicular observer face merely because the "
                         + "observer is a full cube");
         ctx.assertTrue(weakPowerToward(world, wirePos, Direction.EAST) == 0,
-                "powered dust must not emit toward a perpendicular observer face");
+                net.minecraft.text.Text.literal("powered dust must not emit toward a perpendicular observer face"));
         ctx.complete();
     }
 
@@ -262,8 +262,8 @@ public final class RedstoneWireConnectionTest {
         world.setBlockState(sidePos, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
 
         ctx.assertTrue(weakPowerToward(world, wirePos, Direction.EAST) == 0,
-                "GH #37 is functional as well as visual: powered dust must not emit directional "
-                        + "power toward an ordinary stone block with no redstone component");
+                net.minecraft.text.Text.literal("GH #37 is functional as well as visual: powered dust must not emit directional "
+                        + "power toward an ordinary stone block with no redstone component"));
         ctx.complete();
     }
 
@@ -277,19 +277,19 @@ public final class RedstoneWireConnectionTest {
         world.setBlockState(sidePos.down(), Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
         world.setBlockState(sidePos, Blocks.REDSTONE_WIRE.getDefaultState(), Block.NOTIFY_LISTENERS);
         ctx.assertTrue(weakPowerToward(world, wirePos, Direction.EAST) == 15,
-                "powered dust must still emit toward same-level redstone dust");
+                net.minecraft.text.Text.literal("powered dust must still emit toward same-level redstone dust"));
 
         world.setBlockState(sidePos,
                 Blocks.REPEATER.getDefaultState().with(HorizontalFacingBlock.FACING, Direction.EAST),
                 Block.NOTIFY_LISTENERS);
         ctx.assertTrue(weakPowerToward(world, wirePos, Direction.EAST) == 15,
-                "powered dust must still emit along an aligned repeater's axis");
+                net.minecraft.text.Text.literal("powered dust must still emit along an aligned repeater's axis"));
 
         world.setBlockState(sidePos,
                 Blocks.REPEATER.getDefaultState().with(HorizontalFacingBlock.FACING, Direction.NORTH),
                 Block.NOTIFY_LISTENERS);
         ctx.assertTrue(weakPowerToward(world, wirePos, Direction.EAST) == 0,
-                "powered dust must not emit into the side of a perpendicular repeater");
+                net.minecraft.text.Text.literal("powered dust must not emit into the side of a perpendicular repeater"));
         ctx.complete();
     }
 
@@ -307,13 +307,13 @@ public final class RedstoneWireConnectionTest {
                 Block.NOTIFY_LISTENERS);
 
         ctx.assertTrue(Blocks.REDSTONE_WIRE.getDefaultState().canPlaceAt(world, vanillaDustPos),
-                "removing the connection overrides must not remove dust placement support on "
-                        + "vanilla bottom slabs");
+                net.minecraft.text.Text.literal("removing the connection overrides must not remove dust placement support on "
+                        + "vanilla bottom slabs"));
         ctx.assertTrue(Blocks.REDSTONE_WIRE.getDefaultState().canPlaceAt(world, terrainDustPos),
-                "removing the connection overrides must not remove dust placement support on "
-                        + "Terrain Slabs bottom-like surfaces");
+                net.minecraft.text.Text.literal("removing the connection overrides must not remove dust placement support on "
+                        + "Terrain Slabs bottom-like surfaces"));
         ctx.assertTrue(!Blocks.REDSTONE_WIRE.getDefaultState().canPlaceAt(world, wirePosOverAir(ctx)),
-                "dust must retain vanilla survival behavior and reject air as a support surface");
+                net.minecraft.text.Text.literal("dust must retain vanilla survival behavior and reject air as a support surface"));
         ctx.complete();
     }
 
@@ -329,13 +329,13 @@ public final class RedstoneWireConnectionTest {
                     Block.NOTIFY_ALL);
             world.setBlockState(dustPos, Blocks.REDSTONE_WIRE.getDefaultState(), Block.NOTIFY_ALL);
             ctx.assertTrue(world.getBlockState(dustPos).isOf(Blocks.REDSTONE_WIRE),
-                    "setup: dust must survive on " + slabSupport.getTranslationKey()
-                            + " before that support is removed");
+                    net.minecraft.text.Text.literal("setup: dust must survive on " + slabSupport.getTranslationKey()
+                            + " before that support is removed"));
 
             world.setBlockState(supportPos, Blocks.AIR.getDefaultState(), Block.NOTIFY_ALL);
             ctx.assertTrue(world.getBlockState(dustPos).isAir(),
-                    "redstone dust must pop immediately when "
-                            + slabSupport.getTranslationKey() + " support is removed");
+                    net.minecraft.text.Text.literal("redstone dust must pop immediately when "
+                            + slabSupport.getTranslationKey() + " support is removed"));
         }
         ctx.complete();
     }
@@ -387,6 +387,6 @@ public final class RedstoneWireConnectionTest {
             String message
     ) {
         WireConnection actual = connectionToward(world, wirePos, direction);
-        ctx.assertTrue(actual == expected, message + "; expected " + expected + ", got " + actual);
+        ctx.assertTrue(actual == expected, net.minecraft.text.Text.literal(message + "; expected " + expected + ", got " + actual));
     }
 }

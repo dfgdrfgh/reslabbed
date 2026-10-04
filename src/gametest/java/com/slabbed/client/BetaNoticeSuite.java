@@ -21,9 +21,9 @@ public final class BetaNoticeSuite {
     public void freshKeyIsNotDismissed(TestContext ctx) {
         String key = "gametest:fresh:" + System.nanoTime();
         ctx.assertTrue(!BetaNoticeDismissedWorlds.isDismissed(key),
-                "a key that was never dismissed must read as not-dismissed");
+                net.minecraft.text.Text.literal("a key that was never dismissed must read as not-dismissed"));
         ctx.assertTrue(!BetaNoticeDismissedWorlds.isDismissed(null),
-                "a null key (unidentifiable context) must never read as dismissed");
+                net.minecraft.text.Text.literal("a null key (unidentifiable context) must never read as dismissed"));
         ctx.complete();
     }
 
@@ -34,10 +34,10 @@ public final class BetaNoticeSuite {
 
         BetaNoticeDismissedWorlds.dismiss(dismissedKey);
         ctx.assertTrue(BetaNoticeDismissedWorlds.isDismissed(dismissedKey),
-                "the dismissed key must now read as dismissed");
+                net.minecraft.text.Text.literal("the dismissed key must now read as dismissed"));
         ctx.assertTrue(!BetaNoticeDismissedWorlds.isDismissed(otherKey),
-                "THE POINT of this feature: dismissing one world/server must NOT silence a "
-                        + "different, never-dismissed one — got dismissed=true for an untouched key");
+                net.minecraft.text.Text.literal("THE POINT of this feature: dismissing one world/server must NOT silence a "
+                        + "different, never-dismissed one — got dismissed=true for an untouched key"));
         ctx.complete();
     }
 
@@ -46,7 +46,7 @@ public final class BetaNoticeSuite {
         // Must not throw, and must not somehow make every subsequent null check "dismissed".
         BetaNoticeDismissedWorlds.dismiss(null);
         ctx.assertTrue(!BetaNoticeDismissedWorlds.isDismissed(null),
-                "dismissing a null key must not make null read as dismissed");
+                net.minecraft.text.Text.literal("dismissing a null key must not make null read as dismissed"));
         ctx.complete();
     }
 
@@ -57,7 +57,7 @@ public final class BetaNoticeSuite {
         BetaNoticeSessionGate.resetForTest();
         String key = "gametest:fresh:" + System.nanoTime();
         ctx.assertTrue(BetaNoticeSessionGate.shouldShow(key),
-                "a key never shown/dismissed this session must be allowed to show");
+                net.minecraft.text.Text.literal("a key never shown/dismissed this session must be allowed to show"));
         ctx.complete();
     }
 
@@ -65,10 +65,10 @@ public final class BetaNoticeSuite {
     public void sameKeyDoesNotShowTwiceInOneSession(TestContext ctx) {
         BetaNoticeSessionGate.resetForTest();
         String key = "gametest:repeat:" + System.nanoTime();
-        ctx.assertTrue(BetaNoticeSessionGate.shouldShow(key), "must be allowed to show the first time");
+        ctx.assertTrue(BetaNoticeSessionGate.shouldShow(key), net.minecraft.text.Text.literal("must be allowed to show the first time"));
         BetaNoticeSessionGate.markShown(key);
         ctx.assertTrue(!BetaNoticeSessionGate.shouldShow(key),
-                "the SAME key must not show again after being marked shown this session");
+                net.minecraft.text.Text.literal("the SAME key must not show again after being marked shown this session"));
         ctx.complete();
     }
 
@@ -82,11 +82,11 @@ public final class BetaNoticeSuite {
         String keyB = "gametest:worldB:" + System.nanoTime();
 
         BetaNoticeSessionGate.markShown(keyA);
-        ctx.assertTrue(!BetaNoticeSessionGate.shouldShow(keyA), "sanity: keyA now suppressed for this session");
+        ctx.assertTrue(!BetaNoticeSessionGate.shouldShow(keyA), net.minecraft.text.Text.literal("sanity: keyA now suppressed for this session"));
         ctx.assertTrue(BetaNoticeSessionGate.shouldShow(keyB),
-                "THE FIX: a brand-new world/key that was never shown must still show, even though "
+                net.minecraft.text.Text.literal("THE FIX: a brand-new world/key that was never shown must still show, even though "
                         + "a DIFFERENT world already showed the notice this session — a single "
-                        + "global flag was the reported bug");
+                        + "global flag was the reported bug"));
         ctx.complete();
     }
 
@@ -96,7 +96,7 @@ public final class BetaNoticeSuite {
         String key = "gametest:dismissed:" + System.nanoTime();
         BetaNoticeDismissedWorlds.dismiss(key);
         ctx.assertTrue(!BetaNoticeSessionGate.shouldShow(key),
-                "a permanently-dismissed key must never show, regardless of session state");
+                net.minecraft.text.Text.literal("a permanently-dismissed key must never show, regardless of session state"));
         ctx.complete();
     }
 
@@ -107,28 +107,28 @@ public final class BetaNoticeSuite {
     @GameTest(structure = "fabric-gametest-api-v1:empty")
     public void aVersionWithNoQualifierDoesNotShowTheBetaNotice(TestContext ctx) {
         ctx.assertTrue(!BetaNoticeSessionGate.isAlphaOrBetaVersion("0.5.1"),
-                "0.5.1 is not a beta build and must not claim to be one — this is the reported bug");
+                net.minecraft.text.Text.literal("0.5.1 is not a beta build and must not claim to be one — this is the reported bug"));
         ctx.assertTrue(!BetaNoticeSessionGate.isAlphaOrBetaVersion("0.6.0"),
-                "a plain release version must not show the notice");
+                net.minecraft.text.Text.literal("a plain release version must not show the notice"));
         ctx.assertTrue(!BetaNoticeSessionGate.isAlphaOrBetaVersion("0.5.1+1.21.11"),
-                "build metadata after '+' is not a pre-release qualifier");
+                net.minecraft.text.Text.literal("build metadata after '+' is not a pre-release qualifier"));
         ctx.assertTrue(!BetaNoticeSessionGate.isAlphaOrBetaVersion("0.5.1+beta-build"),
-                "a 'beta' inside BUILD metadata must not fake a qualifier — the qualifier is the "
-                        + "semver pre-release field, everything after the first '-' and before '+'");
+                net.minecraft.text.Text.literal("a 'beta' inside BUILD metadata must not fake a qualifier — the qualifier is the "
+                        + "semver pre-release field, everything after the first '-' and before '+'"));
         ctx.assertTrue(!BetaNoticeSessionGate.isAlphaOrBetaVersion(null),
-                "an unresolvable version must fail silent, not fail loud");
+                net.minecraft.text.Text.literal("an unresolvable version must fail silent, not fail loud"));
         ctx.complete();
     }
 
     @GameTest(structure = "fabric-gametest-api-v1:empty")
     public void alphaAndBetaQualifiersStillShowTheBetaNotice(TestContext ctx) {
         ctx.assertTrue(BetaNoticeSessionGate.isAlphaOrBetaVersion("0.5.0-beta.8"),
-                "the version this line last shipped a notice on must still show it");
+                net.minecraft.text.Text.literal("the version this line last shipped a notice on must still show it"));
         ctx.assertTrue(BetaNoticeSessionGate.isAlphaOrBetaVersion("0.6.0-alpha.1"),
-                "THE OTHER DIRECTION: the next planned alpha must still show the notice — "
-                        + "deleting the notice outright was explicitly rejected");
+                net.minecraft.text.Text.literal("THE OTHER DIRECTION: the next planned alpha must still show the notice — "
+                        + "deleting the notice outright was explicitly rejected"));
         ctx.assertTrue(BetaNoticeSessionGate.isAlphaOrBetaVersion("1.0.0-BETA"),
-                "the qualifier check is case-insensitive");
+                net.minecraft.text.Text.literal("the qualifier check is case-insensitive"));
         ctx.complete();
     }
 
@@ -139,16 +139,16 @@ public final class BetaNoticeSuite {
     @GameTest(structure = "fabric-gametest-api-v1:empty")
     public void theNoticeCallsItselfWhateverTheVersionSays(TestContext ctx) {
         ctx.assertTrue("alpha".equals(BetaNoticeSessionGate.preReleaseWord("0.5.1-alpha.1+1.21.11")),
-                "the shipped alpha must call itself an alpha — this is the reported bug, got "
-                        + BetaNoticeSessionGate.preReleaseWord("0.5.1-alpha.1+1.21.11"));
+                net.minecraft.text.Text.literal("the shipped alpha must call itself an alpha — this is the reported bug, got "
+                        + BetaNoticeSessionGate.preReleaseWord("0.5.1-alpha.1+1.21.11")));
         ctx.assertTrue("beta".equals(BetaNoticeSessionGate.preReleaseWord("0.5.0-beta.8")),
-                "a beta must still call itself a beta");
+                net.minecraft.text.Text.literal("a beta must still call itself a beta"));
         ctx.assertTrue("beta".equals(BetaNoticeSessionGate.preReleaseWord("1.0.0-BETA")),
-                "the stage word is normalized, not echoed verbatim");
+                net.minecraft.text.Text.literal("the stage word is normalized, not echoed verbatim"));
         ctx.assertTrue(BetaNoticeSessionGate.preReleaseWord("0.5.1") == null,
-                "a version with no qualifier has no stage word, and shows no notice at all");
+                net.minecraft.text.Text.literal("a version with no qualifier has no stage word, and shows no notice at all"));
         ctx.assertTrue(BetaNoticeSessionGate.preReleaseWord("0.5.1+beta-build") == null,
-                "build metadata must not supply a stage word either");
+                net.minecraft.text.Text.literal("build metadata must not supply a stage word either"));
         ctx.complete();
     }
 
@@ -157,8 +157,8 @@ public final class BetaNoticeSuite {
     @GameTest(structure = "fabric-gametest-api-v1:empty")
     public void aReleaseCandidateDoesNotShowTheBetaNotice(TestContext ctx) {
         ctx.assertTrue(!BetaNoticeSessionGate.isAlphaOrBetaVersion("0.6.0-rc.1"),
-                "'rc' is deliberately not a beta qualifier — change the notice text before "
-                        + "widening this");
+                net.minecraft.text.Text.literal("'rc' is deliberately not a beta qualifier — change the notice text before "
+                        + "widening this"));
         ctx.complete();
     }
 
@@ -166,11 +166,11 @@ public final class BetaNoticeSuite {
     public void nullKeyBucketIsCappedSeparatelyFromRealKeys(TestContext ctx) {
         BetaNoticeSessionGate.resetForTest();
         String realKey = "gametest:real:" + System.nanoTime();
-        ctx.assertTrue(BetaNoticeSessionGate.shouldShow(null), "an unidentifiable context must be allowed to show once");
+        ctx.assertTrue(BetaNoticeSessionGate.shouldShow(null), net.minecraft.text.Text.literal("an unidentifiable context must be allowed to show once"));
         BetaNoticeSessionGate.markShown(null);
-        ctx.assertTrue(!BetaNoticeSessionGate.shouldShow(null), "the null bucket caps at once per session too");
+        ctx.assertTrue(!BetaNoticeSessionGate.shouldShow(null), net.minecraft.text.Text.literal("the null bucket caps at once per session too"));
         ctx.assertTrue(BetaNoticeSessionGate.shouldShow(realKey),
-                "marking the null/unknown bucket shown must not suppress a real, identified world key");
+                net.minecraft.text.Text.literal("marking the null/unknown bucket shown must not suppress a real, identified world key"));
         ctx.complete();
     }
 }

@@ -63,14 +63,14 @@ public final class FlushSeatGuardTest {
         place(w, seat, bottomSlab(Blocks.STONE_SLAB));
         forceLegacyAnchor(w, seat);
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, seat),
-                "setup: the seat slab must carry the (legacy, pre-fix-world) anchor — this test "
-                        + "exercises the ANCHOR read lane");
+                net.minecraft.text.Text.literal("setup: the seat slab must carry the (legacy, pre-fix-world) anchor — this test "
+                        + "exercises the ANCHOR read lane"));
 
         double dy = SlabSupport.getYOffset(w, seat, w.getBlockState(seat));
         ctx.assertTrue(Math.abs(dy) <= EPS,
-                "FLUSH-SEAT GUARD: an anchored bottom slab whose direct support is FLUSH stone "
+                net.minecraft.text.Text.literal("FLUSH-SEAT GUARD: an anchored bottom slab whose direct support is FLUSH stone "
                         + "(dy 0.0) must read 0.0 — not sink -0.5 fully inside its own support "
-                        + "(the live z=14 interpenetration row) — got " + dy);
+                        + "(the live z=14 interpenetration row) — got " + dy));
         ctx.complete();
     }
 
@@ -96,10 +96,10 @@ public final class FlushSeatGuardTest {
         boolean anchored = SlabAnchorAttachment.isAnchored(w, seat);
         double dy = SlabSupport.getYOffset(w, seat, w.getBlockState(seat));
         ctx.assertTrue(!anchored && Math.abs(dy) <= EPS,
-                "FLUSH-SEAT GUARD: a slab clicked onto FLUSH stone beside a lowered side-slab "
+                net.minecraft.text.Text.literal("FLUSH-SEAT GUARD: a slab clicked onto FLUSH stone beside a lowered side-slab "
                         + "source must NOT sink into the stone it was clicked onto and must NOT "
                         + "anchor via the side lane (WYSIWYG) — got anchored=" + anchored
-                        + " dy=" + dy);
+                        + " dy=" + dy));
         ctx.complete();
     }
 
@@ -118,13 +118,13 @@ public final class FlushSeatGuardTest {
         place(w, subject, bottomSlab(Blocks.STONE_SLAB));
         forceLegacyAnchor(w, subject);
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, subject),
-                "setup: the subject slab must carry the (legacy) anchor");
+                net.minecraft.text.Text.literal("setup: the subject slab must carry the (legacy) anchor"));
 
         double dy = SlabSupport.getYOffset(w, subject, w.getBlockState(subject));
         ctx.assertTrue(Math.abs(dy) <= EPS,
-                "FLUSH-SEAT GUARD: a flush TOP-slab support's top face is at the cell top, so an "
+                net.minecraft.text.Text.literal("FLUSH-SEAT GUARD: a flush TOP-slab support's top face is at the cell top, so an "
                         + "anchored slab on it must read 0.0 — a -0.5 read interpenetrates the "
-                        + "TOP slab's upper half exactly like full stone — got " + dy);
+                        + "TOP slab's upper half exactly like full stone — got " + dy));
         ctx.complete();
     }
 
@@ -147,11 +147,11 @@ public final class FlushSeatGuardTest {
         SlabAnchorAttachment.freezeLoweredOnPlace(w, seat, w.getBlockState(seat));
 
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, seat),
-                "guard: the AIR-below cantilever slab must still anchor via the side lane");
+                net.minecraft.text.Text.literal("guard: the AIR-below cantilever slab must still anchor via the side lane"));
         double dy = SlabSupport.getYOffset(w, seat, w.getBlockState(seat));
         ctx.assertTrue(Math.abs(dy + 0.5) <= EPS,
-                "guard: the legitimate cantilever (air below, beside a lowered source) must keep "
-                        + "its -0.5 alignment — got " + dy);
+                net.minecraft.text.Text.literal("guard: the legitimate cantilever (air below, beside a lowered source) must keep "
+                        + "its -0.5 alignment — got " + dy));
         ctx.complete();
     }
 
@@ -175,12 +175,12 @@ public final class FlushSeatGuardTest {
         SlabAnchorAttachment.freezeLoweredOnPlace(w, seat, w.getBlockState(seat));
 
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, seat),
-                "guard: the TOP side slab must still anchor via the side lane (its lowered "
-                        + "volume rests ON the flush seat, never inside it)");
+                net.minecraft.text.Text.literal("guard: the TOP side slab must still anchor via the side lane (its lowered "
+                        + "volume rests ON the flush seat, never inside it)"));
         double dy = SlabSupport.getYOffset(w, seat, w.getBlockState(seat));
         ctx.assertTrue(Math.abs(dy + 0.5) <= EPS,
-                "guard: a TOP slab beside a lowered source over flush stone keeps the BS-FB-1S "
-                        + "-0.5 alignment (it seats ON the stone) — got " + dy);
+                net.minecraft.text.Text.literal("guard: a TOP slab beside a lowered source over flush stone keeps the BS-FB-1S "
+                        + "-0.5 alignment (it seats ON the stone) — got " + dy));
         ctx.complete();
     }
 
@@ -199,7 +199,7 @@ public final class FlushSeatGuardTest {
         place(w, top, Blocks.STONE.getDefaultState());
         double dy = SlabSupport.getYOffset(w, top, w.getBlockState(top));
         ctx.assertTrue(Math.abs(dy + 0.5) <= EPS,
-                "fixture: the side-source top stone must render -0.5, got " + dy);
+                net.minecraft.text.Text.literal("fixture: the side-source top stone must render -0.5, got " + dy));
     }
 
     /**

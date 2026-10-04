@@ -72,19 +72,19 @@ public final class DeepDyConsentTest {
                 + " capDerived=" + derived;
 
         ctx.assertTrue(Math.abs(inForce - derived) <= EPS,
-                "THE CONSENT WIRING IS NOT LIVE: the cap the resolver is using is not the cap this "
+                net.minecraft.text.Text.literal("THE CONSENT WIRING IS NOT LIVE: the cap the resolver is using is not the cap this "
                         + "world's own state derives. Either the world-load hook did not run or "
-                        + "something else is writing the cached cap. " + measured);
+                        + "something else is writing the cached cap. " + measured));
 
         if (SlabSupport.DEEP_DY_ALPHABET) {
             ctx.assertTrue(Math.abs(inForce - SlabSupport.LEGACY_DEEP_MIN_RESOLVED_DY) <= EPS,
-                    "the developer override must force the deep cap regardless of world state — "
-                            + measured);
+                    net.minecraft.text.Text.literal("the developer override must force the deep cap regardless of world state — "
+                            + measured));
         } else {
             ctx.assertTrue(Math.abs(inForce - SlabSupport.SHIPPED_MIN_RESOLVED_DY) <= EPS,
-                    "NO WORLD IN THIS SUITE CONSENTS, so the cap must be the shipped one and the "
+                    net.minecraft.text.Text.literal("NO WORLD IN THIS SUITE CONSENTS, so the cap must be the shipped one and the "
                             + "whole suite must be byte-identical to the build before consent "
-                            + "existed. " + measured);
+                            + "existed. " + measured));
         }
         ctx.complete();
     }
@@ -102,27 +102,27 @@ public final class DeepDyConsentTest {
         double unarmed = SlabSupport.capFor(false);
 
         ctx.assertTrue(armed == SlabSupport.LEGACY_DEEP_MIN_RESOLVED_DY,
-                "a consented world's cap must BE SlabSupport.LEGACY_DEEP_MIN_RESOLVED_DY, not a "
+                net.minecraft.text.Text.literal("a consented world's cap must BE SlabSupport.LEGACY_DEEP_MIN_RESOLVED_DY, not a "
                         + "value that happens to equal it — got " + armed + " against "
-                        + SlabSupport.LEGACY_DEEP_MIN_RESOLVED_DY);
+                        + SlabSupport.LEGACY_DEEP_MIN_RESOLVED_DY));
         ctx.assertTrue((int) Math.ceil(-armed) <= SlabbedOffsetRaycast.WINDOW_RADIUS,
-                "the targeting window must contain every legacy consented height, or "
+                net.minecraft.text.Text.literal("the targeting window must contain every legacy consented height, or "
                         + "a consenting player gets blocks drawn where they cannot aim: cap="
-                        + armed + " radius=" + SlabbedOffsetRaycast.WINDOW_RADIUS);
+                        + armed + " radius=" + SlabbedOffsetRaycast.WINDOW_RADIUS));
 
         if (SlabSupport.DEEP_DY_ALPHABET) {
             ctx.assertTrue(unarmed == armed,
-                    "the developer override may only ever ARM. An unconsented world must not be "
+                    net.minecraft.text.Text.literal("the developer override may only ever ARM. An unconsented world must not be "
                             + "able to pull the cap back to " + unarmed + " while the deep leg is "
                             + "running, or the deep leg would test nothing outside consented "
-                            + "worlds.");
+                            + "worlds."));
         } else {
             ctx.assertTrue(unarmed == SlabSupport.SHIPPED_MIN_RESOLVED_DY,
-                    "an unconsented world must read the shipped cap ("
-                            + SlabSupport.SHIPPED_MIN_RESOLVED_DY + "), got " + unarmed);
+                    net.minecraft.text.Text.literal("an unconsented world must read the shipped cap ("
+                            + SlabSupport.SHIPPED_MIN_RESOLVED_DY + "), got " + unarmed));
             ctx.assertTrue(unarmed > armed,
-                    "fixture: the two legs must be different numbers or this cell proves nothing — "
-                            + unarmed + " vs " + armed);
+                    net.minecraft.text.Text.literal("fixture: the two legs must be different numbers or this cell proves nothing — "
+                            + unarmed + " vs " + armed));
         }
         ctx.complete();
     }
@@ -149,32 +149,32 @@ public final class DeepDyConsentTest {
         try {
             w.removeAttached(DeepDyConsentAttachment.CONSENT_TYPE);
             ctx.assertTrue(DeepDyConsentAttachment.stamp(w) == null,
-                    "LEGACY is the ABSENCE of the stamp, and absence must be readable as absence — "
+                    net.minecraft.text.Text.literal("LEGACY is the ABSENCE of the stamp, and absence must be readable as absence — "
                             + "no content is inspected and no age is inferred anywhere in this "
                             + "class, so if absence is not distinguishable there is no legacy "
-                            + "state at all.");
+                            + "state at all."));
             ctx.assertTrue(!DeepDyConsentAttachment.consented(w),
-                    "an absent stamp must never read as consent");
+                    net.minecraft.text.Text.literal("an absent stamp must never read as consent"));
 
             w.setAttached(DeepDyConsentAttachment.CONSENT_TYPE, false);
             ctx.assertTrue(Boolean.FALSE.equals(DeepDyConsentAttachment.stamp(w)),
-                    "a world stamped false must read back as stamped false, NOT as absent — the "
-                            + "two are the same behaviour and different facts");
+                    net.minecraft.text.Text.literal("a world stamped false must read back as stamped false, NOT as absent — the "
+                            + "two are the same behaviour and different facts"));
             ctx.assertTrue(!DeepDyConsentAttachment.consented(w),
-                    "stamped false must not read as consent");
+                    net.minecraft.text.Text.literal("stamped false must not read as consent"));
 
             w.setAttached(DeepDyConsentAttachment.CONSENT_TYPE, true);
             ctx.assertTrue(Boolean.TRUE.equals(DeepDyConsentAttachment.stamp(w))
                             && DeepDyConsentAttachment.consented(w),
-                    "a world stamped true must read back as consenting");
+                    net.minecraft.text.Text.literal("a world stamped true must read back as consenting"));
 
             ctx.assertTrue(SlabSupport.minResolvedDy() == capBefore,
-                    "THE CAP IS BEING LOOKED UP, NOT CACHED. Writing the authoritative store three "
+                    net.minecraft.text.Text.literal("THE CAP IS BEING LOOKED UP, NOT CACHED. Writing the authoritative store three "
                             + "times moved the resolver's answer from " + capBefore + " to "
                             + SlabSupport.minResolvedDy() + ". The cap is read on the resolver's "
                             + "hot path and must be a cached value refreshed on world load — a "
                             + "per-call store read is the perf class this project has already "
-                            + "shipped twice.");
+                            + "shipped twice."));
         } finally {
             if (original == null) {
                 w.removeAttached(DeepDyConsentAttachment.CONSENT_TYPE);
@@ -206,12 +206,12 @@ public final class DeepDyConsentTest {
 
             for (ServerWorld world : originalStamps.keySet()) {
                 ctx.assertTrue(Boolean.TRUE.equals(DeepDyConsentAttachment.stamp(world)),
-                        "consent must be mirrored to every loaded dimension before the transition "
-                                + "returns; missing " + world.getRegistryKey().getValue());
+                        net.minecraft.text.Text.literal("consent must be mirrored to every loaded dimension before the transition "
+                                + "returns; missing " + world.getRegistryKey().getValue()));
             }
             ctx.assertTrue(SlabSupport.minResolvedDy() == SlabSupport.capFor(true),
-                    "consent persisted but the server cache still uses cap "
-                            + SlabSupport.minResolvedDy() + " instead of " + SlabSupport.capFor(true));
+                    net.minecraft.text.Text.literal("consent persisted but the server cache still uses cap "
+                            + SlabSupport.minResolvedDy() + " instead of " + SlabSupport.capFor(true)));
 
             boolean reversalRejected = false;
             try {
@@ -220,14 +220,14 @@ public final class DeepDyConsentTest {
                 reversalRejected = true;
             }
             ctx.assertTrue(reversalRejected,
-                    "deep-dy consent must be one-way because revoking it would move unstored cells");
+                    net.minecraft.text.Text.literal("deep-dy consent must be one-way because revoking it would move unstored cells"));
             for (ServerWorld world : originalStamps.keySet()) {
                 ctx.assertTrue(Boolean.TRUE.equals(DeepDyConsentAttachment.stamp(world)),
-                        "a rejected reversal must leave every dimension consented; changed "
-                                + world.getRegistryKey().getValue());
+                        net.minecraft.text.Text.literal("a rejected reversal must leave every dimension consented; changed "
+                                + world.getRegistryKey().getValue()));
             }
             ctx.assertTrue(SlabSupport.minResolvedDy() == SlabSupport.capFor(true),
-                    "a rejected reversal changed the live cap");
+                    net.minecraft.text.Text.literal("a rejected reversal changed the live cap"));
         } finally {
             for (Map.Entry<ServerWorld, Boolean> entry : originalStamps.entrySet()) {
                 if (entry.getValue() == null) {
@@ -297,21 +297,21 @@ public final class DeepDyConsentTest {
         System.out.println("[CONSENT-PERF] " + measured);
 
         ctx.assertTrue(resolutions > 0,
-                "vacuity guard: the battery must actually resolve something — " + measured);
+                net.minecraft.text.Text.literal("vacuity guard: the battery must actually resolve something — " + measured));
         ctx.assertTrue(Math.abs(deepest - SlabSupport.minResolvedDy()) <= EPS,
-                "VACUITY GUARD, and it is the whole point of this cell: the battery must SATURATE "
+                net.minecraft.text.Text.literal("VACUITY GUARD, and it is the whole point of this cell: the battery must SATURATE "
                         + "at the cap, or it never consulted the value whose read cost is being "
                         + "measured and the zero below would be zero for the wrong reason. "
-                        + "Expected the deepest reading to be the cap — " + measured);
+                        + "Expected the deepest reading to be the cap — " + measured));
 
         ctx.assertTrue(storeReadsAfter == storeReadsBefore,
-                "PERF GATE: " + (storeReadsAfter - storeReadsBefore) + " authoritative consent-store"
+                net.minecraft.text.Text.literal("PERF GATE: " + (storeReadsAfter - storeReadsBefore) + " authoritative consent-store"
                         + " reads happened while resolving " + resolutions + " cells. The cap is on "
                         + "the resolver's hot path — the path Stage 1 measured growing 3.06x on the "
                         + "pick alone — and it must be a cached value written on world load, never "
                         + "a per-call world/attachment/map lookup. This is the assertion that "
                         + "exists because this project has shipped a perf regression twice. Do not "
-                        + "relax it; find what started reading the store. " + measured);
+                        + "relax it; find what started reading the store. " + measured));
         ctx.complete();
     }
 
@@ -346,8 +346,8 @@ public final class DeepDyConsentTest {
         com.sun.management.ThreadMXBean threads =
                 (com.sun.management.ThreadMXBean) ManagementFactory.getThreadMXBean();
         ctx.assertTrue(threads.isThreadAllocatedMemorySupported(),
-                "this cell needs the JVM's per-thread allocation counter; without it there is no "
-                        + "measurement and a green would be a false one");
+                net.minecraft.text.Text.literal("this cell needs the JVM's per-thread allocation counter; without it there is no "
+                        + "measurement and a green would be a false one"));
         threads.setThreadAllocatedMemoryEnabled(true);
         long id = Thread.currentThread().threadId();
 
@@ -378,15 +378,15 @@ public final class DeepDyConsentTest {
         System.out.println("[CONSENT-PERF] " + measured);
 
         ctx.assertTrue(measuredSink != 0.0 && controlSink != 0.0,
-                "vacuity guard: a loop was optimised away, so nothing was measured — " + measured);
+                net.minecraft.text.Text.literal("vacuity guard: a loop was optimised away, so nothing was measured — " + measured));
         ctx.assertTrue(perRead < MAX_ALLOCATED_BYTES_PER_READ,
-                "PERF GATE: reading the dy cap allocated " + perRead + " bytes per read, past the "
+                net.minecraft.text.Text.literal("PERF GATE: reading the dy cap allocated " + perRead + " bytes per read, past the "
                         + MAX_ALLOCATED_BYTES_PER_READ + " this gate allows. It must allocate "
                         + "NOTHING — one volatile double load. A box, a map lookup or an Optional "
                         + "on this path is at least 16 bytes EVERY call, so a real regression "
                         + "lands 16x or more above this line. This assertion exists because this "
                         + "project has shipped a perf regression twice: do not raise the number, "
-                        + "find what started allocating. " + measured);
+                        + "find what started allocating. " + measured));
         ctx.complete();
     }
 
@@ -401,14 +401,14 @@ public final class DeepDyConsentTest {
     @GameTest(structure = "fabric-gametest-api-v1:empty")
     public void newWorldsStayOnShippedAlphabetWhileDeepPassThroughDefectIsOpen(TestContext ctx) {
         ctx.assertTrue(!DeepDyConsentAttachment.NEW_WORLD_DEFAULT_DEEP_DY,
-                "NEW_WORLD_DEFAULT_DEEP_DY cannot be true while the deep pass-through "
+                net.minecraft.text.Text.literal("NEW_WORLD_DEFAULT_DEEP_DY cannot be true while the deep pass-through "
                         + "depth-budget tests still characterize a wrong answer; correct those "
-                        + "tests and update this cell with the default.");
+                        + "tests and update this cell with the default."));
         ctx.assertTrue(SlabSupport.capFor(DeepDyConsentAttachment.NEW_WORLD_DEFAULT_DEEP_DY)
                         == SlabSupport.capFor(false),
-                "while the new-world default is the shipped alphabet, a brand-new world and a "
+                net.minecraft.text.Text.literal("while the new-world default is the shipped alphabet, a brand-new world and a "
                         + "legacy world must derive the SAME cap — otherwise this stage has changed "
-                        + "behaviour for somebody, which it undertook not to do");
+                        + "behaviour for somebody, which it undertook not to do"));
         ctx.complete();
     }
 }

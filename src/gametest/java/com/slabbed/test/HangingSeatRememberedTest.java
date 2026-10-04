@@ -70,27 +70,27 @@ public final class HangingSeatRememberedTest {
         world.spawnEntity(frame);
         Box hungBox = frame.getBoundingBox();
         ctx.assertTrue(Math.abs(seatOf(frame) + 0.5d) <= EPS,
-                "premise: a frame hung on a -0.5 wall must mint seat -0.5, got " + seatOf(frame));
+                net.minecraft.text.Text.literal("premise: a frame hung on a -0.5 wall must mint seat -0.5, got " + seatOf(frame)));
         // The wall behind it is rebuilt FLUSH: a new block, no stored height.
         ctx.setBlockState(wallRel, Blocks.AIR.getDefaultState());
         ctx.setBlockState(wallRel, Blocks.OAK_PLANKS.getDefaultState());
         double wallNow = com.slabbed.util.SlabSupport.getYOffset(world, wall, world.getBlockState(wall));
-        ctx.assertTrue(Math.abs(wallNow) <= EPS, "premise: the rebuilt wall must read flush, got " + wallNow);
+        ctx.assertTrue(Math.abs(wallNow) <= EPS, net.minecraft.text.Text.literal("premise: the rebuilt wall must read flush, got " + wallNow));
         // Save and reload the frame: the seat is the frame's own fact and comes back verbatim.
         WriteView output = NbtWriteView.create(ErrorReporter.EMPTY, world.getRegistryManager());
         frame.saveData(output);
         NbtCompound saved = ((NbtWriteView) output).getNbt();
         ItemFrameEntity reloaded = EntityType.ITEM_FRAME.create(world, SpawnReason.LOAD);
-        ctx.assertTrue(reloaded != null, "premise: could not create the reloaded frame");
+        ctx.assertTrue(reloaded != null, net.minecraft.text.Text.literal("premise: could not create the reloaded frame"));
         reloaded.readData(NbtReadView.create(ErrorReporter.EMPTY, world.getRegistryManager(), saved));
         world.spawnEntity(reloaded);
         Box reloadedBox = reloaded.getBoundingBox();
         ctx.assertTrue(Math.abs(seatOf(reloaded) + 0.5d) <= EPS && Math.abs(reloadedBox.minY - hungBox.minY) <= EPS,
-                "a frame must keep the seat it was hung at (-0.5) after its wall is rebuilt flush and it is reloaded; "
+                net.minecraft.text.Text.literal("a frame must keep the seat it was hung at (-0.5) after its wall is rebuilt flush and it is reloaded; "
                         + "seat " + seatOf(reloaded) + " box minY " + reloadedBox.minY + " vs hung " + hungBox.minY
-                        + " — the frame followed the wall instead of remembering (LAW 1 corollary)");
+                        + " — the frame followed the wall instead of remembering (LAW 1 corollary)"));
         ctx.assertTrue(Math.abs(reloaded.getY() - frame.getY()) <= EPS,
-                "the entity position must stay at grid height across the reload; " + reloaded.getY() + " vs " + frame.getY());
+                net.minecraft.text.Text.literal("the entity position must stay at grid height across the reload; " + reloaded.getY() + " vs " + frame.getY()));
         ctx.complete();
     }
 
@@ -114,7 +114,7 @@ public final class HangingSeatRememberedTest {
         PaintingEntity onControl = PaintingEntity.placePainting(world, control.offset(Direction.EAST), Direction.EAST).orElse(null);
         PaintingEntity overSlab = PaintingEntity.placePainting(world, slabScene.offset(Direction.EAST), Direction.EAST).orElse(null);
         ctx.assertTrue(onLowered != null && onControl != null && overSlab != null,
-                "premise: every painting must find a fitting variant");
+                net.minecraft.text.Text.literal("premise: every painting must find a fitting variant"));
         world.spawnEntity(onLowered);
         world.spawnEntity(onControl);
         world.spawnEntity(overSlab);
@@ -125,15 +125,15 @@ public final class HangingSeatRememberedTest {
                 + " | box minY lowered=" + lb.minY + " control=" + cb.minY + " overSlab=" + sb.minY;
         System.out.println("[PAINTING_SEAT] " + report);
         ctx.assertTrue(Math.abs(seatOf(onControl)) <= EPS && Math.abs(((cb.minY + cb.maxY) / 2.0d) - onControl.getY()) <= EPS,
-                "control: a painting on a flush wall keeps vanilla's centred box: " + report);
+                net.minecraft.text.Text.literal("control: a painting on a flush wall keeps vanilla's centred box: " + report));
         ctx.assertTrue(Math.abs(seatOf(onLowered) + 0.5d) <= EPS && Math.abs((lb.minY - cb.minY) + 0.5d) <= EPS,
-                "a painting on a -0.5 wall must hang on the drawn face (box 0.5 below the control's): " + report);
+                net.minecraft.text.Text.literal("a painting on a -0.5 wall must hang on the drawn face (box 0.5 below the control's): " + report));
         ctx.assertTrue(Math.abs(onLowered.getY() - onControl.getY()) <= EPS,
-                "the painting's entity position must stay at grid height: " + report);
+                net.minecraft.text.Text.literal("the painting's entity position must stay at grid height: " + report));
         ctx.assertTrue(Math.abs(seatOf(overSlab)) <= EPS && Math.abs(sb.minY - cb.minY) <= EPS,
-                "GH #48 for entities: a painting on a FLUSH wall must ignore the slab under its cell: " + report);
+                net.minecraft.text.Text.literal("GH #48 for entities: a painting on a FLUSH wall must ignore the slab under its cell: " + report));
         ctx.assertTrue(onLowered.canStayAttached() && onControl.canStayAttached() && overSlab.canStayAttached(),
-                "every painting must still survive on its real wall: " + report);
+                net.minecraft.text.Text.literal("every painting must still survive on its real wall: " + report));
         ctx.complete();
     }
 
@@ -148,11 +148,11 @@ public final class HangingSeatRememberedTest {
         NbtCompound saved = ((NbtWriteView) output).getNbt();
         saved.remove("slabbed:hang_dy"); // an old save: no remembered seat
         ItemFrameEntity old = EntityType.ITEM_FRAME.create(world, SpawnReason.LOAD);
-        ctx.assertTrue(old != null, "premise: could not create the frame");
+        ctx.assertTrue(old != null, net.minecraft.text.Text.literal("premise: could not create the frame"));
         old.readData(NbtReadView.create(ErrorReporter.EMPTY, world.getRegistryManager(), saved));
         world.spawnEntity(old);
         ctx.assertTrue(Math.abs(seatOf(old) + 0.5d) <= EPS,
-                "a frame with no saved seat must mint one from its wall on load (-0.5), got " + seatOf(old));
+                net.minecraft.text.Text.literal("a frame with no saved seat must mint one from its wall on load (-0.5), got " + seatOf(old)));
         ctx.complete();
     }
 }

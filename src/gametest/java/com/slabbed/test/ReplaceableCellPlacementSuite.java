@@ -60,10 +60,10 @@ public final class ReplaceableCellPlacementSuite {
                 new Vec3d(cell.getX() + 0.5d, cell.getY() + 0.1d, cell.getZ() + 0.5d));
 
         ctx.assertTrue(result.isAccepted(),
-                "R1: stone into the grass cell must place; got " + result);
+                net.minecraft.text.Text.literal("R1: stone into the grass cell must place; got " + result));
         ctx.assertTrue(world.getBlockState(cell).isOf(Blocks.STONE),
-                "R1: the grass cell itself must now hold the stone; got "
-                        + PlacementHarness.describe(world, cell));
+                net.minecraft.text.Text.literal("R1: the grass cell itself must now hold the stone; got "
+                        + PlacementHarness.describe(world, cell)));
         assertSeat(ctx, world, cell, 0.0d, true, "R1 up-face grass replacement");
         ctx.complete();
     }
@@ -82,10 +82,10 @@ public final class ReplaceableCellPlacementSuite {
                 new Vec3d(cell.getX() + 0.5d, cell.getY() + 0.9d, cell.getZ() + 0.5d));
 
         ctx.assertTrue(result.isAccepted(),
-                "R2: stone into the grass cell via its underside must place; got " + result);
+                net.minecraft.text.Text.literal("R2: stone into the grass cell via its underside must place; got " + result));
         ctx.assertTrue(world.getBlockState(cell).isOf(Blocks.STONE),
-                "R2: the grass cell itself must now hold the stone; got "
-                        + PlacementHarness.describe(world, cell));
+                net.minecraft.text.Text.literal("R2: the grass cell itself must now hold the stone; got "
+                        + PlacementHarness.describe(world, cell)));
         assertSeat(ctx, world, cell, 0.0d, true, "R2 down-face grass replacement");
         ctx.complete();
     }
@@ -99,7 +99,7 @@ public final class ReplaceableCellPlacementSuite {
         world.setBlockState(cell, Blocks.SHORT_GRASS.getDefaultState(), Block.NOTIFY_LISTENERS);
         ctx.assertTrue(SlabPlacementDyAttachment.writeBatch(
                         world, Map.of(support, Double.doubleToRawLongBits(-0.5d))),
-                "R3 fixture: the lowered support height must publish");
+                net.minecraft.text.Text.literal("R3 fixture: the lowered support height must publish"));
         System.out.println("[REPLACEABLE-CELL] R3 pre-click grass "
                 + PlacementHarness.describe(world, cell));
 
@@ -109,10 +109,10 @@ public final class ReplaceableCellPlacementSuite {
                 new Vec3d(cell.getX() + 0.5d, cell.getY() + 0.1d, cell.getZ() + 0.5d));
 
         ctx.assertTrue(result.isAccepted(),
-                "R3: stone into the lowered grass cell must place; got " + result);
+                net.minecraft.text.Text.literal("R3: stone into the lowered grass cell must place; got " + result));
         ctx.assertTrue(world.getBlockState(cell).isOf(Blocks.STONE),
-                "R3: the grass cell itself must now hold the stone; got "
-                        + PlacementHarness.describe(world, cell));
+                net.minecraft.text.Text.literal("R3: the grass cell itself must now hold the stone; got "
+                        + PlacementHarness.describe(world, cell)));
         assertSeat(ctx, world, cell, -0.5d, false, "R3 grass replacement on a -0.5 support");
         ctx.complete();
     }
@@ -130,12 +130,12 @@ public final class ReplaceableCellPlacementSuite {
                 new Vec3d(cell.getX() + 0.5d, cell.getY() + 0.05d, cell.getZ() + 0.5d));
 
         ctx.assertTrue(result.isAccepted(),
-                "R4: an oak slab into the grass cell must place; got " + result);
+                net.minecraft.text.Text.literal("R4: an oak slab into the grass cell must place; got " + result));
         BlockState placed = world.getBlockState(cell);
         ctx.assertTrue(placed.isOf(Blocks.OAK_SLAB)
                         && placed.get(SlabBlock.TYPE) == SlabType.BOTTOM,
-                "R4: the grass cell must now hold a BOTTOM oak slab; got "
-                        + PlacementHarness.describe(world, cell));
+                net.minecraft.text.Text.literal("R4: the grass cell must now hold a BOTTOM oak slab; got "
+                        + PlacementHarness.describe(world, cell)));
         assertSeat(ctx, world, cell, 0.0d, true, "R4 slab-item grass replacement");
         ctx.complete();
     }
@@ -154,10 +154,10 @@ public final class ReplaceableCellPlacementSuite {
                 new Vec3d(cell.getX() + 0.5d, cell.getY() + 0.12d, cell.getZ() + 0.5d));
 
         ctx.assertTrue(result.isAccepted(),
-                "R5: stone into the one-layer snow cell must place; got " + result);
+                net.minecraft.text.Text.literal("R5: stone into the one-layer snow cell must place; got " + result));
         ctx.assertTrue(world.getBlockState(cell).isOf(Blocks.STONE),
-                "R5: the snow cell itself must now hold the stone; got "
-                        + PlacementHarness.describe(world, cell));
+                net.minecraft.text.Text.literal("R5: the snow cell itself must now hold the stone; got "
+                        + PlacementHarness.describe(world, cell)));
         assertSeat(ctx, world, cell, 0.0d, true, "R5 thin-snow replacement");
         ctx.complete();
     }
@@ -174,19 +174,19 @@ public final class ReplaceableCellPlacementSuite {
         ActionResult firstResult = PlacementHarness.useHeldItem(world, first, ground, Direction.UP,
                 new Vec3d(ground.getX() + 0.5d, ground.getY() + 1.0d, ground.getZ() + 0.5d));
         ctx.assertTrue(firstResult.isAccepted(),
-                "R6 fixture: the first candle must place; got " + firstResult);
+                net.minecraft.text.Text.literal("R6 fixture: the first candle must place; got " + firstResult));
         BlockState one = world.getBlockState(cell);
         ctx.assertTrue(one.isOf(Blocks.CANDLE) && one.get(CandleBlock.CANDLES) == 1,
-                "R6 fixture: one candle expected; got " + PlacementHarness.describe(world, cell));
+                net.minecraft.text.Text.literal("R6 fixture: one candle expected; got " + PlacementHarness.describe(world, cell)));
         System.out.println("[REPLACEABLE-CELL] R6 stored after first candle = "
                 + SlabPlacementDyAttachment.storedDy(world, cell));
 
         ctx.assertTrue(SlabPlacementDyAttachment.writeBatch(
                         world, Map.of(cell, Double.doubleToRawLongBits(-0.5d))),
-                "R6 fixture: the candle cell must accept the authored -0.5 fact");
+                net.minecraft.text.Text.literal("R6 fixture: the candle cell must accept the authored -0.5 fact"));
         ctx.assertTrue(Double.doubleToRawLongBits(SlabPlacementDyAttachment.storedDy(world, cell))
                         == Double.doubleToRawLongBits(-0.5d),
-                "R6 fixture: the authored -0.5 fact must read back");
+                net.minecraft.text.Text.literal("R6 fixture: the authored -0.5 fact must read back"));
 
         PlayerEntity second = PlacementHarness.mockPlayerHolding(
                 ctx, cell.north(3), new ItemStack(Blocks.CANDLE.asItem(), 1));
@@ -194,11 +194,11 @@ public final class ReplaceableCellPlacementSuite {
                 new Vec3d(cell.getX() + 0.5d, cell.getY() + 0.4d, cell.getZ() + 0.5d));
 
         ctx.assertTrue(secondResult.isAccepted(),
-                "R6: the second candle must merge; got " + secondResult);
+                net.minecraft.text.Text.literal("R6: the second candle must merge; got " + secondResult));
         BlockState two = world.getBlockState(cell);
         ctx.assertTrue(two.isOf(Blocks.CANDLE) && two.get(CandleBlock.CANDLES) == 2,
-                "R6: two candles expected after the merge; got "
-                        + PlacementHarness.describe(world, cell));
+                net.minecraft.text.Text.literal("R6: two candles expected after the merge; got "
+                        + PlacementHarness.describe(world, cell)));
         assertSeat(ctx, world, cell, -0.5d, false, "R6 candle merge over a stored -0.5 fact");
         ctx.complete();
     }
@@ -219,25 +219,25 @@ public final class ReplaceableCellPlacementSuite {
                 new Vec3d(lower.getX() + 0.5d, lower.getY() + 0.1d, lower.getZ() + 0.5d));
 
         ctx.assertTrue(result.isAccepted(),
-                "R7: a door into the grass cell must place; got " + result);
+                net.minecraft.text.Text.literal("R7: a door into the grass cell must place; got " + result));
         BlockState lowerState = world.getBlockState(lower);
         BlockState upperState = world.getBlockState(upper);
         ctx.assertTrue(lowerState.isOf(Blocks.OAK_DOOR)
                         && lowerState.get(Properties.DOUBLE_BLOCK_HALF) == DoubleBlockHalf.LOWER,
-                "R7: the grass cell must hold the LOWER door half; got "
-                        + PlacementHarness.describe(world, lower));
+                net.minecraft.text.Text.literal("R7: the grass cell must hold the LOWER door half; got "
+                        + PlacementHarness.describe(world, lower)));
         ctx.assertTrue(upperState.isOf(Blocks.OAK_DOOR)
                         && upperState.get(Properties.DOUBLE_BLOCK_HALF) == DoubleBlockHalf.UPPER,
-                "R7: the cell above must hold the UPPER door half; got "
-                        + PlacementHarness.describe(world, upper));
+                net.minecraft.text.Text.literal("R7: the cell above must hold the UPPER door half; got "
+                        + PlacementHarness.describe(world, upper)));
         SlabPlacementDyAttachment.PlacementDyFact lowerFact =
                 SlabPlacementDyAttachment.rawFact(world, lower);
         SlabPlacementDyAttachment.PlacementDyFact upperFact =
                 SlabPlacementDyAttachment.rawFact(world, upper);
         ctx.assertTrue(lowerFact.present() == upperFact.present()
                         && (!lowerFact.present() || lowerFact.rawBits() == upperFact.rawBits()),
-                "R7: both door halves must publish one consistent fact; got lower="
-                        + lowerFact + " upper=" + upperFact);
+                net.minecraft.text.Text.literal("R7: both door halves must publish one consistent fact; got lower="
+                        + lowerFact + " upper=" + upperFact));
         assertSeat(ctx, world, lower, 0.0d, true, "R7 lower door half in the grass cell");
         assertSeat(ctx, world, upper, 0.0d, true, "R7 upper door half above the grass cell");
         ctx.complete();
@@ -257,10 +257,10 @@ public final class ReplaceableCellPlacementSuite {
                 new Vec3d(base.getX() + 0.5d, base.getY() + 1.0d, base.getZ() + 0.5d));
 
         ctx.assertTrue(result.isAccepted(),
-                "R8 control: the adjacent-lane placement must place; got " + result);
+                net.minecraft.text.Text.literal("R8 control: the adjacent-lane placement must place; got " + result));
         ctx.assertTrue(world.getBlockState(cell).isOf(Blocks.STONE),
-                "R8 control: stone must land in the cell above; got "
-                        + PlacementHarness.describe(world, cell));
+                net.minecraft.text.Text.literal("R8 control: stone must land in the cell above; got "
+                        + PlacementHarness.describe(world, cell)));
         assertSeat(ctx, world, cell, 0.0d, true, "R8 adjacent-lane control");
         ctx.complete();
     }
@@ -283,16 +283,16 @@ public final class ReplaceableCellPlacementSuite {
                 ? absentAllowed
                 : Double.doubleToRawLongBits(stored) == Double.doubleToRawLongBits(expectedDy);
         ctx.assertTrue(storedOk,
-                label + ": stored dy must be " + (absentAllowed ? "absent or " : "")
-                        + expectedDy + "; got " + stored);
+                net.minecraft.text.Text.literal(label + ": stored dy must be " + (absentAllowed ? "absent or " : "")
+                        + expectedDy + "; got " + stored));
         BlockState state = world.getBlockState(pos);
         double visual = SlabSupport.getYOffset(world, pos, state);
         ctx.assertTrue(Math.abs(visual - expectedDy) <= EPS,
-                label + ": resolved dy must be " + expectedDy + "; got " + visual);
+                net.minecraft.text.Text.literal(label + ": resolved dy must be " + expectedDy + "; got " + visual));
         VoxelShape outline = state.getOutlineShape(world, pos, ShapeContext.absent());
         ctx.assertTrue(!outline.isEmpty()
                         && Math.abs(outline.getMin(Direction.Axis.Y) - expectedDy) <= EPS,
-                label + ": outline min-Y must sit at " + expectedDy + " in the cell; got "
-                        + (outline.isEmpty() ? "empty" : outline.getMin(Direction.Axis.Y)));
+                net.minecraft.text.Text.literal(label + ": outline min-Y must sit at " + expectedDy + " in the cell; got "
+                        + (outline.isEmpty() ? "empty" : outline.getMin(Direction.Axis.Y))));
     }
 }

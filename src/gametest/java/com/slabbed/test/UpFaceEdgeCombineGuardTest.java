@@ -41,7 +41,7 @@ public final class UpFaceEdgeCombineGuardTest {
             world.setBlockState(side, Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
             ctx.assertTrue(SlabPlacementDyAttachment.writeBatch(
                             world, Map.of(support, Double.doubleToRawLongBits(supportDy))),
-                    "fixture: lowered support height must publish for " + edge);
+                    net.minecraft.text.Text.literal("fixture: lowered support height must publish for " + edge));
 
             PlayerEntity player = PlacementHarness.mockSlabPlayer(ctx, support.north(3));
             Vec3d hit = topEdgeHit(support, supportDy, edge);
@@ -49,21 +49,21 @@ public final class UpFaceEdgeCombineGuardTest {
                     world, player, support, Direction.UP, hit);
 
             ctx.assertTrue(result.isAccepted(),
-                    "top-face " + edge + " edge click must place, got " + result);
+                    net.minecraft.text.Text.literal("top-face " + edge + " edge click must place, got " + result));
             BlockState aboveState = world.getBlockState(above);
             ctx.assertTrue(aboveState.isOf(Blocks.OAK_SLAB)
                             && aboveState.get(SlabBlock.TYPE) == SlabType.BOTTOM,
-                    "top-face " + edge + " edge click must place a BOTTOM slab above the support; got "
-                            + PlacementHarness.describe(world, above));
+                    net.minecraft.text.Text.literal("top-face " + edge + " edge click must place a BOTTOM slab above the support; got "
+                            + PlacementHarness.describe(world, above)));
             ctx.assertTrue(world.getBlockState(side).isAir(),
-                    "top-face " + edge + " edge click must not place beside the support; got "
-                            + PlacementHarness.describe(world, side));
+                    net.minecraft.text.Text.literal("top-face " + edge + " edge click must not place beside the support; got "
+                            + PlacementHarness.describe(world, side)));
             assertFrozenDy(ctx, world, above, supportDy,
                     "top-face " + edge + " edge placement");
 
             world.setBlockState(support, Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
             ctx.assertTrue(world.getBlockState(above).isOf(Blocks.OAK_SLAB),
-                    "removing the aimed support must not remove the placed slab for " + edge);
+                    net.minecraft.text.Text.literal("removing the aimed support must not remove the placed slab for " + edge));
             assertFrozenDy(ctx, world, above, supportDy,
                     "top-face " + edge + " edge placement after support removal");
         }
@@ -83,24 +83,24 @@ public final class UpFaceEdgeCombineGuardTest {
                 Block.NOTIFY_LISTENERS);
         ctx.assertTrue(SlabPlacementDyAttachment.writeBatch(
                         world, Map.of(support, Double.doubleToRawLongBits(supportDy))),
-                "fixture: lowered support height must publish");
+                net.minecraft.text.Text.literal("fixture: lowered support height must publish"));
 
         PlayerEntity player = PlacementHarness.mockSlabPlayer(ctx, support.north(3));
         ActionResult result = PlacementHarness.useHeldOakSlab(
                 world, player, support, Direction.UP,
                 topEdgeHit(support, supportDy, Direction.WEST));
 
-        ctx.assertTrue(result.isAccepted(), "occupied-neighbor top-edge click must place, got " + result);
+        ctx.assertTrue(result.isAccepted(), net.minecraft.text.Text.literal("occupied-neighbor top-edge click must place, got " + result));
         BlockState aboveState = world.getBlockState(above);
         ctx.assertTrue(aboveState.isOf(Blocks.OAK_SLAB)
                         && aboveState.get(SlabBlock.TYPE) == SlabType.BOTTOM,
-                "occupied-neighbor top-edge click must still place above; got "
-                        + PlacementHarness.describe(world, above));
+                net.minecraft.text.Text.literal("occupied-neighbor top-edge click must still place above; got "
+                        + PlacementHarness.describe(world, above)));
         BlockState neighborAfter = world.getBlockState(neighbor);
         ctx.assertTrue(neighborAfter.isOf(Blocks.OAK_SLAB)
                         && neighborAfter.get(SlabBlock.TYPE) == SlabType.BOTTOM,
-                "the existing neighbor must remain a single BOTTOM slab; got "
-                        + PlacementHarness.describe(world, neighbor));
+                net.minecraft.text.Text.literal("the existing neighbor must remain a single BOTTOM slab; got "
+                        + PlacementHarness.describe(world, neighbor)));
         assertFrozenDy(ctx, world, above, supportDy, "occupied-neighbor top-edge placement");
         ctx.complete();
     }
@@ -120,11 +120,11 @@ public final class UpFaceEdgeCombineGuardTest {
         ActionResult result = PlacementHarness.useHeldOakSlab(
                 world, player, slab, Direction.NORTH, hit);
 
-        ctx.assertTrue(result.isAccepted(), "literal horizontal-face click must place, got " + result);
+        ctx.assertTrue(result.isAccepted(), net.minecraft.text.Text.literal("literal horizontal-face click must place, got " + result));
         BlockState after = world.getBlockState(slab);
         ctx.assertTrue(after.get(SlabBlock.TYPE) == SlabType.DOUBLE,
-                "literal horizontal click must keep vanilla same-cell combine behavior; got "
-                        + PlacementHarness.describe(world, slab));
+                net.minecraft.text.Text.literal("literal horizontal click must keep vanilla same-cell combine behavior; got "
+                        + PlacementHarness.describe(world, slab)));
         ctx.complete();
     }
 
@@ -153,9 +153,9 @@ public final class UpFaceEdgeCombineGuardTest {
         double stored = SlabPlacementDyAttachment.storedDy(world, pos);
         ctx.assertTrue(Double.doubleToRawLongBits(stored)
                         == Double.doubleToRawLongBits(expectedDy),
-                label + " must freeze dy=" + expectedDy + "; got " + stored);
+                net.minecraft.text.Text.literal(label + " must freeze dy=" + expectedDy + "; got " + stored));
         double visual = SlabSupport.getYOffset(world, pos, world.getBlockState(pos));
         ctx.assertTrue(Math.abs(visual - expectedDy) <= EPS,
-                label + " visual dy must remain " + expectedDy + "; got " + visual);
+                net.minecraft.text.Text.literal(label + " visual dy must remain " + expectedDy + "; got " + visual));
     }
 }

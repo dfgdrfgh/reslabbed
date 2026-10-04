@@ -55,7 +55,7 @@ public final class ChainUnderLoweredFullBlockCapTest {
 
     private static void expect(TestContext ctx, ServerWorld w, BlockPos pos, double want, String what) {
         double got = dy(w, pos);
-        ctx.assertTrue(Math.abs(got - want) <= EPS, what + ": expected dy=" + want + " got " + got);
+        ctx.assertTrue(Math.abs(got - want) <= EPS, net.minecraft.text.Text.literal(what + ": expected dy=" + want + " got " + got));
     }
 
     /**
@@ -66,7 +66,7 @@ public final class ChainUnderLoweredFullBlockCapTest {
     private static void lowerCapByHalf(TestContext ctx, ServerWorld w, BlockPos cap) {
         place(w, cap, Blocks.OAK_PLANKS.getDefaultState());
         ctx.assertTrue(SlabPlacementDyAttachment.record(w, cap, -0.5),
-                "fixture: the cap's placement height must actually be recorded");
+                net.minecraft.text.Text.literal("fixture: the cap's placement height must actually be recorded"));
         expect(ctx, w, cap, -0.5, "fixture: the ordinary cap must render lowered before anything hangs from it");
     }
 
@@ -161,7 +161,7 @@ public final class ChainUnderLoweredFullBlockCapTest {
         BlockPos chain = cap.down();
         place(w, cap, Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, type));
         ctx.assertTrue(SlabPlacementDyAttachment.record(w, cap, -0.5),
-                "fixture: the " + type + " slab cap's placement height must actually be recorded");
+                net.minecraft.text.Text.literal("fixture: the " + type + " slab cap's placement height must actually be recorded"));
         expect(ctx, w, cap, -0.5, "fixture: the " + type + " slab cap must render lowered");
 
         place(w, chain, yChain());

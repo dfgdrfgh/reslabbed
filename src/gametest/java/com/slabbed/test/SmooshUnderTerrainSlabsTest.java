@@ -75,8 +75,8 @@ public final class SmooshUnderTerrainSlabsTest {
     public void hangingRootsUnderTsTopSlabStayFlush(TestContext ctx) {
         double dy = hangerDyUnder(ctx, tsSlab(SlabType.TOP));
         ctx.assertTrue(Math.abs(dy) <= EPS,
-                "hanging roots under a Terrain Slabs TOP slab must hang FLUSH (0.0) — TS owns its "
-                        + "own offset; +0.5 smooshes the hanger up into the TS block; got " + dy);
+                net.minecraft.text.Text.literal("hanging roots under a Terrain Slabs TOP slab must hang FLUSH (0.0) — TS owns its "
+                        + "own offset; +0.5 smooshes the hanger up into the TS block; got " + dy));
         ctx.complete();
     }
 
@@ -86,7 +86,7 @@ public final class SmooshUnderTerrainSlabsTest {
     public void hangingRootsUnderTsDoubleSlabStayFlush(TestContext ctx) {
         double dy = hangerDyUnder(ctx, tsSlab(SlabType.DOUBLE));
         ctx.assertTrue(Math.abs(dy) <= EPS,
-                "hanging roots under a Terrain Slabs DOUBLE slab must hang FLUSH (0.0); got " + dy);
+                net.minecraft.text.Text.literal("hanging roots under a Terrain Slabs DOUBLE slab must hang FLUSH (0.0); got " + dy));
         ctx.complete();
     }
 
@@ -96,8 +96,8 @@ public final class SmooshUnderTerrainSlabsTest {
     public void hangingRootsUnderVanillaTopSlabHangFlush(TestContext ctx) {
         double dy = hangerDyUnder(ctx, vanillaSlab(SlabType.TOP));
         ctx.assertTrue(Math.abs(dy) <= EPS,
-                "hanging roots under a VANILLA top slab must hang FLUSH (0.0) — +0.5 reach-up "
-                        + "deprecated; got " + dy);
+                net.minecraft.text.Text.literal("hanging roots under a VANILLA top slab must hang FLUSH (0.0) — +0.5 reach-up "
+                        + "deprecated; got " + dy));
         ctx.complete();
     }
 
@@ -107,7 +107,7 @@ public final class SmooshUnderTerrainSlabsTest {
     public void hangingRootsUnderFlushFullBlockStayFlush(TestContext ctx) {
         double dy = hangerDyUnder(ctx, Blocks.STONE.getDefaultState());
         ctx.assertTrue(Math.abs(dy) <= EPS,
-                "hanging roots under a flush full block must hang FLUSH (0.0); got " + dy);
+                net.minecraft.text.Text.literal("hanging roots under a flush full block must hang FLUSH (0.0); got " + dy));
         ctx.complete();
     }
 
@@ -119,7 +119,7 @@ public final class SmooshUnderTerrainSlabsTest {
     public void hangingLanternUnderTsTopSlabStayFlush(TestContext ctx) {
         double dy = ceilingBlockDyUnder(ctx, hangingLantern(), tsSlab(SlabType.TOP));
         ctx.assertTrue(Math.abs(dy) <= EPS,
-                "a hanging lantern under a Terrain Slabs TOP slab must hang FLUSH (0.0); got " + dy);
+                net.minecraft.text.Text.literal("a hanging lantern under a Terrain Slabs TOP slab must hang FLUSH (0.0); got " + dy));
         ctx.complete();
     }
 
@@ -127,7 +127,7 @@ public final class SmooshUnderTerrainSlabsTest {
     public void hangingLanternUnderTsDoubleSlabStayFlush(TestContext ctx) {
         double dy = ceilingBlockDyUnder(ctx, hangingLantern(), tsSlab(SlabType.DOUBLE));
         ctx.assertTrue(Math.abs(dy) <= EPS,
-                "a hanging lantern under a Terrain Slabs DOUBLE slab must hang FLUSH (0.0); got " + dy);
+                net.minecraft.text.Text.literal("a hanging lantern under a Terrain Slabs DOUBLE slab must hang FLUSH (0.0); got " + dy));
         ctx.complete();
     }
 
@@ -135,7 +135,7 @@ public final class SmooshUnderTerrainSlabsTest {
     public void yAxisChainUnderTsTopSlabStayFlush(TestContext ctx) {
         double dy = ceilingBlockDyUnder(ctx, yAxisChain(), tsSlab(SlabType.TOP));
         ctx.assertTrue(Math.abs(dy) <= EPS,
-                "a Y-axis chain under a Terrain Slabs TOP slab must hang FLUSH (0.0); got " + dy);
+                net.minecraft.text.Text.literal("a Y-axis chain under a Terrain Slabs TOP slab must hang FLUSH (0.0); got " + dy));
         ctx.complete();
     }
 
@@ -143,7 +143,7 @@ public final class SmooshUnderTerrainSlabsTest {
     public void pointedDripstoneUnderTsTopSlabStayFlush(TestContext ctx) {
         double dy = ceilingBlockDyUnder(ctx, Blocks.POINTED_DRIPSTONE.getDefaultState(), tsSlab(SlabType.TOP));
         ctx.assertTrue(Math.abs(dy) <= EPS,
-                "pointed dripstone under a Terrain Slabs TOP slab must hang FLUSH (0.0); got " + dy);
+                net.minecraft.text.Text.literal("pointed dripstone under a Terrain Slabs TOP slab must hang FLUSH (0.0); got " + dy));
         ctx.complete();
     }
 
@@ -153,7 +153,7 @@ public final class SmooshUnderTerrainSlabsTest {
     public void hangingLanternUnderVanillaTopSlabHangFlush(TestContext ctx) {
         double dy = ceilingBlockDyUnder(ctx, hangingLantern(), vanillaSlab(SlabType.TOP));
         ctx.assertTrue(Math.abs(dy) <= EPS,
-                "a hanging lantern under a VANILLA top slab must hang FLUSH (0.0) — reach-up deprecated; got " + dy);
+                net.minecraft.text.Text.literal("a hanging lantern under a VANILLA top slab must hang FLUSH (0.0) — reach-up deprecated; got " + dy));
         ctx.complete();
     }
 
@@ -161,7 +161,7 @@ public final class SmooshUnderTerrainSlabsTest {
     public void pointedDripstoneUnderVanillaTopSlabHangFlush(TestContext ctx) {
         double dy = ceilingBlockDyUnder(ctx, Blocks.POINTED_DRIPSTONE.getDefaultState(), vanillaSlab(SlabType.TOP));
         ctx.assertTrue(Math.abs(dy) <= EPS,
-                "pointed dripstone under a VANILLA top slab must hang FLUSH (0.0) — reach-up deprecated; got " + dy);
+                net.minecraft.text.Text.literal("pointed dripstone under a VANILLA top slab must hang FLUSH (0.0) — reach-up deprecated; got " + dy));
         ctx.complete();
     }
 
@@ -169,7 +169,7 @@ public final class SmooshUnderTerrainSlabsTest {
     public void yAxisChainUnderVanillaTopSlabHangFlush(TestContext ctx) {
         double dy = ceilingBlockDyUnder(ctx, yAxisChain(), vanillaSlab(SlabType.TOP));
         ctx.assertTrue(Math.abs(dy) <= EPS,
-                "a Y-axis chain under a VANILLA top slab must hang FLUSH (0.0) — reach-up deprecated; got " + dy);
+                net.minecraft.text.Text.literal("a Y-axis chain under a VANILLA top slab must hang FLUSH (0.0) — reach-up deprecated; got " + dy));
         ctx.complete();
     }
 }

@@ -84,19 +84,19 @@ public final class OffsetRaycastTargetingTest {
         BlockPos full = buildLoweredFullBlock(world, origin.add(3, 2, 3));
 
         ctx.assertTrue(SlabSupport.getYOffset(world, full, world.getBlockState(full)) == -0.5,
-                "fixture invalid: full block should be lowered -0.5");
+                net.minecraft.text.Text.literal("fixture invalid: full block should be lowered -0.5"));
 
         // Aim straight down at the visual top centre (world Y = full.y + 0.5).
         Vec3d eye = v(origin, 3.5, 6.0, 3.5);
         Vec3d end = v(origin, 3.5, 0.0, 3.5);
         BlockHitResult hit = slabbed(world, eye, end);
 
-        ctx.assertTrue(hit.getType() == HitResult.Type.BLOCK, "expected a block hit");
+        ctx.assertTrue(hit.getType() == HitResult.Type.BLOCK, net.minecraft.text.Text.literal("expected a block hit"));
         ctx.assertTrue(hit.getBlockPos().equals(full),
-                "expected hit on lowered full block " + full + ", got " + hit.getBlockPos());
-        ctx.assertTrue(hit.getSide() == Direction.UP, "expected UP face, got " + hit.getSide());
+                net.minecraft.text.Text.literal("expected hit on lowered full block " + full + ", got " + hit.getBlockPos()));
+        ctx.assertTrue(hit.getSide() == Direction.UP, net.minecraft.text.Text.literal("expected UP face, got " + hit.getSide()));
         ctx.assertTrue(Math.abs(hit.getPos().y - (full.getY() + 0.5)) < 1.0e-4,
-                "expected hit Y at visual top " + (full.getY() + 0.5) + ", got " + hit.getPos().y);
+                net.minecraft.text.Text.literal("expected hit Y at visual top " + (full.getY() + 0.5) + ", got " + hit.getPos().y));
         ctx.complete();
     }
 
@@ -120,19 +120,19 @@ public final class OffsetRaycastTargetingTest {
 
         BlockHitResult hit = slabbed(world, eye, end);
         ctx.assertTrue(hit.getType() == HitResult.Type.BLOCK,
-                "offset-aware raycast should hit the lowered block, got " + hit.getType());
+                net.minecraft.text.Text.literal("offset-aware raycast should hit the lowered block, got " + hit.getType()));
         ctx.assertTrue(hit.getBlockPos().equals(full),
-                "offset-aware raycast should target the lowered full block " + full
-                        + ", got " + hit.getBlockPos());
+                net.minecraft.text.Text.literal("offset-aware raycast should target the lowered full block " + full
+                        + ", got " + hit.getBlockPos()));
         ctx.assertTrue(hit.getSide() == Direction.NORTH,
-                "expected NORTH face (player-facing), got " + hit.getSide());
+                net.minecraft.text.Text.literal("expected NORTH face (player-facing), got " + hit.getSide()));
 
         // Negative control: stock vanilla cannot see the block at this aim.
         HitResult van = vanilla(world, eye, end);
         boolean vanillaSawBlock = van.getType() == HitResult.Type.BLOCK
                 && ((BlockHitResult) van).getBlockPos().equals(full);
         ctx.assertFalse(vanillaSawBlock,
-                "control failed: vanilla DDA unexpectedly hit the lowered block — bug geometry invalid");
+                net.minecraft.text.Text.literal("control failed: vanilla DDA unexpectedly hit the lowered block — bug geometry invalid"));
         ctx.complete();
     }
 
@@ -147,7 +147,7 @@ public final class OffsetRaycastTargetingTest {
         BlockPos p = origin.add(4, 3, 4); // isolated, air all around -> dy = 0
         world.setBlockState(p, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
         ctx.assertTrue(SlabSupport.getYOffset(world, p, world.getBlockState(p)) == 0.0,
-                "fixture invalid: isolated block must have dy 0");
+                net.minecraft.text.Text.literal("fixture invalid: isolated block must have dy 0"));
 
         Vec3d centre = v(origin, 4.5, 3.5, 4.5);
         Vec3d[] eyes = {
@@ -163,16 +163,16 @@ public final class OffsetRaycastTargetingTest {
             BlockHitResult mine = slabbed(world, eye, end);
             HitResult van = vanilla(world, eye, end);
             ctx.assertTrue(van.getType() == HitResult.Type.BLOCK,
-                    "ray " + i + " control: vanilla should hit the block");
+                    net.minecraft.text.Text.literal("ray " + i + " control: vanilla should hit the block"));
             ctx.assertTrue(mine.getType() == HitResult.Type.BLOCK,
-                    "ray " + i + ": offset raycast should hit the block");
+                    net.minecraft.text.Text.literal("ray " + i + ": offset raycast should hit the block"));
             BlockHitResult vanBlock = (BlockHitResult) van;
             ctx.assertTrue(mine.getBlockPos().equals(vanBlock.getBlockPos()),
-                    "ray " + i + ": pos mismatch mine=" + mine.getBlockPos() + " vanilla=" + vanBlock.getBlockPos());
+                    net.minecraft.text.Text.literal("ray " + i + ": pos mismatch mine=" + mine.getBlockPos() + " vanilla=" + vanBlock.getBlockPos()));
             ctx.assertTrue(mine.getSide() == vanBlock.getSide(),
-                    "ray " + i + ": side mismatch mine=" + mine.getSide() + " vanilla=" + vanBlock.getSide());
+                    net.minecraft.text.Text.literal("ray " + i + ": side mismatch mine=" + mine.getSide() + " vanilla=" + vanBlock.getSide()));
             ctx.assertTrue(mine.getPos().squaredDistanceTo(vanBlock.getPos()) < EPS,
-                    "ray " + i + ": hit point mismatch mine=" + mine.getPos() + " vanilla=" + vanBlock.getPos());
+                    net.minecraft.text.Text.literal("ray " + i + ": hit point mismatch mine=" + mine.getPos() + " vanilla=" + vanBlock.getPos()));
         }
         ctx.complete();
     }
@@ -196,7 +196,7 @@ public final class OffsetRaycastTargetingTest {
 
         BlockHitResult hit = slabbed(world, eye, end);
         ctx.assertTrue(hit.getBlockPos().equals(near),
-                "nearest block should win: expected " + near + ", got " + hit.getBlockPos());
+                net.minecraft.text.Text.literal("nearest block should win: expected " + near + ", got " + hit.getBlockPos()));
         ctx.complete();
     }
 
@@ -217,7 +217,7 @@ public final class OffsetRaycastTargetingTest {
 
         double slabDy = SlabSupport.getYOffset(world, sideSlab, world.getBlockState(sideSlab));
         ctx.assertTrue(slabDy == -0.5,
-                "fixture invalid: side slab beside lowered FB should inherit dy=-0.5, got " + slabDy);
+                net.minecraft.text.Text.literal("fixture invalid: side slab beside lowered FB should inherit dy=-0.5, got " + slabDy));
 
         // Lowered bottom slab outline spans world Y [slab.y-0.5, slab.y]; aim at its
         // east face at mid-height (slab.y - 0.25), a layer vanilla DDA skips.
@@ -228,16 +228,16 @@ public final class OffsetRaycastTargetingTest {
         BlockHitResult hit = slabbed(world, eye, end);
         ctx.assertTrue(hit.getType() == HitResult.Type.BLOCK
                         && hit.getBlockPos().equals(sideSlab),
-                "offset-aware raycast should target the lowered side slab " + sideSlab
-                        + ", got " + hit.getType() + " " + hit.getBlockPos());
+                net.minecraft.text.Text.literal("offset-aware raycast should target the lowered side slab " + sideSlab
+                        + ", got " + hit.getType() + " " + hit.getBlockPos()));
         ctx.assertTrue(hit.getSide() == Direction.EAST,
-                "expected EAST face, got " + hit.getSide());
+                net.minecraft.text.Text.literal("expected EAST face, got " + hit.getSide()));
 
         HitResult van = vanilla(world, eye, end);
         boolean vanillaSawSlab = van.getType() == HitResult.Type.BLOCK
                 && ((BlockHitResult) van).getBlockPos().equals(sideSlab);
         ctx.assertFalse(vanillaSawSlab,
-                "control failed: vanilla unexpectedly hit the lowered side slab at mid-height");
+                net.minecraft.text.Text.literal("control failed: vanilla unexpectedly hit the lowered side slab at mid-height"));
         ctx.complete();
     }
 
@@ -264,14 +264,14 @@ public final class OffsetRaycastTargetingTest {
         world.setBlockState(fence, Blocks.OAK_FENCE.getDefaultState(), Block.NOTIFY_LISTENERS);
 
         double dy = SlabSupport.getVisualYOffset(world, fence, world.getBlockState(fence));
-        ctx.assertTrue(dy < -1.0e-6, "fence on a bottom slab must resolve a lowered dy, got " + dy);
+        ctx.assertTrue(dy < -1.0e-6, net.minecraft.text.Text.literal("fence on a bottom slab must resolve a lowered dy, got " + dy));
 
         VoxelShape outline = world.getBlockState(fence).getOutlineShape(world, fence, ShapeContext.absent());
-        ctx.assertFalse(outline.isEmpty(), "fence outline should be non-empty");
+        ctx.assertFalse(outline.isEmpty(), net.minecraft.text.Text.literal("fence outline should be non-empty"));
         double minY = outline.getBoundingBox().minY;
         ctx.assertTrue(Math.abs(minY - dy) < 1.0e-6,
-                "fence-on-slab outline minY must follow the lowered dy (" + dy + "), got minY=" + minY
-                        + " — the outline/raycast must match the visually-lowered model (GH #21)");
+                net.minecraft.text.Text.literal("fence-on-slab outline minY must follow the lowered dy (" + dy + "), got minY=" + minY
+                        + " — the outline/raycast must match the visually-lowered model (GH #21)"));
         ctx.complete();
     }
 
@@ -289,10 +289,10 @@ public final class OffsetRaycastTargetingTest {
                 Block.NOTIFY_LISTENERS);
         BlockPos torch = slab.up();
         world.setBlockState(torch, Blocks.TORCH.getDefaultState(), Block.NOTIFY_LISTENERS);
-        ctx.assertTrue(world.getBlockState(torch).isOf(Blocks.TORCH), "fixture: torch must survive on slab top");
+        ctx.assertTrue(world.getBlockState(torch).isOf(Blocks.TORCH), net.minecraft.text.Text.literal("fixture: torch must survive on slab top"));
 
         double dy = SlabSupport.getYOffset(world, torch, world.getBlockState(torch));
-        ctx.assertTrue(dy == -0.5, "fixture: floor torch on slab should be lowered -0.5, got " + dy);
+        ctx.assertTrue(dy == -0.5, net.minecraft.text.Text.literal("fixture: floor torch on slab should be lowered -0.5, got " + dy));
 
         // Aim horizontally at the torch column at the lowered comfort-post mid-height.
         double y = torch.getY() - 0.25;
@@ -300,8 +300,8 @@ public final class OffsetRaycastTargetingTest {
         Vec3d end = v(origin, 3.5, y - origin.getY(), 7.5);
         BlockHitResult hit = slabbed(world, eye, end);
         ctx.assertTrue(hit.getType() == HitResult.Type.BLOCK && hit.getBlockPos().equals(torch),
-                "offset-aware raycast should target the lowered floor torch " + torch
-                        + ", got " + hit.getType() + " " + hit.getBlockPos());
+                net.minecraft.text.Text.literal("offset-aware raycast should target the lowered floor torch " + torch
+                        + ", got " + hit.getType() + " " + hit.getBlockPos()));
         ctx.complete();
     }
 
@@ -325,7 +325,7 @@ public final class OffsetRaycastTargetingTest {
 
         double dy = SlabSupport.getYOffset(world, compound, world.getBlockState(compound));
         ctx.assertTrue(dy == -1.0,
-                "fixture: full block above lowered side slab should be compound dy=-1.0, got " + dy);
+                net.minecraft.text.Text.literal("fixture: full block above lowered side slab should be compound dy=-1.0, got " + dy));
 
         // Compound outline spans [compound.y-1.0, compound.y]; aim at its upper region
         // (compound.y-0.25), which lies in the cell BELOW compound's logical cell.
@@ -334,14 +334,14 @@ public final class OffsetRaycastTargetingTest {
         Vec3d end = v(origin, sideSlab.getX() + 0.0 - origin.getX(), y - origin.getY(), sideSlab.getZ() + 0.5 - origin.getZ());
         BlockHitResult hit = slabbed(world, eye, end);
         ctx.assertTrue(hit.getType() == HitResult.Type.BLOCK && hit.getBlockPos().equals(compound),
-                "±1 window should find the -1.0 compound owner " + compound
-                        + " from the cell below, got " + hit.getType() + " " + hit.getBlockPos());
+                net.minecraft.text.Text.literal("±1 window should find the -1.0 compound owner " + compound
+                        + " from the cell below, got " + hit.getType() + " " + hit.getBlockPos()));
 
         HitResult van = vanilla(world, eye, end);
         boolean vanillaSawCompound = van.getType() == HitResult.Type.BLOCK
                 && ((BlockHitResult) van).getBlockPos().equals(compound);
         ctx.assertFalse(vanillaSawCompound,
-                "control: vanilla should not see the compound owner at this sub-cell aim");
+                net.minecraft.text.Text.literal("control: vanilla should not see the compound owner at this sub-cell aim"));
         ctx.complete();
     }
 
@@ -368,18 +368,18 @@ public final class OffsetRaycastTargetingTest {
         // (offset-aware targeting of LOWERED objects is covered by the -0.5 tests elsewhere here).
         double dy = SlabSupport.getYOffset(world, lantern, world.getBlockState(lantern));
         ctx.assertTrue(dy == 0.0,
-                "fixture: hanging lantern under top slab now hangs FLUSH 0.0 (reach-up deprecated), got " + dy);
+                net.minecraft.text.Text.literal("fixture: hanging lantern under top slab now hangs FLUSH 0.0 (reach-up deprecated), got " + dy));
 
         // Aim horizontally at the centre of the lantern's actual outline.
         VoxelShape outline = world.getBlockState(lantern).getOutlineShape(world, lantern, ShapeContext.absent());
-        ctx.assertFalse(outline.isEmpty(), "lantern outline non-empty");
+        ctx.assertFalse(outline.isEmpty(), net.minecraft.text.Text.literal("lantern outline non-empty"));
         double midY = lantern.getY() + (outline.getBoundingBox().minY + outline.getBoundingBox().maxY) / 2.0;
         Vec3d eye = v(origin, 3.5, midY - origin.getY(), 0.5);
         Vec3d end = v(origin, 3.5, midY - origin.getY(), 7.5);
         BlockHitResult hit = slabbed(world, eye, end);
         ctx.assertTrue(hit.getType() == HitResult.Type.BLOCK && hit.getBlockPos().equals(lantern),
-                "raycast should target the flush hanging lantern " + lantern
-                        + ", got " + hit.getType() + " " + hit.getBlockPos());
+                net.minecraft.text.Text.literal("raycast should target the flush hanging lantern " + lantern
+                        + ", got " + hit.getType() + " " + hit.getBlockPos()));
         ctx.complete();
     }
 
@@ -396,7 +396,7 @@ public final class OffsetRaycastTargetingTest {
 
         Block tsGrassSlab = Registries.BLOCK.get(Identifier.of("terrainslabs", "grass_slab"));
         ctx.assertTrue(tsGrassSlab != Blocks.AIR,
-                "fixture: terrainslabs:grass_slab must be registered (Terrain Slabs loaded)");
+                net.minecraft.text.Text.literal("fixture: terrainslabs:grass_slab must be registered (Terrain Slabs loaded)"));
 
         BlockPos slab = origin.add(3, 2, 3);
         var slabState = tsGrassSlab.getDefaultState();
@@ -406,7 +406,7 @@ public final class OffsetRaycastTargetingTest {
         world.setBlockState(slab, slabState, Block.NOTIFY_LISTENERS);
         ctx.assertTrue(
                 CompatHooks.customSlabSurfaceKind(world.getBlockState(slab)) == CompatSlabSurfaceKind.BOTTOM_LIKE,
-                "fixture: TS grass slab should classify BOTTOM_LIKE");
+                net.minecraft.text.Text.literal("fixture: TS grass slab should classify BOTTOM_LIKE"));
 
         // A stripped log is a CURATED slab-sit object (in the isSlabSitCandidate allow-list) and
         // still lowers onto a TS surface. A plain GRASS block is generic natural terrain and must
@@ -416,7 +416,7 @@ public final class OffsetRaycastTargetingTest {
         BlockPos log = slab.up();
         world.setBlockState(log, Blocks.STRIPPED_SPRUCE_LOG.getDefaultState(), Block.NOTIFY_LISTENERS);
         double logDy = SlabSupport.getYOffset(world, log, world.getBlockState(log));
-        ctx.assertTrue(logDy == -0.5, "control: stripped log (curated object) on TS surface should lower -0.5, got " + logDy);
+        ctx.assertTrue(logDy == -0.5, net.minecraft.text.Text.literal("control: stripped log (curated object) on TS surface should lower -0.5, got " + logDy));
 
         BlockPos grassSlab2 = origin.add(5, 2, 3);
         world.setBlockState(grassSlab2, slabState, Block.NOTIFY_LISTENERS);
@@ -424,8 +424,8 @@ public final class OffsetRaycastTargetingTest {
         world.setBlockState(grass, Blocks.GRASS_BLOCK.getDefaultState(), Block.NOTIFY_LISTENERS);
         double grassDy = SlabSupport.getYOffset(world, grass, world.getBlockState(grass));
         ctx.assertTrue(grassDy == 0.0,
-                "grass block (generic terrain) on a Terrain Slabs surface must stay FLUSH (0.0) — "
-                        + "lowering opaque terrain cubes tears world holes; got " + grassDy);
+                net.minecraft.text.Text.literal("grass block (generic terrain) on a Terrain Slabs surface must stay FLUSH (0.0) — "
+                        + "lowering opaque terrain cubes tears world holes; got " + grassDy));
         ctx.complete();
     }
 
@@ -441,7 +441,7 @@ public final class OffsetRaycastTargetingTest {
         ServerWorld world = ctx.getWorld();
         BlockPos origin = ctx.getAbsolutePos(BlockPos.ORIGIN);
         Block ts = Registries.BLOCK.get(Identifier.of("terrainslabs", "grass_slab"));
-        ctx.assertTrue(ts != Blocks.AIR, "fixture: Terrain Slabs loaded");
+        ctx.assertTrue(ts != Blocks.AIR, net.minecraft.text.Text.literal("fixture: Terrain Slabs loaded"));
 
         BlockPos tsPos = origin.add(3, 2, 3);
         var tss = ts.getDefaultState();
@@ -455,11 +455,11 @@ public final class OffsetRaycastTargetingTest {
         world.setBlockState(lPos, Blocks.LANTERN.getDefaultState(), Block.NOTIFY_LISTENERS);
 
         ctx.assertTrue(SlabSupport.getYOffset(world, sPos, world.getBlockState(sPos)) == -0.5,
-                "vanilla bottom slab on Terrain Slabs should lower -0.5");
+                net.minecraft.text.Text.literal("vanilla bottom slab on Terrain Slabs should lower -0.5"));
         double lDy = SlabSupport.getYOffset(world, lPos, world.getBlockState(lPos));
         ctx.assertTrue(lDy == -1.0,
-                "lantern on a vanilla BOTTOM slab on Terrain Slabs (mixed slab) must lower -1.0 to sit "
-                        + "flush (slab's own -0.5 + sit -0.5), was floating at " + lDy);
+                net.minecraft.text.Text.literal("lantern on a vanilla BOTTOM slab on Terrain Slabs (mixed slab) must lower -1.0 to sit "
+                        + "flush (slab's own -0.5 + sit -0.5), was floating at " + lDy));
         ctx.complete();
     }
 
@@ -473,7 +473,7 @@ public final class OffsetRaycastTargetingTest {
         ServerWorld world = ctx.getWorld();
         BlockPos origin = ctx.getAbsolutePos(BlockPos.ORIGIN);
         Block ts = Registries.BLOCK.get(Identifier.of("terrainslabs", "grass_slab"));
-        ctx.assertTrue(ts != Blocks.AIR, "fixture: Terrain Slabs loaded");
+        ctx.assertTrue(ts != Blocks.AIR, net.minecraft.text.Text.literal("fixture: Terrain Slabs loaded"));
 
         BlockPos tsPos = origin.add(3, 2, 3);
         var tss = ts.getDefaultState();
@@ -487,18 +487,18 @@ public final class OffsetRaycastTargetingTest {
         world.setBlockState(fbPos, Blocks.CRAFTING_TABLE.getDefaultState(), Block.NOTIFY_LISTENERS);
 
         ctx.assertTrue(SlabSupport.getYOffset(world, sPos, world.getBlockState(sPos)) == -0.5,
-                "fixture: vanilla bottom slab on Terrain Slabs should lower -0.5");
+                net.minecraft.text.Text.literal("fixture: vanilla bottom slab on Terrain Slabs should lower -0.5"));
         // Live path (no anchor yet — the transient first-frame value).
         double liveDy = SlabSupport.getYOffset(world, fbPos, world.getBlockState(fbPos));
         ctx.assertTrue(liveDy == -1.0,
-                "full block on a mixed slab must lower -1.0 on the live path, got " + liveDy);
+                net.minecraft.text.Text.literal("full block on a mixed slab must lower -1.0 on the live path, got " + liveDy));
         // Persisted anchor (the steady-state value after placement syncs) must MATCH — no pop.
         com.slabbed.anchor.SlabAnchorAttachment.addAnchor(world, fbPos, world.getBlockState(fbPos));
         ctx.assertTrue(com.slabbed.anchor.SlabAnchorAttachment.isAnchored(world, fbPos),
-                "fixture: full block on a bottom slab must anchor on placement");
+                net.minecraft.text.Text.literal("fixture: full block on a bottom slab must anchor on placement"));
         double anchoredDy = SlabSupport.getYOffset(world, fbPos, world.getBlockState(fbPos));
         ctx.assertTrue(anchoredDy == -1.0,
-                "anchored full block on a mixed slab must STAY at -1.0 (no pop up to -0.5), got " + anchoredDy);
+                net.minecraft.text.Text.literal("anchored full block on a mixed slab must STAY at -1.0 (no pop up to -0.5), got " + anchoredDy));
         ctx.complete();
     }
 
@@ -511,7 +511,7 @@ public final class OffsetRaycastTargetingTest {
         ServerWorld world = ctx.getWorld();
         BlockPos origin = ctx.getAbsolutePos(BlockPos.ORIGIN);
         Block ts = Registries.BLOCK.get(Identifier.of("terrainslabs", "grass_slab"));
-        ctx.assertTrue(ts != Blocks.AIR, "fixture: Terrain Slabs loaded");
+        ctx.assertTrue(ts != Blocks.AIR, net.minecraft.text.Text.literal("fixture: Terrain Slabs loaded"));
 
         BlockPos tsPos = origin.add(3, 2, 3);
         var tss = ts.getDefaultState();
@@ -524,8 +524,8 @@ public final class OffsetRaycastTargetingTest {
 
         double dy = SlabSupport.getYOffset(world, topPos, world.getBlockState(topPos));
         ctx.assertTrue(dy == -1.0,
-                "vanilla TOP slab on a Terrain Slabs bottom must lower -1.0 to sit flush (was a "
-                        + "half-block gap at -0.5), got " + dy);
+                net.minecraft.text.Text.literal("vanilla TOP slab on a Terrain Slabs bottom must lower -1.0 to sit flush (was a "
+                        + "half-block gap at -0.5), got " + dy));
         ctx.complete();
     }
 
@@ -537,7 +537,7 @@ public final class OffsetRaycastTargetingTest {
         ServerWorld world = ctx.getWorld();
         BlockPos origin = ctx.getAbsolutePos(BlockPos.ORIGIN);
         Block ts = Registries.BLOCK.get(Identifier.of("terrainslabs", "grass_slab"));
-        ctx.assertTrue(ts != Blocks.AIR, "fixture: Terrain Slabs loaded");
+        ctx.assertTrue(ts != Blocks.AIR, net.minecraft.text.Text.literal("fixture: Terrain Slabs loaded"));
 
         BlockPos tsPos = origin.add(3, 2, 3);
         var tss = ts.getDefaultState();
@@ -551,10 +551,10 @@ public final class OffsetRaycastTargetingTest {
         world.setBlockState(l2, Blocks.OAK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM), Block.NOTIFY_LISTENERS);
 
         ctx.assertTrue(SlabSupport.getYOffset(world, l1, world.getBlockState(l1)) == -0.5,
-                "fixture: mixed slab (vanilla bottom on terrain) is -0.5");
+                net.minecraft.text.Text.literal("fixture: mixed slab (vanilla bottom on terrain) is -0.5"));
         double l2Dy = SlabSupport.getYOffset(world, l2, world.getBlockState(l2));
         ctx.assertTrue(l2Dy == -1.0,
-                "vanilla slab stacked on a mixed slab must chain to -1.0 (was floating at -0.5), got " + l2Dy);
+                net.minecraft.text.Text.literal("vanilla slab stacked on a mixed slab must chain to -1.0 (was floating at -0.5), got " + l2Dy));
         ctx.complete();
     }
 
@@ -575,10 +575,10 @@ public final class OffsetRaycastTargetingTest {
         world.setBlockState(lantern, Blocks.LANTERN.getDefaultState(), Block.NOTIFY_LISTENERS);
 
         ctx.assertTrue(SlabSupport.getYOffset(world, cantilever, world.getBlockState(cantilever)) == -0.5,
-                "fixture: cantilevered support should be lowered -0.5");
+                net.minecraft.text.Text.literal("fixture: cantilevered support should be lowered -0.5"));
         double lDy = SlabSupport.getYOffset(world, lantern, world.getBlockState(lantern));
         ctx.assertTrue(lDy == -0.5,
-                "lantern on a cantilevered lowered support must lower to match (was floating at 0), got " + lDy);
+                net.minecraft.text.Text.literal("lantern on a cantilevered lowered support must lower to match (was floating at 0), got " + lDy));
         ctx.complete();
     }
 
@@ -600,7 +600,7 @@ public final class OffsetRaycastTargetingTest {
         BlockPos[] targets = { dbl, stair };
         for (BlockPos t : targets) {
             ctx.assertTrue(SlabSupport.getYOffset(world, t, world.getBlockState(t)) == 0.0,
-                    "fixture: " + t + " must be non-offset");
+                    net.minecraft.text.Text.literal("fixture: " + t + " must be non-offset"));
             Vec3d centre = v(origin, t.getX() + 0.5 - origin.getX(), t.getY() + 0.5 - origin.getY(), t.getZ() + 0.5 - origin.getZ());
             Vec3d[] eyes = {
                     centre.add(0, 3.0, 0),
@@ -617,7 +617,7 @@ public final class OffsetRaycastTargetingTest {
                     // If vanilla misses (grazing past a non-cube shape), only require the
                     // offset raycaster to also not invent a different block.
                     ctx.assertTrue(mine.getType() != HitResult.Type.BLOCK || mine.getBlockPos().equals(t),
-                            t + " ray " + i + ": unexpected hit " + mine.getBlockPos());
+                            net.minecraft.text.Text.literal(t + " ray " + i + ": unexpected hit " + mine.getBlockPos()));
                     continue;
                 }
                 BlockHitResult vanBlock = (BlockHitResult) van;
@@ -625,8 +625,8 @@ public final class OffsetRaycastTargetingTest {
                                 && mine.getBlockPos().equals(vanBlock.getBlockPos())
                                 && mine.getSide() == vanBlock.getSide()
                                 && mine.getPos().squaredDistanceTo(vanBlock.getPos()) < EPS,
-                        t + " ray " + i + ": parity mismatch mine=(" + mine.getBlockPos() + "," + mine.getSide()
-                                + ") vanilla=(" + vanBlock.getBlockPos() + "," + vanBlock.getSide() + ")");
+                        net.minecraft.text.Text.literal(t + " ray " + i + ": parity mismatch mine=(" + mine.getBlockPos() + "," + mine.getSide()
+                                + ") vanilla=(" + vanBlock.getBlockPos() + "," + vanBlock.getSide() + ")"));
             }
         }
         ctx.complete();
@@ -659,10 +659,10 @@ public final class OffsetRaycastTargetingTest {
         BlockPos aLant = aTop.up();
         world.setBlockState(aLant, Blocks.LANTERN.getDefaultState(), Block.NOTIFY_LISTENERS);
         ctx.assertTrue(SlabSupport.getYOffset(world, aTop, world.getBlockState(aTop)) == -0.5,
-                "fixture: TOP slab on a lowered full block must render lowered -0.5");
+                net.minecraft.text.Text.literal("fixture: TOP slab on a lowered full block must render lowered -0.5"));
         double aLantDy = SlabSupport.getYOffset(world, aLant, world.getBlockState(aLant));
         ctx.assertTrue(aLantDy == -0.5,
-                "lantern on a lowered TOP slab must follow it down (was floating at 0.0), got " + aLantDy);
+                net.minecraft.text.Text.literal("lantern on a lowered TOP slab must follow it down (was floating at 0.0), got " + aLantDy));
 
         // 2) Chain on the same lowered-TOP-slab arrangement (chains are excluded from the
         //    overhead hanger-follow path, so this exercises the sit-on-slab path directly).
@@ -676,7 +676,7 @@ public final class OffsetRaycastTargetingTest {
         world.setBlockState(bChain, Blocks.IRON_CHAIN.getDefaultState(), Block.NOTIFY_LISTENERS);
         double bChainDy = SlabSupport.getYOffset(world, bChain, world.getBlockState(bChain));
         ctx.assertTrue(bChainDy == -0.5,
-                "chain on a lowered TOP slab must follow it down (was floating at 0.0), got " + bChainDy);
+                net.minecraft.text.Text.literal("chain on a lowered TOP slab must follow it down (was floating at 0.0), got " + bChainDy));
 
         // 3) Lantern on a vanilla DOUBLE slab that sits on a lowered full block.
         BlockPos c0 = origin.add(5, 2, 1);
@@ -688,15 +688,15 @@ public final class OffsetRaycastTargetingTest {
         BlockPos cLant = cDbl.up();
         world.setBlockState(cLant, Blocks.LANTERN.getDefaultState(), Block.NOTIFY_LISTENERS);
         ctx.assertTrue(SlabSupport.getYOffset(world, cDbl, world.getBlockState(cDbl)) == -0.5,
-                "fixture: DOUBLE slab on a lowered full block must render lowered -0.5");
+                net.minecraft.text.Text.literal("fixture: DOUBLE slab on a lowered full block must render lowered -0.5"));
         double cLantDy = SlabSupport.getYOffset(world, cLant, world.getBlockState(cLant));
         ctx.assertTrue(cLantDy == -0.5,
-                "lantern on a lowered DOUBLE slab must follow it down (was floating at 0.0), got " + cLantDy);
+                net.minecraft.text.Text.literal("lantern on a lowered DOUBLE slab must follow it down (was floating at 0.0), got " + cLantDy));
 
         // 4) Lantern on a vanilla TOP slab placed directly on a Terrain Slabs BOTTOM_LIKE
         //    surface (the exact TS+VS combo from the report).
         Block ts = Registries.BLOCK.get(Identifier.of("terrainslabs", "grass_slab"));
-        ctx.assertTrue(ts != Blocks.AIR, "fixture: Terrain Slabs loaded");
+        ctx.assertTrue(ts != Blocks.AIR, net.minecraft.text.Text.literal("fixture: Terrain Slabs loaded"));
         var tsBottom = ts.getDefaultState();
         if (tsBottom.contains(SlabBlock.TYPE)) {
             tsBottom = tsBottom.with(SlabBlock.TYPE, SlabType.BOTTOM);
@@ -709,7 +709,7 @@ public final class OffsetRaycastTargetingTest {
         world.setBlockState(dLant, Blocks.LANTERN.getDefaultState(), Block.NOTIFY_LISTENERS);
         double dLantDy = SlabSupport.getYOffset(world, dLant, world.getBlockState(dLant));
         ctx.assertTrue(dLantDy == -0.5,
-                "lantern on a TOP slab on a Terrain Slabs surface must lower -0.5, got " + dLantDy);
+                net.minecraft.text.Text.literal("lantern on a TOP slab on a Terrain Slabs surface must lower -0.5, got " + dLantDy));
         ctx.complete();
     }
 
@@ -728,10 +728,10 @@ public final class OffsetRaycastTargetingTest {
         BlockPos aLant = aTop.up();
         world.setBlockState(aLant, Blocks.LANTERN.getDefaultState(), Block.NOTIFY_LISTENERS);
         ctx.assertTrue(SlabSupport.getYOffset(world, aTop, world.getBlockState(aTop)) == 0.0,
-                "fixture: TOP slab on solid ground must be non-lowered");
+                net.minecraft.text.Text.literal("fixture: TOP slab on solid ground must be non-lowered"));
         double aLantDy = SlabSupport.getYOffset(world, aLant, world.getBlockState(aLant));
         ctx.assertTrue(aLantDy == 0.0,
-                "lantern on a normal (non-lowered) TOP slab must stay at 0.0, got " + aLantDy);
+                net.minecraft.text.Text.literal("lantern on a normal (non-lowered) TOP slab must stay at 0.0, got " + aLantDy));
 
         // DOUBLE slab on solid ground (not lowered) -> lantern stays at 0.0.
         BlockPos b0 = origin.add(5, 2, 2);
@@ -741,10 +741,10 @@ public final class OffsetRaycastTargetingTest {
         BlockPos bLant = bDbl.up();
         world.setBlockState(bLant, Blocks.LANTERN.getDefaultState(), Block.NOTIFY_LISTENERS);
         ctx.assertTrue(SlabSupport.getYOffset(world, bDbl, world.getBlockState(bDbl)) == 0.0,
-                "fixture: DOUBLE slab on solid ground must be non-lowered");
+                net.minecraft.text.Text.literal("fixture: DOUBLE slab on solid ground must be non-lowered"));
         double bLantDy = SlabSupport.getYOffset(world, bLant, world.getBlockState(bLant));
         ctx.assertTrue(bLantDy == 0.0,
-                "lantern on a normal (non-lowered) DOUBLE slab must stay at 0.0, got " + bLantDy);
+                net.minecraft.text.Text.literal("lantern on a normal (non-lowered) DOUBLE slab must stay at 0.0, got " + bLantDy));
         ctx.complete();
     }
 
@@ -779,19 +779,19 @@ public final class OffsetRaycastTargetingTest {
         world.setBlockState(slab, Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
 
         ctx.assertTrue(com.slabbed.anchor.SlabAnchorAttachment.isAnchored(world, grass),
-                "fixture: grass must stay anchored after the adjacent lowered FB is removed");
+                net.minecraft.text.Text.literal("fixture: grass must stay anchored after the adjacent lowered FB is removed"));
         double supportDy = SlabSupport.getYOffset(world, grass, world.getBlockState(grass));
         ctx.assertTrue(supportDy == -0.5,
-                "fixture: anchor-lowered grass support must render -0.5, got " + supportDy);
+                net.minecraft.text.Text.literal("fixture: anchor-lowered grass support must render -0.5, got " + supportDy));
         ctx.assertTrue(!world.getBlockState(grass.down()).getBlock().equals(Blocks.STONE_SLAB),
-                "fixture: support's column below must be a non-slab solid block (no slab in lantern column)");
+                net.minecraft.text.Text.literal("fixture: support's column below must be a non-slab solid block (no slab in lantern column)"));
 
         BlockPos lantern = grass.up();
         world.setBlockState(lantern, Blocks.LANTERN.getDefaultState(), Block.NOTIFY_LISTENERS);
         double lanternDy = SlabSupport.getYOffset(world, lantern, world.getBlockState(lantern));
         ctx.assertTrue(lanternDy == -0.5,
-                "standing lantern on an anchor-lowered full block (solid below) must lower -0.5 "
-                        + "to sit flush, was floating at " + lanternDy);
+                net.minecraft.text.Text.literal("standing lantern on an anchor-lowered full block (solid below) must lower -0.5 "
+                        + "to sit flush, was floating at " + lanternDy));
         ctx.complete();
     }
 
@@ -813,13 +813,13 @@ public final class OffsetRaycastTargetingTest {
         world.setBlockState(compound, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
         double supportDy = SlabSupport.getYOffset(world, compound, world.getBlockState(compound));
         ctx.assertTrue(supportDy == -1.0,
-                "fixture: compound support must be dy=-1.0, got " + supportDy);
+                net.minecraft.text.Text.literal("fixture: compound support must be dy=-1.0, got " + supportDy));
 
         BlockPos lantern = compound.up();
         world.setBlockState(lantern, Blocks.LANTERN.getDefaultState(), Block.NOTIFY_LISTENERS);
         double lanternDy = SlabSupport.getYOffset(world, lantern, world.getBlockState(lantern));
         ctx.assertTrue(lanternDy == -1.0,
-                "standing lantern on a compound -1.0 support must inherit -1.0 (not a flat -0.5), got " + lanternDy);
+                net.minecraft.text.Text.literal("standing lantern on a compound -1.0 support must inherit -1.0 (not a flat -0.5), got " + lanternDy));
         ctx.complete();
     }
 }

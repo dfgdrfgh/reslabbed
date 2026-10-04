@@ -46,17 +46,17 @@ public final class PlacementDyStoreTest {
         BlockPos subject = buildMinusOneSubject(ctx, 1, 1, true);
 
         ctx.assertTrue(SlabPlacementDyAttachment.hasStoredDy(w, subject),
-                "setup: an anchored lowered cell must carry its placement height");
+                net.minecraft.text.Text.literal("setup: an anchored lowered cell must carry its placement height"));
         double before = dy(w, subject);
         ctx.assertTrue(Math.abs(before + 1.0) <= EPS,
-                "fixture: the anchored subject must read -1.0, got " + before);
+                net.minecraft.text.Text.literal("fixture: the anchored subject must read -1.0, got " + before));
 
         w.breakBlock(subject.down(), false);
 
         double after = dy(w, subject);
         ctx.assertTrue(sameHeight(before, after),
-                "LANE G: breaking the seat below moved a placed block from " + before + " to "
-                        + after + " — the stored placement height must win over every live lane");
+                net.minecraft.text.Text.literal("LANE G: breaking the seat below moved a placed block from " + before + " to "
+                        + after + " — the stored placement height must win over every live lane"));
         ctx.complete();
     }
 
@@ -73,21 +73,21 @@ public final class PlacementDyStoreTest {
         BlockPos subject = buildMinusOneSubject(ctx, 1, 1, false);
 
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, subject),
-                "setup: the old-world shape is an anchor with no store");
+                net.minecraft.text.Text.literal("setup: the old-world shape is an anchor with no store"));
         ctx.assertTrue(!SlabPlacementDyAttachment.hasStoredDy(w, subject),
-                "setup: this row must carry NO stored height, or it proves nothing about old worlds");
+                net.minecraft.text.Text.literal("setup: this row must carry NO stored height, or it proves nothing about old worlds"));
 
         double before = dy(w, subject);
         ctx.assertTrue(Math.abs(before + 1.0) <= EPS,
-                "old world: the anchored subject must still read -1.0, got " + before);
+                net.minecraft.text.Text.literal("old world: the anchored subject must still read -1.0, got " + before));
 
         w.breakBlock(subject.down(), false);
 
         double after = dy(w, subject);
         ctx.assertTrue(Math.abs(after + 0.5) <= EPS,
-                "old world: with no stored height the subject must resolve to the pre-store -0.5 "
+                net.minecraft.text.Text.literal("old world: with no stored height the subject must resolve to the pre-store -0.5 "
                         + "floor, got " + after + " — a different answer here means the store "
-                        + "changed worlds it never touched");
+                        + "changed worlds it never touched"));
         ctx.complete();
     }
 
@@ -108,11 +108,11 @@ public final class PlacementDyStoreTest {
 
         double subjectDy = dy(w, subject);
         ctx.assertTrue(Math.abs(subjectDy + 0.5) <= EPS,
-                "fixture: an unanchored block on a bottom slab still reads -0.5, got " + subjectDy);
+                net.minecraft.text.Text.literal("fixture: an unanchored block on a bottom slab still reads -0.5, got " + subjectDy));
         ctx.assertTrue(!SlabAnchorAttachment.isAnchored(w, subject),
-                "fixture: setBlockState never runs onPlaced, so this cell must be unanchored");
+                net.minecraft.text.Text.literal("fixture: setBlockState never runs onPlaced, so this cell must be unanchored"));
         ctx.assertTrue(!SlabPlacementDyAttachment.hasStoredDy(w, subject),
-                "scope: an unanchored cell must carry NO stored height in this slice");
+                net.minecraft.text.Text.literal("scope: an unanchored cell must carry NO stored height in this slice"));
         ctx.complete();
     }
 
@@ -129,15 +129,15 @@ public final class PlacementDyStoreTest {
         SlabAnchorAttachment.addAnchor(w, subject, w.getBlockState(subject));
 
         ctx.assertTrue(SlabPlacementDyAttachment.hasStoredDy(w, subject),
-                "setup: the anchored block must carry its placement height");
+                net.minecraft.text.Text.literal("setup: the anchored block must carry its placement height"));
 
         w.breakBlock(subject, false);
 
         ctx.assertTrue(!SlabPlacementDyAttachment.hasStoredDy(w, subject),
-                "breaking the block must clear its stored height, or a later placement in the same "
-                        + "cell would take a dead block's height");
+                net.minecraft.text.Text.literal("breaking the block must clear its stored height, or a later placement in the same "
+                        + "cell would take a dead block's height"));
         ctx.assertTrue(!SlabAnchorAttachment.isAnchored(w, subject),
-                "breaking the block must clear its anchor too (pre-existing contract)");
+                net.minecraft.text.Text.literal("breaking the block must clear its anchor too (pre-existing contract)"));
         ctx.complete();
     }
 
@@ -152,16 +152,16 @@ public final class PlacementDyStoreTest {
         BlockPos pos = ctx.getAbsolutePos(BlockPos.ORIGIN).add(7, 3, 7);
 
         ctx.assertTrue(!SlabPlacementDyAttachment.record(w, pos, -0.3),
-                "a height off the sixteenths grid must be declined, not rounded");
+                net.minecraft.text.Text.literal("a height off the sixteenths grid must be declined, not rounded"));
         ctx.assertTrue(!SlabPlacementDyAttachment.hasStoredDy(w, pos),
-                "a declined height must leave no fact behind");
+                net.minecraft.text.Text.literal("a declined height must leave no fact behind"));
 
         for (double height : new double[] {-0.5, -1.0, -0.0625}) {
             ctx.assertTrue(SlabPlacementDyAttachment.record(w, pos, height),
-                    "an on-grid height (" + height + ") must be stored");
+                    net.minecraft.text.Text.literal("an on-grid height (" + height + ") must be stored"));
             double read = SlabPlacementDyAttachment.storedDy(w, pos);
             ctx.assertTrue(sameHeight(height, read),
-                    "stored " + height + " read back as " + read + " — the store must be exact");
+                    net.minecraft.text.Text.literal("stored " + height + " read back as " + read + " — the store must be exact"));
         }
         SlabPlacementDyAttachment.clear(w, pos);
         ctx.complete();
@@ -196,13 +196,13 @@ public final class PlacementDyStoreTest {
         anchor(w, seat, throughAddAnchor);
         double seatDy = dy(w, seat);
         ctx.assertTrue(Math.abs(seatDy + 0.5) <= EPS,
-                "fixture: the seat slab must read -0.5, got " + seatDy);
+                net.minecraft.text.Text.literal("fixture: the seat slab must read -0.5, got " + seatDy));
 
         BlockPos subject = seat.up();
         place(w, subject, Blocks.STRIPPED_JUNGLE_LOG.getDefaultState());
         anchor(w, subject, throughAddAnchor);
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, subject),
-                "fixture: the subject must be anchored");
+                net.minecraft.text.Text.literal("fixture: the subject must be anchored"));
         return subject;
     }
 

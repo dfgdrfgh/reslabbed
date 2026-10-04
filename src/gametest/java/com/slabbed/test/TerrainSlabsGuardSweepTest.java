@@ -78,7 +78,7 @@ public final class TerrainSlabsGuardSweepTest {
         BlockPos ts = vSlab.up();
         w.setBlockState(ts, tsBottom(), Block.NOTIFY_LISTENERS);
         ctx.assertTrue(CompatHooks.shouldSkipOffset(w.getBlockState(ts)),
-                "fixture: the shim block must be recognized as TS-owned (shouldSkipOffset true)");
+                net.minecraft.text.Text.literal("fixture: the shim block must be recognized as TS-owned (shouldSkipOffset true)"));
         return ts;
     }
 
@@ -89,11 +89,11 @@ public final class TerrainSlabsGuardSweepTest {
         BlockPos ts = buildTsOnVanillaSlab(ctx);
         double dy = SlabSupport.getYOffset(w, ts, w.getBlockState(ts));
         ctx.assertTrue(Math.abs(dy) <= EPS,
-                "GUARD: a TS-owned slab in a would-lower shape must read getYOffset 0.0 from "
-                        + "Slabbed (TS owns its offset; anything else is the double-offset leak), got " + dy);
+                net.minecraft.text.Text.literal("GUARD: a TS-owned slab in a would-lower shape must read getYOffset 0.0 from "
+                        + "Slabbed (TS owns its offset; anything else is the double-offset leak), got " + dy));
         double visual = SlabSupport.getVisualYOffset(w, ts, w.getBlockState(ts));
         ctx.assertTrue(Math.abs(visual) <= EPS,
-                "GUARD: getVisualYOffset must agree (the published per-position value), got " + visual);
+                net.minecraft.text.Text.literal("GUARD: getVisualYOffset must agree (the published per-position value), got " + visual));
         ctx.complete();
     }
 
@@ -103,8 +103,8 @@ public final class TerrainSlabsGuardSweepTest {
         ServerWorld w = ctx.getWorld();
         BlockPos ts = buildTsOnVanillaSlab(ctx);
         ctx.assertTrue(!SlabSupport.shouldOffset(w, ts, w.getBlockState(ts)),
-                "GUARD: shouldOffset must refuse a TS-owned block outright (the CompatHooks "
-                        + "early return) — a widened predicate must not reach past it");
+                net.minecraft.text.Text.literal("GUARD: shouldOffset must refuse a TS-owned block outright (the CompatHooks "
+                        + "early return) — a widened predicate must not reach past it"));
         ctx.complete();
     }
 
@@ -125,13 +125,13 @@ public final class TerrainSlabsGuardSweepTest {
         SlabAnchorAttachment.freezeLoweredOnPlace(w, ts, state);
         double dy = SlabSupport.getYOffset(w, ts, w.getBlockState(ts));
         ctx.assertTrue(Math.abs(dy - (-0.5)) <= EPS,
-                "PINNED: a TS-owned slab placed on a vanilla bottom slab must anchor and seat at "
+                net.minecraft.text.Text.literal("PINNED: a TS-owned slab placed on a vanilla bottom slab must anchor and seat at "
                         + "dy=-0.5 (live-confirmed correct WYSIWYG seating, maintainer ruling "
-                        + "2026-08-09) — the onPlaced chain must capture this shape, got dy=" + dy);
+                        + "2026-08-09) — the onPlaced chain must capture this shape, got dy=" + dy));
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, ts),
-                "PINNED: this shape must anchor — LAW 1 requires the height survive a later "
+                net.minecraft.text.Text.literal("PINNED: this shape must anchor — LAW 1 requires the height survive a later "
                         + "neighbour change, and only an anchor (or a stored placement height) "
-                        + "provides that");
+                        + "provides that"));
         ctx.complete();
     }
 
@@ -150,9 +150,9 @@ public final class TerrainSlabsGuardSweepTest {
         w.setBlockState(follower, Blocks.LANTERN.getDefaultState(), Block.NOTIFY_LISTENERS);
         double dy = SlabSupport.getYOffset(w, follower, w.getBlockState(follower));
         ctx.assertTrue(dy < -EPS,
-                "CONTROL (live-confirmed 2026-08-09): a standing object resting directly on a TS "
+                net.minecraft.text.Text.literal("CONTROL (live-confirmed 2026-08-09): a standing object resting directly on a TS "
                         + "bottom slab must still lower — the working compat lane, distinct from "
-                        + "Root Cause A's plain-solid-cube leak — got dy=" + dy);
+                        + "Root Cause A's plain-solid-cube leak — got dy=" + dy));
         ctx.complete();
     }
 
@@ -175,19 +175,19 @@ public final class TerrainSlabsGuardSweepTest {
             ActionResult result = PlacementHarness.useHeldItem(w, player, ts, Direction.UP, hit);
 
             ctx.assertTrue(result.isAccepted(),
-                    "floor-supported placement on Terrain bottom slab must succeed for " + block
-                            + "; got " + result);
+                    net.minecraft.text.Text.literal("floor-supported placement on Terrain bottom slab must succeed for " + block
+                            + "; got " + result));
             ctx.assertTrue(w.getBlockState(placedPos).isOf(block),
-                    "the expected floor-supported block must occupy the destination for " + block);
+                    net.minecraft.text.Text.literal("the expected floor-supported block must occupy the destination for " + block));
             double stored = SlabPlacementDyAttachment.storedDy(w, placedPos);
             ctx.assertTrue(Double.doubleToRawLongBits(stored)
                             == Double.doubleToRawLongBits(-0.5d),
-                    "player-authored floor object on Terrain dy=0 must freeze at -0.5 for "
-                            + block + "; got " + stored);
+                    net.minecraft.text.Text.literal("player-authored floor object on Terrain dy=0 must freeze at -0.5 for "
+                            + block + "; got " + stored));
             double visual = SlabSupport.getYOffset(w, placedPos, w.getBlockState(placedPos));
             ctx.assertTrue(Math.abs(visual - (-0.5d)) <= EPS,
-                    "floor object must visibly seat on the Terrain bottom slab for " + block
-                            + "; got dy=" + visual);
+                    net.minecraft.text.Text.literal("floor object must visibly seat on the Terrain bottom slab for " + block
+                            + "; got dy=" + visual));
         }
         ctx.complete();
     }
@@ -207,8 +207,8 @@ public final class TerrainSlabsGuardSweepTest {
         w.setBlockState(above, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
         double dy = SlabSupport.getYOffset(w, above, w.getBlockState(above));
         ctx.assertTrue(Math.abs(dy) <= EPS,
-                "an unauthored plain full block above Terrain must stay flush for world-hole safety; "
-                        + "got dy=" + dy);
+                net.minecraft.text.Text.literal("an unauthored plain full block above Terrain must stay flush for world-hole safety; "
+                        + "got dy=" + dy));
         ctx.complete();
     }
 
@@ -221,31 +221,31 @@ public final class TerrainSlabsGuardSweepTest {
         BlockPos ts = ground.up();
         w.setBlockState(ts, tsBottom(), Block.NOTIFY_LISTENERS);
         BlockPos above = ts.up();
-        ctx.assertTrue(w.getBlockState(above).isAir(), "fixture: the cell above the TS slab must start as air");
+        ctx.assertTrue(w.getBlockState(above).isAir(), net.minecraft.text.Text.literal("fixture: the cell above the TS slab must start as air"));
 
         PlayerEntity player = PlacementHarness.mockPlayerHolding(ctx, ts.north(3), new net.minecraft.item.ItemStack(Blocks.STONE.asItem(), 16));
         Vec3d hit = new Vec3d(ts.getX() + 0.5, ts.getY() + 0.5, ts.getZ() + 0.5);
         ActionResult result = PlacementHarness.useHeldItem(w, player, ts, Direction.UP, hit);
-        ctx.assertTrue(result.isAccepted(), "fixture: useOn on the TS slab's up face must place, got " + result);
+        ctx.assertTrue(result.isAccepted(), net.minecraft.text.Text.literal("fixture: useOn on the TS slab's up face must place, got " + result));
 
         BlockState placed = w.getBlockState(above);
         ctx.assertTrue(placed.isOf(Blocks.STONE),
-                "fixture: stone must land in the cell above the TS slab, got " + placed);
+                net.minecraft.text.Text.literal("fixture: stone must land in the cell above the TS slab, got " + placed));
         ctx.assertTrue(!SlabAnchorAttachment.isAnchored(w, above),
-                "a transaction-owned numeric height must not widen Terrain anchor propagation");
+                net.minecraft.text.Text.literal("a transaction-owned numeric height must not widen Terrain anchor propagation"));
         double stored = SlabPlacementDyAttachment.storedDy(w, above);
         ctx.assertTrue(Double.doubleToRawLongBits(stored) == Double.doubleToRawLongBits(-0.5d),
-                "player-authored full block on Terrain dy=0 must freeze at -0.5; got " + stored);
+                net.minecraft.text.Text.literal("player-authored full block on Terrain dy=0 must freeze at -0.5; got " + stored));
         double dy = SlabSupport.getYOffset(w, above, w.getBlockState(above));
         ctx.assertTrue(Math.abs(dy - (-0.5d)) <= EPS,
-                "player-authored full block must seat on the Terrain bottom slab; got dy=" + dy);
+                net.minecraft.text.Text.literal("player-authored full block must seat on the Terrain bottom slab; got dy=" + dy));
 
         w.setBlockState(ts, Blocks.AIR.getDefaultState(), Block.NOTIFY_ALL);
         ctx.assertTrue(w.getBlockState(above).isOf(Blocks.STONE),
-                "removing the authored support must not replace the full block");
+                net.minecraft.text.Text.literal("removing the authored support must not replace the full block"));
         double afterRemoval = SlabSupport.getYOffset(w, above, w.getBlockState(above));
         ctx.assertTrue(Math.abs(afterRemoval - (-0.5d)) <= EPS,
-                "the stored authored height must survive later support removal; got " + afterRemoval);
+                net.minecraft.text.Text.literal("the stored authored height must survive later support removal; got " + afterRemoval));
         ctx.complete();
     }
 
@@ -257,21 +257,21 @@ public final class TerrainSlabsGuardSweepTest {
         SlabAnchorAttachment.addAnchor(w, ts, w.getBlockState(ts));
         SlabAnchorAttachment.freezeLoweredOnPlace(w, ts, w.getBlockState(ts));
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, ts),
-                "fixture: the TS slab must hold the anchor this test exercises "
-                        + "(the same shape tsOnVanillaBottomSlabAnchorsAndSeatsAtHalfDrop pins)");
+                net.minecraft.text.Text.literal("fixture: the TS slab must hold the anchor this test exercises "
+                        + "(the same shape tsOnVanillaBottomSlabAnchorsAndSeatsAtHalfDrop pins)"));
 
         BlockPos subjectGround = ts.down(2).north();
         w.setBlockState(subjectGround, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
         BlockPos subject = subjectGround.up(2);
-        ctx.assertTrue(subject.equals(ts.north()), "fixture: the subject slab must be horizontally adjacent to the TS slab");
+        ctx.assertTrue(subject.equals(ts.north()), net.minecraft.text.Text.literal("fixture: the subject slab must be horizontally adjacent to the TS slab"));
         w.setBlockState(subject, Blocks.OAK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                 Block.NOTIFY_LISTENERS);
 
         double dy = SlabSupport.getYOffset(w, subject, w.getBlockState(subject));
         ctx.assertTrue(Math.abs(dy) <= EPS,
-                "a vanilla slab horizontally adjacent to an anchored TS slab and resting on "
+                net.minecraft.text.Text.literal("a vanilla slab horizontally adjacent to an anchored TS slab and resting on "
                         + "ordinary flush ground must stay flush; it must not inherit the TS "
-                        + "slab's anchor as a horizontal lowering source, got dy=" + dy);
+                        + "slab's anchor as a horizontal lowering source, got dy=" + dy));
         ctx.complete();
     }
 }

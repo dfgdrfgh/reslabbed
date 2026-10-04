@@ -91,8 +91,8 @@ public final class ClientCarpetDyAuthorityTest {
         place(w, subject, Blocks.WHITE_CARPET.getDefaultState());
         double commonDy = SlabSupport.getVisualYOffset(w, subject, w.getBlockState(subject));
         ctx.assertTrue(commonDy <= -0.5 + EPS,
-                "fixture: the carpet on a -1.0 support must itself be lowered past -0.5 by the "
-                        + "common authority, got " + commonDy);
+                net.minecraft.text.Text.literal("fixture: the carpet on a -1.0 support must itself be lowered past -0.5 by the "
+                        + "common authority, got " + commonDy));
 
         assertClientAgreesWithCommon(ctx, subject, "anchored white_carpet on a -1.0 support");
         ctx.complete();
@@ -138,7 +138,7 @@ public final class ClientCarpetDyAuthorityTest {
         double commonDy = SlabSupport.getVisualYOffset(w, pos, state);
         double clientDy = ClientDy.dyFor(w, pos, state);
         ctx.assertTrue(Math.abs(clientDy - commonDy) <= EPS,
-                "the client render path must consume the SAME dy as the shared authority for "
+                net.minecraft.text.Text.literal("the client render path must consume the SAME dy as the shared authority for "
                         + what + ": SlabSupport.getVisualYOffset=" + commonDy
                         + " but ClientDy.dyFor=" + clientDy
                         + " — ClientDy carries a carpet special case that bypasses getVisualYOffset "
@@ -146,7 +146,7 @@ public final class ClientCarpetDyAuthorityTest {
                         + "and outline draw the carpet flush while the common dy says it is lowered "
                         + "(live 2026-08-06 recorder 0ba17cf0: white_carpet dy=-1.000 ANCHORED and "
                         + "dy=-0.500 ANCHORED, both still rendering flush). maintainer ruling: 'everything "
-                        + "should be able to lower; no exceptions'");
+                        + "should be able to lower; no exceptions'"));
     }
 
     /** {@code stone_slab(BOTTOM) / stone} — returns the stone, hard-asserting it renders -0.5. */
@@ -158,7 +158,7 @@ public final class ClientCarpetDyAuthorityTest {
         place(w, support, Blocks.STONE.getDefaultState());
         double supportDy = SlabSupport.getYOffset(w, support, w.getBlockState(support));
         ctx.assertTrue(Math.abs(supportDy + 0.5) <= EPS,
-                "fixture: the stone support must itself render -0.5, got " + supportDy);
+                net.minecraft.text.Text.literal("fixture: the stone support must itself render -0.5, got " + supportDy));
         return support;
     }
 
@@ -187,7 +187,7 @@ public final class ClientCarpetDyAuthorityTest {
         SlabAnchorAttachment.addAnchor(w, subject, w.getBlockState(subject));
         double subjectDy = SlabSupport.getYOffset(w, subject, w.getBlockState(subject));
         ctx.assertTrue(Math.abs(subjectDy + 1.0) <= EPS,
-                "fixture: the subject log must render -1.0, got " + subjectDy);
+                net.minecraft.text.Text.literal("fixture: the subject log must render -1.0, got " + subjectDy));
         return subject;
     }
 

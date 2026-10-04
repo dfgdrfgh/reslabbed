@@ -41,30 +41,30 @@ public final class SlabbedDiagnosticsTest {
 
         // Base-0 block, outline followed the dy → no flag.
         ctx.assertTrue(!SlabbedDiagnostics.outlineMismatch(fence, -0.5, -0.5),
-                "a fence whose outline followed the dy must NOT flag");
+                net.minecraft.text.Text.literal("a fence whose outline followed the dy must NOT flag"));
         // Base-0 block, outline pinned at grid while visual lowered → real bug (the raycast class).
         ctx.assertTrue(SlabbedDiagnostics.outlineMismatch(fence, -0.5, 0.0),
-                "a fence outline pinned at grid while visual lowered MUST flag (the raycast bug)");
+                net.minecraft.text.Text.literal("a fence outline pinned at grid while visual lowered MUST flag (the raycast bug)"));
         // A BOTTOM slab (base 0) is decidable and flags the bug value.
         ctx.assertTrue(SlabbedDiagnostics.outlineMismatch(bottomSlab, -0.5, 0.0),
-                "a bottom slab with outline at grid while visual lowered MUST flag");
+                net.minecraft.text.Text.literal("a bottom slab with outline at grid while visual lowered MUST flag"));
         ctx.assertTrue(!SlabbedDiagnostics.outlineMismatch(bed, -0.5, -0.5),
-                "a bed whose outline tracks the dy must NOT flag");
+                net.minecraft.text.Text.literal("a bed whose outline tracks the dy must NOT flag"));
         ctx.assertTrue(!SlabbedDiagnostics.outlineMismatch(fence, -0.5, Double.NaN),
-                "an empty outline must not produce a spurious mismatch");
+                net.minecraft.text.Text.literal("an empty outline must not produce a spurious mismatch"));
 
         // REGRESSION (recorder session c5ab15ce, 2026-07-02) — the recorded false positives:
         // a lowered TOP slab has outline base 0.5, so outlineMinY 0.0 at visualDy -0.5 is
         // CORRECT, not a mismatch (proven in AnchoredSlabTriadTest). Top slabs and hanging
         // decorations (chain ~0.41, lantern ~0.06 base) are excluded from this check entirely.
         ctx.assertTrue(!SlabbedDiagnostics.outlineMismatch(topSlab, -0.5, 0.0),
-                "a lowered TOP slab (base 0.5 -> outlineMinY 0.0) must NOT flag — recorded false positive");
+                net.minecraft.text.Text.literal("a lowered TOP slab (base 0.5 -> outlineMinY 0.0) must NOT flag — recorded false positive"));
         ctx.assertTrue(!SlabbedDiagnostics.outlineMismatch(chain, -0.5, -0.094),
-                "a chain (nonzero outline base) must NOT flag — this was a false positive");
+                net.minecraft.text.Text.literal("a chain (nonzero outline base) must NOT flag — this was a false positive"));
         ctx.assertTrue(!SlabbedDiagnostics.outlineMismatch(lantern, 0.5, 0.563),
-                "a hanging lantern (nonzero base) must NOT flag");
+                net.minecraft.text.Text.literal("a hanging lantern (nonzero base) must NOT flag"));
         ctx.assertTrue(!SlabbedDiagnostics.outlineMismatch(chain, -0.5, 0.0),
-                "even an extreme chain value must not flag — chains are not decidable here");
+                net.minecraft.text.Text.literal("even an extreme chain value must not flag — chains are not decidable here"));
         ctx.complete();
     }
 
@@ -77,11 +77,11 @@ public final class SlabbedDiagnosticsTest {
     @GameTest(structure = "fabric-gametest-api-v1:empty")
     public void dodoDetectorFiresOnLoweredOpaqueCube(TestContext ctx) {
         ctx.assertTrue(SlabbedDiagnostics.dodoShapePrecondition(true, -0.5),
-                "an opaque full cube at a nonzero dy is a DODO (see-through hole) risk");
+                net.minecraft.text.Text.literal("an opaque full cube at a nonzero dy is a DODO (see-through hole) risk"));
         ctx.assertTrue(!SlabbedDiagnostics.dodoShapePrecondition(true, 0.0),
-                "a flush opaque cube is fine");
+                net.minecraft.text.Text.literal("a flush opaque cube is fine"));
         ctx.assertTrue(!SlabbedDiagnostics.dodoShapePrecondition(false, -0.5),
-                "a non-opaque block lowered is normal, not a DODO");
+                net.minecraft.text.Text.literal("a non-opaque block lowered is normal, not a DODO"));
         ctx.complete();
     }
 
@@ -102,14 +102,14 @@ public final class SlabbedDiagnosticsTest {
         double floor = SlabSupport.minResolvedDy();
         double oneStepShort = floor / 2.0d;
         ctx.assertTrue(SlabbedDiagnostics.smooshRisk(lantern, floor),
-                "a decoration lowered to the resolver floor (" + floor + ") is a smoosh "
-                        + "(double-offset) risk");
+                net.minecraft.text.Text.literal("a decoration lowered to the resolver floor (" + floor + ") is a smoosh "
+                        + "(double-offset) risk"));
         ctx.assertTrue(!SlabbedDiagnostics.smooshRisk(lantern, oneStepShort),
-                "a decoration lowered short of the floor (" + oneStepShort + ") is normal");
+                net.minecraft.text.Text.literal("a decoration lowered short of the floor (" + oneStepShort + ") is normal"));
         ctx.assertTrue(!SlabbedDiagnostics.smooshRisk(oakSlab, floor),
-                "a slab is not a smoosh subject (compound stacks are legitimate)");
+                net.minecraft.text.Text.literal("a slab is not a smoosh subject (compound stacks are legitimate)"));
         ctx.assertTrue(!SlabbedDiagnostics.smooshRisk(stone, floor),
-                "an opaque full cube is a DODO, not a smoosh (classified separately)");
+                net.minecraft.text.Text.literal("an opaque full cube is a DODO, not a smoosh (classified separately)"));
         ctx.complete();
     }
 
@@ -128,15 +128,15 @@ public final class SlabbedDiagnosticsTest {
     public void smooshIgnoresAirButStillFiresOnRealDecorations(TestContext ctx) {
         double floor = SlabSupport.minResolvedDy();
         ctx.assertTrue(!SlabbedDiagnostics.smooshRisk(Blocks.AIR.getDefaultState(), floor),
-                "an air cell has no geometry to smoosh — it must NOT flag (4 of 6 SMOOSH rows in "
-                        + "a recorded live run were air)");
+                net.minecraft.text.Text.literal("an air cell has no geometry to smoosh — it must NOT flag (4 of 6 SMOOSH rows in "
+                        + "a recorded live run were air)"));
         ctx.assertTrue(!SlabbedDiagnostics.smooshRisk(Blocks.CAVE_AIR.getDefaultState(), floor),
-                "cave air is air too — the gate is isAir(), not an id comparison");
+                net.minecraft.text.Text.literal("cave air is air too — the gate is isAir(), not an id comparison"));
         ctx.assertTrue(SlabbedDiagnostics.smooshRisk(Blocks.LANTERN.getDefaultState(), floor),
-                "THE GATE MUST NOT SILENCE THE FLAG: a real decoration at the floor still flags");
+                net.minecraft.text.Text.literal("THE GATE MUST NOT SILENCE THE FLAG: a real decoration at the floor still flags"));
         ctx.assertTrue(SlabbedDiagnostics.smooshRisk(Blocks.IRON_CHAIN.getDefaultState(), floor),
-                "the two non-air SMOOSH rows of run 9e925ab0 were iron_chain — they must survive "
-                        + "the narrowing");
+                net.minecraft.text.Text.literal("the two non-air SMOOSH rows of run 9e925ab0 were iron_chain — they must survive "
+                        + "the narrowing"));
         ctx.complete();
     }
 
@@ -146,22 +146,22 @@ public final class SlabbedDiagnosticsTest {
         BlockState lantern = Blocks.LANTERN.getDefaultState();
         BlockState stone = Blocks.STONE.getDefaultState();
         ctx.assertTrue(SlabbedDiagnostics.dyDiscontinuity(chain, lantern, -0.5, 0.0),
-                "a chain and lantern at different dy is a visible vertical gap");
+                net.minecraft.text.Text.literal("a chain and lantern at different dy is a visible vertical gap"));
         ctx.assertTrue(!SlabbedDiagnostics.dyDiscontinuity(chain, lantern, -0.5, -0.5),
-                "a chain and lantern at the SAME dy connect cleanly (no gap)");
+                net.minecraft.text.Text.literal("a chain and lantern at the SAME dy connect cleanly (no gap)"));
         ctx.assertTrue(!SlabbedDiagnostics.dyDiscontinuity(chain, stone, -0.5, 0.0),
-                "a chain next to a non-decoration is not a decoration-gap");
+                net.minecraft.text.Text.literal("a chain next to a non-decoration is not a decoration-gap"));
         ctx.complete();
     }
 
     @GameTest(structure = "fabric-gametest-api-v1:empty")
     public void modelMismatchDetectorFiresWhenModelDivergesFromVisual(TestContext ctx) {
         ctx.assertTrue(SlabbedDiagnostics.modelMismatch(-0.5, 0.0),
-                "a model rendered at grid while visual is lowered must flag (the pre-GH#21 fence render)");
+                net.minecraft.text.Text.literal("a model rendered at grid while visual is lowered must flag (the pre-GH#21 fence render)"));
         ctx.assertTrue(!SlabbedDiagnostics.modelMismatch(-0.5, -0.5),
-                "model tracking visual is clean");
+                net.minecraft.text.Text.literal("model tracking visual is clean"));
         ctx.assertTrue(!SlabbedDiagnostics.modelMismatch(-0.5, Double.NaN),
-                "an unknown (server-side) model dy must not flag");
+                net.minecraft.text.Text.literal("an unknown (server-side) model dy must not flag"));
         ctx.complete();
     }
 
@@ -179,31 +179,31 @@ public final class SlabbedDiagnosticsTest {
         BlockState fence = Blocks.OAK_FENCE.getDefaultState();
 
         ctx.assertTrue(!SlabbedDiagnostics.isMeasured(SlabbedDiagnostics.NOT_SAMPLED),
-                "NOT_SAMPLED must not count as a measurement");
+                net.minecraft.text.Text.literal("NOT_SAMPLED must not count as a measurement"));
         ctx.assertTrue(!SlabbedDiagnostics.isMeasured(SlabbedDiagnostics.MEASURED_EMPTY),
-                "MEASURED_EMPTY has no minY, so it must not count as a measurement either");
+                net.minecraft.text.Text.literal("MEASURED_EMPTY has no minY, so it must not count as a measurement either"));
         ctx.assertTrue(SlabbedDiagnostics.isMeasured(-0.5),
-                "a real number must count as a measurement");
+                net.minecraft.text.Text.literal("a real number must count as a measurement"));
 
         String unsampled = SlabbedDiagnostics.format(SlabbedDiagnostics.NOT_SAMPLED);
         String empty = SlabbedDiagnostics.format(SlabbedDiagnostics.MEASURED_EMPTY);
         ctx.assertTrue(!unsampled.equals(empty),
-                "THE FIX: 'not measurable here' and 'measured, and empty' must print as DIFFERENT "
-                        + "tokens — both read '" + unsampled + "'");
+                net.minecraft.text.Text.literal("THE FIX: 'not measurable here' and 'measured, and empty' must print as DIFFERENT "
+                        + "tokens — both read '" + unsampled + "'"));
         ctx.assertTrue(!unsampled.equals(SlabbedDiagnostics.format(-0.5))
                         && !empty.equals(SlabbedDiagnostics.format(-0.5)),
-                "neither sentinel may be mistaken for a number");
+                net.minecraft.text.Text.literal("neither sentinel may be mistaken for a number"));
 
         // Every predicate stays silent on BOTH sentinels: an unread leg is not evidence of a bug.
         ctx.assertTrue(!SlabbedDiagnostics.modelMismatch(-0.5, SlabbedDiagnostics.MEASURED_EMPTY),
-                "an empty model leg must not flag a mismatch");
+                net.minecraft.text.Text.literal("an empty model leg must not flag a mismatch"));
         ctx.assertTrue(!SlabbedDiagnostics.modelMismatch(-0.5, SlabbedDiagnostics.NOT_SAMPLED),
-                "an unsampled model leg must not flag a mismatch");
+                net.minecraft.text.Text.literal("an unsampled model leg must not flag a mismatch"));
         ctx.assertTrue(!SlabbedDiagnostics.outlineMismatch(fence, -0.5, SlabbedDiagnostics.MEASURED_EMPTY),
-                "an empty outline must not flag a triad mismatch");
+                net.minecraft.text.Text.literal("an empty outline must not flag a triad mismatch"));
         ctx.assertTrue(!SlabbedDiagnostics.collisionFollowsVisual(
                         -0.5, SlabbedDiagnostics.MEASURED_EMPTY, -0.5),
-                "an empty outline leg cannot support a collision-tracking claim");
+                net.minecraft.text.Text.literal("an empty outline leg cannot support a collision-tracking claim"));
         ctx.complete();
     }
 
@@ -223,7 +223,7 @@ public final class SlabbedDiagnosticsTest {
         BlockPos origin = ctx.getAbsolutePos(BlockPos.ORIGIN);
 
         PlaceResult placed = SlabbedLabFixtures.placeBasicFixture(w, origin);
-        ctx.assertTrue(placed.ok(), "placeBasicFixture failed: " + placed.error());
+        ctx.assertTrue(placed.ok(), net.minecraft.text.Text.literal("placeBasicFixture failed: " + placed.error()));
 
         // Same geometry SlabbedLabFixtureTest#outlineRaycastParity uses: the BOTTOM_SLAB lane
         // support, whose occupant is proven to be offset (so this is not vacuous at dy 0).
@@ -232,14 +232,14 @@ public final class SlabbedDiagnosticsTest {
         SlabbedDiagnostics.Sample c = SlabbedDiagnostics.analyze(w, composter, w.getBlockState(composter));
 
         ctx.assertTrue(SlabbedDiagnostics.isMeasured(c.raycastMinY()),
-                "a composter overrides getRaycastShape, so the raycast leg MUST report a number, got "
-                        + SlabbedDiagnostics.format(c.raycastMinY()));
+                net.minecraft.text.Text.literal("a composter overrides getRaycastShape, so the raycast leg MUST report a number, got "
+                        + SlabbedDiagnostics.format(c.raycastMinY())));
         ctx.assertTrue(c.raycastMinY() < -1.0e-6,
-                "the offset must be visible on the raycast leg (else this assertion is vacuous at 0), got "
-                        + SlabbedDiagnostics.format(c.raycastMinY()));
+                net.minecraft.text.Text.literal("the offset must be visible on the raycast leg (else this assertion is vacuous at 0), got "
+                        + SlabbedDiagnostics.format(c.raycastMinY())));
         ctx.assertTrue(Math.abs(c.raycastMinY() - c.outlineMinY()) < SlabbedDiagnostics.EPS,
-                "outline and raycast legs disagree: outline=" + SlabbedDiagnostics.format(c.outlineMinY())
-                        + " raycast=" + SlabbedDiagnostics.format(c.raycastMinY()));
+                net.minecraft.text.Text.literal("outline and raycast legs disagree: outline=" + SlabbedDiagnostics.format(c.outlineMinY())
+                        + " raycast=" + SlabbedDiagnostics.format(c.raycastMinY())));
 
         // Stone: vanilla's default empty raycast shape. Reported as a measurement, not as a blank.
         BlockPos stone = origin.add(0, 1, 0);
@@ -247,16 +247,16 @@ public final class SlabbedDiagnosticsTest {
         SlabbedDiagnostics.Sample s = SlabbedDiagnostics.analyze(w, stone, w.getBlockState(stone));
 
         ctx.assertTrue(s.raycastMinY() == SlabbedDiagnostics.MEASURED_EMPTY,
-                "stone has no targeting shape of its own, so the raycast leg must read EMPTY, got "
-                        + SlabbedDiagnostics.format(s.raycastMinY()));
+                net.minecraft.text.Text.literal("stone has no targeting shape of its own, so the raycast leg must read EMPTY, got "
+                        + SlabbedDiagnostics.format(s.raycastMinY())));
         ctx.assertTrue(!Double.isNaN(s.raycastMinY()),
-                "an empty raycast shape must NOT share the unsampled sentinel — that conflation is "
-                        + "exactly what made a recorded live run unreadable");
+                net.minecraft.text.Text.literal("an empty raycast shape must NOT share the unsampled sentinel — that conflation is "
+                        + "exactly what made a recorded live run unreadable"));
         ctx.assertTrue(SlabbedDiagnostics.isMeasured(s.outlineMinY()),
-                "the outline leg must still carry a real number, got "
-                        + SlabbedDiagnostics.format(s.outlineMinY()));
+                net.minecraft.text.Text.literal("the outline leg must still carry a real number, got "
+                        + SlabbedDiagnostics.format(s.outlineMinY())));
         ctx.assertTrue(Double.isNaN(s.modelDy()),
-                "a server-side analyze has no render sample, so the model leg must read NOT_SAMPLED");
+                net.minecraft.text.Text.literal("a server-side analyze has no render sample, so the model leg must read NOT_SAMPLED"));
         ctx.complete();
     }
 
@@ -280,18 +280,18 @@ public final class SlabbedDiagnosticsTest {
         SlabbedDiagnostics.Sample clean = sample(-0.5, -0.5, -0.5, -0.5);
 
         ctx.assertTrue(outlineOnly.triadMismatch() && outlineOnly.outlineMismatch(),
-                "OUTLINE leg alone must raise the triad flag, got " + outlineOnly.flagSummary());
+                net.minecraft.text.Text.literal("OUTLINE leg alone must raise the triad flag, got " + outlineOnly.flagSummary()));
         ctx.assertTrue(raycastOnly.triadMismatch() && raycastOnly.raycastMismatch(),
-                "RAYCAST leg alone must raise the triad flag — under the old predicate this leg had "
-                        + "NO FLAG AT ALL, got " + raycastOnly.flagSummary());
+                net.minecraft.text.Text.literal("RAYCAST leg alone must raise the triad flag — under the old predicate this leg had "
+                        + "NO FLAG AT ALL, got " + raycastOnly.flagSummary()));
         ctx.assertTrue(modelOnly.triadMismatch() && modelOnly.modelMismatch(),
-                "MODEL leg alone must raise the triad flag — the old predicate left it out of the "
-                        + "counter entirely, got " + modelOnly.flagSummary());
+                net.minecraft.text.Text.literal("MODEL leg alone must raise the triad flag — the old predicate left it out of the "
+                        + "counter entirely, got " + modelOnly.flagSummary()));
         ctx.assertTrue(!clean.triadMismatch(),
-                "three agreeing legs must not flag, got " + clean.flagSummary());
+                net.minecraft.text.Text.literal("three agreeing legs must not flag, got " + clean.flagSummary()));
         ctx.assertTrue(clean.triadLegsVerified() == 3,
-                "and on that clean row all three legs must be CHECKED, else the green means "
-                        + "nothing — got " + clean.triadCoverage());
+                net.minecraft.text.Text.literal("and on that clean row all three legs must be CHECKED, else the green means "
+                        + "nothing — got " + clean.triadCoverage()));
         ctx.complete();
     }
 
@@ -320,27 +320,27 @@ public final class SlabbedDiagnosticsTest {
 
         SlabbedDiagnostics.Sample headless = SlabbedDiagnostics.analyze(w, stone, w.getBlockState(stone));
         ctx.assertTrue(headless.modelLeg() == SlabbedDiagnostics.LegCheck.NOT_SAMPLED,
-                "a headless analyze has no independent model sample, and that must be STATED, got "
-                        + headless.triadCoverage());
+                net.minecraft.text.Text.literal("a headless analyze has no independent model sample, and that must be STATED, got "
+                        + headless.triadCoverage()));
         ctx.assertTrue(!headless.modelMismatch(),
-                "it must still not INVENT a mismatch out of the missing sample");
+                net.minecraft.text.Text.literal("it must still not INVENT a mismatch out of the missing sample"));
         ctx.assertTrue(headless.triadLegsVerified() < 3,
-                "so this row must NOT count as three-leg coverage, got "
-                        + headless.triadLegsVerified() + "/3 — " + headless.triadCoverage());
+                net.minecraft.text.Text.literal("so this row must NOT count as three-leg coverage, got "
+                        + headless.triadLegsVerified() + "/3 — " + headless.triadCoverage()));
         ctx.assertTrue(headless.triadCoverage().contains("model=NOT_SAMPLED"),
-                "and the reason must be legible in the recorder row, got " + headless.triadCoverage());
+                net.minecraft.text.Text.literal("and the reason must be legible in the recorder row, got " + headless.triadCoverage()));
 
         // Hand it a real, DIVERGENT sample: the same leg must fire. A flag that only ever reports
         // "unchecked" would be no better than the silent false it replaces.
         SlabbedDiagnostics.Sample supplied =
                 SlabbedDiagnostics.analyze(w, stone, w.getBlockState(stone), 0.0);
         ctx.assertTrue(Math.abs(supplied.visualDy()) > SlabbedDiagnostics.EPS,
-                "fixture: stone on a bottom slab must be lowered, else the row below is vacuous, got "
-                        + SlabbedDiagnostics.format(supplied.visualDy()));
+                net.minecraft.text.Text.literal("fixture: stone on a bottom slab must be lowered, else the row below is vacuous, got "
+                        + SlabbedDiagnostics.format(supplied.visualDy())));
         ctx.assertTrue(supplied.modelLeg() == SlabbedDiagnostics.LegCheck.CHECKED
                         && supplied.modelMismatch() && supplied.triadMismatch(),
-                "a supplied model sample of 0.0 against a lowered visual dy MUST fire, got "
-                        + supplied.flagSummary() + " — " + supplied.triadCoverage());
+                net.minecraft.text.Text.literal("a supplied model sample of 0.0 against a lowered visual dy MUST fire, got "
+                        + supplied.flagSummary() + " — " + supplied.triadCoverage()));
         ctx.complete();
     }
 
@@ -355,19 +355,19 @@ public final class SlabbedDiagnosticsTest {
     @GameTest(structure = "fabric-gametest-api-v1:empty")
     public void raycastLegFiresOnDisagreementAndReportsEmptyAsUnverified(TestContext ctx) {
         ctx.assertTrue(SlabbedDiagnostics.raycastMismatch(0.0, -0.5),
-                "a targeting shape pinned at grid while the outline is lowered MUST fire");
+                net.minecraft.text.Text.literal("a targeting shape pinned at grid while the outline is lowered MUST fire"));
         ctx.assertTrue(!SlabbedDiagnostics.raycastMismatch(-0.5, -0.5),
-                "a targeting shape tracking the outline is clean");
+                net.minecraft.text.Text.literal("a targeting shape tracking the outline is clean"));
         ctx.assertTrue(!SlabbedDiagnostics.raycastMismatch(
                         SlabbedDiagnostics.MEASURED_EMPTY, -0.5),
-                "an EMPTY targeting shape is CORRECT for stone/slabs/chains — inventing a mismatch "
-                        + "there would be a phantom");
+                net.minecraft.text.Text.literal("an EMPTY targeting shape is CORRECT for stone/slabs/chains — inventing a mismatch "
+                        + "there would be a phantom"));
         ctx.assertTrue(SlabbedDiagnostics.raycastLeg(SlabbedDiagnostics.MEASURED_EMPTY, -0.5)
                         == SlabbedDiagnostics.LegCheck.EMPTY_BY_DESIGN,
-                "but EMPTY verifies no dy, so it must not be reported as a CHECKED leg");
+                net.minecraft.text.Text.literal("but EMPTY verifies no dy, so it must not be reported as a CHECKED leg"));
         ctx.assertTrue(SlabbedDiagnostics.raycastLeg(SlabbedDiagnostics.NOT_SAMPLED, -0.5)
                         == SlabbedDiagnostics.LegCheck.NOT_SAMPLED,
-                "and 'never read' must stay distinguishable from 'read, and empty'");
+                net.minecraft.text.Text.literal("and 'never read' must stay distinguishable from 'read, and empty'"));
         ctx.complete();
     }
 
@@ -388,29 +388,29 @@ public final class SlabbedDiagnosticsTest {
         BlockState slab = Blocks.OAK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM);
         w.setBlockState(pos, slab, Block.NOTIFY_LISTENERS);
         ctx.assertTrue(SlabPlacementDyAttachment.record(w, pos, -1.0),
-                "fixture: the placement store must accept the forced dy");
+                net.minecraft.text.Text.literal("fixture: the placement store must accept the forced dy"));
         double dy = SlabSupport.getVisualYOffset(w, pos, w.getBlockState(pos));
         ctx.assertTrue(Math.abs(dy + 1.0) <= SlabbedDiagnostics.EPS,
-                "fixture: the subject must actually read -1.0, got " + dy);
+                net.minecraft.text.Text.literal("fixture: the subject must actually read -1.0, got " + dy));
 
         Vec3d eye = new Vec3d(pos.getX() + 0.5, pos.getY() + 4.0, pos.getZ() + 0.5);
         Vec3d end = new Vec3d(pos.getX() + 0.5, pos.getY() - 4.0, pos.getZ() + 0.5);
         BlockHitResult hit = SlabbedOffsetRaycast.raycast(w, eye, end, ShapeContext.absent());
 
         ctx.assertTrue(hit.getType() == HitResult.Type.BLOCK && hit.getBlockPos().equals(pos),
-                "the effective hit must land on the subject, got " + hit.getType() + " "
-                        + hit.getBlockPos());
+                net.minecraft.text.Text.literal("the effective hit must land on the subject, got " + hit.getType() + " "
+                        + hit.getBlockPos()));
         // A bottom slab is half a block tall, so its offset top face is at dy + 0.5.
         double expected = pos.getY() + 0.5 + dy;
         ctx.assertTrue(Math.abs(hit.getPos().y - expected) <= 1.0e-4,
-                "the effective hit must land on the OFFSET top face at " + expected + ", got "
+                net.minecraft.text.Text.literal("the effective hit must land on the OFFSET top face at " + expected + ", got "
                         + hit.getPos().y + " — if this drifts from the visual dy the crosshair and "
-                        + "the geometry have separated, which is the whole point of the triad law");
+                        + "the geometry have separated, which is the whole point of the triad law"));
 
         SlabbedDiagnostics.Sample s = SlabbedDiagnostics.analyze(w, pos, w.getBlockState(pos));
         ctx.assertTrue(s.raycastLeg() == SlabbedDiagnostics.LegCheck.EMPTY_BY_DESIGN,
-                "a slab has no getRaycastShape of its own, so the diagnostic's raycast leg must "
-                        + "report EMPTY_BY_DESIGN rather than a verified pass, got " + s.triadCoverage());
+                net.minecraft.text.Text.literal("a slab has no getRaycastShape of its own, so the diagnostic's raycast leg must "
+                        + "report EMPTY_BY_DESIGN rather than a verified pass, got " + s.triadCoverage()));
         SlabPlacementDyAttachment.clear(w, pos);
         ctx.complete();
     }
@@ -445,12 +445,12 @@ public final class SlabbedDiagnosticsTest {
         SlabbedDiagnostics.Sample a = SlabbedDiagnostics.analyze(w, cubeA, w.getBlockState(cubeA));
 
         ctx.assertTrue(SlabbedDiagnostics.dodoShapePrecondition(true, a.visualDy()),
-                "fixture: subject A must satisfy the OLD predicate, else the narrowing below is "
-                        + "vacuous — dy=" + SlabbedDiagnostics.format(a.visualDy()));
+                net.minecraft.text.Text.literal("fixture: subject A must satisfy the OLD predicate, else the narrowing below is "
+                        + "vacuous — dy=" + SlabbedDiagnostics.format(a.visualDy())));
         ctx.assertTrue(!a.dodoRisk(),
-                "NARROWED: a lowered cube with no occluding neighbour at a different height exposes "
+                net.minecraft.text.Text.literal("NARROWED: a lowered cube with no occluding neighbour at a different height exposes "
                         + "no hole, so it must NOT flag. This is the 36-of-55 class. Got flags: "
-                        + a.flagSummary());
+                        + a.flagSummary()));
 
         // B — a real vertical step between two opaque cubes. The cull mixin is horizontal-only, so
         // nothing mitigates this one and it must still flag.
@@ -460,27 +460,27 @@ public final class SlabbedDiagnosticsTest {
         w.setBlockState(high, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
         ctx.assertTrue(SlabPlacementDyAttachment.record(w, low, -1.0)
                         && SlabPlacementDyAttachment.record(w, high, -0.5),
-                "fixture: the placement store must accept both forced heights");
+                net.minecraft.text.Text.literal("fixture: the placement store must accept both forced heights"));
         double lowDy = SlabSupport.getVisualYOffset(w, low, w.getBlockState(low));
         double highDy = SlabSupport.getVisualYOffset(w, high, w.getBlockState(high));
         ctx.assertTrue(highDy - lowDy > SlabbedDiagnostics.EPS,
-                "fixture: the block above must sit HIGHER than the subject for a gap to exist, got "
-                        + lowDy + " below " + highDy);
+                net.minecraft.text.Text.literal("fixture: the block above must sit HIGHER than the subject for a gap to exist, got "
+                        + lowDy + " below " + highDy));
 
         SlabbedDiagnostics.Sample b = SlabbedDiagnostics.analyze(w, low, w.getBlockState(low));
         ctx.assertTrue(b.dodoRisk(),
-                "THE FLAG MUST STILL FIRE: a " + (highDy - lowDy) + "-block vertical gap under an "
+                net.minecraft.text.Text.literal("THE FLAG MUST STILL FIRE: a " + (highDy - lowDy) + "-block vertical gap under an "
                         + "opaque cube whose top face the mesher culls is a see-through hole, and "
                         + "the per-face mitigation is horizontal-only so nothing covers it. Got "
-                        + "flags: " + b.flagSummary());
+                        + "flags: " + b.flagSummary()));
 
         // ... and it is the STEP that fires it, not the lowering: level the pair and it goes quiet.
         ctx.assertTrue(SlabPlacementDyAttachment.record(w, high, -1.0),
-                "fixture: re-record the upper block level with the subject");
+                net.minecraft.text.Text.literal("fixture: re-record the upper block level with the subject"));
         SlabbedDiagnostics.Sample levelled = SlabbedDiagnostics.analyze(w, low, w.getBlockState(low));
         ctx.assertTrue(!levelled.dodoRisk(),
-                "two equally-lowered stacked cubes have no gap between them, so the flag must go "
-                        + "quiet — got flags: " + levelled.flagSummary());
+                net.minecraft.text.Text.literal("two equally-lowered stacked cubes have no gap between them, so the flag must go "
+                        + "quiet — got flags: " + levelled.flagSummary()));
 
         SlabPlacementDyAttachment.clear(w, low);
         SlabPlacementDyAttachment.clear(w, high);
@@ -517,13 +517,13 @@ public final class SlabbedDiagnosticsTest {
         SlabbedDiagnostics.Sample s = SlabbedDiagnostics.analyze(w, fence, w.getBlockState(fence));
 
         ctx.assertTrue(s.visualDy() < -1.0e-6,
-                "fence on a vanilla slab must resolve a lowered dy, got " + SlabbedDiagnostics.format(s.visualDy()));
+                net.minecraft.text.Text.literal("fence on a vanilla slab must resolve a lowered dy, got " + SlabbedDiagnostics.format(s.visualDy())));
         ctx.assertTrue(!s.triadMismatch(),
-                "post-GH#21-fix, the fence outline follows the dy, so no triad mismatch — got flags "
-                        + s.flagSummary());
-        ctx.assertTrue(!s.dodoRisk(), "a fence is not an opaque cube, so no DODO risk");
+                net.minecraft.text.Text.literal("post-GH#21-fix, the fence outline follows the dy, so no triad mismatch — got flags "
+                        + s.flagSummary()));
+        ctx.assertTrue(!s.dodoRisk(), net.minecraft.text.Text.literal("a fence is not an opaque cube, so no DODO risk"));
         ctx.assertTrue(!s.anySuspect(),
-                "a correctly-lowered fence must analyze completely clean, got flags: " + s.flagSummary());
+                net.minecraft.text.Text.literal("a correctly-lowered fence must analyze completely clean, got flags: " + s.flagSummary()));
         ctx.complete();
     }
 
@@ -534,8 +534,8 @@ public final class SlabbedDiagnosticsTest {
         w.setBlockState(pos, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
 
         SlabbedDiagnostics.Sample s = SlabbedDiagnostics.analyze(w, pos, w.getBlockState(pos));
-        ctx.assertTrue(Math.abs(s.visualDy()) < 1.0e-6, "flat stone must have dy 0");
-        ctx.assertTrue(!s.anySuspect(), "flat stone on the ground must analyze clean, got: " + s.flagSummary());
+        ctx.assertTrue(Math.abs(s.visualDy()) < 1.0e-6, net.minecraft.text.Text.literal("flat stone must have dy 0"));
+        ctx.assertTrue(!s.anySuspect(), net.minecraft.text.Text.literal("flat stone on the ground must analyze clean, got: " + s.flagSummary()));
         ctx.complete();
     }
 }

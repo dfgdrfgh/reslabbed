@@ -39,20 +39,20 @@ public final class TerrainSlabsHotfixTest {
     public void modernTerrainSlabsClassifiesBottomLike(TestContext ctx) {
         CompatSlabSurfaceKind kind = CompatHooks.customSlabSurfaceKind(tsBottomSlab());
         ctx.assertTrue(kind == CompatSlabSurfaceKind.BOTTOM_LIKE,
-                "terrain_slabs:test_slab[type=bottom] must classify BOTTOM_LIKE (mod-id fix), got " + kind);
+                net.minecraft.text.Text.literal("terrain_slabs:test_slab[type=bottom] must classify BOTTOM_LIKE (mod-id fix), got " + kind));
         ctx.complete();
     }
 
     @GameTest(structure = "fabric-gametest-api-v1:empty")
     public void terrainSlabsObjectOffsetCapabilityUsesUpstreamAuthority(TestContext ctx) {
         ctx.assertTrue(CompatHooks.terrainSlabsHandlesObjectOffset(Blocks.DANDELION.getDefaultState()),
-                "PlantBlock family must use Terrain Slabs' own on-top offset authority");
+                net.minecraft.text.Text.literal("PlantBlock family must use Terrain Slabs' own on-top offset authority"));
         ctx.assertTrue(CompatHooks.terrainSlabsHandlesObjectOffset(Blocks.SNOW.getDefaultState()),
-                "registry-owned snow must use Terrain Slabs' own on-top offset authority");
+                net.minecraft.text.Text.literal("registry-owned snow must use Terrain Slabs' own on-top offset authority"));
         ctx.assertTrue(!CompatHooks.terrainSlabsHandlesObjectOffset(Blocks.TORCH.getDefaultState()),
-                "torch is not Terrain-owned and must use Slabbed's floor-seat transaction");
+                net.minecraft.text.Text.literal("torch is not Terrain-owned and must use Slabbed's floor-seat transaction"));
         ctx.assertTrue(!CompatHooks.terrainSlabsHandlesObjectOffset(Blocks.STONE.getDefaultState()),
-                "ordinary full blocks are player-authored transaction subjects, not OnTop objects");
+                net.minecraft.text.Text.literal("ordinary full blocks are player-authored transaction subjects, not OnTop objects"));
         ctx.complete();
     }
 
@@ -68,11 +68,11 @@ public final class TerrainSlabsHotfixTest {
 
         ActionResult result = PlacementHarness.useHeldItem(w, player, ground, Direction.UP, hit);
 
-        ctx.assertTrue(result.isAccepted(), "dandelion placement on ordinary dirt must succeed");
-        ctx.assertTrue(w.getBlockState(plant).isOf(Blocks.DANDELION), "the dandelion must be placed");
+        ctx.assertTrue(result.isAccepted(), net.minecraft.text.Text.literal("dandelion placement on ordinary dirt must succeed"));
+        ctx.assertTrue(w.getBlockState(plant).isOf(Blocks.DANDELION), net.minecraft.text.Text.literal("the dandelion must be placed"));
         double stored = SlabPlacementDyAttachment.storedDy(w, plant);
         ctx.assertTrue(Double.doubleToRawLongBits(stored) == Double.doubleToRawLongBits(0.0d),
-                "Terrain capability must not steal a non-Terrain placement transaction; got " + stored);
+                net.minecraft.text.Text.literal("Terrain capability must not steal a non-Terrain placement transaction; got " + stored));
         ctx.complete();
     }
 
@@ -91,8 +91,8 @@ public final class TerrainSlabsHotfixTest {
         w.setBlockState(objPos, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
         double dy = SlabSupport.getYOffset(w, objPos, w.getBlockState(objPos));
         ctx.assertTrue(Math.abs(dy) <= EPS,
-                "stone (generic terrain) on a modern terrain_slabs slab must stay FLUSH (0.0) — "
-                        + "lowering opaque terrain cubes tears world holes; got " + dy);
+                net.minecraft.text.Text.literal("stone (generic terrain) on a modern terrain_slabs slab must stay FLUSH (0.0) — "
+                        + "lowering opaque terrain cubes tears world holes; got " + dy));
         ctx.complete();
     }
 
@@ -114,10 +114,10 @@ public final class TerrainSlabsHotfixTest {
         double lowerDy = SlabSupport.getYOffset(w, lowerLog, w.getBlockState(lowerLog));
         double upperDy = SlabSupport.getYOffset(w, upperLog, w.getBlockState(upperLog));
         ctx.assertTrue(Math.abs(lowerDy + 0.5) <= EPS,
-                "setup: lower oak log on a modern terrain_slabs slab should lower to -0.5, got " + lowerDy);
+                net.minecraft.text.Text.literal("setup: lower oak log on a modern terrain_slabs slab should lower to -0.5, got " + lowerDy));
         ctx.assertTrue(Math.abs(upperDy - lowerDy) <= EPS,
-                "slab-log-dodo-log: upper oak log must share lower log dy " + lowerDy
-                        + " to keep the vertical stack connected; got " + upperDy);
+                net.minecraft.text.Text.literal("slab-log-dodo-log: upper oak log must share lower log dy " + lowerDy
+                        + " to keep the vertical stack connected; got " + upperDy));
         ctx.complete();
     }
 
@@ -138,10 +138,10 @@ public final class TerrainSlabsHotfixTest {
         double lowerDy = SlabSupport.getYOffset(w, lowerLog, w.getBlockState(lowerLog));
         double grassDy = SlabSupport.getYOffset(w, grass, w.getBlockState(grass));
         ctx.assertTrue(Math.abs(lowerDy + 0.5) <= EPS,
-                "setup: lower oak log on a modern terrain_slabs slab should lower to -0.5, got " + lowerDy);
+                net.minecraft.text.Text.literal("setup: lower oak log on a modern terrain_slabs slab should lower to -0.5, got " + lowerDy));
         ctx.assertTrue(Math.abs(grassDy - lowerDy) <= EPS,
-                "grass-on-lowered-log: grass block must share lower log dy " + lowerDy
-                        + " to keep the stack connected; got " + grassDy);
+                net.minecraft.text.Text.literal("grass-on-lowered-log: grass block must share lower log dy " + lowerDy
+                        + " to keep the stack connected; got " + grassDy));
         ctx.complete();
     }
 }

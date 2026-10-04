@@ -38,7 +38,7 @@ public final class ServerHitToleranceShiftTest {
                 Math.abs(actual.x - expected.x) <= EPS
                         && Math.abs(actual.y - expected.y) <= EPS
                         && Math.abs(actual.z - expected.z) <= EPS,
-                what + ": expected validation center " + expected + ", got " + actual);
+                net.minecraft.text.Text.literal(what + ": expected validation center " + expected + ", got " + actual));
     }
 
     /** Flush full block: dy = 0.0, the validation center must be vanilla's ofCenter, untouched. */
@@ -49,7 +49,7 @@ public final class ServerHitToleranceShiftTest {
         w.setBlockState(stone, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
 
         double dy = SlabSupport.getYOffset(w, stone, w.getBlockState(stone));
-        ctx.assertTrue(Math.abs(dy) <= EPS, "fixture: free-standing stone must be flush, got " + dy);
+        ctx.assertTrue(Math.abs(dy) <= EPS, net.minecraft.text.Text.literal("fixture: free-standing stone must be flush, got " + dy));
 
         assertCenter(ctx,
                 SlabbedServerHitValidation.shiftedValidationCenter(w, stone),
@@ -78,7 +78,7 @@ public final class ServerHitToleranceShiftTest {
 
         double dy = SlabSupport.getYOffset(w, dirt, w.getBlockState(dirt));
         ctx.assertTrue(Math.abs(dy + 0.5) <= EPS,
-                "fixture: anchored dirt on a bottom slab must render -0.5, got " + dy);
+                net.minecraft.text.Text.literal("fixture: anchored dirt on a bottom slab must render -0.5, got " + dy));
 
         assertCenter(ctx,
                 SlabbedServerHitValidation.shiftedValidationCenter(w, dirt),
@@ -104,7 +104,7 @@ public final class ServerHitToleranceShiftTest {
 
         Block terrainSlab = Registries.BLOCK.get(Identifier.of("terrainslabs", "grass_slab"));
         ctx.assertTrue(terrainSlab != Blocks.AIR,
-                "fixture: terrainslabs:grass_slab must be registered under runGameTest");
+                net.minecraft.text.Text.literal("fixture: terrainslabs:grass_slab must be registered under runGameTest"));
 
         w.setBlockState(base, terrainSlab.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                 Block.NOTIFY_LISTENERS);
@@ -116,7 +116,7 @@ public final class ServerHitToleranceShiftTest {
 
         double dy = SlabSupport.getYOffset(w, cap, w.getBlockState(cap));
         ctx.assertTrue(Math.abs(dy + 1.0) <= EPS,
-                "fixture: full block on a mixed slab must compound to -1.0, got " + dy);
+                net.minecraft.text.Text.literal("fixture: full block on a mixed slab must compound to -1.0, got " + dy));
 
         assertCenter(ctx,
                 SlabbedServerHitValidation.shiftedValidationCenter(w, cap),

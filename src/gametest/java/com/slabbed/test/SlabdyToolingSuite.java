@@ -48,11 +48,11 @@ public final class SlabdyToolingSuite {
                 "missing", null);
         String row = join(lines);
 
-        ctx.assertTrue(lines.size() == 8, "row must have exactly 8 lines (7 + the cache-vs-fresh diagnostic): " + row);
-        ctx.assertTrue(row.contains("dy=0.000 flush"), "flat stone must report dy=0.000 flush: " + row);
-        ctx.assertTrue(row.contains("src=-"), "a non-lowered, non-anchored block must report src=-: " + row);
-        ctx.assertTrue(row.contains("held=empty"), "an empty held item must report held=empty: " + row);
-        ctx.assertTrue(row.contains("modelTraceArmed=-"), "no trace armed when the caller passes null: " + row);
+        ctx.assertTrue(lines.size() == 8, net.minecraft.text.Text.literal("row must have exactly 8 lines (7 + the cache-vs-fresh diagnostic): " + row));
+        ctx.assertTrue(row.contains("dy=0.000 flush"), net.minecraft.text.Text.literal("flat stone must report dy=0.000 flush: " + row));
+        ctx.assertTrue(row.contains("src=-"), net.minecraft.text.Text.literal("a non-lowered, non-anchored block must report src=-: " + row));
+        ctx.assertTrue(row.contains("held=empty"), net.minecraft.text.Text.literal("an empty held item must report held=empty: " + row));
+        ctx.assertTrue(row.contains("modelTraceArmed=-"), net.minecraft.text.Text.literal("no trace armed when the caller passes null: " + row));
         ctx.complete();
     }
 
@@ -71,9 +71,9 @@ public final class SlabdyToolingSuite {
                 w, pos, w.getBlockState(pos), Direction.UP, lowerHit, ItemStack.EMPTY, "missing", null));
 
         ctx.assertTrue(upperRow.contains("half=UPPER"),
-                "a hit point near the top of a flush full cube must report half=UPPER: " + upperRow);
+                net.minecraft.text.Text.literal("a hit point near the top of a flush full cube must report half=UPPER: " + upperRow));
         ctx.assertTrue(lowerRow.contains("half=LOWER"),
-                "a hit point near the bottom of a flush full cube must report half=LOWER: " + lowerRow);
+                net.minecraft.text.Text.literal("a hit point near the bottom of a flush full cube must report half=LOWER: " + lowerRow));
         ctx.complete();
     }
 
@@ -92,14 +92,14 @@ public final class SlabdyToolingSuite {
         String row = join(lines);
 
         ctx.assertTrue(row.contains("dy=-0.500 LOWERED"),
-                "a fence lowered onto a vanilla bottom slab must report dy=-0.500 LOWERED: " + row);
+                net.minecraft.text.Text.literal("a fence lowered onto a vanilla bottom slab must report dy=-0.500 LOWERED: " + row));
         ctx.assertTrue(row.contains("src=geometric"),
-                "a lowered, non-anchored block falls back to src=geometric: " + row);
-        ctx.assertTrue(row.contains("face=north"), "the reported face must match what was passed in: " + row);
-        ctx.assertTrue(row.contains("held=minecraft:oak_fence"), "the held item must be reported by id: " + row);
-        ctx.assertTrue(row.contains("below="), "a below= line must be present: " + row);
+                net.minecraft.text.Text.literal("a lowered, non-anchored block falls back to src=geometric: " + row));
+        ctx.assertTrue(row.contains("face=north"), net.minecraft.text.Text.literal("the reported face must match what was passed in: " + row));
+        ctx.assertTrue(row.contains("held=minecraft:oak_fence"), net.minecraft.text.Text.literal("the held item must be reported by id: " + row));
+        ctx.assertTrue(row.contains("below="), net.minecraft.text.Text.literal("a below= line must be present: " + row));
         ctx.assertTrue(row.contains("modelTraceArmed=" + fencePos.toShortString()),
-                "the echoed armed position must match what the caller passed in: " + row);
+                net.minecraft.text.Text.literal("the echoed armed position must match what the caller passed in: " + row));
         ctx.complete();
     }
 
@@ -118,9 +118,9 @@ public final class SlabdyToolingSuite {
         String belowLine = lines.get(6);
 
         ctx.assertTrue(belowLine.startsWith("  below=" + slabPos.toShortString()),
-                "the below= line must report the slab position directly under the fence: " + belowLine);
+                net.minecraft.text.Text.literal("the below= line must report the slab position directly under the fence: " + belowLine));
         ctx.assertTrue(belowLine.contains("minecraft:oak_slab"),
-                "the below= line must report the slab's block id: " + belowLine);
+                net.minecraft.text.Text.literal("the below= line must report the slab's block id: " + belowLine));
         ctx.complete();
     }
 
@@ -134,11 +134,11 @@ public final class SlabdyToolingSuite {
                 w, pos, w.getBlockState(pos), null, null, null, "missing", null);
         String row = join(lines);
 
-        ctx.assertTrue(row.contains("hit=none"), "a null hit vector must degrade to hit=none, not crash: " + row);
-        ctx.assertTrue(row.contains("local=none"), "a null hit vector must degrade local=none too: " + row);
-        ctx.assertTrue(row.contains("held=empty"), "a null held item must degrade to held=empty, not crash: " + row);
-        ctx.assertTrue(row.contains("face=none"), "a null face must degrade to face=none, not crash: " + row);
-        ctx.assertTrue(row.contains("expectedPlace=none"), "a null face means no expectedPlace: " + row);
+        ctx.assertTrue(row.contains("hit=none"), net.minecraft.text.Text.literal("a null hit vector must degrade to hit=none, not crash: " + row));
+        ctx.assertTrue(row.contains("local=none"), net.minecraft.text.Text.literal("a null hit vector must degrade local=none too: " + row));
+        ctx.assertTrue(row.contains("held=empty"), net.minecraft.text.Text.literal("a null held item must degrade to held=empty, not crash: " + row));
+        ctx.assertTrue(row.contains("face=none"), net.minecraft.text.Text.literal("a null face must degrade to face=none, not crash: " + row));
+        ctx.assertTrue(row.contains("expectedPlace=none"), net.minecraft.text.Text.literal("a null face means no expectedPlace: " + row));
         ctx.complete();
     }
 
@@ -159,7 +159,7 @@ public final class SlabdyToolingSuite {
         SlabAnchorAttachment.addAnchor(w, dirtPos, w.getBlockState(dirtPos));
 
         ctx.assertTrue(SlabSupport.peekCachedClientVisualYOffset(dirtPos) == null,
-                "setup: a fresh gametest ServerWorld must never have populated the client cache");
+                net.minecraft.text.Text.literal("setup: a fresh gametest ServerWorld must never have populated the client cache"));
 
         List<String> lines = SlabdyRowFormatter.formatRow(w, dirtPos, w.getBlockState(dirtPos),
                 Direction.UP, new Vec3d(dirtPos.getX() + 0.5, dirtPos.getY() + 0.5, dirtPos.getZ() + 0.5),
@@ -167,9 +167,9 @@ public final class SlabdyToolingSuite {
 
         String cacheLine = lines.stream().filter(l -> l.startsWith("  cache:")).findFirst().orElse("");
         ctx.assertTrue(cacheLine.contains("target=" + dirtPos.toShortString() + "(minecraft:dirt) cache=MISS fresh=-0.500"),
-                "cache line must show MISS for an unpopulated cache and the correct fresh value; got: " + cacheLine);
+                net.minecraft.text.Text.literal("cache line must show MISS for an unpopulated cache and the correct fresh value; got: " + cacheLine));
         ctx.assertTrue(!cacheLine.contains("STALE"),
-                "a cache MISS must never be reported as STALE (nothing to compare against); got: " + cacheLine);
+                net.minecraft.text.Text.literal("a cache MISS must never be reported as STALE (nothing to compare against); got: " + cacheLine));
         ctx.complete();
     }
 
@@ -188,7 +188,7 @@ public final class SlabdyToolingSuite {
                 Block.NOTIFY_LISTENERS);
         w.setBlockState(dirtPos, Blocks.DIRT.getDefaultState(), Block.NOTIFY_LISTENERS);
         SlabAnchorAttachment.addAnchor(w, dirtPos, w.getBlockState(dirtPos));
-        ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, dirtPos), "setup: dirt must anchor on the bottom slab");
+        ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, dirtPos), net.minecraft.text.Text.literal("setup: dirt must anchor on the bottom slab"));
 
         List<String> lines = SlabdyRowFormatter.formatRow(w, dirtPos, w.getBlockState(dirtPos),
                 Direction.UP, new Vec3d(dirtPos.getX() + 0.5, dirtPos.getY() + 0.5, dirtPos.getZ() + 0.5),
@@ -196,9 +196,9 @@ public final class SlabdyToolingSuite {
 
         String outlineLine = lines.stream().filter(l -> l.contains("outlineMinY=")).findFirst().orElse("");
         ctx.assertTrue(outlineLine.contains("outlineMinY=-0.500"),
-                "THE FIX: an anchored dirt at dy=-0.500 must show outlineMinY=-0.500 (a SINGLE "
+                net.minecraft.text.Text.literal("THE FIX: an anchored dirt at dy=-0.500 must show outlineMinY=-0.500 (a SINGLE "
                         + "offset, matching the native full-cube shape [0,0,0]->[1,1,1] shifted "
-                        + "once) -- not -1.000 (a double-applied offset). Got: " + outlineLine);
+                        + "once) -- not -1.000 (a double-applied offset). Got: " + outlineLine));
         ctx.complete();
     }
 }

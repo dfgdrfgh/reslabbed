@@ -50,7 +50,7 @@ public final class HangingLoadDeferralTest {
                     world.getRegistryManager().getOrThrow(RegistryKeys.PAINTING_VARIANT).getOrThrow(PaintingVariants.POINTER))
                 : new ItemFrameEntity(world, attachment, Direction.NORTH);
         ctx.assertTrue(Math.abs(((HangingSeatDyHolder) original).slabbed$hangSeatDy() + 0.5) < 1.0e-6,
-                "premise: original decoration must be lowered");
+                net.minecraft.text.Text.literal("premise: original decoration must be lowered"));
         Box originalBox = original.getBoundingBox();
         NbtWriteView output = NbtWriteView.create(ErrorReporter.EMPTY, world.getRegistryManager());
         original.saveData(output);
@@ -59,31 +59,31 @@ public final class HangingLoadDeferralTest {
         AbstractDecorationEntity restored = painting
                 ? EntityType.PAINTING.create(world, SpawnReason.LOAD)
                 : EntityType.ITEM_FRAME.create(world, SpawnReason.LOAD);
-        ctx.assertTrue(restored != null, "premise: restored entity exists");
+        ctx.assertTrue(restored != null, net.minecraft.text.Text.literal("premise: restored entity exists"));
         PendingHangChunkProbe.begin(world.getChunkManager());
         try {
             restored.readData(NbtReadView.create(ErrorReporter.EMPTY, world.getRegistryManager(), nbt));
             ctx.assertTrue(PendingHangChunkProbe.blockingReads == 0,
-                    "NBT restoration entered the blocking chunk API " + PendingHangChunkProbe.blockingReads + " times");
+                    net.minecraft.text.Text.literal("NBT restoration entered the blocking chunk API " + PendingHangChunkProbe.blockingReads + " times"));
             ctx.assertTrue(PendingHangChunkProbe.nonblockingReads > 0,
-                    "premise: pending-chunk guard was exercised");
+                    net.minecraft.text.Text.literal("premise: pending-chunk guard was exercised"));
             ctx.assertTrue(((HangingSeatDyHolder) restored).slabbed$hasHangSeat() == savedSeat,
-                    "pending load must preserve a saved seat and defer an absent seat");
+                    net.minecraft.text.Text.literal("pending load must preserve a saved seat and defer an absent seat"));
         } finally {
             PendingHangChunkProbe.end();
         }
         restored.tick();
         ctx.assertTrue(Math.abs(((HangingSeatDyHolder) restored).slabbed$hangSeatDy() + 0.5) < 1.0e-6,
-                "ready tick must restore or mint the lowered seat");
+                net.minecraft.text.Text.literal("ready tick must restore or mint the lowered seat"));
         ctx.assertTrue(Math.abs(restored.getBoundingBox().minY - originalBox.minY) < 1.0e-6,
-                "deferred layout must match the original lowered box");
+                net.minecraft.text.Text.literal("deferred layout must match the original lowered box"));
         world.setBlockState(wall, Blocks.AIR.getDefaultState());
         world.setBlockState(wall, Blocks.OAK_PLANKS.getDefaultState());
         restored.tick();
         ctx.assertTrue(Math.abs(((HangingSeatDyHolder) restored).slabbed$hangSeatDy() + 0.5) < 1.0e-6,
-                "later support changes must not remint the decoration seat");
+                net.minecraft.text.Text.literal("later support changes must not remint the decoration seat"));
         ctx.assertTrue(Math.abs(restored.getBoundingBox().minY - originalBox.minY) < 1.0e-6,
-                "later ticks must not apply the height twice");
+                net.minecraft.text.Text.literal("later ticks must not apply the height twice"));
         System.out.println("[HANG_LOAD_PROOF] saved=" + savedSeat + " painting=" + painting + " blocking=0 seat=-0.5 PASS");
         ctx.complete();
     }

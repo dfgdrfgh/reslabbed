@@ -87,7 +87,7 @@ public final class UseOnPlacementSuite {
         world.setBlockState(slab, Blocks.OAK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                 Block.NOTIFY_LISTENERS);
         ctx.assertTrue(SlabSupport.getYOffset(world, slab, world.getBlockState(slab)) == 0.0,
-                "fixture: bottom slab on solid ground must be flat (dy 0.0)");
+                net.minecraft.text.Text.literal("fixture: bottom slab on solid ground must be flat (dy 0.0)"));
 
         PlayerEntity player = mockSlabPlayer(ctx, slab.north(3));
         Vec3d hit = new Vec3d(slab.getX() + 0.5, slab.getY() + 0.5, slab.getZ() + 0.5);
@@ -95,11 +95,11 @@ public final class UseOnPlacementSuite {
         row("control.flatBottomSlab.topFaceCombine", world, slab, slab.up(), result);
 
         ctx.assertTrue(result.isAccepted(),
-                "control: useOn on a flat bottom slab's top face must place, got " + result);
+                net.minecraft.text.Text.literal("control: useOn on a flat bottom slab's top face must place, got " + result));
         BlockState after = world.getBlockState(slab);
         ctx.assertTrue(after.isOf(Blocks.OAK_SLAB) && after.get(SlabBlock.TYPE) == SlabType.DOUBLE,
-                "control: central top-face slab click on a FLAT bottom slab must COMBINE to DOUBLE "
-                        + "(vanilla law preserved through the placement path), got " + describe(world, slab));
+                net.minecraft.text.Text.literal("control: central top-face slab click on a FLAT bottom slab must COMBINE to DOUBLE "
+                        + "(vanilla law preserved through the placement path), got " + describe(world, slab)));
         ctx.complete();
     }
 
@@ -126,14 +126,14 @@ public final class UseOnPlacementSuite {
 
         double dy = SlabSupport.getYOffset(world, top, world.getBlockState(top));
         ctx.assertTrue(dy == -0.5,
-                "fixture: TOP slab on a lowered full block must render lowered -0.5, got " + dy);
+                net.minecraft.text.Text.literal("fixture: TOP slab on a lowered full block must render lowered -0.5, got " + dy));
         double visualDy = SlabSupport.getVisualYOffset(world, top, world.getBlockState(top));
         ctx.assertTrue(visualDy == -0.5,
-                "fixture: intent-mixin gate input getVisualYOffset must read -0.5, got " + visualDy);
+                net.minecraft.text.Text.literal("fixture: intent-mixin gate input getVisualYOffset must read -0.5, got " + visualDy));
 
         BlockPos extendCell = top.west();
         ctx.assertTrue(world.getBlockState(extendCell).isAir(),
-                "fixture: the extend target cell west of the lowered TOP slab must start as air");
+                net.minecraft.text.Text.literal("fixture: the extend target cell west of the lowered TOP slab must start as air"));
 
         PlayerEntity player = mockSlabPlayer(ctx, top.west(3));
         // West face of the slab's cell, on the VISIBLE lowered geometry: raw fraction 0.4
@@ -143,17 +143,17 @@ public final class UseOnPlacementSuite {
         row("minusHalf.loweredTopSlab.sideClick", world, top, extendCell, result);
 
         ctx.assertTrue(result.isAccepted(),
-                "-0.5 lane: useOn on the lowered TOP slab's visible west face must place, got " + result);
+                net.minecraft.text.Text.literal("-0.5 lane: useOn on the lowered TOP slab's visible west face must place, got " + result));
         BlockState clickedAfter = world.getBlockState(top);
         ctx.assertTrue(clickedAfter.isOf(Blocks.OAK_SLAB) && clickedAfter.get(SlabBlock.TYPE) == SlabType.TOP,
-                "-0.5 lane: the lowered TOP slab must NOT combine into a DOUBLE on a visible side "
-                        + "click (WYSIWYG extend intent), got " + describe(world, top));
+                net.minecraft.text.Text.literal("-0.5 lane: the lowered TOP slab must NOT combine into a DOUBLE on a visible side "
+                        + "click (WYSIWYG extend intent), got " + describe(world, top)));
         BlockState extended = world.getBlockState(extendCell);
         ctx.assertTrue(extended.isOf(Blocks.OAK_SLAB),
-                "-0.5 lane: the adjacent cell must gain the extended slab, got " + describe(world, extendCell));
+                net.minecraft.text.Text.literal("-0.5 lane: the adjacent cell must gain the extended slab, got " + describe(world, extendCell)));
         ctx.assertTrue(extended.get(SlabBlock.TYPE) == SlabType.TOP,
-                "-0.5 lane: the extended slab must mint TYPE=TOP from the remapped (visible-half) "
-                        + "discriminator, got " + describe(world, extendCell));
+                net.minecraft.text.Text.literal("-0.5 lane: the extended slab must mint TYPE=TOP from the remapped (visible-half) "
+                        + "discriminator, got " + describe(world, extendCell)));
         ctx.complete();
     }
 
@@ -184,7 +184,7 @@ public final class UseOnPlacementSuite {
                 Block.NOTIFY_LISTENERS);
         BlockPos above = slab.up();
         ctx.assertTrue(world.getBlockState(above).isAir(),
-                "fixture: the cell above the bottom slab must start as air");
+                net.minecraft.text.Text.literal("fixture: the cell above the bottom slab must start as air"));
 
         PlayerEntity player = mockPlayerHolding(ctx, slab.north(3), new ItemStack(Blocks.STONE.asItem(), 16));
         Vec3d hit = new Vec3d(slab.getX() + 0.5, slab.getY() + 0.5, slab.getZ() + 0.5);
@@ -192,18 +192,18 @@ public final class UseOnPlacementSuite {
         row("gh57.row1.fullBlockOnBottomSlab.upFace", world, slab, above, result);
 
         ctx.assertTrue(result.isAccepted(),
-                "row1: useOn stone on a bottom slab's up face must place, got " + result);
+                net.minecraft.text.Text.literal("row1: useOn stone on a bottom slab's up face must place, got " + result));
         BlockState placed = world.getBlockState(above);
         ctx.assertTrue(placed.isOf(Blocks.STONE),
-                "row1: stone must land in the cell ABOVE the bottom slab (vanilla offset cell), got "
-                        + describe(world, above));
+                net.minecraft.text.Text.literal("row1: stone must land in the cell ABOVE the bottom slab (vanilla offset cell), got "
+                        + describe(world, above)));
         double dy = SlabSupport.getYOffset(world, above, placed);
         ctx.assertTrue(dy == -0.5,
-                "row1: SlabSupport.getYOffset must resolve -0.5 for a full block placed directly on a "
-                        + "bottom slab, got " + dy);
+                net.minecraft.text.Text.literal("row1: SlabSupport.getYOffset must resolve -0.5 for a full block placed directly on a "
+                        + "bottom slab, got " + dy));
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(world, above),
-                "row1: BlockOnPlacedAnchorMixin must persist the anchor for a full block placed "
-                        + "directly on a bottom slab (qualifiesForDirectAnchor), got isAnchored=false");
+                net.minecraft.text.Text.literal("row1: BlockOnPlacedAnchorMixin must persist the anchor for a full block placed "
+                        + "directly on a bottom slab (qualifiesForDirectAnchor), got isAnchored=false"));
         ctx.complete();
     }
 
@@ -225,13 +225,13 @@ public final class UseOnPlacementSuite {
         world.setBlockState(dirtPos, Blocks.DIRT.getDefaultState(), Block.NOTIFY_LISTENERS);
         SlabAnchorAttachment.addAnchor(world, dirtPos, world.getBlockState(dirtPos));
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(world, dirtPos),
-                "setup: dirt must anchor on the bottom slab");
+                net.minecraft.text.Text.literal("setup: dirt must anchor on the bottom slab"));
         double dirtDy = SlabSupport.getYOffset(world, dirtPos, world.getBlockState(dirtPos));
-        ctx.assertTrue(dirtDy == -0.5, "setup: anchored dirt should render -0.5, got " + dirtDy);
+        ctx.assertTrue(dirtDy == -0.5, net.minecraft.text.Text.literal("setup: anchored dirt should render -0.5, got " + dirtDy));
 
         BlockPos above = dirtPos.up();
         ctx.assertTrue(world.getBlockState(above).isAir(),
-                "fixture: the cell above the anchored dirt must start as air");
+                net.minecraft.text.Text.literal("fixture: the cell above the anchored dirt must start as air"));
 
         PlayerEntity player = mockPlayerHolding(ctx, dirtPos.north(3), new ItemStack(Blocks.STONE.asItem(), 16));
         Vec3d hit = new Vec3d(dirtPos.getX() + 0.5, dirtPos.getY() + 0.5, dirtPos.getZ() + 0.5);
@@ -239,18 +239,18 @@ public final class UseOnPlacementSuite {
         row("gh57.row2.fullBlockOnAnchoredLoweredDirt.upFace", world, dirtPos, above, result);
 
         ctx.assertTrue(result.isAccepted(),
-                "row2: useOn stone on the anchored lowered dirt's up face must place, got " + result);
+                net.minecraft.text.Text.literal("row2: useOn stone on the anchored lowered dirt's up face must place, got " + result));
         BlockState placed = world.getBlockState(above);
         ctx.assertTrue(placed.isOf(Blocks.STONE),
-                "row2: stone must land in the cell above the anchored lowered dirt, got "
-                        + describe(world, above));
+                net.minecraft.text.Text.literal("row2: stone must land in the cell above the anchored lowered dirt, got "
+                        + describe(world, above)));
         double dy = SlabSupport.getYOffset(world, above, placed);
         ctx.assertTrue(dy == -0.5,
-                "row2: SlabSupport.getYOffset must resolve -0.5 for a full block placed on an "
-                        + "anchored lowered full block, got " + dy);
+                net.minecraft.text.Text.literal("row2: SlabSupport.getYOffset must resolve -0.5 for a full block placed on an "
+                        + "anchored lowered full block, got " + dy));
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(world, above),
-                "row2: the newly placed block must itself anchor (column-lowered anchor lane), "
-                        + "got isAnchored=false");
+                net.minecraft.text.Text.literal("row2: the newly placed block must itself anchor (column-lowered anchor lane), "
+                        + "got isAnchored=false"));
         ctx.complete();
     }
 
@@ -296,15 +296,15 @@ public final class UseOnPlacementSuite {
         // persisted anchor.
         world.setBlockState(dirtPos, Blocks.DIRT.getDefaultState(), Block.NOTIFY_LISTENERS);
         ctx.assertTrue(!SlabAnchorAttachment.isAnchored(world, dirtPos),
-                "fixture: dirt placed via setBlockState only must carry no anchor");
+                net.minecraft.text.Text.literal("fixture: dirt placed via setBlockState only must carry no anchor"));
         double dirtDy = SlabSupport.getYOffset(world, dirtPos, world.getBlockState(dirtPos));
         ctx.assertTrue(dirtDy == -0.5,
-                "fixture: dirt resting directly on a bottom slab must still render lowered -0.5 "
-                        + "live (its own one-hop hasSlabInColumn walk), got " + dirtDy);
+                net.minecraft.text.Text.literal("fixture: dirt resting directly on a bottom slab must still render lowered -0.5 "
+                        + "live (its own one-hop hasSlabInColumn walk), got " + dirtDy));
 
         BlockPos above = dirtPos.up();
         ctx.assertTrue(world.getBlockState(above).isAir(),
-                "fixture: the cell above the unanchored dirt must start as air");
+                net.minecraft.text.Text.literal("fixture: the cell above the unanchored dirt must start as air"));
 
         PlayerEntity player = mockPlayerHolding(ctx, dirtPos.north(3), new ItemStack(Blocks.STONE.asItem(), 16));
         Vec3d hit = new Vec3d(dirtPos.getX() + 0.5, dirtPos.getY() + 0.5, dirtPos.getZ() + 0.5);
@@ -312,11 +312,11 @@ public final class UseOnPlacementSuite {
         row("gh57.row3.fullBlockOnUnanchoredLoweredLookingDirt.upFace", world, dirtPos, above, result);
 
         ctx.assertTrue(result.isAccepted(),
-                "row3: useOn stone on the unanchored lowered-looking dirt's up face must place, got "
-                        + result);
+                net.minecraft.text.Text.literal("row3: useOn stone on the unanchored lowered-looking dirt's up face must place, got "
+                        + result));
         BlockState placed = world.getBlockState(above);
         ctx.assertTrue(placed.isOf(Blocks.STONE),
-                "row3: stone must land in the cell above the dirt, got " + describe(world, above));
+                net.minecraft.text.Text.literal("row3: stone must land in the cell above the dirt, got " + describe(world, above)));
 
         // PINNING ASSERTIONS — NOT statements of desired behavior, and NOT the outcome this row
         // originally hypothesized. GH #57's reporter describes a block placed above a slab-
@@ -333,15 +333,15 @@ public final class UseOnPlacementSuite {
         double dy = SlabSupport.getYOffset(world, above, placed);
         boolean anchored = SlabAnchorAttachment.isAnchored(world, above);
         ctx.assertTrue(dy == -0.5,
-                "PINS CURRENT BEHAVIOR for GH #57 (this one-hop shape does NOT reproduce the "
+                net.minecraft.text.Text.literal("PINS CURRENT BEHAVIOR for GH #57 (this one-hop shape does NOT reproduce the "
                         + "reported float): a full block placed directly above an unanchored "
                         + "lowered-looking full block (itself resting on a bottom slab) renders dy=" + dy
-                        + " (anchored=" + anchored + ")");
+                        + " (anchored=" + anchored + ")"));
         ctx.assertTrue(anchored,
-                "PINS CURRENT BEHAVIOR for GH #57: a full block placed above an unanchored "
+                net.minecraft.text.Text.literal("PINS CURRENT BEHAVIOR for GH #57: a full block placed above an unanchored "
                         + "lowered-looking support is anchored=" + anchored + " (dy=" + dy + ") — "
                         + "qualifiesForColumnLoweredAnchor's unbounded-through-solids column walk "
-                        + "found the bottom slab beneath the unanchored dirt and anchored it anyway");
+                        + "found the bottom slab beneath the unanchored dirt and anchored it anyway"));
         ctx.complete();
     }
 
@@ -364,7 +364,7 @@ public final class UseOnPlacementSuite {
         BlockPos origin = ctx.getAbsolutePos(BlockPos.ORIGIN);
 
         Block ts = Registries.BLOCK.get(Identifier.of("terrainslabs", "grass_slab"));
-        ctx.assertTrue(ts != Blocks.AIR, "fixture: Terrain Slabs loaded");
+        ctx.assertTrue(ts != Blocks.AIR, net.minecraft.text.Text.literal("fixture: Terrain Slabs loaded"));
         BlockState tsBottom = ts.getDefaultState();
         if (tsBottom.contains(SlabBlock.TYPE)) {
             tsBottom = tsBottom.with(SlabBlock.TYPE, SlabType.BOTTOM);
@@ -378,15 +378,15 @@ public final class UseOnPlacementSuite {
 
         double dy = SlabSupport.getYOffset(world, top, world.getBlockState(top));
         ctx.assertTrue(dy == -1.0,
-                "fixture: vanilla TOP slab on a Terrain Slabs bottom must render -1.0 "
-                        + "(vanillaTopSlabOnTerrainLowersFull lane), got " + dy);
+                net.minecraft.text.Text.literal("fixture: vanilla TOP slab on a Terrain Slabs bottom must render -1.0 "
+                        + "(vanillaTopSlabOnTerrainLowersFull lane), got " + dy));
         double visualDy = SlabSupport.getVisualYOffset(world, top, world.getBlockState(top));
         ctx.assertTrue(visualDy == -1.0,
-                "fixture: intent-mixin gate input getVisualYOffset must read -1.0, got " + visualDy);
+                net.minecraft.text.Text.literal("fixture: intent-mixin gate input getVisualYOffset must read -1.0, got " + visualDy));
 
         BlockPos extendCell = top.west();
         ctx.assertTrue(world.getBlockState(extendCell).isAir(),
-                "fixture: the extend target cell west of the -1.0 slab must start as air");
+                net.minecraft.text.Text.literal("fixture: the extend target cell west of the -1.0 slab must start as air"));
 
         PlayerEntity player = PlacementHarness.mockSlabPlayer(ctx, top.west(3));
         // Visible span is [Y-0.5, Y]; hit its upper region: absolute Y - 0.1 → raw fraction
@@ -399,17 +399,17 @@ public final class UseOnPlacementSuite {
         PlacementHarness.row("minusOne.loweredTopSlab.sideClick", world, top, extendCell, result);
 
         ctx.assertTrue(result.isAccepted(),
-                "-1.0 lane: useOn on the -1.0 slab's visible west face must place, got " + result);
+                net.minecraft.text.Text.literal("-1.0 lane: useOn on the -1.0 slab's visible west face must place, got " + result));
         BlockState clickedAfter = world.getBlockState(top);
         ctx.assertTrue(clickedAfter.isOf(Blocks.OAK_SLAB) && clickedAfter.get(SlabBlock.TYPE) == SlabType.TOP,
-                "-1.0 lane: the -1.0-lowered TOP slab must NOT combine into a DOUBLE on a visible "
+                net.minecraft.text.Text.literal("-1.0 lane: the -1.0-lowered TOP slab must NOT combine into a DOUBLE on a visible "
                         + "side click (WYSIWYG extend intent; intent-mixin gate is == -0.5 so the "
                         + "raw-fraction misdecision persists here), got "
-                        + PlacementHarness.describe(world, top));
+                        + PlacementHarness.describe(world, top)));
         BlockState extended = world.getBlockState(extendCell);
         ctx.assertTrue(extended.isOf(Blocks.OAK_SLAB),
-                "-1.0 lane: the adjacent cell must gain the extended slab, got "
-                        + PlacementHarness.describe(world, extendCell));
+                net.minecraft.text.Text.literal("-1.0 lane: the adjacent cell must gain the extended slab, got "
+                        + PlacementHarness.describe(world, extendCell)));
         ctx.complete();
     }
 }

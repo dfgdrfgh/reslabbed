@@ -30,23 +30,23 @@ public final class RecorderManifestRedactionTest {
         String redacted = LiveCursorIntentRecorder.redactJavaCommand(command);
 
         ctx.assertTrue(!redacted.contains("super-secret-jwt-token"),
-                "accessToken value must be redacted, got: " + redacted);
+                net.minecraft.text.Text.literal("accessToken value must be redacted, got: " + redacted));
         ctx.assertTrue(!redacted.contains("11112222333344445555666677778888"),
-                "uuid value must be redacted, got: " + redacted);
+                net.minecraft.text.Text.literal("uuid value must be redacted, got: " + redacted));
         ctx.assertTrue(!redacted.contains("9999888877776666"),
-                "xuid value must be redacted, got: " + redacted);
+                net.minecraft.text.Text.literal("xuid value must be redacted, got: " + redacted));
         ctx.assertTrue(!redacted.contains("abcdef-0123-4567-89ab-cdef01234567"),
-                "clientId value must be redacted, got: " + redacted);
-        ctx.assertTrue(redacted.contains("--accessToken [REDACTED]"), "accessToken flag itself should remain, value replaced");
-        ctx.assertTrue(redacted.contains("--username TestPlayer"), "non-sensitive args must be preserved");
-        ctx.assertTrue(redacted.contains("--userType msa"), "non-sensitive args must be preserved");
+                net.minecraft.text.Text.literal("clientId value must be redacted, got: " + redacted));
+        ctx.assertTrue(redacted.contains("--accessToken [REDACTED]"), net.minecraft.text.Text.literal("accessToken flag itself should remain, value replaced"));
+        ctx.assertTrue(redacted.contains("--username TestPlayer"), net.minecraft.text.Text.literal("non-sensitive args must be preserved"));
+        ctx.assertTrue(redacted.contains("--userType msa"), net.minecraft.text.Text.literal("non-sensitive args must be preserved"));
         ctx.complete();
     }
 
     @GameTest(structure = "fabric-gametest-api-v1:empty")
     public void handlesNullAndEmptySafely(TestContext ctx) {
-        ctx.assertTrue(LiveCursorIntentRecorder.redactJavaCommand(null) == null, "null in, null out");
-        ctx.assertTrue("".equals(LiveCursorIntentRecorder.redactJavaCommand("")), "empty in, empty out");
+        ctx.assertTrue(LiveCursorIntentRecorder.redactJavaCommand(null) == null, net.minecraft.text.Text.literal("null in, null out"));
+        ctx.assertTrue("".equals(LiveCursorIntentRecorder.redactJavaCommand("")), net.minecraft.text.Text.literal("empty in, empty out"));
         ctx.complete();
     }
 }

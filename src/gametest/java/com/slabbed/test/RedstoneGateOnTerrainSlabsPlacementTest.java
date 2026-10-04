@@ -56,18 +56,18 @@ public final class RedstoneGateOnTerrainSlabsPlacementTest {
                 Block.NOTIFY_LISTENERS);
 
         ctx.assertTrue(w.getBlockState(vanillaPos).isSideSolid(w, vanillaPos, Direction.UP, SideShapeType.RIGID),
-                "setup: vanilla bottom slab must report RIGID UP-solid");
+                net.minecraft.text.Text.literal("setup: vanilla bottom slab must report RIGID UP-solid"));
 
         ctx.assertTrue(
                 w.getBlockState(tsPos).isSideSolid(w, tsPos, Direction.UP, SideShapeType.RIGID),
-                "a Terrain-Slabs-owned bottom slab must ALSO report RIGID UP-solid, or redstone "
+                net.minecraft.text.Text.literal("a Terrain-Slabs-owned bottom slab must ALSO report RIGID UP-solid, or redstone "
                         + "gates (repeater/comparator) and any other RIGID-gated block cannot be "
-                        + "placed on it (live-reported 'can't place redstone repeater/comparator on TS')");
+                        + "placed on it (live-reported 'can't place redstone repeater/comparator on TS')"));
 
         ctx.assertTrue(Blocks.REPEATER.getDefaultState().canPlaceAt(w, tsPos.up()),
-                "a repeater must be placeable directly on top of a Terrain-Slabs-owned bottom slab");
+                net.minecraft.text.Text.literal("a repeater must be placeable directly on top of a Terrain-Slabs-owned bottom slab"));
         ctx.assertTrue(Blocks.COMPARATOR.getDefaultState().canPlaceAt(w, tsPos.up()),
-                "a comparator must be placeable directly on top of a Terrain-Slabs-owned bottom slab");
+                net.minecraft.text.Text.literal("a comparator must be placeable directly on top of a Terrain-Slabs-owned bottom slab"));
         ctx.complete();
     }
 
@@ -80,7 +80,7 @@ public final class RedstoneGateOnTerrainSlabsPlacementTest {
         w.setBlockState(pos, TerrainSlabsTestShim.TEST_TS_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP),
                 Block.NOTIFY_LISTENERS);
         ctx.assertTrue(!SlabSupport.isBottomSlab(w.getBlockState(pos)),
-                "setup: a TOP-type slab must not be classified as a bottom slab");
+                net.minecraft.text.Text.literal("setup: a TOP-type slab must not be classified as a bottom slab"));
         ctx.complete();
     }
 }

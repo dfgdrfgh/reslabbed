@@ -89,7 +89,7 @@ public final class NeverPopSuite {
             w.setBlockState(pos, Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
         }
         ctx.assertTrue(fails.length() == 0,
-                "these placed blocks POPPED when their support was removed (never-pop / WYSIWYG):" + fails);
+                net.minecraft.text.Text.literal("these placed blocks POPPED when their support was removed (never-pop / WYSIWYG):" + fails));
         ctx.complete();
     }
 
@@ -120,7 +120,7 @@ public final class NeverPopSuite {
             w.setBlockState(pos, Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
         }
         ctx.assertTrue(fails.length() == 0,
-                "these flat-placed blocks got PULLED DOWN by a later slab (never-pop / WYSIWYG):" + fails);
+                net.minecraft.text.Text.literal("these flat-placed blocks got PULLED DOWN by a later slab (never-pop / WYSIWYG):" + fails));
         ctx.complete();
     }
 
@@ -147,17 +147,17 @@ public final class NeverPopSuite {
         onPlaced(w, fence, w.getBlockState(fence));
 
         double dyPlaced = SlabSupport.getYOffset(w, fence, w.getBlockState(fence));
-        ctx.assertTrue(Math.abs(dyPlaced + 0.5) < 1.0e-6, "a fence on a bottom slab is placed lowered -0.5, got " + dyPlaced);
+        ctx.assertTrue(Math.abs(dyPlaced + 0.5) < 1.0e-6, net.minecraft.text.Text.literal("a fence on a bottom slab is placed lowered -0.5, got " + dyPlaced));
         ctx.assertTrue(
                 SlabAnchorAttachment.isAnchored(w, fence) || SlabAnchorAttachment.isFrozenFlat(w, fence),
-                "a fence placed lowered MUST be height-locked (anchored or frozen), else it pops (WYSIWYG)");
+                net.minecraft.text.Text.literal("a fence placed lowered MUST be height-locked (anchored or frozen), else it pops (WYSIWYG)"));
 
         // The actual pop scenario: remove the slab below. A geometric fence would recompute to 0.0
         // and pop UP; a height-locked one stays at -0.5.
         w.setBlockState(slab, Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
         double dyAfter = SlabSupport.getYOffset(w, fence, w.getBlockState(fence));
         ctx.assertTrue(Math.abs(dyAfter + 0.5) < 1.0e-6,
-                "the placed fence must STAY at -0.5 after its support changes, got " + dyAfter + " (it popped)");
+                net.minecraft.text.Text.literal("the placed fence must STAY at -0.5 after its support changes, got " + dyAfter + " (it popped)"));
         ctx.complete();
     }
 
@@ -171,7 +171,7 @@ public final class NeverPopSuite {
         onPlaced(w, wall, w.getBlockState(wall));
         ctx.assertTrue(
                 SlabAnchorAttachment.isAnchored(w, wall) || SlabAnchorAttachment.isFrozenFlat(w, wall),
-                "a wall placed lowered MUST be height-locked");
+                net.minecraft.text.Text.literal("a wall placed lowered MUST be height-locked"));
         ctx.complete();
     }
 
@@ -184,15 +184,15 @@ public final class NeverPopSuite {
         w.setBlockState(fence, Blocks.OAK_FENCE.getDefaultState(), Block.NOTIFY_LISTENERS);
         onPlaced(w, fence, w.getBlockState(fence));
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, fence) || SlabAnchorAttachment.isFrozenFlat(w, fence),
-                "precondition: fence is height-locked after placement");
+                net.minecraft.text.Text.literal("precondition: fence is height-locked after placement"));
 
         // Mutate a connection property (what a neighbour update does) — same block kind.
         BlockState connected = w.getBlockState(fence).with(Properties.NORTH, true);
         w.setBlockState(fence, connected, Block.NOTIFY_LISTENERS);
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, fence) || SlabAnchorAttachment.isFrozenFlat(w, fence),
-                "the height-lock MUST survive a fence connection-state update (property-only change)");
+                net.minecraft.text.Text.literal("the height-lock MUST survive a fence connection-state update (property-only change)"));
         double dy = SlabSupport.getYOffset(w, fence, w.getBlockState(fence));
-        ctx.assertTrue(Math.abs(dy + 0.5) < 1.0e-6, "still -0.5 after the connection update, got " + dy);
+        ctx.assertTrue(Math.abs(dy + 0.5) < 1.0e-6, net.minecraft.text.Text.literal("still -0.5 after the connection update, got " + dy));
         ctx.complete();
     }
 
@@ -214,15 +214,15 @@ public final class NeverPopSuite {
         onPlaced(w, pos, w.getBlockState(pos));
 
         double placed = SlabSupport.getYOffset(w, pos, w.getBlockState(pos));
-        ctx.assertTrue(placed < -1.0e-6, label + " on a bottom slab must place lowered, got " + placed);
+        ctx.assertTrue(placed < -1.0e-6, net.minecraft.text.Text.literal(label + " on a bottom slab must place lowered, got " + placed));
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, pos),
-                label + " placed lowered MUST be height-locked (else it snaps when the column changes)");
+                net.minecraft.text.Text.literal(label + " placed lowered MUST be height-locked (else it snaps when the column changes)"));
 
         // Edit the column below WITHOUT touching the block entity — a geometric one would toggle.
         w.setBlockState(slab, Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
         double after = SlabSupport.getYOffset(w, pos, w.getBlockState(pos));
         ctx.assertTrue(Math.abs(after - placed) < 1.0e-6,
-                label + " must STAY at " + placed + " when the cell below changes, got " + after + " (snap)");
+                net.minecraft.text.Text.literal(label + " must STAY at " + placed + " when the cell below changes, got " + after + " (snap)"));
 
         w.setBlockState(pos, Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
         w.setBlockState(slab, Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
@@ -251,12 +251,12 @@ public final class NeverPopSuite {
         w.setBlockState(pos, Blocks.HOPPER.getDefaultState(), Block.NOTIFY_LISTENERS);
         onPlaced(w, pos, w.getBlockState(pos));
         double placed = SlabSupport.getYOffset(w, pos, w.getBlockState(pos));
-        ctx.assertTrue(Math.abs(placed) < 1.0e-6, "hopper placed flat must be dy 0, got " + placed);
+        ctx.assertTrue(Math.abs(placed) < 1.0e-6, net.minecraft.text.Text.literal("hopper placed flat must be dy 0, got " + placed));
 
         w.setBlockState(ground, bottomSlab(), Block.NOTIFY_LISTENERS);
         double after = SlabSupport.getYOffset(w, pos, w.getBlockState(pos));
         ctx.assertTrue(Math.abs(after) < 1.0e-6,
-                "a flat-placed hopper must NOT be pulled down by a slab added under it, got " + after);
+                net.minecraft.text.Text.literal("a flat-placed hopper must NOT be pulled down by a slab added under it, got " + after));
         ctx.complete();
     }
 
@@ -271,9 +271,9 @@ public final class NeverPopSuite {
         w.setBlockState(pos, Blocks.OAK_HANGING_SIGN.getDefaultState(), Block.NOTIFY_LISTENERS);
         onPlaced(w, pos, w.getBlockState(pos));
         ctx.assertTrue(!SlabAnchorAttachment.isAnchored(w, pos),
-                "a hanging sign (ceiling-hung block entity) must NOT be anchored — it follows its support");
+                net.minecraft.text.Text.literal("a hanging sign (ceiling-hung block entity) must NOT be anchored — it follows its support"));
         ctx.assertTrue(!SlabAnchorAttachment.isFrozenFlat(w, pos),
-                "a hanging sign must NOT be frozen-flat either");
+                net.minecraft.text.Text.literal("a hanging sign must NOT be frozen-flat either"));
         ctx.complete();
     }
 
@@ -325,35 +325,35 @@ public final class NeverPopSuite {
         ServerWorld w = ctx.getWorld();
         BlockPos pot = buildPotOnLoweredColumn(ctx, 1, 1, true);
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, pot),
-                "fixture: the pot must start ANCHORED, as the recorder reports for (203,-55,-34)");
+                net.minecraft.text.Text.literal("fixture: the pot must start ANCHORED, as the recorder reports for (203,-55,-34)"));
 
         BlockPos subject = pot.up();
         place(w, subject, Blocks.STONE.getDefaultState());
         ctx.assertTrue(!SlabAnchorAttachment.isAnchored(w, subject),
-                "fixture: the subject must carry NO anchor, as the recorder reports for "
-                        + "(203,-54,-34) — that is WHY it re-derives on every neighbour change");
+                net.minecraft.text.Text.literal("fixture: the subject must carry NO anchor, as the recorder reports for "
+                        + "(203,-54,-34) — that is WHY it re-derives on every neighbour change"));
         double before = SlabSupport.getYOffset(w, subject, w.getBlockState(subject));
         ctx.assertTrue(Math.abs(before + 0.5) <= EPS,
-                "fixture: the stone resting on the lowered flower_pot must start at -0.5, got "
-                        + before);
+                net.minecraft.text.Text.literal("fixture: the stone resting on the lowered flower_pot must start at -0.5, got "
+                        + before));
 
         // Potting: FlowerPotBlock's own use action is a plain in-place setBlockState to potted_*.
         place(w, pot, Blocks.POTTED_CORNFLOWER.getDefaultState());
 
         double potDy = SlabSupport.getYOffset(w, pot, w.getBlockState(pot));
         ctx.assertTrue(Math.abs(potDy + 0.5) <= EPS,
-                "fixture: THE SUPPORT DID NOT MOVE — the potted pot must still render -0.5 (the "
-                        + "recorder shows -0.500 in both frames), got " + potDy);
+                net.minecraft.text.Text.literal("fixture: THE SUPPORT DID NOT MOVE — the potted pot must still render -0.5 (the "
+                        + "recorder shows -0.500 in both frames), got " + potDy));
 
         double after = SlabSupport.getYOffset(w, subject, w.getBlockState(subject));
         ctx.assertTrue(Math.abs(after - before) <= EPS,
-                "NEVER-POP: potting the flower below must not move the block above. Was " + before
+                net.minecraft.text.Text.literal("NEVER-POP: potting the flower below must not move the block above. Was " + before
                         + ", now " + after + " (live (203,-54,-34): -0.5 -> 0.0 the instant "
                         + "flower_pot became potted_cornflower, while the pot's own dy stayed "
                         + "-0.500 — hasSlabInColumn used the pot's ANCHOR FLAG as a proxy for "
                         + "'is this cell lowered', and potting clears that flag)"
                         + " [subjectAnchored=" + SlabAnchorAttachment.isAnchored(w, subject)
-                        + " potAnchored=" + SlabAnchorAttachment.isAnchored(w, pot) + "]");
+                        + " potAnchored=" + SlabAnchorAttachment.isAnchored(w, pot) + "]"));
         ctx.complete();
     }
 
@@ -372,17 +372,17 @@ public final class NeverPopSuite {
         placeWithOnPlaced(w, subject, Blocks.STONE.getDefaultState());
         double before = SlabSupport.getYOffset(w, subject, w.getBlockState(subject));
         ctx.assertTrue(Math.abs(before + 0.5) <= EPS,
-                "fixture: the stone placed on the lowered flower_pot must start at -0.5, got "
-                        + before);
+                net.minecraft.text.Text.literal("fixture: the stone placed on the lowered flower_pot must start at -0.5, got "
+                        + before));
 
         place(w, pot, Blocks.POTTED_CORNFLOWER.getDefaultState());
 
         double after = SlabSupport.getYOffset(w, subject, w.getBlockState(subject));
         ctx.assertTrue(Math.abs(after - before) <= EPS,
-                "NEVER-POP (player-placed): potting the flower below must not move the block above. "
+                net.minecraft.text.Text.literal("NEVER-POP (player-placed): potting the flower below must not move the block above. "
                         + "Was " + before + ", now " + after
                         + " [subjectAnchored=" + SlabAnchorAttachment.isAnchored(w, subject)
-                        + " potAnchored=" + SlabAnchorAttachment.isAnchored(w, pot) + "]");
+                        + " potAnchored=" + SlabAnchorAttachment.isAnchored(w, pot) + "]"));
         ctx.complete();
     }
 
@@ -397,7 +397,7 @@ public final class NeverPopSuite {
         BlockPos pot = buildPotOnLoweredColumn(ctx, 1, 4, false);
         place(w, pot, Blocks.POTTED_CORNFLOWER.getDefaultState());
         ctx.assertTrue(!SlabAnchorAttachment.isAnchored(w, pot),
-                "fixture: no anchor anywhere — this cell exercises the GEOMETRIC lane");
+                net.minecraft.text.Text.literal("fixture: no anchor anywhere — this cell exercises the GEOMETRIC lane"));
 
         BlockPos subject = pot.up();
         place(w, subject, Blocks.STONE.getDefaultState());
@@ -407,10 +407,10 @@ public final class NeverPopSuite {
         double after = SlabSupport.getYOffset(w, subject, w.getBlockState(subject));
 
         ctx.assertTrue(Math.abs(after - before) <= EPS,
-                "NEVER-POP: emptying the pot below must not move the block above. Was " + before
-                        + ", now " + after);
+                net.minecraft.text.Text.literal("NEVER-POP: emptying the pot below must not move the block above. Was " + before
+                        + ", now " + after));
         ctx.assertTrue(Math.abs(after + 0.5) <= EPS,
-                "and the settled value must be -0.5 (the whole column is lowered), got " + after);
+                net.minecraft.text.Text.literal("and the settled value must be -0.5 (the whole column is lowered), got " + after));
         ctx.complete();
     }
 
@@ -429,7 +429,7 @@ public final class NeverPopSuite {
 
         double dyBefore = SlabSupport.getYOffset(w, pot, w.getBlockState(pot));
         ctx.assertTrue(Math.abs(dyBefore + 0.5) <= EPS,
-                "fixture: the placed pot must start at -0.5, got " + dyBefore);
+                net.minecraft.text.Text.literal("fixture: the placed pot must start at -0.5, got " + dyBefore));
 
         // Break the block directly beneath the pot with a real neighbour update, exactly like the
         // other never-pop "remove support" rows in this suite.
@@ -437,15 +437,15 @@ public final class NeverPopSuite {
 
         BlockState potAfterState = w.getBlockState(pot);
         ctx.assertTrue(potAfterState.isOf(Blocks.FLOWER_POT),
-                "#67: a pot must survive its support breaking (vanilla FlowerPotBlock has no "
+                net.minecraft.text.Text.literal("#67: a pot must survive its support breaking (vanilla FlowerPotBlock has no "
                         + "canPlaceAt override, so it never needs support); found " + potAfterState
-                        + " at " + pot + " instead of flower_pot");
+                        + " at " + pot + " instead of flower_pot"));
 
         double dyAfter = SlabSupport.getYOffset(w, pot, w.getBlockState(pot));
         ctx.assertTrue(Math.abs(dyAfter - dyBefore) <= EPS,
-                "#67: the surviving pot's height must not change when its support breaks. Was "
+                net.minecraft.text.Text.literal("#67: the surviving pot's height must not change when its support breaks. Was "
                         + dyBefore + ", now " + dyAfter
-                        + " [potAnchored=" + SlabAnchorAttachment.isAnchored(w, pot) + "]");
+                        + " [potAnchored=" + SlabAnchorAttachment.isAnchored(w, pot) + "]"));
         ctx.complete();
     }
 
@@ -465,7 +465,7 @@ public final class NeverPopSuite {
         place(w, support, Blocks.STONE.getDefaultState());
         double supportDy = SlabSupport.getYOffset(w, support, w.getBlockState(support));
         ctx.assertTrue(Math.abs(supportDy + 0.5) <= EPS,
-                "fixture: the stone under the pot must render -0.5, got " + supportDy);
+                net.minecraft.text.Text.literal("fixture: the stone under the pot must render -0.5, got " + supportDy));
 
         BlockPos pot = support.up();
         if (placePot) {
@@ -475,8 +475,8 @@ public final class NeverPopSuite {
         }
         double potDy = SlabSupport.getYOffset(w, pot, w.getBlockState(pot));
         ctx.assertTrue(Math.abs(potDy + 0.5) <= EPS,
-                "fixture: the flower_pot must render -0.5 (live (203,-55,-34) visualDy=-0.500), got "
-                        + potDy);
+                net.minecraft.text.Text.literal("fixture: the flower_pot must render -0.5 (live (203,-55,-34) visualDy=-0.500), got "
+                        + potDy));
         return pot;
     }
 
@@ -506,7 +506,7 @@ public final class NeverPopSuite {
         w.setBlockState(block, Blocks.GRASS_BLOCK.getDefaultState(), Block.NOTIFY_LISTENERS);
         onPlaced(w, block, w.getBlockState(block));
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, block),
-                "precondition: grass block on a bottom slab is anchored");
+                net.minecraft.text.Text.literal("precondition: grass block on a bottom slab is anchored"));
         double before = SlabSupport.getYOffset(w, block, w.getBlockState(block));
 
         // Grass -> dirt: a block-KIND change at the SAME position (the tower conversion).
@@ -516,10 +516,10 @@ public final class NeverPopSuite {
         w.setBlockState(block, Blocks.DIRT.getDefaultState(), Block.NOTIFY_ALL);
 
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, block),
-                "the anchor MUST survive an in-place grass->dirt transform (WYSIWYG, no jitter)");
+                net.minecraft.text.Text.literal("the anchor MUST survive an in-place grass->dirt transform (WYSIWYG, no jitter)"));
         double after = SlabSupport.getYOffset(w, block, w.getBlockState(block));
         ctx.assertTrue(Math.abs(after - before) < 1.0e-6,
-                "dy must not jump on the in-place transform: before=" + before + " after=" + after);
+                net.minecraft.text.Text.literal("dy must not jump on the in-place transform: before=" + before + " after=" + after));
         ctx.complete();
     }
 
@@ -531,13 +531,13 @@ public final class NeverPopSuite {
         w.setBlockState(slab, bottomSlab(), Block.NOTIFY_LISTENERS);
         w.setBlockState(block, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
         onPlaced(w, block, w.getBlockState(block));
-        ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, block), "precondition: stone anchored");
+        ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, block), net.minecraft.text.Text.literal("precondition: stone anchored"));
 
         // A real break MUST clear the anchor so a fresh placement re-evaluates. Use breakBlock
         // (the player-break path that actually fires onStateReplaced), not a raw setBlockState.
         w.breakBlock(block, false);
         ctx.assertTrue(!SlabAnchorAttachment.isAnchored(w, block),
-                "breaking the block MUST clear its anchor");
+                net.minecraft.text.Text.literal("breaking the block MUST clear its anchor"));
         ctx.complete();
     }
 
@@ -549,13 +549,13 @@ public final class NeverPopSuite {
         w.setBlockState(slab, bottomSlab(), Block.NOTIFY_LISTENERS);
         w.setBlockState(block, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
         onPlaced(w, block, w.getBlockState(block));
-        ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, block), "precondition: stone anchored");
+        ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, block), net.minecraft.text.Text.literal("precondition: stone anchored"));
 
         // Break, then place a non-ordinary block (a slab) — the anchor must not linger stale.
         w.breakBlock(block, false);
         w.setBlockState(block, bottomSlab(), Block.NOTIFY_LISTENERS);
         ctx.assertTrue(!SlabAnchorAttachment.isAnchored(w, block),
-                "after a break the anchor must be gone (no stale anchor under the new slab)");
+                net.minecraft.text.Text.literal("after a break the anchor must be gone (no stale anchor under the new slab)"));
         ctx.complete();
     }
 
@@ -567,14 +567,14 @@ public final class NeverPopSuite {
         w.setBlockState(slab, bottomSlab(), Block.NOTIFY_LISTENERS);
         w.setBlockState(block, Blocks.GRASS_BLOCK.getDefaultState(), Block.NOTIFY_LISTENERS);
         onPlaced(w, block, w.getBlockState(block));
-        ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, block), "precondition: grass anchored");
+        ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, block), net.minecraft.text.Text.literal("precondition: grass anchored"));
 
         // Directly replace grass with a SLAB in place (NOTIFY_ALL fires onStateReplaced). A slab
         // is NOT a lock-eligible block, so the gate must CLEAR the stale grass anchor rather than
         // preserve it — the new slab must re-evaluate its own dy from scratch.
         w.setBlockState(block, bottomSlab(), Block.NOTIFY_ALL);
         ctx.assertTrue(!SlabAnchorAttachment.isAnchored(w, block),
-                "replacing the anchored full block with a slab (non-lock) MUST clear the anchor");
+                net.minecraft.text.Text.literal("replacing the anchored full block with a slab (non-lock) MUST clear the anchor"));
         ctx.complete();
     }
 
@@ -618,17 +618,17 @@ public final class NeverPopSuite {
 
         double candleDyBefore = SlabSupport.getYOffset(w, candlePos, w.getBlockState(candlePos));
         ctx.assertTrue(Math.abs(candleDyBefore + 0.5) <= EPS,
-                "setup: candle resting on a bottom slab should render -0.5, got " + candleDyBefore);
+                net.minecraft.text.Text.literal("setup: candle resting on a bottom slab should render -0.5, got " + candleDyBefore));
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, candlePos),
-                "THE FIX: a candle resting on a bottom slab must anchor at placement time, or "
+                net.minecraft.text.Text.literal("THE FIX: a candle resting on a bottom slab must anchor at placement time, or "
                         + "breaking the slab later pops it back to flush "
-                        + "(live-reported 'pop upon breaking at the end')");
+                        + "(live-reported 'pop upon breaking at the end')"));
 
         w.setBlockState(slabPos, Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
         double candleDyAfter = SlabSupport.getYOffset(w, candlePos, w.getBlockState(candlePos));
         ctx.assertTrue(Math.abs(candleDyAfter + 0.5) <= EPS,
-                "never-pop violation: candle popped from -0.5 to " + candleDyAfter
-                        + " after its support was broken, even though it was never re-placed");
+                net.minecraft.text.Text.literal("never-pop violation: candle popped from -0.5 to " + candleDyAfter
+                        + " after its support was broken, even though it was never re-placed"));
         ctx.complete();
     }
 
@@ -644,29 +644,29 @@ public final class NeverPopSuite {
                 Block.NOTIFY_LISTENERS);
         w.setBlockState(dirtPos, Blocks.DIRT.getDefaultState(), Block.NOTIFY_LISTENERS);
         SlabAnchorAttachment.addAnchor(w, dirtPos, w.getBlockState(dirtPos));
-        ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, dirtPos), "setup: dirt must anchor on the bottom slab");
+        ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, dirtPos), net.minecraft.text.Text.literal("setup: dirt must anchor on the bottom slab"));
 
         w.setBlockState(fencePos, Blocks.SPRUCE_FENCE.getDefaultState(), Block.NOTIFY_LISTENERS);
         SlabAnchorAttachment.addAnchor(w, fencePos, w.getBlockState(fencePos));
         double fenceDy = SlabSupport.getYOffset(w, fencePos, w.getBlockState(fencePos));
         ctx.assertTrue(Math.abs(fenceDy + 0.5) <= EPS,
-                "setup: fence beside anchored dirt should render -0.5, got " + fenceDy);
-        ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, fencePos), "setup: fence must anchor via the horizontal-adjacency lane");
+                net.minecraft.text.Text.literal("setup: fence beside anchored dirt should render -0.5, got " + fenceDy));
+        ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, fencePos), net.minecraft.text.Text.literal("setup: fence must anchor via the horizontal-adjacency lane"));
 
         w.setBlockState(trapdoorPos, Blocks.BIRCH_TRAPDOOR.getDefaultState(), Block.NOTIFY_LISTENERS);
         SlabAnchorAttachment.addAnchor(w, trapdoorPos, w.getBlockState(trapdoorPos));
         double trapdoorDyBefore = SlabSupport.getYOffset(w, trapdoorPos, w.getBlockState(trapdoorPos));
         ctx.assertTrue(Math.abs(trapdoorDyBefore + 0.5) <= EPS,
-                "setup: trapdoor resting on the lowered fence should render -0.5, got " + trapdoorDyBefore);
+                net.minecraft.text.Text.literal("setup: trapdoor resting on the lowered fence should render -0.5, got " + trapdoorDyBefore));
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, trapdoorPos),
-                "THE FIX: a trapdoor resting on a lowered fence must anchor at placement time, or "
-                        + "breaking the fence later pops it back to flush");
+                net.minecraft.text.Text.literal("THE FIX: a trapdoor resting on a lowered fence must anchor at placement time, or "
+                        + "breaking the fence later pops it back to flush"));
 
         w.setBlockState(fencePos, Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
         double trapdoorDyAfter = SlabSupport.getYOffset(w, trapdoorPos, w.getBlockState(trapdoorPos));
         ctx.assertTrue(Math.abs(trapdoorDyAfter + 0.5) <= EPS,
-                "never-pop violation: trapdoor popped from -0.5 to " + trapdoorDyAfter
-                        + " after its support was broken, even though it was never re-placed");
+                net.minecraft.text.Text.literal("never-pop violation: trapdoor popped from -0.5 to " + trapdoorDyAfter
+                        + " after its support was broken, even though it was never re-placed"));
         ctx.complete();
     }
 
@@ -678,7 +678,7 @@ public final class NeverPopSuite {
         w.setBlockState(pos, Blocks.CANDLE.getDefaultState(), Block.NOTIFY_LISTENERS);
         SlabAnchorAttachment.addAnchor(w, pos, w.getBlockState(pos));
         ctx.assertTrue(!SlabAnchorAttachment.isAnchored(w, pos),
-                "regression: a candle on ordinary ground (not lowered) must not anchor");
+                net.minecraft.text.Text.literal("regression: a candle on ordinary ground (not lowered) must not anchor"));
         ctx.complete();
     }
 
@@ -698,24 +698,24 @@ public final class NeverPopSuite {
                 Block.NOTIFY_LISTENERS);
         w.setBlockState(dirtAnchorPos, Blocks.DIRT.getDefaultState(), Block.NOTIFY_LISTENERS);
         SlabAnchorAttachment.addAnchor(w, dirtAnchorPos, w.getBlockState(dirtAnchorPos));
-        ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, dirtAnchorPos), "setup: dirt must anchor on the bottom slab");
+        ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, dirtAnchorPos), net.minecraft.text.Text.literal("setup: dirt must anchor on the bottom slab"));
 
         w.setBlockState(supportPos, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
         SlabAnchorAttachment.addAnchor(w, supportPos, w.getBlockState(supportPos));
         double supportDy = SlabSupport.getYOffset(w, supportPos, w.getBlockState(supportPos));
-        ctx.assertTrue(Math.abs(supportDy + 0.5) <= EPS, "setup: cantilevered stone beside anchored dirt should read -0.5, got " + supportDy);
-        ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, supportPos), "setup: cantilevered stone must anchor via the adjacent-lowered-full-block lane");
+        ctx.assertTrue(Math.abs(supportDy + 0.5) <= EPS, net.minecraft.text.Text.literal("setup: cantilevered stone beside anchored dirt should read -0.5, got " + supportDy));
+        ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, supportPos), net.minecraft.text.Text.literal("setup: cantilevered stone must anchor via the adjacent-lowered-full-block lane"));
 
         w.setBlockState(lanternPos, Blocks.LANTERN.getDefaultState().with(net.minecraft.state.property.Properties.HANGING, true),
                 Block.NOTIFY_LISTENERS);
         double lanternDy = SlabSupport.getYOffset(w, lanternPos, w.getBlockState(lanternPos));
         ctx.assertTrue(Math.abs(lanternDy + 0.5) <= EPS,
-                "setup: hanging lantern below the anchored support must itself read -0.5 "
-                        + "(hanger-follow), got " + lanternDy + " -- otherwise this test proves nothing");
+                net.minecraft.text.Text.literal("setup: hanging lantern below the anchored support must itself read -0.5 "
+                        + "(hanger-follow), got " + lanternDy + " -- otherwise this test proves nothing"));
 
         SlabAnchorAttachment.addAnchor(w, lanternPos, w.getBlockState(lanternPos));
         ctx.assertTrue(!SlabAnchorAttachment.isAnchored(w, lanternPos),
-                "regression: a hanging lantern must keep dynamically following its support, not freeze via the decorative lane");
+                net.minecraft.text.Text.literal("regression: a hanging lantern must keep dynamically following its support, not freeze via the decorative lane"));
         ctx.complete();
     }
 }

@@ -50,7 +50,7 @@ public final class AnchorLaneSuite {
         w.setBlockState(p, stone, Block.NOTIFY_LISTENERS);
         SlabAnchorAttachment.addAnchor(w, p, stone);
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, p),
-                "precondition: the full block must anchor on a bottom slab (" + label + ")");
+                net.minecraft.text.Text.literal("precondition: the full block must anchor on a bottom slab (" + label + ")"));
 
         // Replace with a slab WITHOUT clearing the anchor — the stale-anchor scenario.
         BlockState slab = Blocks.POLISHED_TUFF_SLAB.getDefaultState().with(SlabBlock.TYPE, type);
@@ -78,7 +78,7 @@ public final class AnchorLaneSuite {
         double base = (type == SlabType.TOP) ? 0.5 : 0.0;
         double expectedOutline = base + vis;
         ctx.assertTrue(Math.abs(outMinY - expectedOutline) < 1.0e-6,
-                obs + " -> outline does NOT follow the visual dy (expected " + fmt(expectedOutline) + ")");
+                net.minecraft.text.Text.literal(obs + " -> outline does NOT follow the visual dy (expected " + fmt(expectedOutline) + ")"));
         ctx.complete();
     }
 
@@ -135,18 +135,18 @@ public final class AnchorLaneSuite {
 
         w.setBlockState(dirtPos, Blocks.DIRT.getDefaultState(), Block.NOTIFY_LISTENERS);
         SlabAnchorAttachment.addAnchor(w, dirtPos, w.getBlockState(dirtPos));
-        ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, dirtPos), "setup: dirt must anchor on the bottom slab");
+        ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, dirtPos), net.minecraft.text.Text.literal("setup: dirt must anchor on the bottom slab"));
         double dirtDy = SlabSupport.getYOffset(w, dirtPos, w.getBlockState(dirtPos));
-        ctx.assertTrue(Math.abs(dirtDy + 0.5) <= EPS, "setup: anchored dirt should render -0.5, got " + dirtDy);
+        ctx.assertTrue(Math.abs(dirtDy + 0.5) <= EPS, net.minecraft.text.Text.literal("setup: anchored dirt should render -0.5, got " + dirtDy));
 
         w.setBlockState(supportSlabPos, Blocks.BIRCH_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP),
                 Block.NOTIFY_LISTENERS);
         SlabAnchorAttachment.addAnchor(w, supportSlabPos, w.getBlockState(supportSlabPos));
         double supportDy = SlabSupport.getYOffset(w, supportSlabPos, w.getBlockState(supportSlabPos));
         ctx.assertTrue(Math.abs(supportDy + 0.5) <= EPS,
-                "setup: support slab beside anchored dirt should render -0.5, got " + supportDy);
+                net.minecraft.text.Text.literal("setup: support slab beside anchored dirt should render -0.5, got " + supportDy));
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, supportSlabPos),
-                "setup: support slab must anchor via the pre-existing horizontal-adjacency lane");
+                net.minecraft.text.Text.literal("setup: support slab must anchor via the pre-existing horizontal-adjacency lane"));
 
         w.setBlockState(upperSlabPos, Blocks.BIRCH_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP),
                 Block.NOTIFY_LISTENERS);
@@ -155,18 +155,18 @@ public final class AnchorLaneSuite {
         SlabAnchorAttachment.addAnchor(w, upperSlabPos, w.getBlockState(upperSlabPos));
         double upperDyBefore = SlabSupport.getYOffset(w, upperSlabPos, w.getBlockState(upperSlabPos));
         ctx.assertTrue(Math.abs(upperDyBefore + 0.5) <= EPS,
-                "setup: slab resting on the lowered support should render -0.5, got " + upperDyBefore);
+                net.minecraft.text.Text.literal("setup: slab resting on the lowered support should render -0.5, got " + upperDyBefore));
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, upperSlabPos),
-                "THE FIX: a slab resting on a lowered/anchored support must itself anchor at "
+                net.minecraft.text.Text.literal("THE FIX: a slab resting on a lowered/anchored support must itself anchor at "
                         + "placement time, or breaking the support later pops it back to flush "
-                        + "(live-reported 'pop upon breaking at the end')");
+                        + "(live-reported 'pop upon breaking at the end')"));
 
         // Break the support slab — the upper slab must NOT pop.
         w.setBlockState(supportSlabPos, Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
         double upperDyAfter = SlabSupport.getYOffset(w, upperSlabPos, w.getBlockState(upperSlabPos));
         ctx.assertTrue(Math.abs(upperDyAfter + 0.5) <= EPS,
-                "never-pop violation: slab popped from -0.5 to " + upperDyAfter
-                        + " after its support was broken, even though it was never re-placed");
+                net.minecraft.text.Text.literal("never-pop violation: slab popped from -0.5 to " + upperDyAfter
+                        + " after its support was broken, even though it was never re-placed"));
         ctx.complete();
     }
 
@@ -180,13 +180,13 @@ public final class AnchorLaneSuite {
         w.setBlockState(lower, Blocks.BIRCH_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP),
                 Block.NOTIFY_LISTENERS);
         SlabAnchorAttachment.addAnchor(w, lower, w.getBlockState(lower));
-        ctx.assertTrue(!SlabAnchorAttachment.isAnchored(w, lower), "setup: flat slab must not anchor");
+        ctx.assertTrue(!SlabAnchorAttachment.isAnchored(w, lower), net.minecraft.text.Text.literal("setup: flat slab must not anchor"));
 
         w.setBlockState(upper, Blocks.BIRCH_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP),
                 Block.NOTIFY_LISTENERS);
         SlabAnchorAttachment.addAnchor(w, upper, w.getBlockState(upper));
         ctx.assertTrue(!SlabAnchorAttachment.isAnchored(w, upper),
-                "regression: a slab resting on a FLAT (non-lowered) slab must not spuriously anchor");
+                net.minecraft.text.Text.literal("regression: a slab resting on a FLAT (non-lowered) slab must not spuriously anchor"));
         ctx.complete();
     }
 
@@ -217,9 +217,9 @@ public final class AnchorLaneSuite {
                 Block.NOTIFY_LISTENERS);
         SlabAnchorAttachment.addAnchor(w, upper, w.getBlockState(upper));
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, upper),
-                "a slab resting on a PLAIN BOTTOM-type support must anchor vertically: under the maintainer's "
+                net.minecraft.text.Text.literal("a slab resting on a PLAIN BOTTOM-type support must anchor vertically: under the maintainer's "
                         + "2026-08-06 ruling it renders lowered, and never-pop then requires the "
-                        + "anchor that keeps it there when the support is broken");
+                        + "anchor that keeps it there when the support is broken"));
         ctx.complete();
     }
 
@@ -241,30 +241,30 @@ public final class AnchorLaneSuite {
                 Block.NOTIFY_LISTENERS);
         double supportDy = SlabSupport.getYOffset(w, support, w.getBlockState(support));
         ctx.assertTrue(Math.abs(supportDy) <= EPS,
-                "fixture: the support must be a PLAIN (never-sunk) bottom slab rendering 0.0, got "
-                        + supportDy);
+                net.minecraft.text.Text.literal("fixture: the support must be a PLAIN (never-sunk) bottom slab rendering 0.0, got "
+                        + supportDy));
         ctx.assertTrue(!SlabAnchorAttachment.isAnchored(w, support),
-                "fixture: the plain support must carry no anchor of its own");
+                net.minecraft.text.Text.literal("fixture: the plain support must carry no anchor of its own"));
 
         // The real placement sequence: Block.onPlaced -> SlabAnchorAttachment.addAnchor.
         w.setBlockState(subject, Blocks.BIRCH_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                 Block.NOTIFY_LISTENERS);
         SlabAnchorAttachment.addAnchor(w, subject, w.getBlockState(subject));
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, subject),
-                "premise: the slab must record an anchor at placement — that anchor IS the never-pop "
-                        + "guarantee this cell exists to prove");
+                net.minecraft.text.Text.literal("premise: the slab must record an anchor at placement — that anchor IS the never-pop "
+                        + "guarantee this cell exists to prove"));
         double before = SlabSupport.getYOffset(w, subject, w.getBlockState(subject));
         ctx.assertTrue(Math.abs(before + 0.5) <= EPS,
-                "premise: a slab on a plain bottom slab must render -0.5 (maintainer ruling 2026-08-06), "
-                        + "got " + before);
+                net.minecraft.text.Text.literal("premise: a slab on a plain bottom slab must render -0.5 (maintainer ruling 2026-08-06), "
+                        + "got " + before));
 
         // Break the support out from under it.
         w.setBlockState(support, Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
         double after = SlabSupport.getYOffset(w, subject, w.getBlockState(subject));
         ctx.assertTrue(Math.abs(after + 0.5) <= EPS,
-                "NEVER-POP: the slab popped from -0.5 to " + after + " after its plain bottom-slab "
+                net.minecraft.text.Text.literal("NEVER-POP: the slab popped from -0.5 to " + after + " after its plain bottom-slab "
                         + "support was broken, even though it was never re-placed. This is exactly "
-                        + "why the anchor lane had to widen alongside the render lane");
+                        + "why the anchor lane had to widen alongside the render lane"));
         ctx.complete();
     }
 
@@ -288,25 +288,25 @@ public final class AnchorLaneSuite {
                 Block.NOTIFY_LISTENERS);
         w.setBlockState(dirtPos, Blocks.DIRT.getDefaultState(), Block.NOTIFY_LISTENERS);
         SlabAnchorAttachment.addAnchor(w, dirtPos, w.getBlockState(dirtPos));
-        ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, dirtPos), "setup: dirt must anchor on the bottom slab");
+        ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, dirtPos), net.minecraft.text.Text.literal("setup: dirt must anchor on the bottom slab"));
 
         w.setBlockState(supportPos,
                 TerrainSlabsTestShim.TEST_TS_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE),
                 Block.NOTIFY_LISTENERS);
         SlabAnchorAttachment.addAnchor(w, supportPos, w.getBlockState(supportPos));
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, supportPos),
-                "setup: support TS double slab beside anchored dirt must anchor");
+                net.minecraft.text.Text.literal("setup: support TS double slab beside anchored dirt must anchor"));
 
         w.setBlockState(upperPos,
                 TerrainSlabsTestShim.TEST_TS_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                 Block.NOTIFY_LISTENERS);
         SlabAnchorAttachment.addAnchor(w, upperPos, w.getBlockState(upperPos));
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, upperPos),
-                "a TS slab resting on an anchored TS DOUBLE support must itself anchor "
-                        + "(recorder actionId a14: 'lowered double-slab target produced vanilla-dy placed slab')");
+                net.minecraft.text.Text.literal("a TS slab resting on an anchored TS DOUBLE support must itself anchor "
+                        + "(recorder actionId a14: 'lowered double-slab target produced vanilla-dy placed slab')"));
         double upperDy = SlabSupport.getYOffset(w, upperPos, w.getBlockState(upperPos));
         ctx.assertTrue(Math.abs(upperDy + 0.5) <= EPS,
-                "TS slab resting on a lowered TS support should render -0.5, got " + upperDy);
+                net.minecraft.text.Text.literal("TS slab resting on a lowered TS support should render -0.5, got " + upperDy));
         ctx.complete();
     }
 
@@ -351,31 +351,31 @@ public final class AnchorLaneSuite {
         w.setBlockState(dirt, Blocks.DIRT.getDefaultState(), Block.NOTIFY_LISTENERS);
         double dyDirt = SlabSupport.getYOffset(w, dirt, w.getBlockState(dirt));
         ctx.assertTrue(Math.abs(dyDirt + 0.5) <= EPS,
-                "setup: dirt on a vanilla bottom slab should render -0.5, got " + dyDirt);
+                net.minecraft.text.Text.literal("setup: dirt on a vanilla bottom slab should render -0.5, got " + dyDirt));
 
         w.setBlockState(a, tsSlab(SlabType.BOTTOM), Block.NOTIFY_LISTENERS);
         double dyA = SlabSupport.getYOffset(w, a, w.getBlockState(a));
         ctx.assertTrue(Math.abs(dyA + 0.5) <= EPS,
-                "setup: TS slab A beside lowered dirt should render -0.5 (chain BFS), got " + dyA);
+                net.minecraft.text.Text.literal("setup: TS slab A beside lowered dirt should render -0.5 (chain BFS), got " + dyA));
 
         w.setBlockState(bPos, tsSlab(SlabType.BOTTOM), Block.NOTIFY_LISTENERS);
         double dyBBefore = SlabSupport.getYOffset(w, bPos, w.getBlockState(bPos));
         ctx.assertTrue(Math.abs(dyBBefore + 0.5) <= EPS,
-                "setup: TS slab B beside lowered TS slab A should render -0.5 (2-hop chain BFS), got " + dyBBefore);
+                net.minecraft.text.Text.literal("setup: TS slab B beside lowered TS slab A should render -0.5 (2-hop chain BFS), got " + dyBBefore));
 
         // Simulate real placement-time anchoring (BlockOnPlacedAnchorMixin -> addAnchor).
         SlabAnchorAttachment.addAnchor(w, bPos, w.getBlockState(bPos));
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, bPos),
-                "setup: TS slab B must qualify for the lowered-side-slab anchor at placement time");
+                net.minecraft.text.Text.literal("setup: TS slab B must qualify for the lowered-side-slab anchor at placement time"));
 
         // Break the chain's MIDDLE link (slab A) — the maintainer's exact repro.
         w.breakBlock(a, false);
-        ctx.assertTrue(w.getBlockState(a).isAir(), "setup: slab A must actually be broken");
+        ctx.assertTrue(w.getBlockState(a).isAir(), net.minecraft.text.Text.literal("setup: slab A must actually be broken"));
 
         double dyBAfter = SlabSupport.getYOffset(w, bPos, w.getBlockState(bPos));
         ctx.assertTrue(Math.abs(dyBAfter + 0.5) <= EPS,
-                "an ANCHORED TS slab must NOT pop up when the chain's middle link is broken "
-                        + "(live 'breaking middle slab pops the other one up' bug); got " + dyBAfter);
+                net.minecraft.text.Text.literal("an ANCHORED TS slab must NOT pop up when the chain's middle link is broken "
+                        + "(live 'breaking middle slab pops the other one up' bug); got " + dyBAfter));
         ctx.complete();
     }
 
@@ -387,10 +387,10 @@ public final class AnchorLaneSuite {
         ServerWorld w = ctx.getWorld();
         BlockPos pos = ctx.getAbsolutePos(BlockPos.ORIGIN).add(3, 3, 3);
         w.setBlockState(pos, tsSlab(SlabType.BOTTOM), Block.NOTIFY_LISTENERS);
-        ctx.assertTrue(!SlabAnchorAttachment.isAnchored(w, pos), "setup: this TS slab must not be anchored");
+        ctx.assertTrue(!SlabAnchorAttachment.isAnchored(w, pos), net.minecraft.text.Text.literal("setup: this TS slab must not be anchored"));
         double dy = SlabSupport.getYOffset(w, pos, w.getBlockState(pos));
         ctx.assertTrue(Math.abs(dy) <= EPS,
-                "an un-anchored, isolated TS slab must stay flush (0.0); got " + dy);
+                net.minecraft.text.Text.literal("an un-anchored, isolated TS slab must stay flush (0.0); got " + dy));
         ctx.complete();
     }
 
@@ -449,12 +449,12 @@ public final class AnchorLaneSuite {
         place(w, subject, bottomSlab(Blocks.OAK_SLAB));
         double dy = SlabSupport.getYOffset(w, subject, w.getBlockState(subject));
         ctx.assertTrue(Math.abs(dy + 1.0) <= EPS,
-                "oak_slab resting on an ANCHORED bottom slab that renders -0.5 must read -1.0, got "
+                net.minecraft.text.Text.literal("oak_slab resting on an ANCHORED bottom slab that renders -0.5 must read -1.0, got "
                         + dy + " (live (157,-58,-10) dy=0.000 over (157,-59,-10) dy=-0.500: a slab "
                         + "on a LOWERED bottom slab has no lane — hasLoweredNonSlabTopSupport "
                         + "rejects the support on 'instanceof SlabBlock' and "
                         + "hasLoweredTopLikeSlabSupport rejects it on 'isBottomSlab', neither "
-                        + "asking whether it is actually sunk)");
+                        + "asking whether it is actually sunk)"));
         ctx.complete();
     }
 
@@ -470,11 +470,11 @@ public final class AnchorLaneSuite {
         BlockPos subject = seat.up();
         place(w, subject, bottomSlab(Blocks.OAK_SLAB));
         ctx.assertTrue(!SlabAnchorAttachment.isAnchored(w, subject),
-                "setup: this twin must exercise the GEOMETRIC lane — no anchor anywhere");
+                net.minecraft.text.Text.literal("setup: this twin must exercise the GEOMETRIC lane — no anchor anywhere"));
         double dy = SlabSupport.getYOffset(w, subject, w.getBlockState(subject));
         ctx.assertTrue(Math.abs(dy + 1.0) <= EPS,
-                "oak_slab resting on a GEOMETRICALLY lowered bottom slab (-0.5, anchor=none) must "
-                        + "read -1.0, got " + dy);
+                net.minecraft.text.Text.literal("oak_slab resting on a GEOMETRICALLY lowered bottom slab (-0.5, anchor=none) must "
+                        + "read -1.0, got " + dy));
         ctx.complete();
     }
 
@@ -492,8 +492,8 @@ public final class AnchorLaneSuite {
         place(w, subject, bottomSlab(Blocks.OAK_SLAB));
         SlabAnchorAttachment.addAnchor(w, subject, w.getBlockState(subject));
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, subject),
-                "a slab placed on a LOWERED bottom slab must record an anchor, or breaking the "
-                        + "support later pops it flush even though it was never re-placed");
+                net.minecraft.text.Text.literal("a slab placed on a LOWERED bottom slab must record an anchor, or breaking the "
+                        + "support later pops it flush even though it was never re-placed"));
         ctx.complete();
     }
 
@@ -523,17 +523,17 @@ public final class AnchorLaneSuite {
         place(w, support, bottomSlab(Blocks.STONE_SLAB));
         double supportDy = SlabSupport.getYOffset(w, support, w.getBlockState(support));
         ctx.assertTrue(Math.abs(supportDy) <= EPS,
-                "fixture: this cell needs a PLAIN support — the bottom slab must render 0.0, got "
-                        + supportDy);
+                net.minecraft.text.Text.literal("fixture: this cell needs a PLAIN support — the bottom slab must render 0.0, got "
+                        + supportDy));
 
         BlockPos subject = support.up();
         place(w, subject, bottomSlab(Blocks.OAK_SLAB));
         double dy = SlabSupport.getYOffset(w, subject, w.getBlockState(subject));
         ctx.assertTrue(Math.abs(dy + 0.5) <= EPS,
-                "a slab on a plain bottom slab must read -0.5 (maintainer ruling 2026-08-06, "
+                net.minecraft.text.Text.literal("a slab on a plain bottom slab must read -0.5 (maintainer ruling 2026-08-06, "
                         + "exclusion #13: 'it should lower, no? WYSIWYG law' — the support's top "
                         + "face is half a block below the grid, so the slab seats there instead of "
-                        + "floating with vanilla's 0.5 gap), got " + dy);
+                        + "floating with vanilla's 0.5 gap), got " + dy));
         ctx.complete();
     }
 
@@ -620,31 +620,31 @@ public final class AnchorLaneSuite {
         for (int i = 0; i < level.length; i++) {
             double expected = Math.max(-0.5 * i, SlabSupport.minResolvedDy());
             ctx.assertTrue(Math.abs(dy[i] - expected) <= EPS,
-                    "tower L" + i + " must read max(-0.5*" + i + ", cap) = " + expected + ", got "
-                            + dy[i] + " — " + ladderDeep);
+                    net.minecraft.text.Text.literal("tower L" + i + " must read max(-0.5*" + i + ", cap) = " + expected + ", got "
+                            + dy[i] + " — " + ladderDeep));
         }
 
         ctx.assertTrue(Math.abs(dy[0]) <= EPS,
-                "tower L0 (bottom slab on plain stone) must stay flush at 0.0 — " + ladder);
+                net.minecraft.text.Text.literal("tower L0 (bottom slab on plain stone) must stay flush at 0.0 — " + ladder));
         ctx.assertTrue(!SlabAnchorAttachment.isAnchored(w, level[0]),
-                "tower L0 rests on a flat non-slab support and must NOT anchor");
+                net.minecraft.text.Text.literal("tower L0 rests on a flat non-slab support and must NOT anchor"));
 
         ctx.assertTrue(Math.abs(dy[1] + 0.5) <= EPS,
-                "tower L1 must seat on L0's top face at -0.5 (maintainer ruling 2026-08-06) — " + ladder);
+                net.minecraft.text.Text.literal("tower L1 must seat on L0's top face at -0.5 (maintainer ruling 2026-08-06) — " + ladder));
         ctx.assertTrue(Math.abs(dy[2] + 1.0) <= EPS,
-                "tower L2 must seat on L1's top face at -1.0 (compounded through the resolver) — "
-                        + ladder);
+                net.minecraft.text.Text.literal("tower L2 must seat on L1's top face at -1.0 (compounded through the resolver) — "
+                        + ladder));
         ctx.assertTrue(Math.abs(dy[3] - Math.max(-1.5, SlabSupport.minResolvedDy())) <= EPS,
-                "tower L3 PINS THE CLAMP: its raw seat is -1.5, and minResolvedDy() ("
+                net.minecraft.text.Text.literal("tower L3 PINS THE CLAMP: its raw seat is -1.5, and minResolvedDy() ("
                         + SlabSupport.minResolvedDy() + ") either refuses it — reopening a 0.5 "
                         + "vanilla gap above L2 from the fourth course upward — or lets it stand. "
                         + "This is pinned, NOT fixed — the maintainer rules on the tower's appearance from "
-                        + "these values — " + ladder);
+                        + "these values — " + ladder));
 
         for (int i = 1; i < 4; i++) {
             ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, level[i]),
-                    "tower L" + i + " renders lowered, so it must RECORD an anchor or breaking the "
-                            + "course below pops it (never-pop law) — " + ladder);
+                    net.minecraft.text.Text.literal("tower L" + i + " renders lowered, so it must RECORD an anchor or breaking the "
+                            + "course below pops it (never-pop law) — " + ladder));
         }
 
         // STAGE 0, MEASUREMENT B (added 2026-08-07; nothing above this line changed). The two
@@ -658,19 +658,19 @@ public final class AnchorLaneSuite {
         // — the same courses it has always covered — and follows the cap when the cap moves.
         for (int i = saturatedIndex; i < level.length; i++) {
             ctx.assertTrue(Math.abs(dy[i] - SlabSupport.minResolvedDy()) <= EPS,
-                    "tower L" + i + " must stay at the minResolvedDy() clamp ("
+                    net.minecraft.text.Text.literal("tower L" + i + " must stay at the minResolvedDy() clamp ("
                             + SlabSupport.minResolvedDy() + "), NOT fall to the -0.5 "
-                            + "depth-exhaustion floor — " + ladderDeep);
+                            + "depth-exhaustion floor — " + ladderDeep));
             ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, level[i]),
-                    "tower L" + i + " renders lowered, so it must RECORD an anchor (never-pop "
-                            + "law) — " + ladderDeep);
+                    net.minecraft.text.Text.literal("tower L" + i + " renders lowered, so it must RECORD an anchor (never-pop "
+                            + "law) — " + ladderDeep));
             double stored = com.slabbed.anchor.SlabPlacementDyAttachment.storedDy(w, level[i]);
             ctx.assertTrue(Math.abs(stored - SlabSupport.minResolvedDy()) <= EPS,
-                    "tower L" + i + " must carry a STORED placement height of "
+                    net.minecraft.text.Text.literal("tower L" + i + " must carry a STORED placement height of "
                             + SlabSupport.minResolvedDy() + " — that stored fact is exactly what "
                             + "terminates the seat walk at depth 1 and keeps "
                             + "MAX_SUPPORT_RESOLVE_DEPTH out of reach, got " + stored + " — "
-                            + ladderDeep);
+                            + ladderDeep));
         }
         ctx.complete();
     }
@@ -707,7 +707,7 @@ public final class AnchorLaneSuite {
         }
         for (int i = 0; i < 4; i++) {
             ctx.assertTrue(!SlabAnchorAttachment.isAnchored(w, level[i]),
-                    "fixture: L" + i + " must carry no anchor — this cell exercises the GEOMETRIC lane");
+                    net.minecraft.text.Text.literal("fixture: L" + i + " must carry no anchor — this cell exercises the GEOMETRIC lane"));
         }
 
         double[] dy = new double[4];
@@ -716,16 +716,16 @@ public final class AnchorLaneSuite {
         }
         String ladder = "L0=" + dy[0] + " L1=" + dy[1] + " L2=" + dy[2] + " L3=" + dy[3];
 
-        ctx.assertTrue(Math.abs(dy[0]) <= EPS, "geometric tower L0 must be 0.0 — " + ladder);
+        ctx.assertTrue(Math.abs(dy[0]) <= EPS, net.minecraft.text.Text.literal("geometric tower L0 must be 0.0 — " + ladder));
         ctx.assertTrue(Math.abs(dy[1] + 0.5) <= EPS,
-                "geometric tower L1 must seat on L0's top face at -0.5 — " + ladder);
+                net.minecraft.text.Text.literal("geometric tower L1 must seat on L0's top face at -0.5 — " + ladder));
         ctx.assertTrue(Math.abs(dy[2] + 0.5) <= EPS,
-                "PINS CURRENT BEHAVIOUR (not desired): the geometric ladder SATURATES at -0.5 from "
+                net.minecraft.text.Text.literal("PINS CURRENT BEHAVIOUR (not desired): the geometric ladder SATURATES at -0.5 from "
                         + "L2 up, because loweredBottomSlabSupportDy has no vertical-support arm and "
                         + "reports an unanchored lowered bottom slab as 0.0. The anchored ladder "
-                        + "(slabTowerLaddersToTheClampThenGaps) compounds to -1.0 here — " + ladder);
+                        + "(slabTowerLaddersToTheClampThenGaps) compounds to -1.0 here — " + ladder));
         ctx.assertTrue(Math.abs(dy[3] + 0.5) <= EPS,
-                "PINS CURRENT BEHAVIOUR: same saturation at L3 — " + ladder);
+                net.minecraft.text.Text.literal("PINS CURRENT BEHAVIOUR: same saturation at L3 — " + ladder));
         ctx.complete();
     }
 
@@ -751,7 +751,7 @@ public final class AnchorLaneSuite {
         place(w, sourceTop, Blocks.STONE.getDefaultState());
         double sourceTopDy = SlabSupport.getYOffset(w, sourceTop, w.getBlockState(sourceTop));
         ctx.assertTrue(Math.abs(sourceTopDy + 0.5) <= EPS,
-                "fixture: the side-source top stone must render -0.5, got " + sourceTopDy);
+                net.minecraft.text.Text.literal("fixture: the side-source top stone must render -0.5, got " + sourceTopDy));
 
         place(w, base, Blocks.STONE.getDefaultState());
         BlockPos seat = base.up(2);
@@ -759,13 +759,13 @@ public final class AnchorLaneSuite {
         if (anchorSeat) {
             SlabAnchorAttachment.addAnchor(w, seat, w.getBlockState(seat));
             ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, seat),
-                    "fixture: the seat slab must anchor via the lowered-side-slab lane");
+                    net.minecraft.text.Text.literal("fixture: the seat slab must anchor via the lowered-side-slab lane"));
         }
         // THE PREMISE THIS WHOLE CLASS RESTS ON: the support is a bottom slab that is ACTUALLY
         // SUNK. Without this assert the cells could pass vacuously against a seat at 0.0.
         double seatDy = SlabSupport.getYOffset(w, seat, w.getBlockState(seat));
         ctx.assertTrue(Math.abs(seatDy + 0.5) <= EPS,
-                "fixture: the bottom-slab SUPPORT must itself render -0.5, got " + seatDy);
+                net.minecraft.text.Text.literal("fixture: the bottom-slab SUPPORT must itself render -0.5, got " + seatDy));
         return seat;
     }
 

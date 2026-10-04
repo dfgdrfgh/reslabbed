@@ -164,8 +164,8 @@ public final class ScaffoldingColumnPlacementSuite {
                                 : "")));
             }
         }
-        ctx.assertTrue(problems.isEmpty(), row + ": seat contract at " + pos
-                + " (expected dy " + expectedDy + "): " + String.join("; ", problems));
+        ctx.assertTrue(problems.isEmpty(), net.minecraft.text.Text.literal(row + ": seat contract at " + pos
+                + " (expected dy " + expectedDy + "): " + String.join("; ", problems)));
     }
 
     // ── row 1: non-sneak side click on the BASE of a 3-high column stacks flush on top ────────
@@ -178,21 +178,21 @@ public final class ScaffoldingColumnPlacementSuite {
         PlayerEntity player = scaffoldPlayer(ctx, base.west(2));
         ActionResult result = click(w, player, base, Direction.WEST, faceCentre(base, Direction.WEST));
         ctx.assertTrue(result.isAccepted(),
-                "side click on the column base must be accepted, got " + result);
+                net.minecraft.text.Text.literal("side click on the column base must be accepted, got " + result));
         ctx.assertTrue(w.getBlockState(dest).isOf(Blocks.SCAFFOLDING),
-                "the redirected placement must land on the column top " + dest + ", got "
-                        + w.getBlockState(dest));
+                net.minecraft.text.Text.literal("the redirected placement must land on the column top " + dest + ", got "
+                        + w.getBlockState(dest)));
         // Kills the diagonal-float shape: nothing above the new top, nothing beside it.
         ctx.assertTrue(w.getBlockState(dest.up()).isAir(),
-                "the cell above the new top must stay air, got " + w.getBlockState(dest.up()));
+                net.minecraft.text.Text.literal("the cell above the new top must stay air, got " + w.getBlockState(dest.up())));
         for (Direction side : new Direction[]{Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST}) {
             BlockPos beside = dest.offset(side);
             ctx.assertTrue(w.getBlockState(beside).isAir(),
-                    "horizontal neighbor " + beside + " of the new top must stay air, got "
-                            + w.getBlockState(beside));
+                    net.minecraft.text.Text.literal("horizontal neighbor " + beside + " of the new top must stay air, got "
+                            + w.getBlockState(beside)));
         }
         ctx.assertTrue(stackCount(player) == 15,
-                "one scaffolding must be consumed, stack now " + stackCount(player));
+                net.minecraft.text.Text.literal("one scaffolding must be consumed, stack now " + stackCount(player)));
         assertSeated(ctx, "sideClickOnColumnStacksOnTopFlush", dest, 0.0);
         ctx.complete();
     }
@@ -207,11 +207,11 @@ public final class ScaffoldingColumnPlacementSuite {
         PlayerEntity player = scaffoldPlayer(ctx, base.west(2));
         ActionResult result = click(w, player, base, Direction.WEST, faceCentre(base, Direction.WEST));
         ctx.assertTrue(result.isAccepted(),
-                "side click on the single scaffold must be accepted, got " + result);
+                net.minecraft.text.Text.literal("side click on the single scaffold must be accepted, got " + result));
         ctx.assertTrue(w.getBlockState(dest).isOf(Blocks.SCAFFOLDING),
-                "the redirected placement must land at " + dest + ", got " + w.getBlockState(dest));
+                net.minecraft.text.Text.literal("the redirected placement must land at " + dest + ", got " + w.getBlockState(dest)));
         ctx.assertTrue(stackCount(player) == 15,
-                "one scaffolding must be consumed, stack now " + stackCount(player));
+                net.minecraft.text.Text.literal("one scaffolding must be consumed, stack now " + stackCount(player)));
         assertSeated(ctx, "sideClickSingleScaffoldStacksFlush", dest, 0.0);
         ctx.complete();
     }
@@ -229,17 +229,17 @@ public final class ScaffoldingColumnPlacementSuite {
         // Premise probe: the mock player's sneak flag must actually reach the placement context's
         // cancel-interaction query, or this row would silently test the non-sneak lane instead.
         ctx.assertTrue(player.shouldCancelInteraction(),
-                "premise probe: setSneaking(true) must make the mock player report "
+                net.minecraft.text.Text.literal("premise probe: setSneaking(true) must make the mock player report "
                         + "shouldCancelInteraction; it does not, so the sneak lane cannot be "
-                        + "driven this way");
+                        + "driven this way"));
         ActionResult result = click(w, player, top, Direction.UP, faceCentre(top, Direction.UP));
         ctx.assertTrue(result.isAccepted(),
-                "sneak top-face click must be accepted, got " + result);
+                net.minecraft.text.Text.literal("sneak top-face click must be accepted, got " + result));
         ctx.assertTrue(w.getBlockState(dest).isOf(Blocks.SCAFFOLDING),
-                "sneak top-face click must stack directly above at " + dest + ", got "
-                        + w.getBlockState(dest));
+                net.minecraft.text.Text.literal("sneak top-face click must stack directly above at " + dest + ", got "
+                        + w.getBlockState(dest)));
         ctx.assertTrue(stackCount(player) == 15,
-                "one scaffolding must be consumed, stack now " + stackCount(player));
+                net.minecraft.text.Text.literal("one scaffolding must be consumed, stack now " + stackCount(player)));
         assertSeated(ctx, "sneakTopFaceStacksDirectlyAbove", dest, 0.0);
         ctx.complete();
     }
@@ -256,18 +256,18 @@ public final class ScaffoldingColumnPlacementSuite {
         ActionResult result = click(w, player, top, Direction.UP, faceCentre(top, Direction.UP));
         BlockPos dest = top.south();
         ctx.assertTrue(result.isAccepted(),
-                "non-sneak top-face click must be accepted, got " + result);
+                net.minecraft.text.Text.literal("non-sneak top-face click must be accepted, got " + result));
         ctx.assertTrue(w.getBlockState(dest).isOf(Blocks.SCAFFOLDING),
-                "non-sneak top-face click must extend horizontally to " + dest + " at the same Y, "
-                        + "got " + w.getBlockState(dest));
+                net.minecraft.text.Text.literal("non-sneak top-face click must extend horizontally to " + dest + " at the same Y, "
+                        + "got " + w.getBlockState(dest)));
         // Kills the diagonal-float shape: neither the clicked top nor the new cell gains a block above.
         ctx.assertTrue(w.getBlockState(top.up()).isAir(),
-                "the cell above the clicked top must stay air, got " + w.getBlockState(top.up()));
+                net.minecraft.text.Text.literal("the cell above the clicked top must stay air, got " + w.getBlockState(top.up())));
         ctx.assertTrue(w.getBlockState(dest.up()).isAir(),
-                "the cell above the horizontal extension must stay air, got "
-                        + w.getBlockState(dest.up()));
+                net.minecraft.text.Text.literal("the cell above the horizontal extension must stay air, got "
+                        + w.getBlockState(dest.up())));
         ctx.assertTrue(stackCount(player) == 15,
-                "one scaffolding must be consumed, stack now " + stackCount(player));
+                net.minecraft.text.Text.literal("one scaffolding must be consumed, stack now " + stackCount(player)));
         assertSeated(ctx, "topFaceClickExtendsHorizontallySameY", dest, 0.0);
         ctx.complete();
     }
@@ -288,12 +288,12 @@ public final class ScaffoldingColumnPlacementSuite {
         ActionResult result = click(w, player, base.up(1), Direction.DOWN,
                 faceCentre(base.up(1), Direction.DOWN));
         ctx.assertTrue(result.isAccepted(),
-                "inside-column bottom-face click must be accepted, got " + result);
+                net.minecraft.text.Text.literal("inside-column bottom-face click must be accepted, got " + result));
         ctx.assertTrue(w.getBlockState(dest).isOf(Blocks.SCAFFOLDING),
-                "the redirected placement must land on the column top " + dest + ", got "
-                        + w.getBlockState(dest));
+                net.minecraft.text.Text.literal("the redirected placement must land on the column top " + dest + ", got "
+                        + w.getBlockState(dest)));
         ctx.assertTrue(stackCount(player) == 15,
-                "one scaffolding must be consumed, stack now " + stackCount(player));
+                net.minecraft.text.Text.literal("one scaffolding must be consumed, stack now " + stackCount(player)));
         assertSeated(ctx, "insideColumnUpwardPlacementIsVisibleAndTargetable", dest, 0.0);
         ctx.complete();
     }
@@ -310,13 +310,13 @@ public final class ScaffoldingColumnPlacementSuite {
         ActionResult first = click(w, player, base, Direction.UP, topHit);
         BlockPos cell1 = base.south();
         ctx.assertTrue(first.isAccepted(),
-                "first top-face click must be accepted, got " + first);
+                net.minecraft.text.Text.literal("first top-face click must be accepted, got " + first));
         BlockState state1 = w.getBlockState(cell1);
         ctx.assertTrue(state1.isOf(Blocks.SCAFFOLDING),
-                "first extension must land at " + cell1 + ", got " + state1);
+                net.minecraft.text.Text.literal("first extension must land at " + cell1 + ", got " + state1));
         ctx.assertTrue(state1.get(ScaffoldingBlock.DISTANCE) == 1,
-                "first extension must carry DISTANCE 1 (vanilla's own stability mechanic), got "
-                        + state1.get(ScaffoldingBlock.DISTANCE));
+                net.minecraft.text.Text.literal("first extension must carry DISTANCE 1 (vanilla's own stability mechanic), got "
+                        + state1.get(ScaffoldingBlock.DISTANCE)));
         assertSeated(ctx, "horizontalExtensionConsumesDistanceNotDy(first)", cell1, 0.0);
 
         // Second click on the SAME column top: the horizontal walk skips the cell placed above
@@ -324,17 +324,17 @@ public final class ScaffoldingColumnPlacementSuite {
         ActionResult second = click(w, player, base, Direction.UP, topHit);
         BlockPos cell2 = base.south(2);
         ctx.assertTrue(second.isAccepted(),
-                "second top-face click must be accepted, got " + second);
+                net.minecraft.text.Text.literal("second top-face click must be accepted, got " + second));
         BlockState state2 = w.getBlockState(cell2);
         ctx.assertTrue(state2.isOf(Blocks.SCAFFOLDING),
-                "second extension must land at " + cell2 + ", got " + state2);
+                net.minecraft.text.Text.literal("second extension must land at " + cell2 + ", got " + state2));
         ctx.assertTrue(state2.get(ScaffoldingBlock.DISTANCE) == 2,
-                "second extension must carry DISTANCE 2, got "
-                        + state2.get(ScaffoldingBlock.DISTANCE));
+                net.minecraft.text.Text.literal("second extension must carry DISTANCE 2, got "
+                        + state2.get(ScaffoldingBlock.DISTANCE)));
         assertSeated(ctx, "horizontalExtensionConsumesDistanceNotDy(second)", cell2, 0.0);
 
         ctx.assertTrue(stackCount(player) == 14,
-                "two scaffolding must be consumed, stack now " + stackCount(player));
+                net.minecraft.text.Text.literal("two scaffolding must be consumed, stack now " + stackCount(player)));
         ctx.complete();
     }
 
@@ -351,10 +351,10 @@ public final class ScaffoldingColumnPlacementSuite {
         PlayerEntity player = scaffoldPlayer(ctx, base.west(2));
         ActionResult result = click(w, player, base, Direction.WEST, faceCentre(base, Direction.WEST));
         ctx.assertTrue(!result.isAccepted(),
-                "a blocked redirect walk must not be accepted, got " + result);
+                net.minecraft.text.Text.literal("a blocked redirect walk must not be accepted, got " + result));
         ctx.assertTrue(stackCount(player) == 16,
-                "no scaffolding may be consumed on a failed placement, stack now "
-                        + stackCount(player));
+                net.minecraft.text.Text.literal("no scaffolding may be consumed on a failed placement, stack now "
+                        + stackCount(player)));
         BlockPos origin = ctx.getAbsolutePos(BlockPos.ORIGIN);
         int scaffoldCells = 0;
         for (int x = 0; x <= 7; x++) {
@@ -365,16 +365,16 @@ public final class ScaffoldingColumnPlacementSuite {
                         scaffoldCells++;
                     }
                     ctx.assertTrue(!SlabPlacementDyAttachment.hasStoredDy(w, pos),
-                            "a failed placement must record no height anywhere; found one at "
-                                    + pos);
+                            net.minecraft.text.Text.literal("a failed placement must record no height anywhere; found one at "
+                                    + pos));
                 }
             }
         }
         ctx.assertTrue(scaffoldCells == 1,
-                "the arena must still hold exactly the one fixture scaffold, found "
-                        + scaffoldCells);
+                net.minecraft.text.Text.literal("the arena must still hold exactly the one fixture scaffold, found "
+                        + scaffoldCells));
         ctx.assertTrue(w.getBlockState(blocked).isOf(Blocks.STONE),
-                "the blocking stone must be untouched, got " + w.getBlockState(blocked));
+                net.minecraft.text.Text.literal("the blocking stone must be untouched, got " + w.getBlockState(blocked)));
         ctx.complete();
     }
 
@@ -388,10 +388,10 @@ public final class ScaffoldingColumnPlacementSuite {
         PlayerEntity player = scaffoldPlayer(ctx, base.west(2));
         ActionResult result = click(w, player, base, Direction.WEST, faceCentre(base, Direction.WEST));
         ctx.assertTrue(result.isAccepted(),
-                "premise: the stacking click must be accepted, got " + result);
+                net.minecraft.text.Text.literal("premise: the stacking click must be accepted, got " + result));
         ctx.assertTrue(w.getBlockState(dest).isOf(Blocks.SCAFFOLDING),
-                "premise: the stacked cell must be scaffolding at " + dest + ", got "
-                        + w.getBlockState(dest));
+                net.minecraft.text.Text.literal("premise: the stacked cell must be scaffolding at " + dest + ", got "
+                        + w.getBlockState(dest)));
         // Whatever the placement recorded — right or wrong — a neighbor pulse must not change it
         // (LAW.md, LAW 1). This row asserts invariance of the record, not its value, so it holds
         // on either side of the placement fix the red rows above demand.
@@ -405,21 +405,21 @@ public final class ScaffoldingColumnPlacementSuite {
         ctx.runAtTick(8, () -> {
             BlockState after = w.getBlockState(dest);
             ctx.assertTrue(after.isOf(Blocks.SCAFFOLDING),
-                    "the pulse must not collapse the stacked cell, got " + after);
+                    net.minecraft.text.Text.literal("the pulse must not collapse the stacked cell, got " + after));
             ctx.assertTrue(w.getBlockState(base).isOf(Blocks.SCAFFOLDING)
                             && w.getBlockState(base.up()).isOf(Blocks.SCAFFOLDING),
-                    "the pulse must not collapse the column");
+                    net.minecraft.text.Text.literal("the pulse must not collapse the column"));
             long storedAfter = Double.doubleToRawLongBits(
                     SlabPlacementDyAttachment.storedDy(w, dest));
             ctx.assertTrue(storedAfter == storedBefore,
-                    "stored dy raw bits must survive the neighbor pulse: before=0x"
+                    net.minecraft.text.Text.literal("stored dy raw bits must survive the neighbor pulse: before=0x"
                             + Long.toHexString(storedBefore) + " after=0x"
-                            + Long.toHexString(storedAfter));
+                            + Long.toHexString(storedAfter)));
             long liveAfter = Double.doubleToRawLongBits(SlabSupport.getYOffset(w, dest, after));
             ctx.assertTrue(liveAfter == liveBefore,
-                    "getYOffset must survive the neighbor pulse: before="
+                    net.minecraft.text.Text.literal("getYOffset must survive the neighbor pulse: before="
                             + Double.longBitsToDouble(liveBefore) + " after="
-                            + Double.longBitsToDouble(liveAfter));
+                            + Double.longBitsToDouble(liveAfter)));
             ctx.complete();
         });
     }
@@ -435,18 +435,18 @@ public final class ScaffoldingColumnPlacementSuite {
         ActionResult result = click(w, player, stone, Direction.UP, faceCentre(stone, Direction.UP));
         BlockPos dest = stone.up();
         ctx.assertTrue(result.isAccepted(),
-                "placement on plain stone must be accepted, got " + result);
+                net.minecraft.text.Text.literal("placement on plain stone must be accepted, got " + result));
         BlockState placed = w.getBlockState(dest);
         ctx.assertTrue(placed.isOf(Blocks.SCAFFOLDING),
-                "scaffolding must land at " + dest + ", got " + placed);
+                net.minecraft.text.Text.literal("scaffolding must land at " + dest + ", got " + placed));
         ctx.assertTrue(placed.get(ScaffoldingBlock.DISTANCE) == 0,
-                "grounded scaffolding must carry DISTANCE 0, got "
-                        + placed.get(ScaffoldingBlock.DISTANCE));
+                net.minecraft.text.Text.literal("grounded scaffolding must carry DISTANCE 0, got "
+                        + placed.get(ScaffoldingBlock.DISTANCE)));
         // Vanilla's own bottom rule: BOTTOM is true only for a floating cell (distance > 0 with
         // no scaffolding below). A grounded DISTANCE=0 cell is BOTTOM=false.
         ctx.assertTrue(!placed.get(ScaffoldingBlock.BOTTOM),
-                "grounded DISTANCE=0 scaffolding must carry BOTTOM=false, got BOTTOM="
-                        + placed.get(ScaffoldingBlock.BOTTOM));
+                net.minecraft.text.Text.literal("grounded DISTANCE=0 scaffolding must carry BOTTOM=false, got BOTTOM="
+                        + placed.get(ScaffoldingBlock.BOTTOM)));
         assertSeated(ctx, "vanillaFlushControlOnStone", dest, 0.0);
         ctx.complete();
     }
@@ -461,11 +461,11 @@ public final class ScaffoldingColumnPlacementSuite {
                 Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                 Block.NOTIFY_LISTENERS);
         ctx.assertTrue(SlabPlacementDyAttachment.record(w, slab, -0.5),
-                "fixture: the placement store must accept -0.5 for the seat slab");
+                net.minecraft.text.Text.literal("fixture: the placement store must accept -0.5 for the seat slab"));
         double slabDy = SlabSupport.getYOffset(w, slab, w.getBlockState(slab));
         ctx.assertTrue(sameBits(slabDy, -0.5),
-                "fixture: the authored slab height must read back verbatim, wrote -0.5, read "
-                        + slabDy);
+                net.minecraft.text.Text.literal("fixture: the authored slab height must read back verbatim, wrote -0.5, read "
+                        + slabDy));
         PlayerEntity player = scaffoldPlayer(ctx, slab.west(2).up());
         // Click the slab's VISIBLE top face centre (native top 0.5 above the cell floor, lowered
         // by the authored -0.5).
@@ -473,15 +473,15 @@ public final class ScaffoldingColumnPlacementSuite {
         ActionResult result = click(w, player, slab, Direction.UP, hit);
         BlockPos dest = slab.up();
         ctx.assertTrue(result.isAccepted(),
-                "placement on the lowered bottom slab must be accepted, got " + result);
+                net.minecraft.text.Text.literal("placement on the lowered bottom slab must be accepted, got " + result));
         BlockState placed = w.getBlockState(dest);
         ctx.assertTrue(placed.isOf(Blocks.SCAFFOLDING),
-                "scaffolding must land at " + dest + ", got " + placed);
+                net.minecraft.text.Text.literal("scaffolding must land at " + dest + ", got " + placed));
         // The slab's top face counts as full support (the slab-top side-solid override), so the
         // cell is grounded, not floating.
         ctx.assertTrue(placed.get(ScaffoldingBlock.DISTANCE) == 0,
-                "a slab-seated scaffold must carry DISTANCE 0 via the slab-top support override, "
-                        + "got " + placed.get(ScaffoldingBlock.DISTANCE));
+                net.minecraft.text.Text.literal("a slab-seated scaffold must carry DISTANCE 0 via the slab-top support override, "
+                        + "got " + placed.get(ScaffoldingBlock.DISTANCE)));
         // Seat contract: a follower on a bottom slab seats on the slab's REAL surface. The slab's
         // visible top sits at its own cell floor (native +0.5, authored -0.5), so the scaffold in
         // the cell above records -1.0 — the same compounding every follower-on-lowered-bottom-slab
@@ -491,8 +491,8 @@ public final class ScaffoldingColumnPlacementSuite {
         assertSeated(ctx, "scaffoldingOnBottomSlabSeatsSupported", dest, -1.0);
         double slabDyAfter = SlabSupport.getYOffset(w, slab, w.getBlockState(slab));
         ctx.assertTrue(sameBits(slabDyAfter, -0.5),
-                "the seat slab's own record must be untouched by the placement, got "
-                        + slabDyAfter);
+                net.minecraft.text.Text.literal("the seat slab's own record must be untouched by the placement, got "
+                        + slabDyAfter));
         ctx.complete();
     }
 
@@ -508,7 +508,7 @@ public final class ScaffoldingColumnPlacementSuite {
                 Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                 Block.NOTIFY_LISTENERS);
         ctx.assertTrue(SlabPlacementDyAttachment.record(w, slab, -0.5),
-                "fixture: the placement store must accept -0.5 for the seat slab");
+                net.minecraft.text.Text.literal("fixture: the placement store must accept -0.5 for the seat slab"));
         PlayerEntity player = scaffoldPlayer(ctx, slab.west(2).up());
         // Column seed via the real item path — row 10's action: a click on the lowered slab's
         // visible top seats the column base at -1.0.
@@ -516,14 +516,14 @@ public final class ScaffoldingColumnPlacementSuite {
         ActionResult seed = click(w, player, slab, Direction.UP, slabHit);
         BlockPos columnTop = slab.up();
         ctx.assertTrue(seed.isAccepted(),
-                "premise: placement on the lowered slab must be accepted, got " + seed);
+                net.minecraft.text.Text.literal("premise: placement on the lowered slab must be accepted, got " + seed));
         ctx.assertTrue(w.getBlockState(columnTop).isOf(Blocks.SCAFFOLDING),
-                "premise: the column base must be scaffolding at " + columnTop + ", got "
-                        + w.getBlockState(columnTop));
+                net.minecraft.text.Text.literal("premise: the column base must be scaffolding at " + columnTop + ", got "
+                        + w.getBlockState(columnTop)));
         double seatDy = SlabPlacementDyAttachment.storedDy(w, columnTop);
         ctx.assertTrue(sameBits(seatDy, -1.0),
-                "premise: the column base must hold stored dy -1.0, observed " + seatDy
-                        + " (raw 0x" + Long.toHexString(Double.doubleToRawLongBits(seatDy)) + ")");
+                net.minecraft.text.Text.literal("premise: the column base must hold stored dy -1.0, observed " + seatDy
+                        + " (raw 0x" + Long.toHexString(Double.doubleToRawLongBits(seatDy)) + ")"));
         // The discriminated action: a side click on the lowered column top redirects the
         // placement to the cell above, and the new cell must FOLLOW the column's real seat —
         // the walk source's own recorded surface — neither a blanket flush 0.0 nor a fresh
@@ -532,22 +532,22 @@ public final class ScaffoldingColumnPlacementSuite {
                 faceCentre(columnTop, Direction.WEST));
         BlockPos dest = columnTop.up();
         ctx.assertTrue(result.isAccepted(),
-                "side click on the lowered column must be accepted, got " + result);
+                net.minecraft.text.Text.literal("side click on the lowered column must be accepted, got " + result));
         ctx.assertTrue(w.getBlockState(dest).isOf(Blocks.SCAFFOLDING),
-                "the redirected placement must land directly above at " + dest + ", got "
-                        + w.getBlockState(dest));
+                net.minecraft.text.Text.literal("the redirected placement must land directly above at " + dest + ", got "
+                        + w.getBlockState(dest)));
         ctx.assertTrue(stackCount(player) == 14,
-                "two scaffolding must be consumed across both placements, stack now "
-                        + stackCount(player));
+                net.minecraft.text.Text.literal("two scaffolding must be consumed across both placements, stack now "
+                        + stackCount(player)));
         assertSeated(ctx, "sideClickOnLoweredColumnFollowsColumnSeat", dest, -1.0);
         double columnTopAfter = SlabPlacementDyAttachment.storedDy(w, columnTop);
         ctx.assertTrue(sameBits(columnTopAfter, -1.0),
-                "the walk source's own record must be untouched, observed " + columnTopAfter
+                net.minecraft.text.Text.literal("the walk source's own record must be untouched, observed " + columnTopAfter
                         + " (raw 0x"
-                        + Long.toHexString(Double.doubleToRawLongBits(columnTopAfter)) + ")");
+                        + Long.toHexString(Double.doubleToRawLongBits(columnTopAfter)) + ")"));
         double slabAfter = SlabSupport.getYOffset(w, slab, w.getBlockState(slab));
         ctx.assertTrue(sameBits(slabAfter, -0.5),
-                "the seat slab's own record must be untouched, observed " + slabAfter);
+                net.minecraft.text.Text.literal("the seat slab's own record must be untouched, observed " + slabAfter));
         ctx.complete();
     }
 }

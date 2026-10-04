@@ -26,20 +26,20 @@ public final class SlabdyRecorderToggleTest {
     public void toggleFlipsBothTheRecorderAndTheBridgeTogether(TestContext ctx) {
         boolean initial = LiveCursorIntentRecorder.isEnabled();
         ctx.assertTrue(SlabbedAuditBridge.isRecorderEnabled() == initial,
-                "the bridge must agree with the recorder's initial state, not a stale cached copy");
+                net.minecraft.text.Text.literal("the bridge must agree with the recorder's initial state, not a stale cached copy"));
 
         boolean afterFirstToggle = LiveCursorIntentRecorder.toggle();
-        ctx.assertTrue(afterFirstToggle != initial, "toggle() must flip the enabled state");
+        ctx.assertTrue(afterFirstToggle != initial, net.minecraft.text.Text.literal("toggle() must flip the enabled state"));
         ctx.assertTrue(LiveCursorIntentRecorder.isEnabled() == afterFirstToggle,
-                "isEnabled() must reflect the state toggle() just returned");
+                net.minecraft.text.Text.literal("isEnabled() must reflect the state toggle() just returned"));
         ctx.assertTrue(SlabbedAuditBridge.isRecorderEnabled() == afterFirstToggle,
-                "the bridge must see the SAME live state the recorder itself reports — "
-                        + "this is the exact bug the bridge fix closes");
+                net.minecraft.text.Text.literal("the bridge must see the SAME live state the recorder itself reports — "
+                        + "this is the exact bug the bridge fix closes"));
 
         boolean afterSecondToggle = LiveCursorIntentRecorder.toggle();
-        ctx.assertTrue(afterSecondToggle == initial, "toggling twice must return to the original state");
+        ctx.assertTrue(afterSecondToggle == initial, net.minecraft.text.Text.literal("toggling twice must return to the original state"));
         ctx.assertTrue(SlabbedAuditBridge.isRecorderEnabled() == initial,
-                "the bridge must track the toggle back to the original state too");
+                net.minecraft.text.Text.literal("the bridge must track the toggle back to the original state too"));
 
         // Leave the recorder in its original state so this test has no lasting
         // side effect on any test that runs after it in the same suite.
@@ -49,19 +49,19 @@ public final class SlabdyRecorderToggleTest {
     @GameTest(structure = "fabric-gametest-api-v1:empty")
     public void bridgeSetsAnExplicitRecorderState(TestContext ctx) {
         ctx.assertTrue(SlabbedAuditBridge.isRecorderAvailable(),
-                "the development test environment must contain the recorder implementation");
+                net.minecraft.text.Text.literal("the development test environment must contain the recorder implementation"));
         boolean initial = SlabbedAuditBridge.isRecorderEnabled();
         try {
             ctx.assertTrue(SlabbedAuditBridge.setRecorderEnabled(true),
-                    "setting the recorder on must leave the bridge on");
+                    net.minecraft.text.Text.literal("setting the recorder on must leave the bridge on"));
             ctx.assertTrue(SlabbedAuditBridge.isRecorderEnabled(),
-                    "the bridge must report the requested on state");
+                    net.minecraft.text.Text.literal("the bridge must report the requested on state"));
 
             boolean afterOff = SlabbedAuditBridge.setRecorderEnabled(false);
             ctx.assertTrue(!afterOff,
-                    "setting the recorder off must leave the bridge off");
+                    net.minecraft.text.Text.literal("setting the recorder off must leave the bridge off"));
             ctx.assertTrue(!SlabbedAuditBridge.isRecorderEnabled(),
-                    "the bridge must report the requested off state");
+                    net.minecraft.text.Text.literal("the bridge must report the requested off state"));
         } finally {
             SlabbedAuditBridge.setRecorderEnabled(initial);
         }
@@ -88,15 +88,15 @@ public final class SlabdyRecorderToggleTest {
 
         LiveCursorIntentRecorder.toggle(); // off #1 -> should flush run_end #1
         long runEndsAfterFirstOff = countRunEndRecords(sessionPath);
-        ctx.assertTrue(runEndsAfterFirstOff >= 1, "the first toggle-off must flush at least one run_end record");
+        ctx.assertTrue(runEndsAfterFirstOff >= 1, net.minecraft.text.Text.literal("the first toggle-off must flush at least one run_end record"));
 
         LiveCursorIntentRecorder.toggle(); // on again
         LiveCursorIntentRecorder.toggle(); // off #2 -> should flush a SECOND run_end
         long runEndsAfterSecondOff = countRunEndRecords(sessionPath);
         ctx.assertTrue(runEndsAfterSecondOff > runEndsAfterFirstOff,
-                "a second toggle-off in the same run must flush its OWN run_end record, not silently "
+                net.minecraft.text.Text.literal("a second toggle-off in the same run must flush its OWN run_end record, not silently "
                         + "no-op because a stale runEnded flag was never reset — before the fix this stayed "
-                        + "stuck at " + runEndsAfterFirstOff);
+                        + "stuck at " + runEndsAfterFirstOff));
 
         // Restore original state.
         if (LiveCursorIntentRecorder.isEnabled() != initial) {
@@ -143,7 +143,7 @@ public final class SlabdyRecorderToggleTest {
         LiveCursorIntentRecorder.recordVisualDiagnostic(p, suspect);
         long after = countVisualDiagnosticSuspects(sessionPath);
         ctx.assertTrue(after > before,
-                "a suspect visual diagnostic must be flushed as a suspect=true row (before=" + before + ")");
+                net.minecraft.text.Text.literal("a suspect visual diagnostic must be flushed as a suspect=true row (before=" + before + ")"));
 
         // Restore original state so the suite is order-independent.
         if (LiveCursorIntentRecorder.isEnabled() != initial) {
@@ -155,23 +155,23 @@ public final class SlabdyRecorderToggleTest {
     @GameTest(structure = "fabric-gametest-api-v1:empty")
     public void placementVerdictRequiresDyAndVisualSettlementEvidence(TestContext ctx) {
         ctx.assertTrue("RED".equals(LiveCursorIntentRecorder.classifyClientServerDy(true, -0.5d, -1.0d)),
-                "any finite client/server dy split must be RED, regardless of the placed item");
+                net.minecraft.text.Text.literal("any finite client/server dy split must be RED, regardless of the placed item"));
         ctx.assertTrue("PASS".equals(LiveCursorIntentRecorder.classifyClientServerDy(true, -0.5d, -0.5d)),
-                "matching finite dy values may pass the numeric component");
+                net.minecraft.text.Text.literal("matching finite dy values may pass the numeric component"));
         ctx.assertTrue("NOT_RUN".equals(LiveCursorIntentRecorder.classifyClientServerDy(true, Double.NaN, -0.5d)),
-                "missing dy evidence must stay NOT_RUN instead of reading as agreement");
+                net.minecraft.text.Text.literal("missing dy evidence must stay NOT_RUN instead of reading as agreement"));
         ctx.assertTrue("NOT_RUN".equals(LiveCursorIntentRecorder.classifyClientServerDy(false, -0.5d, -1.0d)),
-                "dy values from different placement cells must not be compared as settlement evidence");
+                net.minecraft.text.Text.literal("dy values from different placement cells must not be compared as settlement evidence"));
 
         ctx.assertTrue("INCONCLUSIVE".equals(LiveCursorIntentRecorder.reducePlacementVerdict(
                         false, "PASS", "NOT_RUN")),
-                "numeric dy agreement without visual settlement evidence must not become GREEN");
+                net.minecraft.text.Text.literal("numeric dy agreement without visual settlement evidence must not become GREEN"));
         ctx.assertTrue("RED".equals(LiveCursorIntentRecorder.reducePlacementVerdict(
                         false, "RED", "NOT_RUN")),
-                "a dy split must dominate missing visual evidence");
+                net.minecraft.text.Text.literal("a dy split must dominate missing visual evidence"));
         ctx.assertTrue("GREEN".equals(LiveCursorIntentRecorder.reducePlacementVerdict(
                         false, "PASS", "PASS")),
-                "GREEN requires every currently required component to pass");
+                net.minecraft.text.Text.literal("GREEN requires every currently required component to pass"));
         ctx.complete();
     }
 
@@ -192,21 +192,21 @@ public final class SlabdyRecorderToggleTest {
             LiveCursorIntentRecorder.recordClientInteractResult(null);
             ctx.assertTrue(
                     LiveCursorIntentRecorder.healthCounterForTest("actionSnapshotWrites") == actionSnapshotsBefore,
-                    "client start, packet correlation, and client return must not rewrite the whole action ledger");
+                    net.minecraft.text.Text.literal("client start, packet correlation, and client return must not rewrite the whole action ledger"));
             ctx.assertTrue(LiveCursorIntentRecorder.healthCounterForTest("summaryWrites") == summariesBefore,
-                    "client start, packet correlation, and client return must not rewrite both summaries");
+                    net.minecraft.text.Text.literal("client start, packet correlation, and client return must not rewrite both summaries"));
 
             LiveCursorIntentRecorder.recordServerInteract(null, net.minecraft.util.Hand.MAIN_HAND, null, sequence);
             ctx.assertTrue(
                     LiveCursorIntentRecorder.healthCounterForTest("actionSnapshotWrites") == actionSnapshotsBefore,
-                    "server start is not a terminal flush point");
+                    net.minecraft.text.Text.literal("server start is not a terminal flush point"));
             LiveCursorIntentRecorder.recordServerInteractResult(sequence);
 
             ctx.assertTrue(
                     LiveCursorIntentRecorder.healthCounterForTest("actionSnapshotWrites") == actionSnapshotsBefore + 1,
-                    "one logical server interaction must produce exactly one action snapshot");
+                    net.minecraft.text.Text.literal("one logical server interaction must produce exactly one action snapshot"));
             ctx.assertTrue(LiveCursorIntentRecorder.healthCounterForTest("summaryWrites") == summariesBefore + 1,
-                    "one logical server interaction must produce exactly one summary flush");
+                    net.minecraft.text.Text.literal("one logical server interaction must produce exactly one summary flush"));
         } finally {
             if (LiveCursorIntentRecorder.isEnabled() != initial) {
                 LiveCursorIntentRecorder.toggle();
@@ -266,9 +266,9 @@ public final class SlabdyRecorderToggleTest {
     private static void assertConfigResolves(TestContext ctx, String config) {
         var url = SlabdyRecorderToggleTest.class.getClassLoader().getResource(config);
         ctx.assertTrue(url != null,
-                config + " must be on the classpath under exactly this name — it is the string "
+                net.minecraft.text.Text.literal(config + " must be on the classpath under exactly this name — it is the string "
                         + "SlabbedDevMixinBootstrap passes to Mixins.addConfiguration, and a "
-                        + "mismatch just silently turns the recorder off");
+                        + "mismatch just silently turns the recorder off"));
 
         com.google.gson.JsonObject json;
         try (var in = SlabdyRecorderToggleTest.class.getClassLoader().getResourceAsStream(config)) {
@@ -292,9 +292,9 @@ public final class SlabdyRecorderToggleTest {
                 String resource = fqcn.replace('.', '/') + ".class";
                 ctx.assertTrue(
                         SlabdyRecorderToggleTest.class.getClassLoader().getResource(resource) != null,
-                        config + " names " + fqcn + " but " + resource + " is not on the classpath "
+                        net.minecraft.text.Text.literal(config + " names " + fqcn + " but " + resource + " is not on the classpath "
                                 + "— a config that selects nothing leaves the recorder blind "
-                                + "without failing anything");
+                                + "without failing anything"));
             }
         }
     }
@@ -304,10 +304,10 @@ public final class SlabdyRecorderToggleTest {
                 .map(java.lang.reflect.Method::getName)
                 .toList();
         ctx.assertTrue(declared.stream().anyMatch(name -> name.contains(handler)),
-                mixin + "'s handler (" + handler + ") must be merged into " + target.getSimpleName()
+                net.minecraft.text.Text.literal(mixin + "'s handler (" + handler + ") must be merged into " + target.getSimpleName()
                         + " — SlabbedDevMixinBootstrap's preLaunch hook is the only thing that arms "
                         + "slabbed.recorder.mixins.json, and without it the live-cursor recorder "
-                        + "records nothing at all. Declared methods were: " + declared);
+                        + "records nothing at all. Declared methods were: " + declared));
     }
 
     private static long countVisualDiagnosticSuspects(Path sessionPath) throws IOException {

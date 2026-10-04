@@ -81,22 +81,22 @@ public final class SupportDepthBudgetExhaustionTest {
         // the budget, or one that was never lowered at all, would pass the continuity assertion
         // while proving nothing.
         ctx.assertTrue(courses.length > SlabSupport.MAX_SUPPORT_RESOLVE_DEPTH,
-                "FIXTURE IS NOT LOAD-BEARING: the tower is " + courses.length + " courses and the "
+                net.minecraft.text.Text.literal("FIXTURE IS NOT LOAD-BEARING: the tower is " + courses.length + " courses and the "
                         + "budget is " + SlabSupport.MAX_SUPPORT_RESOLVE_DEPTH
-                        + " — it cannot exhaust anything. Lengthen it; do NOT relax the property.");
+                        + " — it cannot exhaust anything. Lengthen it; do NOT relax the property."));
         ctx.assertTrue(dy[0] < -EPS,
-                "FIXTURE IS NOT LOAD-BEARING: the first course must render lowered, got " + dy[0]);
+                net.minecraft.text.Text.literal("FIXTURE IS NOT LOAD-BEARING: the first course must render lowered, got " + dy[0]));
 
         for (int i = 1; i < courses.length; i++) {
             ctx.assertTrue(Math.abs(dy[i] - dy[i - 1]) <= EPS,
-                    "course " + (i + 1) + " reads " + dy[i] + " while the course it stands on reads "
+                    net.minecraft.text.Text.literal("course " + (i + 1) + " reads " + dy[i] + " while the course it stands on reads "
                             + dy[i - 1] + " — a full-height seat passes its height through, so the "
                             + "tower must be one continuous height. It sinks "
                             + (dy[i - 1] - dy[i]) + " INTO its own support at exactly the course "
                             + "that exhausts the depth budget ("
                             + SlabSupport.MAX_SUPPORT_RESOLVE_DEPTH + "), whose exhaustion arm "
                             + "answers minResolvedDy() = " + SlabSupport.minResolvedDy()
-                            + " about a walk that descended nowhere. tower:" + tower);
+                            + " about a walk that descended nowhere. tower:" + tower));
         }
         ctx.complete();
     }
@@ -144,10 +144,10 @@ public final class SupportDepthBudgetExhaustionTest {
             double lowerTop = lower.getY() + shape(w, lower, leg).getMax(Direction.Axis.Y);
             double upperBottom = upper.getY() + shape(w, upper, leg).getMin(Direction.Axis.Y);
             ctx.assertTrue(upperBottom >= lowerTop - EPS,
-                    leg + " INTERPENETRATION at course " + (i + 1) + ": its bottom is at "
+                    net.minecraft.text.Text.literal(leg + " INTERPENETRATION at course " + (i + 1) + ": its bottom is at "
                             + upperBottom + " while the top of the course it stands on is at "
                             + lowerTop + " — it is " + (lowerTop - upperBottom)
-                            + " blocks inside its own support.");
+                            + " blocks inside its own support."));
         }
         ctx.complete();
     }
@@ -186,15 +186,15 @@ public final class SupportDepthBudgetExhaustionTest {
 
         BlockHitResult hit = SlabbedOffsetRaycast.raycast(w, from, to, ShapeContext.absent());
         ctx.assertTrue(hit != null && hit.getType() == HitResult.Type.BLOCK,
-                "fixture: aiming straight down the tower must hit something");
+                net.minecraft.text.Text.literal("fixture: aiming straight down the tower must hit something"));
         ctx.assertTrue(top.equals(hit.getBlockPos()),
-                "the pick aimed down the tower must land on its TOP course " + top.toShortString()
-                        + ", got " + hit.getBlockPos().toShortString());
+                net.minecraft.text.Text.literal("the pick aimed down the tower must land on its TOP course " + top.toShortString()
+                        + ", got " + hit.getBlockPos().toShortString()));
         ctx.assertTrue(Math.abs(hit.getPos().y - expectedTopFace) <= EPS,
-                "RAYCAST follows the sunken height: the pick met the top course at y="
+                net.minecraft.text.Text.literal("RAYCAST follows the sunken height: the pick met the top course at y="
                         + hit.getPos().y + " while its own top face is at y=" + expectedTopFace
                         + " — the aim is displaced by " + (expectedTopFace - hit.getPos().y)
-                        + " blocks, so this is not a model-only defect.");
+                        + " blocks, so this is not a model-only defect."));
         ctx.complete();
     }
 
@@ -218,9 +218,9 @@ public final class SupportDepthBudgetExhaustionTest {
         double supportDy = SlabSupport.getYOffset(w, support, w.getBlockState(support));
         double capDy = SlabSupport.getYOffset(w, cap, w.getBlockState(cap));
         ctx.assertTrue(Math.abs(capDy - supportDy) <= EPS,
-                "a slab capping the tower must take the height of the course it rests on ("
+                net.minecraft.text.Text.literal("a slab capping the tower must take the height of the course it rests on ("
                         + supportDy + "), got " + capDy + " — it sinks " + (supportDy - capDy)
-                        + " into its own support.");
+                        + " into its own support."));
         ctx.complete();
     }
 
@@ -238,10 +238,10 @@ public final class SupportDepthBudgetExhaustionTest {
     @GameTest(structure = "fabric-gametest-api-v1:empty")
     public void theWalkBoundMustNotPreemptTheDescentBudget(TestContext ctx) {
         ctx.assertTrue(SlabSupport.MAX_SUPPORT_WALK_STEPS > SlabSupport.MAX_SUPPORT_RESOLVE_DEPTH,
-                "the walk bound (" + SlabSupport.MAX_SUPPORT_WALK_STEPS + ") must exceed the "
+                net.minecraft.text.Text.literal("the walk bound (" + SlabSupport.MAX_SUPPORT_WALK_STEPS + ") must exceed the "
                         + "descent budget (" + SlabSupport.MAX_SUPPORT_RESOLVE_DEPTH + "), or a "
                         + "descending tower reaches the floor-answering bound before the "
-                        + "cap-answering one and pops UP instead of saturating.");
+                        + "cap-answering one and pops UP instead of saturating."));
         ctx.complete();
     }
 
@@ -270,15 +270,15 @@ public final class SupportDepthBudgetExhaustionTest {
             place(w, course, Blocks.STONE.getDefaultState());
             SlabAnchorAttachment.addAnchor(w, course, w.getBlockState(course));
             ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, course),
-                    "fixture: course " + (i + 1) + " must anchor, or the tower is not a lowered "
-                            + "column and no support walk descends it");
+                    net.minecraft.text.Text.literal("fixture: course " + (i + 1) + " must anchor, or the tower is not a lowered "
+                            + "column and no support walk descends it"));
         }
 
         for (BlockPos course : courses) {
             SlabPlacementDyAttachment.clear(w, course);
             ctx.assertTrue(!SlabPlacementDyAttachment.hasStoredDy(w, course),
-                    "fixture: the tower must hold NO stored heights — a stored height terminates "
-                            + "the support walk and the budget can never be spent");
+                    net.minecraft.text.Text.literal("fixture: the tower must hold NO stored heights — a stored height terminates "
+                            + "the support walk and the budget can never be spent"));
         }
         return courses;
     }

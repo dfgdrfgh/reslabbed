@@ -52,7 +52,7 @@ public final class CantileverSuite {
         w.setBlockState(cant, vanillaBottomSlab(), Block.NOTIFY_LISTENERS); // slab beside, AIR below
         double dy = SlabSupport.getYOffset(w, cant, w.getBlockState(cant));
         ctx.assertTrue(Math.abs(dy + 0.5) <= EPS,
-                "bottom slab cantilevered off a lowered full block should be -0.5; got " + dy);
+                net.minecraft.text.Text.literal("bottom slab cantilevered off a lowered full block should be -0.5; got " + dy));
         ctx.complete();
     }
 
@@ -67,7 +67,7 @@ public final class CantileverSuite {
         w.setBlockState(cant, topSlab(), Block.NOTIFY_LISTENERS);
         double dy = SlabSupport.getYOffset(w, cant, w.getBlockState(cant));
         ctx.assertTrue(Math.abs(dy + 0.5) <= EPS,
-                "TOP slab cantilevered off a lowered full block should be -0.5; got " + dy);
+                net.minecraft.text.Text.literal("TOP slab cantilevered off a lowered full block should be -0.5; got " + dy));
         ctx.complete();
     }
 
@@ -85,7 +85,7 @@ public final class CantileverSuite {
         boolean frozen = SlabAnchorAttachment.isFrozenFlat(w, cant);
         double dy = SlabSupport.getYOffset(w, cant, w.getBlockState(cant));
         ctx.assertTrue(!frozen && Math.abs(dy + 0.5) <= EPS,
-                "cantilever slab beside an existing lowered block must NOT freeze flat; frozen=" + frozen + " dy=" + dy);
+                net.minecraft.text.Text.literal("cantilever slab beside an existing lowered block must NOT freeze flat; frozen=" + frozen + " dy=" + dy));
         ctx.complete();
     }
 
@@ -104,12 +104,12 @@ public final class CantileverSuite {
         w.setBlockState(support, Blocks.DIRT.getDefaultState(), Block.NOTIFY_LISTENERS);
         double supDy = SlabSupport.getYOffset(w, support, w.getBlockState(support));
         ctx.assertTrue(Math.abs(supDy + 0.5) <= EPS,
-                "setup: adjacency-lowered dirt (air below, beside anchored dirt) should render -0.5, got " + supDy);
+                net.minecraft.text.Text.literal("setup: adjacency-lowered dirt (air below, beside anchored dirt) should render -0.5, got " + supDy));
         BlockPos cant = support.east();                                                 // slab cantilevered off the adjacency-lowered dirt
         w.setBlockState(cant, vanillaBottomSlab(), Block.NOTIFY_LISTENERS);
         double dy = SlabSupport.getYOffset(w, cant, w.getBlockState(cant));
         ctx.assertTrue(Math.abs(dy + 0.5) <= EPS,
-                "slab cantilevered off an ADJACENCY-lowered full block must be -0.5 (live bug); got " + dy);
+                net.minecraft.text.Text.literal("slab cantilevered off an ADJACENCY-lowered full block must be -0.5 (live bug); got " + dy));
         ctx.complete();
     }
 
@@ -128,7 +128,7 @@ public final class CantileverSuite {
         double dy1 = SlabSupport.getYOffset(w, c1, w.getBlockState(c1));
         double dy2 = SlabSupport.getYOffset(w, c2, w.getBlockState(c2));
         ctx.assertTrue(Math.abs(dy1 + 0.5) <= EPS && Math.abs(dy2 + 0.5) <= EPS,
-                "chained cantilever slabs should both be -0.5; got c1=" + dy1 + " c2=" + dy2);
+                net.minecraft.text.Text.literal("chained cantilever slabs should both be -0.5; got c1=" + dy1 + " c2=" + dy2));
         ctx.complete();
     }
 
@@ -162,14 +162,14 @@ public final class CantileverSuite {
 
         double dyA = SlabSupport.getYOffset(w, paneA, w.getBlockState(paneA));
         ctx.assertTrue(Math.abs(dyA + 0.5) <= EPS,
-                "setup: pane A on a slab, anchored, should render -0.5, got " + dyA);
+                net.minecraft.text.Text.literal("setup: pane A on a slab, anchored, should render -0.5, got " + dyA));
 
         BlockPos paneB = paneA.east(); // air below, no slab of its own
         w.setBlockState(paneB, Blocks.GLASS_PANE.getDefaultState(), Block.NOTIFY_LISTENERS);
         double dyB = SlabSupport.getYOffset(w, paneB, w.getBlockState(paneB));
         ctx.assertTrue(Math.abs(dyB + 0.5) <= EPS,
-                "a pane placed beside a lowered pane (air below, no slab of its own) must inherit "
-                        + "-0.5 (live WYSIWYG bug: froze flat/detached); got " + dyB);
+                net.minecraft.text.Text.literal("a pane placed beside a lowered pane (air below, no slab of its own) must inherit "
+                        + "-0.5 (live WYSIWYG bug: froze flat/detached); got " + dyB));
         ctx.complete();
     }
 
@@ -187,7 +187,7 @@ public final class CantileverSuite {
         w.setBlockState(fenceB, Blocks.OAK_FENCE.getDefaultState(), Block.NOTIFY_LISTENERS);
         double dyB = SlabSupport.getYOffset(w, fenceB, w.getBlockState(fenceB));
         ctx.assertTrue(Math.abs(dyB + 0.5) <= EPS,
-                "a fence placed beside a lowered fence must inherit -0.5; got " + dyB);
+                net.minecraft.text.Text.literal("a fence placed beside a lowered fence must inherit -0.5; got " + dyB));
         ctx.complete();
     }
 
@@ -207,7 +207,7 @@ public final class CantileverSuite {
         w.setBlockState(stone, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
         double dy = SlabSupport.getYOffset(w, stone, w.getBlockState(stone));
         ctx.assertTrue(Math.abs(dy + 0.5) <= EPS,
-                "a solid full block placed beside a lowered pane must inherit -0.5; got " + dy);
+                net.minecraft.text.Text.literal("a solid full block placed beside a lowered pane must inherit -0.5; got " + dy));
         ctx.complete();
     }
 
@@ -224,7 +224,7 @@ public final class CantileverSuite {
         w.setBlockState(pane, Blocks.GLASS_PANE.getDefaultState(), Block.NOTIFY_LISTENERS);
         double dy = SlabSupport.getYOffset(w, pane, w.getBlockState(pane));
         ctx.assertTrue(Math.abs(dy) <= EPS,
-                "gap-fill-from-above stays solid-subject-only (unchanged) for a pane; got " + dy);
+                net.minecraft.text.Text.literal("gap-fill-from-above stays solid-subject-only (unchanged) for a pane; got " + dy));
         ctx.complete();
     }
 
@@ -256,14 +256,14 @@ public final class CantileverSuite {
 
         double chestDy = SlabSupport.getYOffset(w, chestPos, w.getBlockState(chestPos));
         ctx.assertTrue(Math.abs(chestDy + 0.5) <= EPS,
-                "setup: chest on a slab, anchored, should render -0.5, got " + chestDy);
+                net.minecraft.text.Text.literal("setup: chest on a slab, anchored, should render -0.5, got " + chestDy));
 
         BlockPos hopper1 = chestPos.east(); // air below, no slab of its own
         w.setBlockState(hopper1, net.minecraft.block.Blocks.HOPPER.getDefaultState(), Block.NOTIFY_LISTENERS);
         double dy1 = SlabSupport.getYOffset(w, hopper1, w.getBlockState(hopper1));
         ctx.assertTrue(Math.abs(dy1 + 0.5) <= EPS,
-                "a hopper placed beside a lowered chest (air below, no slab of its own) must inherit "
-                        + "-0.5 (live bug: placed upward into vanilla); got " + dy1);
+                net.minecraft.text.Text.literal("a hopper placed beside a lowered chest (air below, no slab of its own) must inherit "
+                        + "-0.5 (live bug: placed upward into vanilla); got " + dy1));
         ctx.complete();
     }
 
@@ -287,8 +287,8 @@ public final class CantileverSuite {
         w.setBlockState(hopper2, net.minecraft.block.Blocks.HOPPER.getDefaultState(), Block.NOTIFY_LISTENERS);
         double dy2 = SlabSupport.getYOffset(w, hopper2, w.getBlockState(hopper2));
         ctx.assertTrue(Math.abs(dy2 + 0.5) <= EPS,
-                "the SECOND chained hopper (beside the first, anchored, hopper) must also inherit "
-                        + "-0.5; got " + dy2);
+                net.minecraft.text.Text.literal("the SECOND chained hopper (beside the first, anchored, hopper) must also inherit "
+                        + "-0.5; got " + dy2));
         ctx.complete();
     }
 
@@ -308,8 +308,8 @@ public final class CantileverSuite {
         w.setBlockState(hopper1, net.minecraft.block.Blocks.HOPPER.getDefaultState(), Block.NOTIFY_LISTENERS);
         SlabAnchorAttachment.addAnchor(w, hopper1, w.getBlockState(hopper1));
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, hopper1),
-                "a cantilever-lowered hopper beside a lowered chest must get a PERSISTED anchor "
-                        + "(qualifiesForBlockEntityLoweredAnchor delegates to the now-fixed getYOffset)");
+                net.minecraft.text.Text.literal("a cantilever-lowered hopper beside a lowered chest must get a PERSISTED anchor "
+                        + "(qualifiesForBlockEntityLoweredAnchor delegates to the now-fixed getYOffset)"));
         ctx.complete();
     }
 }

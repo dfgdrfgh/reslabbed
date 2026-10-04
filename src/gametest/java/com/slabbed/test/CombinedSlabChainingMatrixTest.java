@@ -165,16 +165,16 @@ public final class CombinedSlabChainingMatrixTest {
 
         Block tsGrass = terrainGrassSlab();
         ctx.assertTrue(tsGrass != Blocks.AIR,
-                "fixture: terrainslabs:grass_slab must be registered (Terrain Slabs loaded under runGameTest)");
+                net.minecraft.text.Text.literal("fixture: terrainslabs:grass_slab must be registered (Terrain Slabs loaded under runGameTest)"));
         ctx.assertTrue(
                 CompatHooks.customSlabSurfaceKind(terrainSlab(SlabType.BOTTOM)) == CompatSlabSurfaceKind.BOTTOM_LIKE,
-                "fixture: terrain BOTTOM slab must classify BOTTOM_LIKE");
+                net.minecraft.text.Text.literal("fixture: terrain BOTTOM slab must classify BOTTOM_LIKE"));
         ctx.assertTrue(
                 CompatHooks.customSlabSurfaceKind(terrainSlab(SlabType.TOP)) == CompatSlabSurfaceKind.TOP_LIKE,
-                "fixture: terrain TOP slab must classify TOP_LIKE");
+                net.minecraft.text.Text.literal("fixture: terrain TOP slab must classify TOP_LIKE"));
         ctx.assertTrue(
                 CompatHooks.customSlabSurfaceKind(terrainSlab(SlabType.DOUBLE)) == CompatSlabSurfaceKind.DOUBLE_LIKE,
-                "fixture: terrain DOUBLE slab must classify DOUBLE_LIKE");
+                net.minecraft.text.Text.literal("fixture: terrain DOUBLE slab must classify DOUBLE_LIKE"));
 
         int lane = 0;
 
@@ -221,7 +221,7 @@ public final class CombinedSlabChainingMatrixTest {
         // terrain BOTTOM is BOTTOM_LIKE (top Y+0.5); the vanilla bottom slab on it drops -0.5.
         double slabDy = record(cfg, "combinedSlab(vanillaBOTTOM)", world, slabPos, -0.5, Kind.STRICT);
         ctx.assertTrue(approx(slabDy, -0.5),
-                cfg + " vanilla bottom slab on terrain bottom should be -0.5, got " + slabDy);
+                net.minecraft.text.Text.literal(cfg + " vanilla bottom slab on terrain bottom should be -0.5, got " + slabDy));
 
         // The mixed slab is bottom-type AND lowered -0.5, so a thing on it drops a further -0.5
         // to total -1.0. lantern / full block / fence are the recently-fixed compound cases →
@@ -250,10 +250,10 @@ public final class CombinedSlabChainingMatrixTest {
         double anchored = forceAnchor ? anchoredReread(world, capPos) : Double.NaN;
         double dy = record(cfg, capLabel, world, capPos, -1.0, Kind.STRICT, anchored);
         ctx.assertTrue(approx(dy, -1.0),
-                cfg + " " + capLabel + " on mixed slab should be -1.0, got " + dy);
+                net.minecraft.text.Text.literal(cfg + " " + capLabel + " on mixed slab should be -1.0, got " + dy));
         if (!Double.isNaN(anchored)) {
             ctx.assertTrue(approx(anchored, -1.0),
-                    cfg + " " + capLabel + " on mixed slab anchored dy should stay -1.0 (no pop), got " + anchored);
+                    net.minecraft.text.Text.literal(cfg + " " + capLabel + " on mixed slab anchored dy should stay -1.0 (no pop), got " + anchored));
         }
     }
 
@@ -403,7 +403,7 @@ public final class CombinedSlabChainingMatrixTest {
         record(cfg, "L0(terrainBOTTOM)", world, l0, 0.0, Kind.STRICT);
         double l1dy = record(cfg, "L1(vanillaBOTTOM=mixed)", world, l1, -0.5, Kind.STRICT);
         ctx.assertTrue(approx(l1dy, -0.5),
-                cfg + " L1 vanilla bottom on terrain bottom (mixed) should be -0.5, got " + l1dy);
+                net.minecraft.text.Text.literal(cfg + " L1 vanilla bottom on terrain bottom (mixed) should be -0.5, got " + l1dy));
         // L2 on the LOWERED mixed slab. Production propagates a single -0.5 step (L2 follows L1's
         // lowering once) but does NOT accumulate the compound to -1.0. Full vertical accumulation
         // law wants -1.0 → record vs -1.0, BY_DESIGN (no vertical accumulate).
@@ -479,7 +479,7 @@ public final class CombinedSlabChainingMatrixTest {
         // HARD-ASSERT: fence on a mixed slab must follow the compound drop to -1.0 (the "fence
         // not chaining" symptom the maintainer reported — pinned green).
         ctx.assertTrue(approx(aFenceDy, -1.0),
-                cfgA + " fence on mixed slab should be -1.0, got " + aFenceDy);
+                net.minecraft.text.Text.literal(cfgA + " fence on mixed slab should be -1.0, got " + aFenceDy));
 
         // (b) fence on a lowered full block: vanilla bottom slab → stone (anchored, -0.5) → fence.
         // The full block lowers -0.5 (sits on bottom slab); a fence on a lowered FULL block (top-
@@ -495,11 +495,11 @@ public final class CombinedSlabChainingMatrixTest {
         record(cfgB, "base(vanillaBOTTOM)", world, bBase, 0.0, Kind.STRICT);
         double bFullDy = record(cfgB, "fullBlock", world, bFull, -0.5, Kind.STRICT);
         ctx.assertTrue(approx(bFullDy, -0.5),
-                cfgB + " full block on bottom slab should be -0.5, got " + bFullDy);
+                net.minecraft.text.Text.literal(cfgB + " full block on bottom slab should be -0.5, got " + bFullDy));
         // Fence on a lowered full block → law -0.5. HARD-ASSERT: this is the "fence not chaining
         // on a lowered full block" question; it currently holds, so pin it green.
         double bFenceDy = record(cfgB, "fence", world, bFence, -0.5, Kind.STRICT);
         ctx.assertTrue(approx(bFenceDy, -0.5),
-                cfgB + " fence on a lowered full block should follow to -0.5, got " + bFenceDy);
+                net.minecraft.text.Text.literal(cfgB + " fence on a lowered full block should follow to -0.5, got " + bFenceDy));
     }
 }

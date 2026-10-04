@@ -39,7 +39,7 @@ public final class LanternUnderTerrainSlabsHangerTest {
             SlabPlacementDyAttachment.clear(w, lanternPos);
             ctx.assertTrue(SlabPlacementDyAttachment.writeBatch(
                             w, java.util.Map.of(support, Double.doubleToRawLongBits(supportDy))),
-                    "fixture: authored Terrain support height must publish for " + type);
+                    net.minecraft.text.Text.literal("fixture: authored Terrain support height must publish for " + type));
             PlayerEntity player = PlacementHarness.mockPlayerHolding(
                     ctx, support.north(3), new ItemStack(Blocks.LANTERN.asItem(), 1));
             double undersideOffset = type == SlabType.TOP ? 0.5d : 0.0d;
@@ -52,22 +52,22 @@ public final class LanternUnderTerrainSlabsHangerTest {
                     w, player, support, Direction.DOWN, hit);
 
             ctx.assertTrue(result.isAccepted(),
-                    "hanging lantern placement under authored Terrain " + type + " must succeed");
+                    net.minecraft.text.Text.literal("hanging lantern placement under authored Terrain " + type + " must succeed"));
             BlockState lantern = w.getBlockState(lanternPos);
             ctx.assertTrue(lantern.isOf(Blocks.LANTERN)
                             && lantern.contains(Properties.HANGING)
                             && lantern.get(Properties.HANGING),
-                    "the lantern must occupy the hanging state for " + type + "; got " + lantern);
+                    net.minecraft.text.Text.literal("the lantern must occupy the hanging state for " + type + "; got " + lantern));
             double expectedDy = supportDy + undersideOffset;
             double stored = SlabPlacementDyAttachment.storedDy(w, lanternPos);
             ctx.assertTrue(Double.doubleToRawLongBits(stored)
                             == Double.doubleToRawLongBits(expectedDy),
-                    "hanging lantern must freeze to the authored Terrain underside plane for "
-                            + type + "; expected " + expectedDy + " got " + stored);
+                    net.minecraft.text.Text.literal("hanging lantern must freeze to the authored Terrain underside plane for "
+                            + type + "; expected " + expectedDy + " got " + stored));
             double visual = SlabSupport.getYOffset(w, lanternPos, lantern);
             ctx.assertTrue(Math.abs(visual - expectedDy) <= EPS,
-                    "hanging lantern visual dy must match the Terrain underside for " + type
-                            + "; expected " + expectedDy + " got " + visual);
+                    net.minecraft.text.Text.literal("hanging lantern visual dy must match the Terrain underside for " + type
+                            + "; expected " + expectedDy + " got " + visual));
         }
         ctx.complete();
     }
@@ -102,14 +102,14 @@ public final class LanternUnderTerrainSlabsHangerTest {
         w.setBlockState(support, supportState, Block.NOTIFY_LISTENERS);
         ctx.assertTrue(SlabPlacementDyAttachment.writeBatch(
                         w, java.util.Map.of(support, Double.doubleToRawLongBits(supportDy))),
-                "fixture: authored Terrain TOP height must publish");
+                net.minecraft.text.Text.literal("fixture: authored Terrain TOP height must publish"));
         w.setBlockState(hanger, hangerState, Block.NOTIFY_LISTENERS);
 
         double expectedDy = supportDy + 0.5d;
         double actualDy = SlabSupport.getYOffset(w, hanger, w.getBlockState(hanger));
         ctx.assertTrue(Math.abs(actualDy - expectedDy) <= EPS,
-                label + " must use the authored Terrain TOP underside; expected "
-                        + expectedDy + " got " + actualDy);
+                net.minecraft.text.Text.literal(label + " must use the authored Terrain TOP underside; expected "
+                        + expectedDy + " got " + actualDy));
         ctx.complete();
     }
 
@@ -125,23 +125,23 @@ public final class LanternUnderTerrainSlabsHangerTest {
                 Block.NOTIFY_LISTENERS);
         w.setBlockState(dirtPos, Blocks.DIRT.getDefaultState(), Block.NOTIFY_LISTENERS);
         SlabAnchorAttachment.addAnchor(w, dirtPos, w.getBlockState(dirtPos));
-        ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, dirtPos), "setup: dirt must anchor on the bottom slab");
+        ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, dirtPos), net.minecraft.text.Text.literal("setup: dirt must anchor on the bottom slab"));
 
         w.setBlockState(tsSlabPos, TerrainSlabsTestShim.TEST_TS_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                 Block.NOTIFY_LISTENERS);
         SlabAnchorAttachment.addAnchor(w, tsSlabPos, w.getBlockState(tsSlabPos));
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, tsSlabPos),
-                "setup: the cantilevered Terrain bottom slab must be authored and anchored");
+                net.minecraft.text.Text.literal("setup: the cantilevered Terrain bottom slab must be authored and anchored"));
         double supportDy = SlabSupport.getYOffset(w, tsSlabPos, w.getBlockState(tsSlabPos));
         ctx.assertTrue(Math.abs(supportDy + 0.5d) <= EPS,
-                "setup: the authored Terrain bottom slab must carry dy=-0.5; got " + supportDy);
+                net.minecraft.text.Text.literal("setup: the authored Terrain bottom slab must carry dy=-0.5; got " + supportDy));
 
         w.setBlockState(lanternPos, Blocks.LANTERN.getDefaultState().with(Properties.HANGING, true),
                 Block.NOTIFY_LISTENERS);
         double lanternDy = SlabSupport.getYOffset(w, lanternPos, w.getBlockState(lanternPos));
         ctx.assertTrue(Math.abs(lanternDy - supportDy) <= EPS,
-                "a lantern under an authored Terrain bottom slab must follow its stored underside; "
-                        + "support=" + supportDy + " lantern=" + lanternDy);
+                net.minecraft.text.Text.literal("a lantern under an authored Terrain bottom slab must follow its stored underside; "
+                        + "support=" + supportDy + " lantern=" + lanternDy));
         ctx.complete();
     }
 
@@ -165,17 +165,17 @@ public final class LanternUnderTerrainSlabsHangerTest {
                 Block.NOTIFY_LISTENERS);
         SlabAnchorAttachment.addAnchor(w, supportSlabPos, w.getBlockState(supportSlabPos));
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, supportSlabPos),
-                "setup: the vanilla support slab must anchor");
+                net.minecraft.text.Text.literal("setup: the vanilla support slab must anchor"));
         double supportDy = SlabSupport.getYOffset(w, supportSlabPos, w.getBlockState(supportSlabPos));
         ctx.assertTrue(Math.abs(supportDy + 0.5) <= EPS,
-                "setup: the vanilla support slab must itself render -0.5 (Slabbed lowers it, unlike TS); got " + supportDy);
+                net.minecraft.text.Text.literal("setup: the vanilla support slab must itself render -0.5 (Slabbed lowers it, unlike TS); got " + supportDy));
 
         w.setBlockState(lanternPos, Blocks.LANTERN.getDefaultState().with(Properties.HANGING, true),
                 Block.NOTIFY_LISTENERS);
         double lanternDy = SlabSupport.getYOffset(w, lanternPos, w.getBlockState(lanternPos));
         ctx.assertTrue(Math.abs(lanternDy + 0.5) <= EPS,
-                "regression: a lantern under a lowered VANILLA slab must STILL follow it to -0.5 "
-                        + "(anti-jam) -- the fix must only change the Terrain-Slabs case; got " + lanternDy);
+                net.minecraft.text.Text.literal("regression: a lantern under a lowered VANILLA slab must STILL follow it to -0.5 "
+                        + "(anti-jam) -- the fix must only change the Terrain-Slabs case; got " + lanternDy));
         ctx.complete();
     }
 }

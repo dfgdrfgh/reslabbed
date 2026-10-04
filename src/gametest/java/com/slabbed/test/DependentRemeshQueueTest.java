@@ -20,8 +20,8 @@ public final class DependentRemeshQueueTest {
         int rebuilt = queue.drain((x, y, z, coverage) -> coverage.forEachRegion(r ->
                 cells[0] += (long) (r.maxX() - r.minX() + 1) * (r.maxY() - r.minY() + 1)
                         * (r.maxZ() - r.minZ() + 1)));
-        ctx.assertTrue(rebuilt == 1, "both regions must share one section rebuild");
-        ctx.assertTrue(cells[0] == 16, "only the two requested cubes may refresh, got " + cells[0]);
+        ctx.assertTrue(rebuilt == 1, net.minecraft.text.Text.literal("both regions must share one section rebuild"));
+        ctx.assertTrue(cells[0] == 16, net.minecraft.text.Text.literal("only the two requested cubes may refresh, got " + cells[0]));
         ctx.complete();
     }
 
@@ -32,15 +32,15 @@ public final class DependentRemeshQueueTest {
         queue.enqueueBlockRegion(3, 1, 2, 8, 7, 9);
 
         ctx.assertTrue(queue.pendingSectionCount() == 1,
-                "two overlapping changes in one section must queue one rebuild, got "
-                        + queue.pendingSectionCount());
+                net.minecraft.text.Text.literal("two overlapping changes in one section must queue one rebuild, got "
+                        + queue.pendingSectionCount()));
         List<BlockRegion> drained = new ArrayList<>();
         int count = queue.drain((sectionX, sectionY, sectionZ, region) -> drained.add(region.bounds()));
         ctx.assertTrue(count == 1 && drained.size() == 1,
-                "the coalesced section must drain exactly once, got " + count);
+                net.minecraft.text.Text.literal("the coalesced section must drain exactly once, got " + count));
         BlockRegion region = drained.getFirst();
         ctx.assertTrue(region.equals(new BlockRegion(1, 1, 2, 8, 7, 9)),
-                "the one rebuild must refresh the union of both changes, got " + region);
+                net.minecraft.text.Text.literal("the one rebuild must refresh the union of both changes, got " + region));
         ctx.complete();
     }
 
@@ -51,19 +51,19 @@ public final class DependentRemeshQueueTest {
         queue.enqueueBlockRegion(15, 15, 15, 16, 16, 16);
 
         ctx.assertTrue(queue.pendingSectionCount() == 8,
-                "a two-block cube crossing all three section boundaries must touch eight sections, got "
-                        + queue.pendingSectionCount());
+                net.minecraft.text.Text.literal("a two-block cube crossing all three section boundaries must touch eight sections, got "
+                        + queue.pendingSectionCount()));
         int count = queue.drain((sectionX, sectionY, sectionZ, coverage) -> {
             BlockRegion region = coverage.bounds();
             ctx.assertTrue(region.minX() >= sectionX * 16 && region.maxX() <= sectionX * 16 + 15,
-                    "x cache region escaped its scheduled section: " + region);
+                    net.minecraft.text.Text.literal("x cache region escaped its scheduled section: " + region));
             ctx.assertTrue(region.minY() >= sectionY * 16 && region.maxY() <= sectionY * 16 + 15,
-                    "y cache region escaped its scheduled section: " + region);
+                    net.minecraft.text.Text.literal("y cache region escaped its scheduled section: " + region));
             ctx.assertTrue(region.minZ() >= sectionZ * 16 && region.maxZ() <= sectionZ * 16 + 15,
-                    "z cache region escaped its scheduled section: " + region);
+                    net.minecraft.text.Text.literal("z cache region escaped its scheduled section: " + region));
         });
         ctx.assertTrue(count == 8 && queue.pendingSectionCount() == 0,
-                "all eight unique sections must drain once under an eight-section budget");
+                net.minecraft.text.Text.literal("all eight unique sections must drain once under an eight-section budget"));
         ctx.complete();
     }
 
@@ -78,13 +78,13 @@ public final class DependentRemeshQueueTest {
 
         int firstTick = queue.drain((sectionX, sectionY, sectionZ, region) -> { });
         ctx.assertTrue(firstTick == budget && queue.pendingSectionCount() == 1,
-                "the first tick must stop at the section budget and retain one, got processed="
-                        + firstTick + " pending=" + queue.pendingSectionCount());
+                net.minecraft.text.Text.literal("the first tick must stop at the section budget and retain one, got processed="
+                        + firstTick + " pending=" + queue.pendingSectionCount()));
         int secondTick = queue.drain((sectionX, sectionY, sectionZ, region) -> { });
         ctx.assertTrue(secondTick == 1 && queue.pendingSectionCount() == 0,
-                "the retained section must drain on the next tick");
+                net.minecraft.text.Text.literal("the retained section must drain on the next tick"));
         ctx.assertTrue(DependentRemeshQueue.REQUEST_IMPORTANT_REBUILD,
-                "Slabbed's own visible-change rebuilds must request the important renderer lane");
+                net.minecraft.text.Text.literal("Slabbed's own visible-change rebuilds must request the important renderer lane"));
         ctx.complete();
     }
 }

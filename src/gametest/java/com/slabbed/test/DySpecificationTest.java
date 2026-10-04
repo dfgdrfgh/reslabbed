@@ -64,7 +64,7 @@ public final class DySpecificationTest {
 
     private static void assertDy(TestContext ctx, String specId, double actual, double expected) {
         ctx.assertTrue(Math.abs(actual - expected) <= EPS,
-                specId + ": dy must be " + expected + " per DY_SPEC.md; got " + actual);
+                net.minecraft.text.Text.literal(specId + ": dy must be " + expected + " per DY_SPEC.md; got " + actual));
         ctx.complete();
     }
 

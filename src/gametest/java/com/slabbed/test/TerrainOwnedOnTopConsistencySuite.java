@@ -62,9 +62,9 @@ public final class TerrainOwnedOnTopConsistencySuite {
         world.setBlockState(surface, TerrainSlabsTestShim.TEST_TS_SLAB.getDefaultState()
                 .with(SlabBlock.TYPE, SlabType.BOTTOM), Block.NOTIFY_ALL);
         ctx.assertTrue(!SlabPlacementDyAttachment.rawFact(world, surface).present(),
-                "fixture: a NATIVE Terrain surface must hold no stored fact");
+                net.minecraft.text.Text.literal("fixture: a NATIVE Terrain surface must hold no stored fact"));
         ctx.assertTrue(CompatHooks.terrainSlabsHandlesObjectOffset(Blocks.SNOW.getDefaultState()),
-                "fixture: the ownership predicate must cover the snow layer");
+                net.minecraft.text.Text.literal("fixture: the ownership predicate must cover the snow layer"));
 
         PlayerEntity player = PlacementHarness.mockPlayerHolding(
                 ctx, surface.north(3), new ItemStack(Blocks.SNOW.asItem(), 1));
@@ -72,10 +72,10 @@ public final class TerrainOwnedOnTopConsistencySuite {
                 new Vec3d(surface.getX() + 0.5d, surface.getY() + 0.5d, surface.getZ() + 0.5d));
 
         ctx.assertTrue(result.isAccepted(),
-                "A1: snow onto the native Terrain surface must place; got " + result);
+                net.minecraft.text.Text.literal("A1: snow onto the native Terrain surface must place; got " + result));
         ctx.assertTrue(world.getBlockState(object).isOf(Blocks.SNOW),
-                "A1: the snow layer must occupy the cell above the Terrain surface; got "
-                        + PlacementHarness.describe(world, object));
+                net.minecraft.text.Text.literal("A1: the snow layer must occupy the cell above the Terrain surface; got "
+                        + PlacementHarness.describe(world, object)));
         assertZeroSlabbedContribution(ctx, world, object, "A1 native-surface snow layer");
         ctx.complete();
     }
@@ -93,7 +93,7 @@ public final class TerrainOwnedOnTopConsistencySuite {
         BlockPos terrain = authoredTerrainSlab(ctx, 2, 2);
         BlockPos object = terrain.up();
         ctx.assertTrue(CompatHooks.terrainSlabsHandlesObjectOffset(Blocks.SNOW.getDefaultState()),
-                "fixture: the ownership predicate must cover the snow layer");
+                net.minecraft.text.Text.literal("fixture: the ownership predicate must cover the snow layer"));
 
         PlayerEntity player = PlacementHarness.mockPlayerHolding(
                 ctx, terrain.north(3), new ItemStack(Blocks.SNOW.asItem(), 1));
@@ -101,10 +101,10 @@ public final class TerrainOwnedOnTopConsistencySuite {
                 new Vec3d(terrain.getX() + 0.5d, terrain.getY() + 0.5d, terrain.getZ() + 0.5d));
 
         ctx.assertTrue(result.isAccepted(),
-                "B1: snow onto the authored Terrain surface must place; got " + result);
+                net.minecraft.text.Text.literal("B1: snow onto the authored Terrain surface must place; got " + result));
         ctx.assertTrue(world.getBlockState(object).isOf(Blocks.SNOW),
-                "B1: the snow layer must occupy the cell above the authored Terrain surface; got "
-                        + PlacementHarness.describe(world, object));
+                net.minecraft.text.Text.literal("B1: the snow layer must occupy the cell above the authored Terrain surface; got "
+                        + PlacementHarness.describe(world, object)));
         assertZeroSlabbedContribution(ctx, world, object, "B1 authored-surface snow layer");
         ctx.complete();
     }
@@ -122,7 +122,7 @@ public final class TerrainOwnedOnTopConsistencySuite {
         BlockPos terrain = authoredTerrainSlab(ctx, 5, 2);
         BlockPos object = terrain.up();
         ctx.assertTrue(!CompatHooks.terrainSlabsHandlesObjectOffset(Blocks.TORCH.getDefaultState()),
-                "fixture: the ownership predicate must NOT cover the torch");
+                net.minecraft.text.Text.literal("fixture: the ownership predicate must NOT cover the torch"));
 
         PlayerEntity player = PlacementHarness.mockPlayerHolding(
                 ctx, terrain.north(3), new ItemStack(Blocks.TORCH.asItem(), 1));
@@ -130,19 +130,19 @@ public final class TerrainOwnedOnTopConsistencySuite {
                 new Vec3d(terrain.getX() + 0.5d, terrain.getY() + 0.5d, terrain.getZ() + 0.5d));
 
         ctx.assertTrue(result.isAccepted(),
-                "C1: torch onto the authored Terrain surface must place; got " + result);
+                net.minecraft.text.Text.literal("C1: torch onto the authored Terrain surface must place; got " + result));
         ctx.assertTrue(world.getBlockState(object).isOf(Blocks.TORCH),
-                "C1: the torch must occupy the cell above the authored Terrain surface; got "
-                        + PlacementHarness.describe(world, object));
+                net.minecraft.text.Text.literal("C1: the torch must occupy the cell above the authored Terrain surface; got "
+                        + PlacementHarness.describe(world, object)));
         double stored = SlabPlacementDyAttachment.storedDy(world, object);
         System.out.println("[TS-OWNED] C1 torch stored=" + stored + " "
                 + PlacementHarness.describe(world, object));
         ctx.assertTrue(Double.doubleToRawLongBits(stored) == Double.doubleToRawLongBits(-1.0d),
-                "C1: a non-owned object over the authored -0.5 Terrain surface must freeze the "
-                        + "authored seat -1.0; got " + stored);
+                net.minecraft.text.Text.literal("C1: a non-owned object over the authored -0.5 Terrain surface must freeze the "
+                        + "authored seat -1.0; got " + stored));
         double resolved = SlabSupport.getYOffset(world, object, world.getBlockState(object));
         ctx.assertTrue(Math.abs(resolved + 1.0d) <= EPS,
-                "C1: the torch must resolve at its frozen authored seat -1.0; got " + resolved);
+                net.minecraft.text.Text.literal("C1: the torch must resolve at its frozen authored seat -1.0; got " + resolved));
         ctx.complete();
     }
 
@@ -171,10 +171,10 @@ public final class TerrainOwnedOnTopConsistencySuite {
                 new Vec3d(vanillaSlab.getX() + 0.5d, vanillaSlab.getY() + 0.5d,
                         vanillaSlab.getZ() + 0.5d));
         ctx.assertTrue(ownerResult.isAccepted(),
-                "fixture: the lowered vanilla owner must place; got " + ownerResult);
+                net.minecraft.text.Text.literal("fixture: the lowered vanilla owner must place; got " + ownerResult));
         double ownerStored = SlabPlacementDyAttachment.storedDy(world, owner);
         ctx.assertTrue(Double.doubleToRawLongBits(ownerStored) == Double.doubleToRawLongBits(-0.5d),
-                "fixture: the lowered vanilla owner must freeze -0.5; got " + ownerStored);
+                net.minecraft.text.Text.literal("fixture: the lowered vanilla owner must freeze -0.5; got " + ownerStored));
 
         Item terrainItem = TerrainSlabsTestShim.TEST_TS_SLAB_ITEM;
         PlayerEntity terrainPlayer = PlacementHarness.mockPlayerHolding(
@@ -183,14 +183,14 @@ public final class TerrainOwnedOnTopConsistencySuite {
                 world, terrainPlayer, owner, Direction.UP,
                 new Vec3d(owner.getX() + 0.5d, owner.getY() + 0.5d, owner.getZ() + 0.5d));
         ctx.assertTrue(terrainResult.isAccepted(),
-                "fixture: the authored Terrain slab must place; got " + terrainResult);
+                net.minecraft.text.Text.literal("fixture: the authored Terrain slab must place; got " + terrainResult));
         ctx.assertTrue(world.getBlockState(terrain).isOf(((BlockItem) terrainItem).getBlock()),
-                "fixture: the Terrain slab item must occupy the authored cell; got "
-                        + PlacementHarness.describe(world, terrain));
+                net.minecraft.text.Text.literal("fixture: the Terrain slab item must occupy the authored cell; got "
+                        + PlacementHarness.describe(world, terrain)));
         double terrainStored = SlabPlacementDyAttachment.storedDy(world, terrain);
         ctx.assertTrue(Double.doubleToRawLongBits(terrainStored)
                         == Double.doubleToRawLongBits(-0.5d),
-                "fixture: the authored Terrain slab must freeze -0.5; got " + terrainStored);
+                net.minecraft.text.Text.literal("fixture: the authored Terrain slab must freeze -0.5; got " + terrainStored));
         return terrain;
     }
 
@@ -209,10 +209,10 @@ public final class TerrainOwnedOnTopConsistencySuite {
         double resolved = SlabSupport.getYOffset(world, object, world.getBlockState(object));
         System.out.println("[TS-OWNED] " + label + " stored=" + stored + " resolved=" + resolved);
         ctx.assertTrue(!SlabPlacementDyAttachment.rawFact(world, object).present(),
-                label + ": the transaction must mint no Slabbed fact for a Terrain-owned object; "
-                        + "got stored=" + stored);
+                net.minecraft.text.Text.literal(label + ": the transaction must mint no Slabbed fact for a Terrain-owned object; "
+                        + "got stored=" + stored));
         ctx.assertTrue(Math.abs(resolved) <= EPS,
-                label + ": Slabbed's live contribution for a Terrain-owned object must be zero "
-                        + "over native AND authored surfaces alike; got " + resolved);
+                net.minecraft.text.Text.literal(label + ": Slabbed's live contribution for a Terrain-owned object must be zero "
+                        + "over native AND authored surfaces alike; got " + resolved));
     }
 }

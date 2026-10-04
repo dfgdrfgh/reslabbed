@@ -41,12 +41,12 @@ public final class SlabHeightStepCullTest {
             com.slabbed.anchor.SlabPlacementDyAttachment.record(w, a, -0.5);
             com.slabbed.anchor.SlabPlacementDyAttachment.record(w, b, 0.0);
             ctx.assertTrue(SlabSupport.isSlabHeightStepFace(w, a, w.getBlockState(a), Direction.EAST),
-                    "partial subject must preserve exposed face: " + subject);
+                    net.minecraft.text.Text.literal("partial subject must preserve exposed face: " + subject));
             ctx.assertTrue(SlabSupport.isSlabHeightStepFace(w, b, w.getBlockState(b), Direction.WEST),
-                    "neighbor must preserve exposed face toward partial subject: " + subject);
+                    net.minecraft.text.Text.literal("neighbor must preserve exposed face toward partial subject: " + subject));
             com.slabbed.anchor.SlabPlacementDyAttachment.record(w, b, -0.5);
             ctx.assertTrue(!SlabSupport.isSlabHeightStepFace(w, a, w.getBlockState(a), Direction.EAST),
-                    "equal-height pair must retain ordinary culling: " + subject);
+                    net.minecraft.text.Text.literal("equal-height pair must retain ordinary culling: " + subject));
         }
         ctx.complete();
     }
@@ -67,17 +67,17 @@ public final class SlabHeightStepCullTest {
         SlabAnchorAttachment.addAnchor(w, loweredPos, w.getBlockState(loweredPos));
         double dy = SlabSupport.getYOffset(w, loweredPos, w.getBlockState(loweredPos));
         ctx.assertTrue(Math.abs(dy + 0.5) <= 1.0e-6,
-                "setup: anchored dirt on a vanilla bottom slab should render -0.5, got " + dy);
-        ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, loweredPos), "setup: dirt must be anchored");
+                net.minecraft.text.Text.literal("setup: anchored dirt on a vanilla bottom slab should render -0.5, got " + dy));
+        ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, loweredPos), net.minecraft.text.Text.literal("setup: dirt must be anchored"));
 
         w.setBlockState(flushPos, Blocks.DIRT.getDefaultState(), Block.NOTIFY_LISTENERS);
-        ctx.assertTrue(!SlabAnchorAttachment.isAnchored(w, flushPos), "setup: the flush neighbour must NOT be anchored");
+        ctx.assertTrue(!SlabAnchorAttachment.isAnchored(w, flushPos), net.minecraft.text.Text.literal("setup: the flush neighbour must NOT be anchored"));
 
         boolean stepFace = SlabSupport.isSlabHeightStepFace(w, loweredPos, w.getBlockState(loweredPos), Direction.EAST);
         ctx.assertTrue(stepFace,
-                "an anchored, lowered opaque full cube beside a flush cube must redraw its "
+                net.minecraft.text.Text.literal("an anchored, lowered opaque full cube beside a flush cube must redraw its "
                         + "stepped face (live see-through-hole bug on plain anchored dirt, not "
-                        + "Terrain-Slabs-related); got " + stepFace);
+                        + "Terrain-Slabs-related); got " + stepFace));
         ctx.complete();
     }
 
@@ -91,9 +91,9 @@ public final class SlabHeightStepCullTest {
         w.setBlockState(a, Blocks.DIRT.getDefaultState(), Block.NOTIFY_LISTENERS);
         w.setBlockState(b, Blocks.DIRT.getDefaultState(), Block.NOTIFY_LISTENERS);
         ctx.assertTrue(!SlabAnchorAttachment.isAnchored(w, a) && !SlabAnchorAttachment.isAnchored(w, b),
-                "setup: neither cube may be anchored");
+                net.minecraft.text.Text.literal("setup: neither cube may be anchored"));
         boolean stepFace = SlabSupport.isSlabHeightStepFace(w, a, w.getBlockState(a), Direction.EAST);
-        ctx.assertTrue(!stepFace, "two flush cubes must never redraw a stepped face; got " + stepFace);
+        ctx.assertTrue(!stepFace, net.minecraft.text.Text.literal("two flush cubes must never redraw a stepped face; got " + stepFace));
         ctx.complete();
     }
 
@@ -115,9 +115,9 @@ public final class SlabHeightStepCullTest {
         SlabAnchorAttachment.addAnchor(w, a, w.getBlockState(a));
         SlabAnchorAttachment.addAnchor(w, b, w.getBlockState(b));
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, a) && SlabAnchorAttachment.isAnchored(w, b),
-                "setup: both cubes must be anchored");
+                net.minecraft.text.Text.literal("setup: both cubes must be anchored"));
         boolean stepFace = SlabSupport.isSlabHeightStepFace(w, a, w.getBlockState(a), Direction.EAST);
-        ctx.assertTrue(!stepFace, "two EQUALLY lowered cubes (no height step) must not redraw; got " + stepFace);
+        ctx.assertTrue(!stepFace, net.minecraft.text.Text.literal("two EQUALLY lowered cubes (no height step) must not redraw; got " + stepFace));
         ctx.complete();
     }
 
@@ -141,26 +141,26 @@ public final class SlabHeightStepCullTest {
                 Block.NOTIFY_LISTENERS);
         w.setBlockState(loweredFullBlockPos, Blocks.DIRT.getDefaultState(), Block.NOTIFY_LISTENERS);
         SlabAnchorAttachment.addAnchor(w, loweredFullBlockPos, w.getBlockState(loweredFullBlockPos));
-        ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, loweredFullBlockPos), "setup: dirt must be anchored/lowered");
+        ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, loweredFullBlockPos), net.minecraft.text.Text.literal("setup: dirt must be anchored/lowered"));
 
         w.setBlockState(topSlabPos, Blocks.OAK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP),
                 Block.NOTIFY_LISTENERS);
         ctx.assertTrue(!w.getBlockState(topSlabPos).isOpaqueFullCube(),
-                "setup: a TOP slab must not be an opaque full cube (that's the whole gap)");
+                net.minecraft.text.Text.literal("setup: a TOP slab must not be an opaque full cube (that's the whole gap)"));
         // Deliberately NOT anchored: a slab placed beside an already-lowered full block is
         // exactly the build order a real player hits often (the full block was lowered first;
         // the slab's own onPlaced anchor evaluation never re-runs later, per the never-pop law),
         // and it's the exact configuration the confirmed probe reproduced this bug in.
-        ctx.assertTrue(!SlabAnchorAttachment.isAnchored(w, topSlabPos), "setup: slab must NOT be anchored (matches the reported build order)");
+        ctx.assertTrue(!SlabAnchorAttachment.isAnchored(w, topSlabPos), net.minecraft.text.Text.literal("setup: slab must NOT be anchored (matches the reported build order)"));
 
         boolean fullBlockFace = SlabSupport.isSlabHeightStepFace(w, loweredFullBlockPos, w.getBlockState(loweredFullBlockPos), Direction.EAST);
-        ctx.assertTrue(fullBlockFace, "sanity: the full block's own face toward the slab was already correctly redrawn");
+        ctx.assertTrue(fullBlockFace, net.minecraft.text.Text.literal("sanity: the full block's own face toward the slab was already correctly redrawn"));
 
         boolean topSlabFace = SlabSupport.isSlabHeightStepFace(w, topSlabPos, w.getBlockState(topSlabPos), Direction.WEST);
         ctx.assertTrue(topSlabFace,
-                "THE FIX (GH#24): a flush TOP slab beside a lowered full block must ALSO redraw "
+                net.minecraft.text.Text.literal("THE FIX (GH#24): a flush TOP slab beside a lowered full block must ALSO redraw "
                         + "its own stepped face — previously a slab subject was never covered by this "
-                        + "check at all, only the opposite (full-block) side was; got " + topSlabFace);
+                        + "check at all, only the opposite (full-block) side was; got " + topSlabFace));
         ctx.complete();
     }
 
@@ -179,11 +179,11 @@ public final class SlabHeightStepCullTest {
 
         w.setBlockState(bottomSlabPos, Blocks.OAK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                 Block.NOTIFY_LISTENERS);
-        ctx.assertTrue(!SlabAnchorAttachment.isAnchored(w, bottomSlabPos), "setup: slab must NOT be anchored (matches the reported build order)");
+        ctx.assertTrue(!SlabAnchorAttachment.isAnchored(w, bottomSlabPos), net.minecraft.text.Text.literal("setup: slab must NOT be anchored (matches the reported build order)"));
 
         boolean bottomSlabFace = SlabSupport.isSlabHeightStepFace(w, bottomSlabPos, w.getBlockState(bottomSlabPos), Direction.WEST);
         ctx.assertTrue(bottomSlabFace,
-                "a flush BOTTOM slab beside a lowered full block must also redraw its stepped face; got " + bottomSlabFace);
+                net.minecraft.text.Text.literal("a flush BOTTOM slab beside a lowered full block must also redraw its stepped face; got " + bottomSlabFace));
         ctx.complete();
     }
 
@@ -197,7 +197,7 @@ public final class SlabHeightStepCullTest {
         w.setBlockState(a, Blocks.OAK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP), Block.NOTIFY_LISTENERS);
         w.setBlockState(b, Blocks.OAK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP), Block.NOTIFY_LISTENERS);
         boolean stepFace = SlabSupport.isSlabHeightStepFace(w, a, w.getBlockState(a), Direction.EAST);
-        ctx.assertTrue(!stepFace, "two flush TOP slabs must never redraw a stepped face; got " + stepFace);
+        ctx.assertTrue(!stepFace, net.minecraft.text.Text.literal("two flush TOP slabs must never redraw a stepped face; got " + stepFace));
         ctx.complete();
     }
 
@@ -221,10 +221,10 @@ public final class SlabHeightStepCullTest {
         w.setBlockState(slabBPos, Blocks.OAK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP), Block.NOTIFY_LISTENERS);
         SlabAnchorAttachment.addAnchor(w, slabBPos, w.getBlockState(slabBPos));
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, slabAPos) && SlabAnchorAttachment.isAnchored(w, slabBPos),
-                "setup: both slabs must anchor via horizontal adjacency to the anchored dirt / each other");
+                net.minecraft.text.Text.literal("setup: both slabs must anchor via horizontal adjacency to the anchored dirt / each other"));
 
         boolean stepFace = SlabSupport.isSlabHeightStepFace(w, slabAPos, w.getBlockState(slabAPos), Direction.EAST);
-        ctx.assertTrue(!stepFace, "two EQUALLY lowered slabs (no height step) must not redraw; got " + stepFace);
+        ctx.assertTrue(!stepFace, net.minecraft.text.Text.literal("two EQUALLY lowered slabs (no height step) must not redraw; got " + stepFace));
         ctx.complete();
     }
 
@@ -256,15 +256,15 @@ public final class SlabHeightStepCullTest {
 
         boolean deepFace = SlabSupport.isSlabHeightStepFace(w, deep, w.getBlockState(deep), Direction.EAST);
         ctx.assertTrue(deepFace,
-                "an anchored -1.0 cube beside an anchored -0.5 cube exposes a real 0.5 seam and must "
+                net.minecraft.text.Text.literal("an anchored -1.0 cube beside an anchored -0.5 cube exposes a real 0.5 seam and must "
                         + "redraw its stepped face — both sides are 'lowered', so the boolean "
                         + "lowered/not-lowered form is magnitude-blind and culls it (the maintainer's live "
-                        + "back-row DODOs); got " + deepFace);
+                        + "back-row DODOs); got " + deepFace));
 
         // The GH#24 lesson: BOTH sides of the seam must be redrawn, not just one.
         boolean shallowFace = SlabSupport.isSlabHeightStepFace(w, shallow, w.getBlockState(shallow), Direction.WEST);
         ctx.assertTrue(shallowFace,
-                "the -0.5 cube's own face toward the -1.0 cube must be redrawn too; got " + shallowFace);
+                net.minecraft.text.Text.literal("the -0.5 cube's own face toward the -1.0 cube must be redrawn too; got " + shallowFace));
         ctx.complete();
     }
 
@@ -277,15 +277,15 @@ public final class SlabHeightStepCullTest {
         BlockPos deep = buildAnchoredMinusOneCube(ctx, 2, 2);
         BlockPos slab = buildAnchoredMinusHalfNeighbor(ctx, deep.east(), bottomSlab(Blocks.BIRCH_SLAB), -0.5);
         ctx.assertTrue(!w.getBlockState(slab).isOpaqueFullCube(),
-                "setup: the neighbour must be a real slab, not an opaque full cube (that is the widening)");
+                net.minecraft.text.Text.literal("setup: the neighbour must be a real slab, not an opaque full cube (that is the widening)"));
 
         boolean slabFace = SlabSupport.isSlabHeightStepFace(w, slab, w.getBlockState(slab), Direction.WEST);
         ctx.assertTrue(slabFace,
-                "an anchored -0.5 SLAB beside an anchored -1.0 cube must redraw its stepped face — "
-                        + "magnitude sensitivity must not cost the widened slab eligibility; got " + slabFace);
+                net.minecraft.text.Text.literal("an anchored -0.5 SLAB beside an anchored -1.0 cube must redraw its stepped face — "
+                        + "magnitude sensitivity must not cost the widened slab eligibility; got " + slabFace));
 
         boolean cubeFace = SlabSupport.isSlabHeightStepFace(w, deep, w.getBlockState(deep), Direction.EAST);
-        ctx.assertTrue(cubeFace, "the cube's own face toward the lowered slab must be redrawn too; got " + cubeFace);
+        ctx.assertTrue(cubeFace, net.minecraft.text.Text.literal("the cube's own face toward the lowered slab must be redrawn too; got " + cubeFace));
         ctx.complete();
     }
 
@@ -319,18 +319,18 @@ public final class SlabHeightStepCullTest {
         boolean shallowFace = SlabSupport.isSlabHeightStepFace(
                 w, pair.shallow(), w.getBlockState(pair.shallow()), Direction.WEST);
         ctx.assertTrue(shallowFace,
-                "THE RED (the maintainer live 2026-08-06, recorder 8248751f): a GEOMETRICALLY lowered -0.5 "
+                net.minecraft.text.Text.literal("THE RED (the maintainer live 2026-08-06, recorder 8248751f): a GEOMETRICALLY lowered -0.5 "
                         + "cube with anchor=none beside a GEOMETRICALLY lowered -1.0 cube with "
                         + "anchor=none exposes a real 0.5 seam and must redraw its stepped face. "
                         + "Step-cull eligibility keyed on an ANCHOR BOOLEAN, so neither side counted "
-                        + "as 'lowered' and the seam stayed culled; got " + shallowFace);
+                        + "as 'lowered' and the seam stayed culled; got " + shallowFace));
 
         // The GH#24 lesson: BOTH sides of the seam must be redrawn, not just one.
         boolean deepFace = SlabSupport.isSlabHeightStepFace(
                 w, pair.deep(), w.getBlockState(pair.deep()), Direction.EAST);
         ctx.assertTrue(deepFace,
-                "the unanchored -1.0 cube's own face toward the unanchored -0.5 cube must be "
-                        + "redrawn too; got " + deepFace);
+                net.minecraft.text.Text.literal("the unanchored -1.0 cube's own face toward the unanchored -0.5 cube must be "
+                        + "redrawn too; got " + deepFace));
         ctx.complete();
     }
 
@@ -346,18 +346,18 @@ public final class SlabHeightStepCullTest {
         SlabAnchorAttachment.addAnchor(w, pair.deep(), w.getBlockState(pair.deep()));
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, pair.deep())
                         && !SlabAnchorAttachment.isAnchored(w, pair.shallow()),
-                "setup: exactly one side of the step must carry an anchor (the MIXED state)");
+                net.minecraft.text.Text.literal("setup: exactly one side of the step must carry an anchor (the MIXED state)"));
 
         boolean shallowFace = SlabSupport.isSlabHeightStepFace(
                 w, pair.shallow(), w.getBlockState(pair.shallow()), Direction.WEST);
         ctx.assertTrue(shallowFace,
-                "an unanchored, geometrically lowered cube beside an ANCHORED deeper cube must "
-                        + "redraw its stepped face; got " + shallowFace);
+                net.minecraft.text.Text.literal("an unanchored, geometrically lowered cube beside an ANCHORED deeper cube must "
+                        + "redraw its stepped face; got " + shallowFace));
 
         boolean deepFace = SlabSupport.isSlabHeightStepFace(
                 w, pair.deep(), w.getBlockState(pair.deep()), Direction.EAST);
         ctx.assertTrue(deepFace,
-                "and the anchored side's own face toward it too; got " + deepFace);
+                net.minecraft.text.Text.literal("and the anchored side's own face toward it too; got " + deepFace));
         ctx.complete();
     }
 
@@ -375,17 +375,17 @@ public final class SlabHeightStepCullTest {
             w.setBlockState(p, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
         }
         ctx.assertTrue(!SlabAnchorAttachment.isAnchored(w, a) && !SlabAnchorAttachment.isAnchored(w, b),
-                "setup: neither cube may be anchored");
+                net.minecraft.text.Text.literal("setup: neither cube may be anchored"));
         double dyA = SlabSupport.getYOffset(w, a, w.getBlockState(a));
         double dyB = SlabSupport.getYOffset(w, b, w.getBlockState(b));
         ctx.assertTrue(Math.abs(dyA - dyB) <= EPS && dyA < -EPS,
-                "setup: both cubes must be geometrically lowered to the SAME depth, got "
-                        + dyA + " and " + dyB);
+                net.minecraft.text.Text.literal("setup: both cubes must be geometrically lowered to the SAME depth, got "
+                        + dyA + " and " + dyB));
 
         boolean stepFace = SlabSupport.isSlabHeightStepFace(w, a, w.getBlockState(a), Direction.EAST);
         ctx.assertTrue(!stepFace,
-                "two EQUALLY (geometrically) lowered cubes have no height step and must not "
-                        + "redraw; got " + stepFace);
+                net.minecraft.text.Text.literal("two EQUALLY (geometrically) lowered cubes have no height step and must not "
+                        + "redraw; got " + stepFace));
         ctx.complete();
     }
 
@@ -424,7 +424,7 @@ public final class SlabHeightStepCullTest {
         SlabAnchorAttachment.addAnchor(w, oneLowered, w.getBlockState(oneLowered));
         w.setBlockState(oneFlush, Blocks.DIRT.getDefaultState(), Block.NOTIFY_LISTENERS);
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, oneLowered) && !SlabAnchorAttachment.isAnchored(w, oneFlush),
-                "setup: exactly one of the pair must be a lowered candidate");
+                net.minecraft.text.Text.literal("setup: exactly one of the pair must be a lowered candidate"));
 
         // (c) calibration: both sides ANCHOR-lowered at different magnitudes.
         BlockPos deep = buildAnchoredMinusOneCube(ctx, 2, 2);
@@ -449,38 +449,38 @@ public final class SlabHeightStepCullTest {
             SlabSupport.isSlabHeightStepFace(w, flushA, w.getBlockState(flushA), Direction.EAST);
             long afterFlush = SlabSupport.stepCullHeightResolutionCount();
             ctx.assertTrue(afterFlush == 0L,
-                    "PERF: ordinary terrain (solid cubes on solid ground, nothing lowered) must "
+                    net.minecraft.text.Text.literal("PERF: ordinary terrain (solid cubes on solid ground, nothing lowered) must "
                             + "resolve ZERO heights on the chunk-render hot path — the structural "
-                            + "screen has to decide it from the block below alone; resolved " + afterFlush);
+                            + "screen has to decide it from the block below alone; resolved " + afterFlush));
 
             SlabSupport.isSlabHeightStepFace(w, oneLowered, w.getBlockState(oneLowered), Direction.EAST);
             long afterOne = SlabSupport.stepCullHeightResolutionCount();
             ctx.assertTrue(afterOne == 0L,
-                    "PERF: 'exactly one side definitely lowered' is decidable from the cheap "
-                            + "prefilter alone and must resolve ZERO heights; resolved " + afterOne);
+                    net.minecraft.text.Text.literal("PERF: 'exactly one side definitely lowered' is decidable from the cheap "
+                            + "prefilter alone and must resolve ZERO heights; resolved " + afterOne));
 
             SlabSupport.isSlabHeightStepFace(w, deep, w.getBlockState(deep), Direction.EAST);
             long afterBoth = SlabSupport.stepCullHeightResolutionCount();
             ctx.assertTrue(afterBoth == 2L,
-                    "CALIBRATION: the both-sides-anchored case must resolve exactly the two heights "
+                    net.minecraft.text.Text.literal("CALIBRATION: the both-sides-anchored case must resolve exactly the two heights "
                             + "it compares — otherwise the zero assertions above are vacuous (a dead "
                             + "counter reads 0 forever); resolved " + afterBoth
-                            + ", shallow neighbour at " + shallow.toShortString());
+                            + ", shallow neighbour at " + shallow.toShortString()));
 
             SlabSupport.isSlabHeightStepFace(w, geometric.shallow(), w.getBlockState(geometric.shallow()),
                     Direction.WEST);
             long afterGeometric = SlabSupport.stepCullHeightResolutionCount();
             ctx.assertTrue(afterGeometric - afterBoth == 2L,
-                    "PERF: the NEW unanchored-geometric tier must be BOUNDED at two heights per "
+                    net.minecraft.text.Text.literal("PERF: the NEW unanchored-geometric tier must be BOUNDED at two heights per "
                             + "face (one per side), never an unbounded search; resolved "
-                            + (afterGeometric - afterBoth));
+                            + (afterGeometric - afterBoth)));
 
             SlabSupport.isSlabHeightStepFace(w, loweredSide, w.getBlockState(loweredSide), Direction.EAST);
             long afterLazy = SlabSupport.stepCullHeightResolutionCount();
             ctx.assertTrue(afterLazy - afterGeometric == 1L,
-                    "PERF: a side the structural screen rules out is known flush and must contribute "
+                    net.minecraft.text.Text.literal("PERF: a side the structural screen rules out is known flush and must contribute "
                             + "0.0 WITHOUT a resolution, so a lowered cube beside plain terrain costs "
-                            + "ONE height, not two; resolved " + (afterLazy - afterGeometric));
+                            + "ONE height, not two; resolved " + (afterLazy - afterGeometric)));
         } finally {
             SlabSupport.endStepCullHeightResolutionCount();
         }
@@ -529,14 +529,14 @@ public final class SlabHeightStepCullTest {
         w.setBlockState(shallow, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
 
         ctx.assertTrue(!SlabAnchorAttachment.isAnchored(w, shallow) && !SlabAnchorAttachment.isAnchored(w, deep),
-                "fixture: NEITHER subject may be anchored — an anchored scene takes the tier-3 lane "
-                        + "that already worked and FALSE-GREENS this test");
+                net.minecraft.text.Text.literal("fixture: NEITHER subject may be anchored — an anchored scene takes the tier-3 lane "
+                        + "that already worked and FALSE-GREENS this test"));
         double shallowDy = SlabSupport.getYOffset(w, shallow, w.getBlockState(shallow));
         ctx.assertTrue(Math.abs(shallowDy + 0.5) <= EPS,
-                "fixture: the shallow subject must render -0.5 by pure geometry, got " + shallowDy);
+                net.minecraft.text.Text.literal("fixture: the shallow subject must render -0.5 by pure geometry, got " + shallowDy));
         double deepDy = SlabSupport.getYOffset(w, deep, w.getBlockState(deep));
         ctx.assertTrue(Math.abs(deepDy + 1.0) <= EPS,
-                "fixture: the deep subject must render -1.0 by pure geometry, got " + deepDy);
+                net.minecraft.text.Text.literal("fixture: the deep subject must render -1.0 by pure geometry, got " + deepDy));
         return new GeometricStepPair(shallow, deep);
     }
 
@@ -571,11 +571,11 @@ public final class SlabHeightStepCullTest {
         w.setBlockState(subject, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
         SlabAnchorAttachment.addAnchor(w, subject, w.getBlockState(subject));
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, subject),
-                "fixture: the -1.0 subject must carry a real anchor — an un-anchored scene takes a "
-                        + "different lane and FALSE-GREENS this test");
+                net.minecraft.text.Text.literal("fixture: the -1.0 subject must carry a real anchor — an un-anchored scene takes a "
+                        + "different lane and FALSE-GREENS this test"));
         double dy = SlabSupport.getYOffset(w, subject, w.getBlockState(subject));
         ctx.assertTrue(Math.abs(dy + 1.0) <= EPS,
-                "fixture: the subject cube must render -1.0, got " + dy);
+                net.minecraft.text.Text.literal("fixture: the subject cube must render -1.0, got " + dy));
         return subject;
     }
 
@@ -591,11 +591,11 @@ public final class SlabHeightStepCullTest {
         w.setBlockState(pos, state, Block.NOTIFY_LISTENERS);
         SlabAnchorAttachment.addAnchor(w, pos, w.getBlockState(pos));
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, pos),
-                "fixture: the shallow neighbour must be anchored — that is what makes BOTH sides "
-                        + "'lowered' and exposes the magnitude blindness");
+                net.minecraft.text.Text.literal("fixture: the shallow neighbour must be anchored — that is what makes BOTH sides "
+                        + "'lowered' and exposes the magnitude blindness"));
         double dy = SlabSupport.getYOffset(w, pos, w.getBlockState(pos));
         ctx.assertTrue(Math.abs(dy - expectedDy) <= EPS,
-                "fixture: the shallow neighbour must render " + expectedDy + ", got " + dy);
+                net.minecraft.text.Text.literal("fixture: the shallow neighbour must render " + expectedDy + ", got " + dy));
         return pos;
     }
 

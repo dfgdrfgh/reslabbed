@@ -57,7 +57,7 @@ public final class StateChangeAnchorTest {
         w.setBlockState(support, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
         double supportDy = SlabSupport.getYOffset(w, support, w.getBlockState(support));
         ctx.assertTrue(Math.abs(supportDy + 0.5) <= EPS,
-                "fixture: the support standing on a bottom slab must read -0.5, got " + supportDy);
+                net.minecraft.text.Text.literal("fixture: the support standing on a bottom slab must read -0.5, got " + supportDy));
 
         // The REAL useOn chain places the subject, so the seat under test is the one a player's
         // click actually leaves behind rather than a hand-written fact.
@@ -67,16 +67,16 @@ public final class StateChangeAnchorTest {
         ActionResult result = useHeldItem(w, player, support, Direction.UP, hit);
         row("stateChange.sameShapeKindChange.place", w, support, subject, result);
         ctx.assertTrue(result.isAccepted(),
-                "fixture: the oak slab must place on the lowered support's up face, got " + result);
+                net.minecraft.text.Text.literal("fixture: the oak slab must place on the lowered support's up face, got " + result));
         BlockState placed = w.getBlockState(subject);
         ctx.assertTrue(placed.isOf(Blocks.OAK_SLAB)
                         && placed.contains(SlabBlock.TYPE)
                         && placed.get(SlabBlock.TYPE) == SlabType.BOTTOM,
-                "fixture: a BOTTOM oak slab must land in the cell above the support, got "
-                        + describe(w, subject));
+                net.minecraft.text.Text.literal("fixture: a BOTTOM oak slab must land in the cell above the support, got "
+                        + describe(w, subject)));
         ctx.assertTrue(SlabPlacementDyAttachment.hasStoredDy(w, subject),
-                "fixture: the placed slab must carry a stored placement height, or this row proves "
-                        + "nothing about keeping one");
+                net.minecraft.text.Text.literal("fixture: the placed slab must carry a stored placement height, or this row proves "
+                        + "nothing about keeping one"));
 
         // Take the lowering source away FIRST, so the stored seat is saying something no live lane
         // at this cell can say any more. Both assertions below are then satisfiable only by the
@@ -84,8 +84,8 @@ public final class StateChangeAnchorTest {
         w.breakBlock(source, false);
         double before = SlabSupport.getYOffset(w, subject, w.getBlockState(subject));
         ctx.assertTrue(Math.abs(before + 0.5) <= EPS,
-                "fixture: with the source below it gone the slab must still read -0.5 from its "
-                        + "stored seat, got " + before);
+                net.minecraft.text.Text.literal("fixture: with the source below it gone the slab must still read -0.5 from its "
+                        + "stored seat, got " + before));
 
         // Oak slab -> birch slab: a block-KIND change at the SAME position, same half, same shape.
         w.setBlockState(subject, bottomSlab(Blocks.BIRCH_SLAB), Block.NOTIFY_ALL);
@@ -93,12 +93,12 @@ public final class StateChangeAnchorTest {
         boolean kept = SlabPlacementDyAttachment.hasStoredDy(w, subject);
         double after = SlabSupport.getYOffset(w, subject, w.getBlockState(subject));
         ctx.assertTrue(kept,
-                "a slab that changes kind in place with the same shape must KEEP its stored seat "
+                net.minecraft.text.Text.literal("a slab that changes kind in place with the same shape must KEEP its stored seat "
                         + "— throwing it away is what sends the converted slab back up to grid "
-                        + "height (the Terrain Slabs grass-slab-to-dirt-slab report)");
+                        + "height (the Terrain Slabs grass-slab-to-dirt-slab report)"));
         ctx.assertTrue(Math.abs(after - before) <= EPS,
-                "the converted slab must not move: before=" + before + " after=" + after + " ("
-                        + describe(w, subject) + ")");
+                net.minecraft.text.Text.literal("the converted slab must not move: before=" + before + " after=" + after + " ("
+                        + describe(w, subject) + ")"));
         ctx.complete();
     }
 

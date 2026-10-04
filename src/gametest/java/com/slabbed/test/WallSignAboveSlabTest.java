@@ -56,7 +56,7 @@ public final class WallSignAboveSlabTest {
         BlockPos cell = wall.offset(Direction.NORTH);
         BlockState sign = world.getBlockState(cell);
         ctx.assertTrue(r.isAccepted() && sign.getBlock() instanceof WallSignBlock,
-                "premise: an oak sign on the wall's north face must hang as a wall sign: result=" + r + " cell=" + sign);
+                net.minecraft.text.Text.literal("premise: an oak sign on the wall's north face must hang as a wall sign: result=" + r + " cell=" + sign));
         return cell;
     }
 
@@ -97,9 +97,9 @@ public final class WallSignAboveSlabTest {
         double wallCDy = SlabSupport.getYOffset(world, wallC, world.getBlockState(wallC));
         // The world state is the premise; the result code is reported only (the placement lane may answer FAIL after placing).
         ctx.assertTrue(world.getBlockState(wallC).isOf(Blocks.STONE) && Math.abs(wallCDy + 0.5d) <= EPS,
-                "premise: the wall block must be lowered onto the slab: " + rc + " dy=" + wallCDy
+                net.minecraft.text.Text.literal("premise: the wall block must be lowered onto the slab: " + rc + " dy=" + wallCDy
                         + " wallC=" + world.getBlockState(wallC) + " slabC=" + world.getBlockState(slabC)
-                        + " builderPos=" + builder.getEntityPos() + " slabC=" + slabC);
+                        + " builderPos=" + builder.getEntityPos() + " slabC=" + slabC));
         BlockPos signC = hangSign(ctx, player, wallC);
 
         double a = seatOf(world, signA);
@@ -107,11 +107,11 @@ public final class WallSignAboveSlabTest {
         double c = seatOf(world, signC);
         String report = "read A(slab below, flush wall)=" + a + " B(control)=" + b + " C(lowered wall)=" + c;
         System.out.println("[WALL_SIGN_ABOVE_SLAB] " + report);
-        ctx.assertTrue(Math.abs(b) <= EPS, "control: a wall sign on a flush wall over stone must read 0: " + report);
-        ctx.assertTrue(Math.abs(c + 0.5d) <= EPS, "a wall sign on a LOWERED wall must follow its wall to -0.5: " + report);
+        ctx.assertTrue(Math.abs(b) <= EPS, net.minecraft.text.Text.literal("control: a wall sign on a flush wall over stone must read 0: " + report));
+        ctx.assertTrue(Math.abs(c + 0.5d) <= EPS, net.minecraft.text.Text.literal("a wall sign on a LOWERED wall must follow its wall to -0.5: " + report));
         ctx.assertTrue(Math.abs(a) <= EPS,
-                "GH #48: a wall sign on a FLUSH wall sank because of the slab under its cell; "
-                        + "a wall sign hangs on its wall and touches nothing below: " + report);
+                net.minecraft.text.Text.literal("GH #48: a wall sign on a FLUSH wall sank because of the slab under its cell; "
+                        + "a wall sign hangs on its wall and touches nothing below: " + report));
         ctx.complete();
     }
 }

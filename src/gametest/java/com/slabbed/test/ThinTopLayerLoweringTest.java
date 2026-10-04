@@ -73,11 +73,11 @@ public final class ThinTopLayerLoweringTest {
         place(w, subject, Blocks.WHITE_CARPET.getDefaultState());
         double dy = SlabSupport.getYOffset(w, subject, w.getBlockState(subject));
         ctx.assertTrue(Math.abs(dy + 0.5) <= EPS,
-                "white_carpet lying on a stone block that renders -0.5 must read -0.5, got " + dy
+                net.minecraft.text.Text.literal("white_carpet lying on a stone block that renders -0.5 must read -0.5, got " + dy
                         + " (live (219,-55,-34) visualDy=0.000 over (219,-56,-34) visualDy=-0.500: "
                         + "isThinTopLayer excludes the whole carpet/snow family from lowering on "
                         + "CLASSNAME, so the carpet floats half a block above the block it lies on "
-                        + "— maintainer ruling: 'everything should be able to lower; no exceptions')");
+                        + "— maintainer ruling: 'everything should be able to lower; no exceptions')"));
         ctx.complete();
     }
 
@@ -98,9 +98,9 @@ public final class ThinTopLayerLoweringTest {
         place(w, subject, Blocks.WHITE_CARPET.getDefaultState());
         double dy = SlabSupport.getYOffset(w, subject, w.getBlockState(subject));
         ctx.assertTrue(Math.abs(dy + 0.5) <= EPS,
-                "white_carpet resting directly on a bottom slab must seat on its top face at -0.5, "
+                net.minecraft.text.Text.literal("white_carpet resting directly on a bottom slab must seat on its top face at -0.5, "
                         + "got " + dy + " (live (219,-55,-36): visualDy=0.000 while the recorder's "
-                        + "own outlineMinY/collisionMinY both read -0.500 — the dy triad split)");
+                        + "own outlineMinY/collisionMinY both read -0.500 — the dy triad split)"));
         ctx.complete();
     }
 
@@ -117,7 +117,7 @@ public final class ThinTopLayerLoweringTest {
         place(w, subject, Blocks.PALE_MOSS_CARPET.getDefaultState());
         double dy = SlabSupport.getYOffset(w, subject, w.getBlockState(subject));
         ctx.assertTrue(Math.abs(dy + 0.5) <= EPS,
-                "pale_moss_carpet on a stone block that renders -0.5 must read -0.5, got " + dy);
+                net.minecraft.text.Text.literal("pale_moss_carpet on a stone block that renders -0.5 must read -0.5, got " + dy));
         ctx.complete();
     }
 
@@ -138,16 +138,16 @@ public final class ThinTopLayerLoweringTest {
         BlockPos subject = support.up();
         BlockState snow = Blocks.SNOW.getDefaultState();
         ctx.assertTrue(snow.contains(Properties.LAYERS),
-                "fixture: minecraft:snow must carry the LAYERS property — that accumulation "
-                        + "BEHAVIOUR is what the removed isEnvironmentDepositedSurfaceFill keyed on");
+                net.minecraft.text.Text.literal("fixture: minecraft:snow must carry the LAYERS property — that accumulation "
+                        + "BEHAVIOUR is what the removed isEnvironmentDepositedSurfaceFill keyed on"));
         place(w, subject, snow);
         double dy = SlabSupport.getYOffset(w, subject, w.getBlockState(subject));
         ctx.assertTrue(Math.abs(dy + 0.5) <= EPS,
-                "a snow LAYER resting on a stone block that renders -0.5 must read -0.5, got " + dy
+                net.minecraft.text.Text.literal("a snow LAYER resting on a stone block that renders -0.5 must read -0.5, got " + dy
                         + " — isEnvironmentDepositedSurfaceFill (LAYERS + PowderSnowBlock) still "
                         + "hard-excludes snow from lowering on a PROPERTY, so it floats half a block "
                         + "above the block it lies on (the maintainer 2026-08-06: 'Snow blocks are not "
-                        + "lowering'; 'everything should be able to lower; no exceptions')");
+                        + "lowering'; 'everything should be able to lower; no exceptions')"));
 
         // Same claim on the other arrangement: a snow layer lying directly on a bottom slab.
         BlockPos slab = ctx.getAbsolutePos(BlockPos.ORIGIN).add(1, 2, 6);
@@ -157,8 +157,8 @@ public final class ThinTopLayerLoweringTest {
         place(w, onSlab, snow);
         double slabDy = SlabSupport.getYOffset(w, onSlab, w.getBlockState(onSlab));
         ctx.assertTrue(Math.abs(slabDy + 0.5) <= EPS,
-                "a snow LAYER lying directly on a bottom slab must seat on its top face at -0.5, "
-                        + "got " + slabDy);
+                net.minecraft.text.Text.literal("a snow LAYER lying directly on a bottom slab must seat on its top face at -0.5, "
+                        + "got " + slabDy));
         ctx.complete();
     }
 
@@ -181,9 +181,9 @@ public final class ThinTopLayerLoweringTest {
         place(w, subject, Blocks.POWDER_SNOW.getDefaultState());
         double dy = SlabSupport.getYOffset(w, subject, w.getBlockState(subject));
         ctx.assertTrue(Math.abs(dy + 0.5) <= EPS,
-                "powder snow resting on a bottom slab must seat on its top face at -0.5, got " + dy
+                net.minecraft.text.Text.literal("powder snow resting on a bottom slab must seat on its top face at -0.5, got " + dy
                         + " — getYOffset still short-circuits PowderSnowBlock to 0.0 (135d125f), "
-                        + "the live (306,-58,-56) dy=0.000 cell the maintainer reported");
+                        + "the live (306,-58,-56) dy=0.000 cell the maintainer reported"));
         ctx.complete();
     }
 
@@ -203,7 +203,7 @@ public final class ThinTopLayerLoweringTest {
         ServerWorld w = ctx.getWorld();
         BlockState snowBlock = Blocks.SNOW_BLOCK.getDefaultState();
         ctx.assertTrue(!snowBlock.contains(Properties.LAYERS),
-                "fixture: minecraft:snow_block is the FULL CUBE, not the layered deposit");
+                net.minecraft.text.Text.literal("fixture: minecraft:snow_block is the FULL CUBE, not the layered deposit"));
 
         // (a) directly on a bottom slab — a full block seats on the slab's top face.
         BlockPos slabA = ctx.getAbsolutePos(BlockPos.ORIGIN).add(1, 1, 6);
@@ -213,10 +213,10 @@ public final class ThinTopLayerLoweringTest {
         double snowOnSlab = dyOf(w, slabA.up(), snowBlock);
         double stoneOnSlab = dyOf(w, slabB.up(), Blocks.STONE.getDefaultState());
         ctx.assertTrue(Math.abs(snowOnSlab - stoneOnSlab) <= EPS,
-                "snow_block on a bottom slab must resolve exactly like stone: stone=" + stoneOnSlab
-                        + " snow_block=" + snowOnSlab);
+                net.minecraft.text.Text.literal("snow_block on a bottom slab must resolve exactly like stone: stone=" + stoneOnSlab
+                        + " snow_block=" + snowOnSlab));
         ctx.assertTrue(Math.abs(snowOnSlab + 0.5) <= EPS,
-                "fixture: a full block directly on a bottom slab seats at -0.5, got " + snowOnSlab);
+                net.minecraft.text.Text.literal("fixture: a full block directly on a bottom slab seats at -0.5, got " + snowOnSlab));
 
         // (b) on top of a full block that is itself lowered — terrain stays flush, snow included.
         BlockPos supportA = loweredStoneSupport(ctx, 5, 6);
@@ -224,8 +224,8 @@ public final class ThinTopLayerLoweringTest {
         double snowOnTerrain = dyOf(w, supportA.up(), snowBlock);
         double stoneOnTerrain = dyOf(w, supportB.up(), Blocks.STONE.getDefaultState());
         ctx.assertTrue(Math.abs(snowOnTerrain - stoneOnTerrain) <= EPS,
-                "snow_block resting on terrain must resolve exactly like stone: stone="
-                        + stoneOnTerrain + " snow_block=" + snowOnTerrain);
+                net.minecraft.text.Text.literal("snow_block resting on terrain must resolve exactly like stone: stone="
+                        + stoneOnTerrain + " snow_block=" + snowOnTerrain));
         ctx.complete();
     }
 
@@ -261,10 +261,10 @@ public final class ThinTopLayerLoweringTest {
         place(w, subject, Blocks.SNOW.getDefaultState());
         double dy = SlabSupport.getYOffset(w, subject, w.getBlockState(subject));
         ctx.assertTrue(Math.abs(dy) <= EPS,
-                "weather-deposited snow lying on natural terrain must stay flush at 0.0 even with a "
+                net.minecraft.text.Text.literal("weather-deposited snow lying on natural terrain must stay flush at 0.0 even with a "
                         + "slab buried below that terrain, got " + dy + " — the opaque-full-cube "
                         + "natural-terrain stop (8d1b42ef) is what makes it safe to let snow lower "
-                        + "by geometry; if this ever reads -0.5 the snowy-terrain DODO is back");
+                        + "by geometry; if this ever reads -0.5 the snowy-terrain DODO is back"));
         ctx.complete();
     }
 
@@ -286,7 +286,7 @@ public final class ThinTopLayerLoweringTest {
         place(w, subject, Blocks.WHITE_CARPET.getDefaultState());
         double dy = SlabSupport.getYOffset(w, subject, w.getBlockState(subject));
         ctx.assertTrue(Math.abs(dy + 0.5) <= EPS,
-                "white_carpet on a Terrain Slabs BOTTOM_LIKE surface must seat at -0.5, got " + dy);
+                net.minecraft.text.Text.literal("white_carpet on a Terrain Slabs BOTTOM_LIKE surface must seat at -0.5, got " + dy));
         ctx.complete();
     }
 
@@ -301,11 +301,11 @@ public final class ThinTopLayerLoweringTest {
         BlockPos subject = surface.up();
         place(w, subject, Blocks.SNOW.getDefaultState());
         ctx.assertTrue(CompatHooks.terrainSlabsHandlesObjectOffset(w.getBlockState(subject)),
-                "fixture: Terrain Slabs OnTopHelper must own the snow layer offset");
+                net.minecraft.text.Text.literal("fixture: Terrain Slabs OnTopHelper must own the snow layer offset"));
         double dy = SlabSupport.getYOffset(w, subject, w.getBlockState(subject));
         ctx.assertTrue(Math.abs(dy) <= EPS,
-                "Slabbed must contribute 0.0 when Terrain Slabs owns snow's -0.5 on-top offset; got "
-                        + dy);
+                net.minecraft.text.Text.literal("Slabbed must contribute 0.0 when Terrain Slabs owns snow's -0.5 on-top offset; got "
+                        + dy));
         ctx.complete();
     }
 
@@ -324,7 +324,7 @@ public final class ThinTopLayerLoweringTest {
         place(w, support, Blocks.STONE.getDefaultState());
         double supportDy = SlabSupport.getYOffset(w, support, w.getBlockState(support));
         ctx.assertTrue(Math.abs(supportDy + 0.5) <= EPS,
-                "fixture: the stone support must itself render -0.5, got " + supportDy);
+                net.minecraft.text.Text.literal("fixture: the stone support must itself render -0.5, got " + supportDy));
         return support;
     }
 

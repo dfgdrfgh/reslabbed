@@ -114,18 +114,18 @@ public final class AnchoredFollowerSupportDyTest {
         place(w, subject, Blocks.STRIPPED_JUNGLE_LOG.getDefaultState());
 
         ctx.assertTrue(!SlabAnchorAttachment.isAnchored(w, subject),
-                "setup: this twin must exercise the GEOMETRIC lane — no anchor anywhere");
+                net.minecraft.text.Text.literal("setup: this twin must exercise the GEOMETRIC lane — no anchor anywhere"));
         double subjectDy = SlabSupport.getYOffset(w, subject, w.getBlockState(subject));
         ctx.assertTrue(Math.abs(subjectDy + 1.0) <= EPS,
-                "fixture: the geometric subject log must render -1.0, got " + subjectDy);
+                net.minecraft.text.Text.literal("fixture: the geometric subject log must render -1.0, got " + subjectDy));
 
         BlockPos followerPos = subject.up();
         place(w, followerPos, bottomSlab(Blocks.BIRCH_SLAB));
         double dy = SlabSupport.getYOffset(w, followerPos, w.getBlockState(followerPos));
         ctx.assertTrue(Math.abs(dy + 1.0) <= EPS,
-                "unanchored birch_slab on a -1.0 support must inherit -1.0, got " + dy
+                net.minecraft.text.Text.literal("unanchored birch_slab on a -1.0 support must inherit -1.0, got " + dy
                         + " (the geometric mirror of the anchored slab branch carried the same "
-                        + "flat -0.5 constant)");
+                        + "flat -0.5 constant)"));
         ctx.complete();
     }
 
@@ -154,7 +154,7 @@ public final class AnchoredFollowerSupportDyTest {
         SlabAnchorAttachment.addAnchor(w, slab, w.getBlockState(slab));
         double slabDy = SlabSupport.getYOffset(w, slab, w.getBlockState(slab));
         ctx.assertTrue(Math.abs(slabDy + 1.0) <= EPS,
-                "fixture: the intermediate slab must itself be at -1.0, got " + slabDy);
+                net.minecraft.text.Text.literal("fixture: the intermediate slab must itself be at -1.0, got " + slabDy));
 
         // LADDER TO THE CAP. Each further bottom-slab course deepens by half a block until the
         // clamp refuses; the count is a consequence of the cap, never written down.
@@ -166,14 +166,14 @@ public final class AnchoredFollowerSupportDyTest {
             double next = SlabSupport.getYOffset(w, slab, w.getBlockState(slab));
             ladder.append(' ').append(next);
             ctx.assertTrue(next < slabDy - EPS,
-                    "fixture: each added course must actually deepen, or the ladder cannot reach "
-                            + "the cap and this row would spin — " + ladder);
+                    net.minecraft.text.Text.literal("fixture: each added course must actually deepen, or the ladder cannot reach "
+                            + "the cap and this row would spin — " + ladder));
             slabDy = next;
         }
         ctx.assertTrue(Math.abs(slabDy - SlabSupport.minResolvedDy()) <= EPS,
-                "fixture: the intermediate support must SATURATE at the cap ("
+                net.minecraft.text.Text.literal("fixture: the intermediate support must SATURATE at the cap ("
                         + SlabSupport.minResolvedDy() + "), or the follower above it is not handed "
-                        + "a past-the-cap raw seat and this row proves nothing — " + ladder);
+                        + "a past-the-cap raw seat and this row proves nothing — " + ladder));
 
         double rawSeat = slabDy - 0.5;
         BlockPos top = slab.up();
@@ -183,13 +183,13 @@ public final class AnchoredFollowerSupportDyTest {
         // NON-VACUITY, asserted before the property: a raw seat that is not past the cap would let
         // the clamp assertion below pass without the clamp ever running.
         ctx.assertTrue(rawSeat < SlabSupport.minResolvedDy() - EPS,
-                "FIXTURE IS NO LONGER LOAD-BEARING: the raw seat handed to the follower is "
+                net.minecraft.text.Text.literal("FIXTURE IS NO LONGER LOAD-BEARING: the raw seat handed to the follower is "
                         + rawSeat + ", which the cap (" + SlabSupport.minResolvedDy() + ") does not "
-                        + "refuse. Deepen the ladder — do NOT relax the assertion. " + ladder);
+                        + "refuse. Deepen the ladder — do NOT relax the assertion. " + ladder));
         ctx.assertTrue(Math.abs(topDy - SlabSupport.minResolvedDy()) <= EPS,
-                "CS-CAP: a block on a bottom slab already at the cap resolves a raw " + rawSeat
+                net.minecraft.text.Text.literal("CS-CAP: a block on a bottom slab already at the cap resolves a raw " + rawSeat
                         + " seat and must clamp to " + SlabSupport.minResolvedDy() + ", got "
-                        + topDy + " — " + ladder);
+                        + topDy + " — " + ladder));
         ctx.complete();
     }
 
@@ -206,10 +206,10 @@ public final class AnchoredFollowerSupportDyTest {
         place(w, block, Blocks.STRIPPED_JUNGLE_LOG.getDefaultState());
         SlabAnchorAttachment.addAnchor(w, block, w.getBlockState(block));
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, block),
-                "setup: a block placed directly on a bottom slab must anchor");
+                net.minecraft.text.Text.literal("setup: a block placed directly on a bottom slab must anchor"));
         double dy = SlabSupport.getYOffset(w, block, w.getBlockState(block));
         ctx.assertTrue(Math.abs(dy + 0.5) <= EPS,
-                "regression: anchored block on a FLAT bottom slab must stay at -0.5, got " + dy);
+                net.minecraft.text.Text.literal("regression: anchored block on a FLAT bottom slab must stay at -0.5, got " + dy));
         ctx.complete();
     }
 
@@ -252,13 +252,13 @@ public final class AnchoredFollowerSupportDyTest {
         double geometric = SlabSupport.getYOffset(w, followerPos, w.getBlockState(followerPos));
         SlabAnchorAttachment.addAnchor(w, followerPos, w.getBlockState(followerPos));
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, followerPos),
-                "setup: the sign must take the ANCHOR lane, or this test compares one lane to itself");
+                net.minecraft.text.Text.literal("setup: the sign must take the ANCHOR lane, or this test compares one lane to itself"));
         double anchored = SlabSupport.getYOffset(w, followerPos, w.getBlockState(followerPos));
         ctx.assertTrue(Math.abs(geometric - anchored) <= EPS,
-                "the geometric and anchor lanes must give the SAME height for a follower on a -1.0 "
-                        + "fence: geometric=" + geometric + " anchored=" + anchored);
+                net.minecraft.text.Text.literal("the geometric and anchor lanes must give the SAME height for a follower on a -1.0 "
+                        + "fence: geometric=" + geometric + " anchored=" + anchored));
         ctx.assertTrue(Math.abs(anchored + 1.0) <= EPS,
-                "and that height must be -1.0, got " + anchored);
+                net.minecraft.text.Text.literal("and that height must be -1.0, got " + anchored));
         ctx.complete();
     }
 
@@ -292,15 +292,15 @@ public final class AnchoredFollowerSupportDyTest {
         SlabAnchorAttachment.addAnchor(w, lower, w.getBlockState(lower));
         double lowerDy = SlabSupport.getYOffset(w, lower, w.getBlockState(lower));
         ctx.assertTrue(Math.abs(lowerDy + 1.0) <= EPS,
-                "fixture: the door's LOWER half on a -1.0 log must read -1.0, got " + lowerDy);
+                net.minecraft.text.Text.literal("fixture: the door's LOWER half on a -1.0 log must read -1.0, got " + lowerDy));
         ctx.assertTrue(!SlabAnchorAttachment.isAnchored(w, lower.up()),
-                "fixture: the UPPER half must be un-anchored — onPlaced never fires for it, and an "
-                        + "anchored upper half would test a lane real doors never take");
+                net.minecraft.text.Text.literal("fixture: the UPPER half must be un-anchored — onPlaced never fires for it, and an "
+                        + "anchored upper half would test a lane real doors never take"));
         double upperDy = SlabSupport.getYOffset(w, lower.up(), w.getBlockState(lower.up()));
         ctx.assertTrue(Math.abs(upperDy - lowerDy) <= EPS,
-                "a door's two halves must render at the SAME height: lower=" + lowerDy
+                net.minecraft.text.Text.literal("a door's two halves must render at the SAME height: lower=" + lowerDy
                         + " upper=" + upperDy + " (the upper half resolves from the lower half, "
-                        + "which is neither a slab nor a solid cube)");
+                        + "which is neither a slab nor a solid cube)"));
         ctx.complete();
     }
 
@@ -322,13 +322,13 @@ public final class AnchoredFollowerSupportDyTest {
         place(w, followerPos, Blocks.STRIPPED_JUNGLE_LOG.getDefaultState());
         SlabAnchorAttachment.addAnchor(w, followerPos, w.getBlockState(followerPos));
         double dy = SlabSupport.getYOffset(w, followerPos, w.getBlockState(followerPos));
-        ctx.assertTrue(Math.abs(dy + 1.0) <= EPS, "fixture: the follower must be at -1.0, got " + dy);
+        ctx.assertTrue(Math.abs(dy + 1.0) <= EPS, net.minecraft.text.Text.literal("fixture: the follower must be at -1.0, got " + dy));
         double outlineMinY = w.getBlockState(followerPos)
                 .getOutlineShape(w, followerPos)
                 .getMin(net.minecraft.util.math.Direction.Axis.Y);
         ctx.assertTrue(Math.abs(outlineMinY - dy) <= EPS,
-                "the OUTLINE must be offset by the same dy the model is (" + dy + "), got minY="
-                        + outlineMinY + " — a leaked raw-shape probe flag would read 0.0 here");
+                net.minecraft.text.Text.literal("the OUTLINE must be offset by the same dy the model is (" + dy + "), got minY="
+                        + outlineMinY + " — a leaked raw-shape probe flag would read 0.0 here"));
         ctx.complete();
     }
 
@@ -353,8 +353,8 @@ public final class AnchoredFollowerSupportDyTest {
         SlabAnchorAttachment.addAnchor(w, follower, w.getBlockState(follower));
         double dy = SlabSupport.getYOffset(w, follower, w.getBlockState(follower));
         ctx.assertTrue(dy >= -0.5 - EPS,
-                "a carpet is a 1/16 seat, not a full-height one: a follower above it must not be "
-                        + "given the carpet's own depth, got " + dy);
+                net.minecraft.text.Text.literal("a carpet is a 1/16 seat, not a full-height one: a follower above it must not be "
+                        + "given the carpet's own depth, got " + dy));
         ctx.complete();
     }
 
@@ -397,22 +397,22 @@ public final class AnchoredFollowerSupportDyTest {
         BlockState supportState = w.getBlockState(support);
         ctx.assertTrue(supportState.getBlock() instanceof SlabBlock
                         && supportState.get(SlabBlock.TYPE) == SlabType.DOUBLE,
-                "fixture: the two clicks must leave a DOUBLE slab in one cell, got " + supportState);
+                net.minecraft.text.Text.literal("fixture: the two clicks must leave a DOUBLE slab in one cell, got " + supportState));
         double supportDy = SlabSupport.getYOffset(w, support, supportState);
         ctx.assertTrue(Math.abs(supportDy + 1.0) <= EPS,
-                "fixture: the DOUBLE slab support must itself render -1.0 — at -0.5 this row would "
-                        + "coincide with the fallback floor and prove nothing, got " + supportDy);
+                net.minecraft.text.Text.literal("fixture: the DOUBLE slab support must itself render -1.0 — at -0.5 this row would "
+                        + "coincide with the fallback floor and prove nothing, got " + supportDy));
 
         useOn(ctx, Blocks.STRIPPED_JUNGLE_LOG.asItem(), support, Direction.UP, 0.0);
         BlockPos follower = support.up();
         ctx.assertTrue(w.getBlockState(follower).isOf(Blocks.STRIPPED_JUNGLE_LOG),
-                "fixture: the follower must land on the double slab, got " + w.getBlockState(follower));
+                net.minecraft.text.Text.literal("fixture: the follower must land on the double slab, got " + w.getBlockState(follower)));
         double dy = SlabSupport.getYOffset(w, follower, w.getBlockState(follower));
         ctx.assertTrue(Math.abs(dy + 1.0) <= EPS,
-                "a full block placed on a -1.0 DOUBLE slab must resolve -1.0, got " + dy
+                net.minecraft.text.Text.literal("a full block placed on a -1.0 DOUBLE slab must resolve -1.0, got " + dy
                         + " (the seat resolver's full-height arm rejected every slab by CLASS, so a "
                         + "double slab — an opaque full cube — matched no arm and the follower took "
-                        + "the -0.5 floor)");
+                        + "the -0.5 floor)"));
         ctx.complete();
     }
 
@@ -438,15 +438,15 @@ public final class AnchoredFollowerSupportDyTest {
         SlabAnchorAttachment.addAnchor(w, support, w.getBlockState(support));
         double supportDy = SlabSupport.getYOffset(w, support, w.getBlockState(support));
         ctx.assertTrue(Math.abs(supportDy + 1.0) <= EPS,
-                "fixture: the TOP slab support must itself render -1.0, got " + supportDy);
+                net.minecraft.text.Text.literal("fixture: the TOP slab support must itself render -1.0, got " + supportDy));
 
         BlockPos follower = support.up();
         place(w, follower, Blocks.STRIPPED_JUNGLE_LOG.getDefaultState());
         SlabAnchorAttachment.addAnchor(w, follower, w.getBlockState(follower));
         double dy = SlabSupport.getYOffset(w, follower, w.getBlockState(follower));
         ctx.assertTrue(Math.abs(dy + 1.0) <= EPS,
-                "a full block on a -1.0 TOP slab must resolve -1.0, got " + dy
-                        + " (a TOP slab fails isSolidBlock but its top face IS at its cell top)");
+                net.minecraft.text.Text.literal("a full block on a -1.0 TOP slab must resolve -1.0, got " + dy
+                        + " (a TOP slab fails isSolidBlock but its top face IS at its cell top)"));
         ctx.complete();
     }
 
@@ -497,11 +497,11 @@ public final class AnchoredFollowerSupportDyTest {
         BlockState supportState = w.getBlockState(support);
         ctx.assertTrue(supportState.getBlock() instanceof SlabBlock
                         && supportState.get(SlabBlock.TYPE) == SlabType.DOUBLE,
-                "fixture: the two clicks must leave a DOUBLE slab in one cell, got " + supportState);
+                net.minecraft.text.Text.literal("fixture: the two clicks must leave a DOUBLE slab in one cell, got " + supportState));
         double supportDy = SlabSupport.getYOffset(w, support, supportState);
         ctx.assertTrue(Math.abs(supportDy + 1.0) <= EPS,
-                "fixture: the DOUBLE slab support must itself render -1.0 — at -0.5 this row would "
-                        + "coincide with the constant it is testing and prove nothing, got " + supportDy);
+                net.minecraft.text.Text.literal("fixture: the DOUBLE slab support must itself render -1.0 — at -0.5 this row would "
+                        + "coincide with the constant it is testing and prove nothing, got " + supportDy));
 
         BlockPos subject = support.up();
         place(w, subject, Blocks.STRIPPED_JUNGLE_LOG.getDefaultState());
@@ -509,11 +509,11 @@ public final class AnchoredFollowerSupportDyTest {
 
         double dy = SlabSupport.getYOffset(w, subject, w.getBlockState(subject));
         ctx.assertTrue(Math.abs(dy + 1.0) <= EPS,
-                "a full block with NO stored height, standing on a -1.0 DOUBLE slab, must resolve "
+                net.minecraft.text.Text.literal("a full block with NO stored height, standing on a -1.0 DOUBLE slab, must resolve "
                         + "-1.0, got " + dy + " (slabColumnYOffset answered a flat -0.5 for every "
                         + "non-BOTTOM slab in the column, whatever depth that slab was actually at "
                         + "— this is the number the client draws before the stored one arrives, and "
-                        + "the gap between the two IS the snap-down)");
+                        + "the gap between the two IS the snap-down)"));
         ctx.complete();
     }
 
@@ -532,10 +532,10 @@ public final class AnchoredFollowerSupportDyTest {
         BlockState supportState = w.getBlockState(support);
         ctx.assertTrue(supportState.getBlock() instanceof SlabBlock
                         && supportState.get(SlabBlock.TYPE) == SlabType.BOTTOM,
-                "fixture: one click must leave a BOTTOM slab, got " + supportState);
+                net.minecraft.text.Text.literal("fixture: one click must leave a BOTTOM slab, got " + supportState));
         double supportDy = SlabSupport.getYOffset(w, support, supportState);
         ctx.assertTrue(Math.abs(supportDy + 1.0) <= EPS,
-                "fixture: the BOTTOM slab support must itself render -1.0, got " + supportDy);
+                net.minecraft.text.Text.literal("fixture: the BOTTOM slab support must itself render -1.0, got " + supportDy));
 
         BlockPos subject = support.up();
         place(w, subject, Blocks.STRIPPED_JUNGLE_LOG.getDefaultState());
@@ -551,10 +551,10 @@ public final class AnchoredFollowerSupportDyTest {
         double expected = Math.max(supportDy - 0.5, SlabSupport.minResolvedDy());
         double dy = SlabSupport.getYOffset(w, subject, w.getBlockState(subject));
         ctx.assertTrue(Math.abs(dy - expected) <= EPS,
-                "control (recorder a13): an unstored full block on a " + supportDy + " BOTTOM slab "
+                net.minecraft.text.Text.literal("control (recorder a13): an unstored full block on a " + supportDy + " BOTTOM slab "
                         + "seats half a block below it and is refused no deeper than "
                         + SlabSupport.minResolvedDy() + ", so it must read " + expected + ", got "
-                        + dy);
+                        + dy));
         ctx.complete();
     }
 
@@ -577,8 +577,8 @@ public final class AnchoredFollowerSupportDyTest {
         SlabAnchorAttachment.addAnchor(w, support, w.getBlockState(support));
         double supportDy = SlabSupport.getYOffset(w, support, w.getBlockState(support));
         ctx.assertTrue(Math.abs(supportDy + 0.5) <= EPS,
-                "fixture: this DOUBLE slab must sit at -0.5, or the row cannot tell 'deepened "
-                        + "correctly' from 'over-deepened', got " + supportDy);
+                net.minecraft.text.Text.literal("fixture: this DOUBLE slab must sit at -0.5, or the row cannot tell 'deepened "
+                        + "correctly' from 'over-deepened', got " + supportDy));
 
         BlockPos subject = support.up();
         place(w, subject, Blocks.STRIPPED_JUNGLE_LOG.getDefaultState());
@@ -586,8 +586,8 @@ public final class AnchoredFollowerSupportDyTest {
 
         double dy = SlabSupport.getYOffset(w, subject, w.getBlockState(subject));
         ctx.assertTrue(Math.abs(dy + 0.5) <= EPS,
-                "an unstored full block on a -0.5 DOUBLE slab must stay at -0.5, got " + dy
-                        + " (the seat lane must deepen only when the seat is genuinely deeper)");
+                net.minecraft.text.Text.literal("an unstored full block on a -0.5 DOUBLE slab must stay at -0.5, got " + dy
+                        + " (the seat lane must deepen only when the seat is genuinely deeper)"));
         ctx.complete();
     }
 
@@ -599,10 +599,10 @@ public final class AnchoredFollowerSupportDyTest {
     private static void assertUnstoredAndUnanchored(TestContext ctx, BlockPos pos, String what) {
         ServerWorld w = ctx.getWorld();
         ctx.assertTrue(!SlabAnchorAttachment.isAnchored(w, pos),
-                "setup: " + what + " must hold no anchor, or this row tests the anchor lane");
+                net.minecraft.text.Text.literal("setup: " + what + " must hold no anchor, or this row tests the anchor lane"));
         ctx.assertTrue(Double.isNaN(SlabPlacementDyAttachment.storedDy(w, pos)),
-                "setup: " + what + " must hold no stored height, or this row tests the store and "
-                        + "cannot fail for the reason it exists");
+                net.minecraft.text.Text.literal("setup: " + what + " must hold no stored height, or this row tests the store and "
+                        + "cannot fail for the reason it exists"));
     }
 
     /**
@@ -624,7 +624,7 @@ public final class AnchoredFollowerSupportDyTest {
         }
         double topDy = SlabSupport.getYOffset(w, cursor, w.getBlockState(cursor));
         ctx.assertTrue(Math.abs(topDy + 1.0) <= EPS,
-                "fixture: real-useOn SBSB tower top stone must read -1.0, got " + topDy);
+                net.minecraft.text.Text.literal("fixture: real-useOn SBSB tower top stone must read -1.0, got " + topDy));
         return cursor;
     }
 
@@ -659,7 +659,7 @@ public final class AnchoredFollowerSupportDyTest {
         SlabAnchorAttachment.addAnchor(w, seat, w.getBlockState(seat));
         double seatDy = SlabSupport.getYOffset(w, seat, w.getBlockState(seat));
         ctx.assertTrue(Math.abs(seatDy + 0.5) <= EPS,
-                "fixture: the seat slab beside the lowered source must render -0.5, got " + seatDy);
+                net.minecraft.text.Text.literal("fixture: the seat slab beside the lowered source must render -0.5, got " + seatDy));
         return seat.up();
     }
 
@@ -675,10 +675,10 @@ public final class AnchoredFollowerSupportDyTest {
         place(w, fence, Blocks.BIRCH_FENCE.getDefaultState());
         SlabAnchorAttachment.addAnchor(w, fence, w.getBlockState(fence));
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, fence),
-                "fixture: the fence support must anchor (connecting structural on a lowered column)");
+                net.minecraft.text.Text.literal("fixture: the fence support must anchor (connecting structural on a lowered column)"));
         double fenceDy = SlabSupport.getYOffset(w, fence, w.getBlockState(fence));
         ctx.assertTrue(Math.abs(fenceDy + 1.0) <= EPS,
-                "fixture: the fence support must itself render -1.0, got " + fenceDy);
+                net.minecraft.text.Text.literal("fixture: the fence support must itself render -1.0, got " + fenceDy));
         return fence;
     }
 
@@ -692,9 +692,9 @@ public final class AnchoredFollowerSupportDyTest {
 
         double dy = SlabSupport.getYOffset(w, followerPos, w.getBlockState(followerPos));
         ctx.assertTrue(Math.abs(dy + 1.0) <= EPS,
-                family + " resting on a -1.0 FENCE must inherit -1.0, got " + dy
+                net.minecraft.text.Text.literal(family + " resting on a -1.0 FENCE must inherit -1.0, got " + dy
                         + " (the seat resolver classifies a support by isSolidBlock, so a fence "
-                        + "matches no arm and the follower falls to the hardcoded -0.5 floor)");
+                        + "matches no arm and the follower falls to the hardcoded -0.5 floor)"));
         ctx.complete();
     }
 
@@ -709,14 +709,14 @@ public final class AnchoredFollowerSupportDyTest {
         place(w, followerPos, follower);
         SlabAnchorAttachment.addAnchor(w, followerPos, w.getBlockState(followerPos));
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, followerPos),
-                "setup(" + family + "): the follower must take the ANCHOR lane — an un-anchored "
-                        + "scene takes the geometric lane and FALSE-GREENS this test");
+                net.minecraft.text.Text.literal("setup(" + family + "): the follower must take the ANCHOR lane — an un-anchored "
+                        + "scene takes the geometric lane and FALSE-GREENS this test"));
 
         double dy = SlabSupport.getYOffset(w, followerPos, w.getBlockState(followerPos));
         ctx.assertTrue(Math.abs(dy + 1.0) <= EPS,
-                "anchored " + family + " on a -1.0 support must inherit -1.0, got " + dy
+                net.minecraft.text.Text.literal("anchored " + family + " on a -1.0 support must inherit -1.0, got " + dy
                         + " (the live 0.5 floating gap: the anchor lane resolves the KIND of "
-                        + "support below, not its ACTUAL dy)");
+                        + "support below, not its ACTUAL dy)"));
         ctx.complete();
     }
 
@@ -737,7 +737,7 @@ public final class AnchoredFollowerSupportDyTest {
         SlabAnchorAttachment.addAnchor(w, sourceTop, w.getBlockState(sourceTop));
         double sourceTopDy = SlabSupport.getYOffset(w, sourceTop, w.getBlockState(sourceTop));
         ctx.assertTrue(Math.abs(sourceTopDy + 0.5) <= EPS,
-                "fixture: source top block must render -0.5, got " + sourceTopDy);
+                net.minecraft.text.Text.literal("fixture: source top block must render -0.5, got " + sourceTopDy));
 
         // Seat column: ground stone, AIR, then the bottom slab beside the lowered source — the
         // seat is a legitimate cantilever (destination volume free) and reads -0.5. The previous
@@ -748,21 +748,21 @@ public final class AnchoredFollowerSupportDyTest {
         place(w, seat, bottomSlab(Blocks.STONE_SLAB));
         SlabAnchorAttachment.addAnchor(w, seat, w.getBlockState(seat));
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, seat),
-                "fixture: the seat slab must anchor via the lowered-side-slab lane");
+                net.minecraft.text.Text.literal("fixture: the seat slab must anchor via the lowered-side-slab lane"));
         double seatDy = SlabSupport.getYOffset(w, seat, w.getBlockState(seat));
         ctx.assertTrue(Math.abs(seatDy + 0.5) <= EPS,
-                "fixture: seat slab beside the lowered source must render -0.5, got " + seatDy);
+                net.minecraft.text.Text.literal("fixture: seat slab beside the lowered source must render -0.5, got " + seatDy));
 
         // Subject: a log standing on the -0.5 seat slab — renders -1.0 (this part already works).
         BlockPos subject = seat.up();
         place(w, subject, Blocks.STRIPPED_JUNGLE_LOG.getDefaultState());
         SlabAnchorAttachment.addAnchor(w, subject, w.getBlockState(subject));
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, subject),
-                "fixture: the subject log must anchor on the bottom slab below it");
+                net.minecraft.text.Text.literal("fixture: the subject log must anchor on the bottom slab below it"));
         double subjectDy = SlabSupport.getYOffset(w, subject, w.getBlockState(subject));
         ctx.assertTrue(Math.abs(subjectDy + 1.0) <= EPS,
-                "fixture: the subject log must render -1.0 (the support the follower stands on), got "
-                        + subjectDy);
+                net.minecraft.text.Text.literal("fixture: the subject log must render -1.0 (the support the follower stands on), got "
+                        + subjectDy));
         return subject;
     }
 

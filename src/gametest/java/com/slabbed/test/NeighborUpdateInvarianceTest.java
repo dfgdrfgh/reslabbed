@@ -172,7 +172,7 @@ public final class NeighborUpdateInvarianceTest {
         }
         double topDy = dy(w, cursor);
         ctx.assertTrue(Math.abs(topDy + 1.0) <= EPS,
-                "premise: real-useOn SBSB tower top stone should read -1.0, got " + topDy);
+                net.minecraft.text.Text.literal("premise: real-useOn SBSB tower top stone should read -1.0, got " + topDy));
         return cursor;
     }
 
@@ -197,7 +197,7 @@ public final class NeighborUpdateInvarianceTest {
         }
         double topDy = dy(w, cursor);
         ctx.assertTrue(Math.abs(topDy + 1.0) <= EPS,
-                "premise: ground-level SBSB tower top stone should read -1.0, got " + topDy);
+                net.minecraft.text.Text.literal("premise: ground-level SBSB tower top stone should read -1.0, got " + topDy));
         return cursor;
     }
 
@@ -214,7 +214,7 @@ public final class NeighborUpdateInvarianceTest {
         w.setBlockState(fb, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
         double fbDy = dy(w, fb);
         ctx.assertTrue(Math.abs(fbDy + 0.5) <= EPS,
-                "premise: the lowered full block (north cell must be air) must render -0.5, got " + fbDy);
+                net.minecraft.text.Text.literal("premise: the lowered full block (north cell must be air) must render -0.5, got " + fbDy));
         return fb;
     }
 
@@ -261,20 +261,20 @@ public final class NeighborUpdateInvarianceTest {
                 bslab(w, subject.north().down());
                 place(ctx, Blocks.STONE.asItem(), subject.west(), Direction.EAST, 0.0);
                 ctx.assertTrue(w.getBlockState(subject).isOf(Blocks.STONE),
-                        "premise: the control block must land in the cantilever cell, got "
-                                + w.getBlockState(subject));
+                        net.minecraft.text.Text.literal("premise: the control block must land in the cantilever cell, got "
+                                + w.getBlockState(subject)));
                 ctx.assertTrue(w.getBlockState(subject.down()).isAir(),
-                        "premise: the control must be a CANTILEVER (air below) or no mutation can "
-                                + "reach a full block's resolver at all");
+                        net.minecraft.text.Text.literal("premise: the control must be a CANTILEVER (air below) or no mutation can "
+                                + "reach a full block's resolver at all"));
                 double d = dy(w, subject);
                 ctx.assertTrue(Math.abs(d) <= EPS,
-                        "premise: the control must be placed FLAT (the dormant source must still "
-                                + "be dormant), got " + d);
+                        net.minecraft.text.Text.literal("premise: the control must be placed FLAT (the dormant source must still "
+                                + "be dormant), got " + d));
                 ctx.assertTrue(Double.doubleToRawLongBits(SlabPlacementDyAttachment.storedDy(w, subject))
                                 == Double.doubleToRawLongBits(0.0d),
-                        "premise: the control needs an explicit frozen 0.0 placement fact");
+                        net.minecraft.text.Text.literal("premise: the control needs an explicit frozen 0.0 placement fact"));
                 ctx.assertTrue(!SlabAnchorAttachment.isFrozenFlat(w, subject),
-                        "premise: the transaction fact must be the sole height authority");
+                        net.minecraft.text.Text.literal("premise: the transaction fact must be the sole height authority"));
                 return subject;
             }),
             // #2 — control: a flat-placed SLAB, held flat under the candle's own mutation.
@@ -307,20 +307,20 @@ public final class NeighborUpdateInvarianceTest {
                 var placed = w.getBlockState(subject);
                 ctx.assertTrue(placed.getBlock() instanceof SlabBlock
                                 && placed.get(SlabBlock.TYPE) == SlabType.BOTTOM,
-                        "premise: the control must be a BOTTOM slab in the cantilever cell, got "
-                                + placed);
+                        net.minecraft.text.Text.literal("premise: the control must be a BOTTOM slab in the cantilever cell, got "
+                                + placed));
                 ctx.assertTrue(w.getBlockState(subject.down()).isAir(),
-                        "premise: the control must be a CANTILEVER (air below) — on a flush seat "
-                                + "the flush-seat guard closes the only lane that can reach it");
+                        net.minecraft.text.Text.literal("premise: the control must be a CANTILEVER (air below) — on a flush seat "
+                                + "the flush-seat guard closes the only lane that can reach it"));
                 double d = dy(w, subject);
                 ctx.assertTrue(Math.abs(d) <= EPS,
-                        "premise: the control must be placed FLAT (the dormant source must still "
-                                + "be dormant), got " + d);
+                        net.minecraft.text.Text.literal("premise: the control must be placed FLAT (the dormant source must still "
+                                + "be dormant), got " + d));
                 ctx.assertTrue(Double.doubleToRawLongBits(SlabPlacementDyAttachment.storedDy(w, subject))
                                 == Double.doubleToRawLongBits(0.0d),
-                        "premise: the control needs an explicit frozen 0.0 placement fact");
+                        net.minecraft.text.Text.literal("premise: the control needs an explicit frozen 0.0 placement fact"));
                 ctx.assertTrue(!SlabAnchorAttachment.isFrozenFlat(w, subject),
-                        "premise: the transaction fact must be the sole height authority");
+                        net.minecraft.text.Text.literal("premise: the transaction fact must be the sole height authority"));
                 return subject;
             }),
             // #3 — an anchored full block on a real, anchored -1.0 support (translated equivalent of
@@ -360,8 +360,8 @@ public final class NeighborUpdateInvarianceTest {
                 BlockPos subject = fb.north();
                 ctx.assertTrue(w.getBlockState(subject).getBlock() instanceof SlabBlock
                                 && w.getBlockState(subject).get(SlabBlock.TYPE) == SlabType.TOP,
-                        "premise: the -0.25 nudge on a -0.5 target mints a TOP slab via the intent "
-                                + "mixin's upperHalfIntent gate — got " + w.getBlockState(subject));
+                        net.minecraft.text.Text.literal("premise: the -0.25 nudge on a -0.5 target mints a TOP slab via the intent "
+                                + "mixin's upperHalfIntent gate — got " + w.getBlockState(subject)));
                 return subject;
             }),
             // #5 — a slab on a lowered bottom slab (9e4dffb5's new behaviour): the seat is itself the
@@ -381,10 +381,10 @@ public final class NeighborUpdateInvarianceTest {
                 place(ctx, Blocks.STONE_SLAB.asItem(), fb, Direction.NORTH, -0.75);
                 BlockPos seat = fb.north();
                 ctx.assertTrue(w.getBlockState(seat).get(SlabBlock.TYPE) == SlabType.BOTTOM,
-                        "premise: the seat must be a BOTTOM slab (the wrong nudge mints TOP via the intent mixin)");
+                        net.minecraft.text.Text.literal("premise: the seat must be a BOTTOM slab (the wrong nudge mints TOP via the intent mixin)"));
                 double seatDy = dy(w, seat);
                 ctx.assertTrue(Math.abs(seatDy + 0.5) <= EPS,
-                        "premise: the cantilever seat slab must render -0.5, got " + seatDy);
+                        net.minecraft.text.Text.literal("premise: the cantilever seat slab must render -0.5, got " + seatDy));
                 place(ctx, Blocks.OAK_SLAB.asItem(), seat, Direction.UP, 0.0);
                 return seat.up();
             }),
@@ -435,22 +435,22 @@ public final class NeighborUpdateInvarianceTest {
                 bslab(w, subject.east().down().down());
                 place(ctx, Blocks.WHITE_CARPET.asItem(), subject.down(), Direction.UP, 0.0);
                 ctx.assertTrue(w.getBlockState(subject).isOf(Blocks.WHITE_CARPET),
-                        "premise: the carpet must land on the slab support, got "
-                                + w.getBlockState(subject));
+                        net.minecraft.text.Text.literal("premise: the carpet must land on the slab support, got "
+                                + w.getBlockState(subject)));
                 ctx.assertTrue(w.getBlockState(subject.down(2)).isAir(),
-                        "premise: the support slab must FLOAT (air below) or the flush-seat guard "
-                                + "closes the lane the moving mutation needs");
+                        net.minecraft.text.Text.literal("premise: the support slab must FLOAT (air below) or the flush-seat guard "
+                                + "closes the lane the moving mutation needs"));
                 double supportDy = dy(w, subject.down());
                 ctx.assertTrue(Math.abs(supportDy) <= EPS,
-                        "premise: the support must start FLAT — the dormant source must still be "
-                                + "dormant, got " + supportDy);
+                        net.minecraft.text.Text.literal("premise: the support must start FLAT — the dormant source must still be "
+                                + "dormant, got " + supportDy));
                 double d = dy(w, subject);
                 ctx.assertTrue(Math.abs(d + 0.5) <= EPS,
-                        "premise: a carpet on a flat bottom slab reads -0.5, got " + d);
+                        net.minecraft.text.Text.literal("premise: a carpet on a flat bottom slab reads -0.5, got " + d));
                 ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, subject)
                                 && SlabPlacementDyAttachment.hasStoredDy(w, subject),
-                        "premise: this row's protection IS the decorative anchor PLUS the stored "
-                                + "magnitude — the anchor alone measurably does not hold this cell");
+                        net.minecraft.text.Text.literal("premise: this row's protection IS the decorative anchor PLUS the stored "
+                                + "magnitude — the anchor alone measurably does not hold this cell"));
                 return subject;
             }),
             // #7 — decoration placed flat then neighboured: the donor's
@@ -500,7 +500,7 @@ public final class NeighborUpdateInvarianceTest {
                 BlockPos support = slab.up();
                 double supportDy = dy(w, support);
                 ctx.assertTrue(Math.abs(supportDy + 0.5) <= EPS,
-                        "premise: the chain's support must render -0.5, got " + supportDy);
+                        net.minecraft.text.Text.literal("premise: the chain's support must render -0.5, got " + supportDy));
                 place(ctx, Blocks.IRON_CHAIN.asItem(), support, Direction.UP, 0.0);
                 return support.up();
             }),
@@ -558,21 +558,21 @@ public final class NeighborUpdateInvarianceTest {
                 place(ctx, Blocks.BIRCH_FENCE.asItem(), owner, Direction.UP, 0.0);
                 BlockPos fence = owner.up();
                 ctx.assertTrue(w.getBlockState(fence).isOf(Blocks.BIRCH_FENCE),
-                        "premise: the fence support must land on the -1.0 tower top, got "
-                                + w.getBlockState(fence));
+                        net.minecraft.text.Text.literal("premise: the fence support must land on the -1.0 tower top, got "
+                                + w.getBlockState(fence)));
                 double fenceDy = dy(w, fence);
                 ctx.assertTrue(Math.abs(fenceDy + 1.0) <= EPS,
-                        "premise: the FENCE support must itself render -1.0 — a -0.5 fence would "
+                        net.minecraft.text.Text.literal("premise: the FENCE support must itself render -1.0 — a -0.5 fence would "
                                 + "make this row coincide with the fallback floor and prove nothing, "
-                                + "got " + fenceDy);
+                                + "got " + fenceDy));
                 place(ctx, Blocks.STONE.asItem(), fence, Direction.UP, 0.0);
                 BlockPos subject = fence.up();
                 ctx.assertTrue(w.getBlockState(subject).isOf(Blocks.STONE),
-                        "premise: the subject must land on the fence, got " + w.getBlockState(subject));
+                        net.minecraft.text.Text.literal("premise: the subject must land on the fence, got " + w.getBlockState(subject)));
                 double d = dy(w, subject);
                 ctx.assertTrue(Math.abs(d + 1.0) <= EPS,
-                        "premise: a block resting on a -1.0 fence must be placed at -1.0 (this is "
-                                + "the live bug this subject exists for), got " + d);
+                        net.minecraft.text.Text.literal("premise: a block resting on a -1.0 fence must be placed at -1.0 (this is "
+                                + "the live bug this subject exists for), got " + d));
                 return subject;
             }),
             // #11 — THE COVERAGE BOUNDARY MOVED AGAIN (2026-08-06, live run f37a3b2b, actions
@@ -611,23 +611,23 @@ public final class NeighborUpdateInvarianceTest {
                 var supportState = w.getBlockState(support);
                 ctx.assertTrue(supportState.getBlock() instanceof SlabBlock
                                 && supportState.get(SlabBlock.TYPE) == SlabType.DOUBLE,
-                        "premise: the two clicks must combine into a DOUBLE slab in ONE cell — a "
+                        net.minecraft.text.Text.literal("premise: the two clicks must combine into a DOUBLE slab in ONE cell — a "
                                 + "BOTTOM slab here would test the half-height arm instead, got "
-                                + supportState);
+                                + supportState));
                 double supportDy = dy(w, support);
                 ctx.assertTrue(Math.abs(supportDy + 1.0) <= EPS,
-                        "premise: the DOUBLE slab support must itself render -1.0 — a -0.5 support "
+                        net.minecraft.text.Text.literal("premise: the DOUBLE slab support must itself render -1.0 — a -0.5 support "
                                 + "would make this row coincide with the fallback floor and prove "
-                                + "nothing, got " + supportDy);
+                                + "nothing, got " + supportDy));
                 place(ctx, Blocks.STONE.asItem(), support, Direction.UP, 0.0);
                 BlockPos subject = support.up();
                 ctx.assertTrue(w.getBlockState(subject).isOf(Blocks.STONE),
-                        "premise: the subject must land on the double slab, got "
-                                + w.getBlockState(subject));
+                        net.minecraft.text.Text.literal("premise: the subject must land on the double slab, got "
+                                + w.getBlockState(subject)));
                 double d = dy(w, subject);
                 ctx.assertTrue(Math.abs(d + 1.0) <= EPS,
-                        "premise: a block resting on a -1.0 DOUBLE slab must be placed at -1.0 "
-                                + "(this is the live bug this subject exists for), got " + d);
+                        net.minecraft.text.Text.literal("premise: a block resting on a -1.0 DOUBLE slab must be placed at -1.0 "
+                                + "(this is the live bug this subject exists for), got " + d));
                 return subject;
             })
     );
@@ -667,7 +667,7 @@ public final class NeighborUpdateInvarianceTest {
             clearArena(ctx, w);
             BlockPos subj = subject.builder().build(ctx, w);
             ctx.assertTrue(!w.getBlockState(subj).isAir(),
-                    "premise: subject '" + subject.name() + "' failed to place");
+                    net.minecraft.text.Text.literal("premise: subject '" + subject.name() + "' failed to place"));
             double before = dy(w, subj);
             m.mutation().apply(w, subj);
             // Vanilla-mechanic carve-out: if the mutation caused vanilla to remove the subject
@@ -686,9 +686,9 @@ public final class NeighborUpdateInvarianceTest {
         logVerdict(subject.name(), violations);
         if (enforcing()) {
             ctx.assertTrue(violations.isEmpty(),
-                    "LAW VIOLATION — subject '" + subject.name()
+                    net.minecraft.text.Text.literal("LAW VIOLATION — subject '" + subject.name()
                             + "' moved on neighbor edits (placed height must survive byte-identical):\n  "
-                            + String.join("\n  ", violations));
+                            + String.join("\n  ", violations)));
         }
         ctx.complete();
     }

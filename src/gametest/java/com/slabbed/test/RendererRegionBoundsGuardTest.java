@@ -21,7 +21,7 @@ public final class RendererRegionBoundsGuardTest {
         try {
             boolean found = SlabSupport.hasLoweringSourceInColumnBelow(rendererRegion, BlockPos.ORIGIN);
             ctx.assertTrue(!found,
-                    "an out-of-region renderer lookup must terminate the bounded column scan");
+                    net.minecraft.text.Text.literal("an out-of-region renderer lookup must terminate the bounded column scan"));
 
             boolean unrelatedRethrown = false;
             try {
@@ -30,7 +30,7 @@ public final class RendererRegionBoundsGuardTest {
                 unrelatedRethrown = expected.getMessage().contains("unrelated-view");
             }
             ctx.assertTrue(unrelatedRethrown,
-                    "the guard must not swallow IndexOutOfBoundsException from unrelated BlockView implementations");
+                    net.minecraft.text.Text.literal("the guard must not swallow IndexOutOfBoundsException from unrelated BlockView implementations"));
             ctx.complete();
         } finally {
             // This test is registered only in the dedicated-server GameTest source set. Restore the

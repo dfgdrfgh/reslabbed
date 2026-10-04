@@ -54,8 +54,8 @@ public final class BottomSlabSpawnProofTest {
         boolean allows = support.allowsSpawning(world, supportPos, entityType);
         boolean onGround = SpawnRestriction.isSpawnPosAllowed(entityType, world, supportPos.up());
         ctx.assertTrue(allows == expected && onGround == expected,
-                label + " expected allowsSpawning/ON_GROUND=" + expected + "/" + expected
-                        + " but got " + allows + "/" + onGround);
+                net.minecraft.text.Text.literal(label + " expected allowsSpawning/ON_GROUND=" + expected + "/" + expected
+                        + " but got " + allows + "/" + onGround));
     }
 
     @GameTest(structure = "fabric-gametest-api-v1:empty")
@@ -69,9 +69,9 @@ public final class BottomSlabSpawnProofTest {
         BlockPos dryAbsolute = ctx.getAbsolutePos(dry);
         BlockState dryState = world.getBlockState(dryAbsolute);
         ctx.assertTrue(dryState.isSideSolidFullSquare(world, dryAbsolute, Direction.UP),
-                "setup: bottom slab must retain Slabbed's full-square UP placement support");
+                net.minecraft.text.Text.literal("setup: bottom slab must retain Slabbed's full-square UP placement support"));
         ctx.assertTrue(dryState.isSideSolid(world, dryAbsolute, Direction.UP, SideShapeType.RIGID),
-                "setup: bottom slab must retain Slabbed's RIGID UP placement support");
+                net.minecraft.text.Text.literal("setup: bottom slab must retain Slabbed's RIGID UP placement support"));
 
         assertSpawnSurface(ctx, dry, EntityType.ZOMBIE, false, "dry vanilla bottom slab / zombie");
         assertSpawnSurface(ctx, dry, EntityType.COW, false, "dry vanilla bottom slab / cow");
@@ -102,7 +102,7 @@ public final class BottomSlabSpawnProofTest {
         ctx.assertTrue(
                 CompatHooks.customSlabSurfaceKind(ctx.getWorld().getBlockState(ctx.getAbsolutePos(bottom)))
                         == CompatSlabSurfaceKind.BOTTOM_LIKE,
-                "setup: terrain_slabs bottom fixture must classify BOTTOM_LIKE");
+                net.minecraft.text.Text.literal("setup: terrain_slabs bottom fixture must classify BOTTOM_LIKE"));
         assertSpawnSurface(ctx, bottom, EntityType.ZOMBIE, false, "terrain_slabs bottom slab");
         ctx.complete();
     }

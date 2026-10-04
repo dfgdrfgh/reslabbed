@@ -157,32 +157,32 @@ public final class DyWindowSuite {
         double supportDy = dy(w, support);
         double storedSupportDy = SlabPlacementDyAttachment.storedDy(w, support);
         ctx.assertTrue(Math.abs(dy(w, slabGround.up(2)) + 0.5) <= EPS,
-                "premise: the tower's third course must sit at -0.5 on the Terrain Slabs surface, "
-                        + "got " + dy(w, slabGround.up(2)));
+                net.minecraft.text.Text.literal("premise: the tower's third course must sit at -0.5 on the Terrain Slabs surface, "
+                        + "got " + dy(w, slabGround.up(2))));
         ctx.assertTrue(Math.abs(supportDy - SlabSupport.minResolvedDy()) <= EPS,
-                "premise: the course both subjects rest on must resolve to the cap ("
+                net.minecraft.text.Text.literal("premise: the course both subjects rest on must resolve to the cap ("
                         + SlabSupport.minResolvedDy() + ") — that is the number that makes BOTH "
-                        + "pre-clamp values " + RAW_TOWER_DY + ", got " + supportDy);
+                        + "pre-clamp values " + RAW_TOWER_DY + ", got " + supportDy));
         ctx.assertTrue(Math.abs(storedSupportDy - SlabSupport.minResolvedDy()) <= EPS,
-                "premise: that course must carry a STORED placement height of "
+                net.minecraft.text.Text.literal("premise: that course must carry a STORED placement height of "
                         + SlabSupport.minResolvedDy() + ", or the direct-custom lane reads its "
                         + "support through a different arm and the two pre-clamp values stop "
-                        + "matching, got " + storedSupportDy);
+                        + "matching, got " + storedSupportDy));
 
         // ── PREMISE: each subject is claimed by the lane this cell means to test ─────────────
         BlockState slabState = w.getBlockState(slabSubject);
         BlockState tableState = w.getBlockState(tableSubject);
         ctx.assertTrue(slabState.getBlock() instanceof SlabBlock,
-                "premise: the named-clamp subject must be a slab so getYOffsetInner's slab branch "
-                        + "claims it before the direct-custom lane can, got " + slabState);
+                net.minecraft.text.Text.literal("premise: the named-clamp subject must be a slab so getYOffsetInner's slab branch "
+                        + "claims it before the direct-custom lane can, got " + slabState));
         ctx.assertTrue(SlabSupport.isDirectCustomSlabSupportedObject(w, tableSubject, tableState),
-                "premise: the second subject must be claimed by the DIRECT-CUSTOM surface lane — "
+                net.minecraft.text.Text.literal("premise: the second subject must be claimed by the DIRECT-CUSTOM surface lane — "
                         + "that is the site whose clamp was written out by hand — got "
-                        + tableState);
+                        + tableState));
         ctx.assertTrue(!(tableState.getBlock() instanceof SlabBlock)
                         && !SlabAnchorAttachment.isAnchored(w, tableSubject),
-                "premise: the direct-custom subject must be neither a slab nor anchored, or an "
-                        + "earlier branch of getYOffsetInner answers instead");
+                net.minecraft.text.Text.literal("premise: the direct-custom subject must be neither a slab nor anchored, or an "
+                        + "earlier branch of getYOffsetInner answers instead"));
 
         double slabDy = dy(w, slabSubject);
         double tableDy = dy(w, tableSubject);
@@ -192,11 +192,11 @@ public final class DyWindowSuite {
 
         // ── THE ASSERTION THIS CELL EXISTS FOR ──────────────────────────────────────────────
         ctx.assertTrue(Math.abs(slabDy - tableDy) <= EPS,
-                "THE TWO CLAMP SITES DISAGREE. The support resolver and the direct-custom surface "
+                net.minecraft.text.Text.literal("THE TWO CLAMP SITES DISAGREE. The support resolver and the direct-custom surface "
                         + "lane were handed the same pre-clamp " + RAW_TOWER_DY + " for the same "
                         + "tower and returned different heights, so a Terrain Slabs tower and a "
                         + "vanilla tower now sit at different depths in the same world. Both sites "
-                        + "must read SlabSupport.minResolvedDy() — " + measured);
+                        + "must read SlabSupport.minResolvedDy() — " + measured));
 
         // ── NON-VACUITY, asserted AFTER the property so a half-fix reports as a half-fix ─────
         // Order matters: if this guard came first, moving the cap without unifying the sites
@@ -204,18 +204,18 @@ public final class DyWindowSuite {
         // blame the fixture for a real product defect. Assert the property, then prove the
         // assertion was load-bearing.
         ctx.assertTrue(RAW_TOWER_DY < SlabSupport.minResolvedDy() - EPS,
-                "FIXTURE IS NO LONGER LOAD-BEARING: this cell proves the two clamps agree by "
+                net.minecraft.text.Text.literal("FIXTURE IS NO LONGER LOAD-BEARING: this cell proves the two clamps agree by "
                         + "making both saturate, and the deepest pre-clamp value this build can "
                         + "present is " + RAW_TOWER_DY + ", which is no longer past the cap ("
                         + SlabSupport.minResolvedDy() + "). Add courses to buildTower until the "
                         + "raw value is past the new cap, and update RAW_TOWER_DY — do NOT delete "
-                        + "this cell, it is what keeps the two clamp sites in step. — " + measured);
+                        + "this cell, it is what keeps the two clamp sites in step. — " + measured));
 
         ctx.assertTrue(Math.abs(slabDy - SlabSupport.minResolvedDy()) <= EPS,
-                "the support resolver must saturate at minResolvedDy() — " + measured);
+                net.minecraft.text.Text.literal("the support resolver must saturate at minResolvedDy() — " + measured));
         ctx.assertTrue(Math.abs(tableDy - SlabSupport.minResolvedDy()) <= EPS,
-                "the direct-custom surface lane must saturate at minResolvedDy(), not at a "
-                        + "magnitude of its own — " + measured);
+                net.minecraft.text.Text.literal("the direct-custom surface lane must saturate at minResolvedDy(), not at a "
+                        + "magnitude of its own — " + measured));
 
         ctx.complete();
     }
@@ -239,16 +239,16 @@ public final class DyWindowSuite {
         System.out.println("[STAGE2-IDENTITY] " + measured);
 
         ctx.assertTrue(cap >= targetable - EPS,
-                "THE ALPHABET HAS OUTRUN THE PICK WINDOW. SlabSupport resolves heights down to "
+                net.minecraft.text.Text.literal("THE ALPHABET HAS OUTRUN THE PICK WINDOW. SlabSupport resolves heights down to "
                         + cap + " while SlabbedOffsetRaycast only undertakes to attribute "
                         + targetable + ", so a block at the cap is drawn where the player cannot "
                         + "aim at it. Move DEEPEST_TARGETABLE_DY first (the window derives its "
-                        + "radius from it), then the cap — " + measured);
+                        + "radius from it), then the cap — " + measured));
 
         ctx.assertTrue(radius >= (int) Math.ceil(-cap),
-                "the pick window must be wide enough for the deepest height the resolver can "
+                net.minecraft.text.Text.literal("the pick window must be wide enough for the deepest height the resolver can "
                         + "produce: cap " + cap + " needs radius " + (int) Math.ceil(-cap)
-                        + " — " + measured);
+                        + " — " + measured));
 
         ctx.complete();
     }
@@ -279,14 +279,14 @@ public final class DyWindowSuite {
         System.out.println("[STAGE2-FINGERPRINT] " + fingerprint);
 
         ctx.assertTrue(fingerprint.equals(PINNED_FINGERPRINT),
-                "STAGE 2 WAS NOT INERT, or the Stage 4 flag has leaked into a shape it must not "
+                net.minecraft.text.Text.literal("STAGE 2 WAS NOT INERT, or the Stage 4 flag has leaked into a shape it must not "
                         + "reach. The resolver's answers over the 196-column battery differ from "
                         + "the values measured before the clamp sites were unified. Running cap is "
                         + SlabSupport.minResolvedDy() + " (deepDyAlphabet="
                         + SlabSupport.DEEP_DY_ALPHABET + "). First difference at index "
                         + firstDifference(fingerprint, PINNED_FINGERPRINT)
                         + ".\n  pinned   = " + PINNED_FINGERPRINT
-                        + "\n  measured = " + fingerprint);
+                        + "\n  measured = " + fingerprint));
         ctx.complete();
     }
 
@@ -323,7 +323,7 @@ public final class DyWindowSuite {
         System.out.println("[STAGE4-DEEPBATTERY] " + fingerprint);
 
         ctx.assertTrue(fingerprint.equals(pinned),
-                (deep
+                net.minecraft.text.Text.literal((deep
                         ? "THE DEEP LEG MOVED since the flag was first armed. "
                         : "THE SHIPPED DEFAULT MOVED. A column deep enough for the cap to bite "
                                 + "answers differently than it did before the Stage 4 flag "
@@ -331,14 +331,14 @@ public final class DyWindowSuite {
                         + "cap=" + SlabSupport.minResolvedDy() + ", first difference at index "
                         + firstDifference(fingerprint, pinned)
                         + ".\n  pinned   = " + pinned
-                        + "\n  measured = " + fingerprint);
+                        + "\n  measured = " + fingerprint));
 
         // NON-VACUITY: if the two pins were equal this cell could not tell the legs apart, and a
         // deep leg silently running the shipped cap would pass it.
         ctx.assertTrue(!PINNED_DEEP_BATTERY_OFF.equals(PINNED_DEEP_BATTERY_ON),
-                "the two pinned deep-battery fingerprints are identical, so this cell can no "
+                net.minecraft.text.Text.literal("the two pinned deep-battery fingerprints are identical, so this cell can no "
                         + "longer distinguish the legs and the deep leg could be running the "
-                        + "shipped cap unnoticed");
+                        + "shipped cap unnoticed"));
         ctx.complete();
     }
 
@@ -450,13 +450,13 @@ public final class DyWindowSuite {
             BlockState sa = w.getBlockState(a.up(i));
             BlockState sb = w.getBlockState(b.up(i));
             ctx.assertTrue(sa.equals(sb),
-                    "premise: the two columns must be the SAME tower below the subject — course "
-                            + i + " differs (" + sa + " vs " + sb + ")");
+                    net.minecraft.text.Text.literal("premise: the two columns must be the SAME tower below the subject — course "
+                            + i + " differs (" + sa + " vs " + sb + ")"));
             double da = dy(w, a.up(i));
             double db = dy(w, b.up(i));
             ctx.assertTrue(Math.abs(da - db) <= EPS,
-                    "premise: the two columns must resolve identically below the subject — course "
-                            + i + " reads " + da + " vs " + db);
+                    net.minecraft.text.Text.literal("premise: the two columns must resolve identically below the subject — course "
+                            + i + " reads " + da + " vs " + db));
         }
     }
 
@@ -734,12 +734,12 @@ public final class DyWindowSuite {
         System.out.println("[STAGE0-A] control bottom_slab dy=-1.0 span=" + controlSpan
                 + " requiredRadius=" + controlNeed + " sideRayHitsOwner=" + controlHit);
         ctx.assertTrue(controlNeed == 1,
-                "control: a bottom slab at -1.0 must occupy exactly one layer one cell below its "
-                        + "owner (requiredRadius 1), measured " + controlNeed + " — " + controlSpan);
+                net.minecraft.text.Text.literal("control: a bottom slab at -1.0 must occupy exactly one layer one cell below its "
+                        + "owner (requiredRadius 1), measured " + controlNeed + " — " + controlSpan));
         ctx.assertTrue(controlHit,
-                "control: the radius-1 window MUST attribute a -1.0 bottom slab from a side ray in "
+                net.minecraft.text.Text.literal("control: the radius-1 window MUST attribute a -1.0 bottom slab from a side ray in "
                         + "its own layer. A miss here means the aim is wrong and the deep row below "
-                        + "proves nothing — " + controlSpan);
+                        + "proves nothing — " + controlSpan));
 
         // SUBJECT: -1.5. Layer P.y-2, distance 2, OUTSIDE the window. Its own column, so the
         // control above can never intercept the vertical probe.
@@ -754,28 +754,28 @@ public final class DyWindowSuite {
                 + " sideRayHitsOwner=" + deepSideHit + " downRayHitsOwner=" + deepDownHit);
 
         ctx.assertTrue(deepSpan.lowLayer == deepSpan.highLayer && deepSpan.lowLayer == deep.getY() - 2,
-                "MEASUREMENT A: a BOTTOM slab at -1.5 must occupy exactly the single cell layer "
+                net.minecraft.text.Text.literal("MEASUREMENT A: a BOTTOM slab at -1.5 must occupy exactly the single cell layer "
                         + "P.y-2 (this is the survey's premise, measured from the real offset "
-                        + "outline) — " + deepSpan);
+                        + "outline) — " + deepSpan));
         ctx.assertTrue(deepNeed == 2,
-                "MEASUREMENT A: attributing that layer to its owner needs a window radius of 2; "
-                        + "today's radius is " + TODAYS_WINDOW_RADIUS + " — " + deepSpan);
+                net.minecraft.text.Text.literal("MEASUREMENT A: attributing that layer to its owner needs a window radius of 2; "
+                        + "today's radius is " + TODAYS_WINDOW_RADIUS + " — " + deepSpan));
 
         ctx.assertTrue(deepSideHit,
-                "INVERTED BY STAGE 1 (was: assertFalse, pinning the radius-1 DEFECT). A side ray "
+                net.minecraft.text.Text.literal("INVERTED BY STAGE 1 (was: assertFalse, pinning the radius-1 DEFECT). A side ray "
                         + "travelling through the -1.5 bottom slab's own body at y=" + sideAim
                         + " marches only cell layer " + deepSpan.lowLayer + ", which is 2 cells "
                         + "from the owner at P.y=" + deep.getY() + ". Under the radius-"
                         + TODAYS_WINDOW_RADIUS + " window that layer's probe set reaches the owner, "
                         + "so the block the player is looking at IS hit. A RED here means the "
-                        + "widening did not take — this assertion is the one that proves it did.");
+                        + "widening did not take — this assertion is the one that proves it did."));
 
         ctx.assertTrue(deepDownHit,
-                "MEASUREMENT A, the survey's overstatement: 'occupies ONLY P.y-2 and is therefore "
+                net.minecraft.text.Text.literal("MEASUREMENT A, the survey's overstatement: 'occupies ONLY P.y-2 and is therefore "
                         + "UNTARGETABLE' is too strong. A ray that passes through the owner cell P "
                         + "at all (aiming down from above) tests P as a PRIMARY cell, and a primary "
                         + "cell is tested whatever its offset — so the deep slab IS hit from above "
-                        + "today. Only the side aim is lost.");
+                        + "today. Only the side aim is lost."));
         ctx.complete();
     }
 
@@ -809,22 +809,22 @@ public final class DyWindowSuite {
                 + " highAimY=" + highAim + " highLayerHit=" + highHit);
 
         ctx.assertTrue(s.lowLayer == deep.getY() - 2 && s.highLayer == deep.getY() - 1,
-                "MEASUREMENT A: a full block at -1.5 must span exactly the two layers P.y-2 and "
-                        + "P.y-1 (the survey's premise, measured) — " + s);
+                net.minecraft.text.Text.literal("MEASUREMENT A: a full block at -1.5 must span exactly the two layers P.y-2 and "
+                        + "P.y-1 (the survey's premise, measured) — " + s));
         ctx.assertTrue(s.requiredWindowRadius() == 2,
-                "MEASUREMENT A: its deepest layer needs radius 2 — " + s);
+                net.minecraft.text.Text.literal("MEASUREMENT A: its deepest layer needs radius 2 — " + s));
 
         ctx.assertTrue(highHit,
-                "MEASUREMENT A: the UPPER layer P.y-1 is one cell from the owner, so the radius-1 "
+                net.minecraft.text.Text.literal("MEASUREMENT A: the UPPER layer P.y-1 is one cell from the owner, so the radius-1 "
                         + "window already attributes it — a grazing ray at y=" + highAim + " hits. "
-                        + "This is also the positive control for the aim.");
+                        + "This is also the positive control for the aim."));
         ctx.assertTrue(lowHit,
-                "INVERTED BY STAGE 1 (was: assertFalse, pinning the radius-1 DEFECT — the block's "
+                net.minecraft.text.Text.literal("INVERTED BY STAGE 1 (was: assertFalse, pinning the radius-1 DEFECT — the block's "
                         + "bottom half was unclickable). A grazing ray through the LOWER half of "
                         + "the same block at y=" + lowAim + " marches only layer " + s.lowLayer
                         + ", two cells from the owner; the radius-" + TODAYS_WINDOW_RADIUS
                         + " window reaches that far, so both halves of the block are now clickable "
-                        + "and the split-clickability defect is closed.");
+                        + "and the split-clickability defect is closed."));
         ctx.complete();
     }
 
@@ -861,14 +861,14 @@ public final class DyWindowSuite {
                     .append(" cube").append(cubeSpan).append("/r").append(cubeSpan.requiredWindowRadius())
                     .append(" max=").append(need).append(";");
             ctx.assertTrue(need == expected[i],
-                    "MEASUREMENT A: cap " + caps[i] + " needs window radius " + expected[i]
-                            + ", measured " + need + " —" + table);
+                    net.minecraft.text.Text.literal("MEASUREMENT A: cap " + caps[i] + " needs window radius " + expected[i]
+                            + ", measured " + need + " —" + table));
         }
         System.out.println("[STAGE0-A] required-radius table:" + table);
 
         ctx.assertTrue(expected[2] == 2,
-                "the identity minResolvedDy() == -(window radius) holds at -2.0 with radius 2 —"
-                        + table);
+                net.minecraft.text.Text.literal("the identity minResolvedDy() == -(window radius) holds at -2.0 with radius 2 —"
+                        + table));
 
         // INVERTED BY STAGE 1 (was: assertTrue(TODAYS_WINDOW_RADIUS == 1), "which is why
         // minResolvedDy() is -1.0"). The window now stands at the radius the RULED cap needs, ahead
@@ -877,15 +877,15 @@ public final class DyWindowSuite {
         // the ruled cap derives, and it is not SHALLOWER than the cap the resolver may produce.
         ctx.assertTrue(TODAYS_WINDOW_RADIUS
                         == (int) Math.ceil(-SlabbedOffsetRaycast.DEEPEST_TARGETABLE_DY),
-                "STAGE 1: the shipping window radius must be the one DERIVED from the window's own "
+                net.minecraft.text.Text.literal("STAGE 1: the shipping window radius must be the one DERIVED from the window's own "
                         + "cap (" + SlabbedOffsetRaycast.DEEPEST_TARGETABLE_DY + " -> radius "
                         + (int) Math.ceil(-SlabbedOffsetRaycast.DEEPEST_TARGETABLE_DY) + "), "
-                        + "measured " + TODAYS_WINDOW_RADIUS + " —" + table);
+                        + "measured " + TODAYS_WINDOW_RADIUS + " —" + table));
         ctx.assertTrue(TODAYS_WINDOW_RADIUS == 3,
-                "STAGE 1: the ruled cap is -2.0 and the measured required radius at -2.0 is 2, so "
+                net.minecraft.text.Text.literal("STAGE 1: the ruled cap is -2.0 and the measured required radius at -2.0 is 2, so "
                         + "the shipping radius must cover new -3 placements — measured " + TODAYS_WINDOW_RADIUS
                         + ". (It was 1 before Stage 1; this row is the inverted Stage 0 row.) —"
-                        + table);
+                        + table));
         ctx.complete();
     }
 
@@ -926,7 +926,7 @@ public final class DyWindowSuite {
         for (BlockPos p : level) {
             SlabPlacementDyAttachment.clear(w, p);
             ctx.assertFalse(SlabPlacementDyAttachment.hasStoredDy(w, p),
-                    "fixture: this cell measures the PRE-STORE lane — " + p + " must hold no fact");
+                    net.minecraft.text.Text.literal("fixture: this cell measures the PRE-STORE lane — " + p + " must hold no fact"));
         }
 
         double[] dy = new double[level.length];
@@ -938,8 +938,8 @@ public final class DyWindowSuite {
         }
         System.out.println("[STAGE0-B] pre-store anchored ladder:" + ladder);
 
-        ctx.assertTrue(Math.abs(dy[0]) <= EPS, "pre-store L0 must be 0.0 —" + ladder);
-        ctx.assertTrue(Math.abs(dy[1] + 0.5) <= EPS, "pre-store L1 must be -0.5 —" + ladder);
+        ctx.assertTrue(Math.abs(dy[0]) <= EPS, net.minecraft.text.Text.literal("pre-store L0 must be 0.0 —" + ladder));
+        ctx.assertTrue(Math.abs(dy[1] + 0.5) <= EPS, net.minecraft.text.Text.literal("pre-store L1 must be -0.5 —" + ladder));
         // STATED AGAINST THE CAP (Stage 4, 2026-08-07): each course deepens half a block until the
         // clamp refuses, so course i reads max(-0.5*i, cap) and saturation lands at index
         // ceil(-cap / 0.5). At the shipped -1.0 cap that is index 2 and every course from L2 up
@@ -948,14 +948,14 @@ public final class DyWindowSuite {
         for (int i = 2; i < level.length; i++) {
             double expected = Math.max(-0.5 * i, SlabSupport.minResolvedDy());
             ctx.assertTrue(Math.abs(dy[i] - expected) <= EPS,
-                    "MEASUREMENT B: pre-store L" + i + " must read max(-0.5*" + i + ", cap) = "
-                            + expected + " (cap " + SlabSupport.minResolvedDy() + ") —" + ladder);
+                    net.minecraft.text.Text.literal("MEASUREMENT B: pre-store L" + i + " must read max(-0.5*" + i + ", cap) = "
+                            + expected + " (cap " + SlabSupport.minResolvedDy() + ") —" + ladder));
         }
         int saturatedIndex = (int) Math.ceil(-SlabSupport.minResolvedDy() / 0.5);
         ctx.assertTrue(saturatedIndex < level.length,
-                "fixture: the ladder must be tall enough to SATURATE, or 'pre-store saturates at "
+                net.minecraft.text.Text.literal("fixture: the ladder must be tall enough to SATURATE, or 'pre-store saturates at "
                         + "the clamp' is untested — saturation needs index " + saturatedIndex
-                        + " and the tower is " + level.length + " courses —" + ladder);
+                        + " and the tower is " + level.length + " courses —" + ladder));
 
         // THE MEASURED ANSWER TO "WHAT DOES EXHAUSTION RETURN", AS MEASURED FOR STAGE 0: it
         // returned a bare -0.5, and IN THIS TOWER SHAPE that was PROVABLY INVISIBLE. Every course
@@ -976,11 +976,11 @@ public final class DyWindowSuite {
         // which builds both shapes side by side.
         int top = level.length - 1;
         ctx.assertTrue(Math.abs(dy[top] - dy[saturatedIndex]) <= EPS,
-                "MEASUREMENT B: in a DROPPING tower the exhaustion path is unobservable at this "
+                net.minecraft.text.Text.literal("MEASUREMENT B: in a DROPPING tower the exhaustion path is unobservable at this "
                         + "clamp — the top course L" + top + " must read exactly what the first "
                         + "saturated course L" + saturatedIndex + " reads. This shape washes the "
                         + "exhaustion value out whatever it is; the PASS-THROUGH shape in "
-                        + "SupportDepthBudgetTest is the one that does not —" + ladder);
+                        + "SupportDepthBudgetTest is the one that does not —" + ladder));
         ctx.complete();
     }
 
@@ -1019,10 +1019,10 @@ public final class DyWindowSuite {
             double expected = Math.max(-0.5 * i, SlabSupport.minResolvedDy());
             double stored = SlabPlacementDyAttachment.storedDy(w, level[i]);
             ctx.assertTrue(Math.abs(stored - expected) <= EPS,
-                    "MEASUREMENT B: L" + i + " must carry a STORED height of " + expected
+                    net.minecraft.text.Text.literal("MEASUREMENT B: L" + i + " must carry a STORED height of " + expected
                             + " — the walk that produced it terminated at depth 1 on L" + (i - 1)
                             + "'s stored fact, so no course of a post-store tower ever spends the "
-                            + "depth budget —" + facts);
+                            + "depth budget —" + facts));
         }
         ctx.complete();
     }
@@ -1060,18 +1060,18 @@ public final class DyWindowSuite {
         BlockPos support = level[1];
         BlockPos follower = level[2];
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, support),
-                "fixture: the support must be genuinely anchored, or the seat resolver never reads "
-                        + "its stored height at all");
+                net.minecraft.text.Text.literal("fixture: the support must be genuinely anchored, or the seat resolver never reads "
+                        + "its stored height at all"));
 
         // Re-point both cells at the deep magnitude: the support holds -2.0, the follower must
         // re-resolve rather than answer from the height it was placed at.
         SlabPlacementDyAttachment.clear(w, support);
         SlabPlacementDyAttachment.clear(w, follower);
         ctx.assertTrue(SlabPlacementDyAttachment.record(w, support, -2.0),
-                "fixture: the store must accept -2.0 (32 sixteenths, inside a signed byte)");
+                net.minecraft.text.Text.literal("fixture: the store must accept -2.0 (32 sixteenths, inside a signed byte)"));
         double supportDy = SlabSupport.getYOffset(w, support, w.getBlockState(support));
         ctx.assertTrue(Math.abs(supportDy + 2.0) <= EPS,
-                "LAW 1: a stored -2.0 must be returned verbatim, got " + supportDy);
+                net.minecraft.text.Text.literal("LAW 1: a stored -2.0 must be returned verbatim, got " + supportDy));
 
         double followerDy = SlabSupport.getYOffset(w, follower, w.getBlockState(follower));
         double supportTopY = support.getY() + 0.5 + supportDy;   // bottom slab: local top face 0.5
@@ -1092,20 +1092,20 @@ public final class DyWindowSuite {
         double expectedFollower = Math.max(rawSeat, SlabSupport.minResolvedDy());
         double expectedGap = expectedFollower - rawSeat;
         ctx.assertTrue(rawSeat < SlabSupport.minResolvedDy() - EPS,
-                "FIXTURE IS NO LONGER LOAD-BEARING: the raw seat " + rawSeat + " is not past the "
+                net.minecraft.text.Text.literal("FIXTURE IS NO LONGER LOAD-BEARING: the raw seat " + rawSeat + " is not past the "
                         + "cap (" + SlabSupport.minResolvedDy() + "), so this cell would measure no "
-                        + "clamp at all. Deepen the stored support — do not relax the row.");
+                        + "clamp at all. Deepen the stored support — do not relax the row."));
         ctx.assertTrue(Math.abs(followerDy - expectedFollower) <= EPS,
-                "MEASUREMENT B: the follower's raw seat is " + rawSeat + " and minResolvedDy() ("
+                net.minecraft.text.Text.literal("MEASUREMENT B: the follower's raw seat is " + rawSeat + " and minResolvedDy() ("
                         + SlabSupport.minResolvedDy() + ") flattens it to " + expectedFollower
                         + ", got " + followerDy + ". The depth budget is not involved: the walk "
-                        + "terminated at depth 1 on the support's stored fact.");
+                        + "terminated at depth 1 on the support's stored fact."));
         ctx.assertTrue(Math.abs(gap - expectedGap) <= EPS,
-                "MEASUREMENT B: the clamp opens a measured " + gap + "-block hole between a -2.0 "
+                net.minecraft.text.Text.literal("MEASUREMENT B: the clamp opens a measured " + gap + "-block hole between a -2.0 "
                         + "support's top face and the block resting on it; at cap "
                         + SlabSupport.minResolvedDy() + " that hole must be " + expectedGap
                         + ". Stage 4 cannot ship the deeper alphabet without moving "
-                        + "minResolvedDy() in the same change.");
+                        + "minResolvedDy() in the same change."));
         ctx.complete();
     }
 
@@ -1139,13 +1139,13 @@ public final class DyWindowSuite {
 
         w.setBlockState(support, bottomSlab(Blocks.STONE_SLAB), Block.NOTIFY_LISTENERS);
         ctx.assertTrue(SlabPlacementDyAttachment.record(w, support, -2.0),
-                "fixture: the store must accept -2.0 at the support");
+                net.minecraft.text.Text.literal("fixture: the store must accept -2.0 at the support"));
         ctx.assertFalse(SlabAnchorAttachment.isAnchored(w, support),
-                "fixture: this cell is the lane-B shape — a stored height with NO anchor");
+                net.minecraft.text.Text.literal("fixture: this cell is the lane-B shape — a stored height with NO anchor"));
 
         double supportDy = SlabSupport.getYOffset(w, support, w.getBlockState(support));
         ctx.assertTrue(Math.abs(supportDy + 2.0) <= EPS,
-                "LAW 1: the support itself must read its stored -2.0, got " + supportDy);
+                net.minecraft.text.Text.literal("LAW 1: the support itself must read its stored -2.0, got " + supportDy));
 
         BlockPos follower = support.up();
         w.setBlockState(follower, bottomSlab(Blocks.OAK_SLAB), Block.NOTIFY_LISTENERS);
@@ -1159,15 +1159,15 @@ public final class DyWindowSuite {
                 + " gap=" + (followerBottomY - supportTopY));
 
         ctx.assertTrue(Math.abs(followerDy + 0.5) <= EPS,
-                "CHARACTERISATION (pins a DEFECT): the follower reads -0.5, the answer it would "
+                net.minecraft.text.Text.literal("CHARACTERISATION (pins a DEFECT): the follower reads -0.5, the answer it would "
                         + "give for a support at 0.0 — loweredBottomSlabSupportDy never asked the "
                         + "store because the support carries no anchor, so a 2.0-block-deep support "
                         + "is seen as flush. Got " + followerDy + ". The FULL-HEIGHT arm "
                         + "(cellTopSupportDy) reads the store with no anchor gate; only the "
-                        + "HALF-HEIGHT arm does not.");
+                        + "HALF-HEIGHT arm does not."));
         ctx.assertTrue(followerBottomY - supportTopY > 1.0 + EPS,
-                "CHARACTERISATION: the resulting hole is " + (followerBottomY - supportTopY)
-                        + " blocks — the whole stored magnitude is lost, not a rounding of it.");
+                net.minecraft.text.Text.literal("CHARACTERISATION: the resulting hole is " + (followerBottomY - supportTopY)
+                        + " blocks — the whole stored magnitude is lost, not a rounding of it."));
         ctx.complete();
     }
 
@@ -1206,17 +1206,17 @@ public final class DyWindowSuite {
                 + " diagnostics.visualDy=" + headless.visualDy());
 
         ctx.assertTrue(Math.abs(modelDy + 1.5) <= EPS,
-                "MEASUREMENT C, model leg: the value the chunk mesh offsets by must be -1.5 at a "
-                        + "deep stored height, got " + modelDy);
+                net.minecraft.text.Text.literal("MEASUREMENT C, model leg: the value the chunk mesh offsets by must be -1.5 at a "
+                        + "deep stored height, got " + modelDy));
         ctx.assertTrue(Double.isNaN(headless.modelDy()),
-                "MEASUREMENT C, second finding: the headless diagnostic reports NO model sample by "
+                net.minecraft.text.Text.literal("MEASUREMENT C, second finding: the headless diagnostic reports NO model sample by "
                         + "construction (the two-argument analyze supplies none), got "
-                        + headless.modelDy());
+                        + headless.modelDy()));
         ctx.assertFalse(headless.modelMismatch(),
-                "MEASUREMENT C, second finding: modelMismatch can NEVER fire headlessly, because "
+                net.minecraft.text.Text.literal("MEASUREMENT C, second finding: modelMismatch can NEVER fire headlessly, because "
                         + "NaN short-circuits it — the model leg of the triad is unchecked in every "
                         + "headless diagnostic, not just unreadable. Any future fix that computes "
-                        + "modelDy server-side must flip this assertion.");
+                        + "modelDy server-side must flip this assertion."));
         ctx.complete();
     }
 
@@ -1233,16 +1233,16 @@ public final class DyWindowSuite {
         BlockState state = w.getBlockState(pos);
 
         VoxelShape outline = state.getOutlineShape(w, pos, ShapeContext.absent());
-        ctx.assertFalse(outline.isEmpty(), "fixture: a bottom slab's outline must be non-empty");
+        ctx.assertFalse(outline.isEmpty(), net.minecraft.text.Text.literal("fixture: a bottom slab's outline must be non-empty"));
         Box box = outline.getBoundingBox();
         System.out.println("[STAGE0-C] outline leg: minY=" + box.minY + " maxY=" + box.maxY);
 
         ctx.assertTrue(Math.abs(box.minY + 1.5) <= EPS,
-                "MEASUREMENT C, outline leg: the offset outline's minY must equal the deep dy "
-                        + "(-1.5), got " + box.minY);
+                net.minecraft.text.Text.literal("MEASUREMENT C, outline leg: the offset outline's minY must equal the deep dy "
+                        + "(-1.5), got " + box.minY));
         ctx.assertTrue(Math.abs(box.maxY + 1.0) <= EPS,
-                "MEASUREMENT C, outline leg: a bottom slab is half a block tall, so its offset "
-                        + "outline must end at -1.0, got " + box.maxY);
+                net.minecraft.text.Text.literal("MEASUREMENT C, outline leg: a bottom slab is half a block tall, so its offset "
+                        + "outline must end at -1.0, got " + box.maxY));
         ctx.complete();
     }
 
@@ -1280,15 +1280,15 @@ public final class DyWindowSuite {
                 + " nearestHitPos=" + hit.getBlockPos() + " hitY=" + hitY);
 
         ctx.assertTrue(hit.getType() == HitResult.Type.BLOCK && hit.getBlockPos().equals(pos),
-                "MEASUREMENT C, raycast leg: a ray down the subject's own column must hit it, got "
-                        + hit.getType() + " " + hit.getBlockPos());
+                net.minecraft.text.Text.literal("MEASUREMENT C, raycast leg: a ray down the subject's own column must hit it, got "
+                        + hit.getType() + " " + hit.getBlockPos()));
         ctx.assertTrue(Math.abs(hitY - (pos.getY() - 1.0)) <= 1.0e-4,
-                "MEASUREMENT C, raycast leg: the hit must land on the OFFSET top face at "
+                net.minecraft.text.Text.literal("MEASUREMENT C, raycast leg: the hit must land on the OFFSET top face at "
                         + (pos.getY() - 1.0) + " (dy -1.5 + the slab's own 0.5 height), got " + hitY
-                        + " — this is the only reading of the raycast leg that is not NaN");
+                        + " — this is the only reading of the raycast leg that is not NaN"));
         ctx.assertTrue(rawEmpty || Math.abs(rawMinY + 1.5) <= EPS,
-                "MEASUREMENT C, raycast leg: if getRaycastShape ever stops being empty it must "
-                        + "agree with the dy (-1.5), got minY=" + rawMinY);
+                net.minecraft.text.Text.literal("MEASUREMENT C, raycast leg: if getRaycastShape ever stops being empty it must "
+                        + "agree with the dy (-1.5), got minY=" + rawMinY));
         ctx.complete();
     }
 
@@ -1305,11 +1305,11 @@ public final class DyWindowSuite {
         ServerWorld w = ctx.getWorld();
         w.setBlockState(pos, state, Block.NOTIFY_LISTENERS);
         ctx.assertTrue(SlabPlacementDyAttachment.record(w, pos, dy),
-                "fixture: the placement store must accept dy=" + dy + " at " + pos);
+                net.minecraft.text.Text.literal("fixture: the placement store must accept dy=" + dy + " at " + pos));
         double read = SlabSupport.getYOffset(w, pos, w.getBlockState(pos));
         ctx.assertTrue(Math.abs(read - dy) <= EPS,
-                "fixture: LAW 1 — a stored placement height must be returned verbatim; wrote " + dy
-                        + ", read " + read + ". Without this the cell measures nothing.");
+                net.minecraft.text.Text.literal("fixture: LAW 1 — a stored placement height must be returned verbatim; wrote " + dy
+                        + ", read " + read + ". Without this the cell measures nothing."));
         return pos;
     }
 
@@ -1506,29 +1506,29 @@ public final class DyWindowSuite {
         System.out.println("[STAGE3-DERIVATION] " + measured);
 
         ctx.assertTrue(Math.abs(l0) <= EPS,
-                "premise: the bottom course seats flush on the stone below it — " + measured);
+                net.minecraft.text.Text.literal("premise: the bottom course seats flush on the stone below it — " + measured));
         ctx.assertTrue(measuredDropPerCourse > EPS,
-                "premise: one course must actually cost something, or the derivation below divides "
-                        + "by nothing — " + measured);
+                net.minecraft.text.Text.literal("premise: one course must actually cost something, or the derivation below divides "
+                        + "by nothing — " + measured));
 
         int derived = (int) Math.ceil(-SlabSupport.LEGACY_DEEP_MIN_RESOLVED_DY / measuredDropPerCourse) + 2;
         ctx.assertTrue(cap == derived,
-                "the legacy depth budget must equal ceil(-LEGACY_DEEP_MIN_RESOLVED_DY / measuredDropPerCourse) "
+                net.minecraft.text.Text.literal("the legacy depth budget must equal ceil(-LEGACY_DEEP_MIN_RESOLVED_DY / measuredDropPerCourse) "
                         + "+ 2 = " + derived + ", got " + cap + ". Either the window's contract "
                         + "depth moved without the budget, or supportSeatDy's half-height arm now "
                         + "drops a different amount than DEEPEST_SEAT_DROP_PER_COURSE says — "
-                        + measured);
+                        + measured));
 
         // SUFFICIENCY AGAINST THE CAP THAT IS ACTUALLY IN FORCE. minResolvedDy() >=
         // DEEPEST_TARGETABLE_DY is an inequality during Stages 1-3 and closes at Stage 4, so a
         // budget sized for the deeper of the two is necessarily enough for the shallower.
         int neededForTodaysCap = (int) Math.ceil(-resolved / measuredDropPerCourse) + 2;
         ctx.assertTrue(cap >= neededForTodaysCap,
-                "the budget must be at least what today's IN-FORCE cap needs (" + neededForTodaysCap
-                        + "), got " + cap + " — " + measured);
+                net.minecraft.text.Text.literal("the budget must be at least what today's IN-FORCE cap needs (" + neededForTodaysCap
+                        + "), got " + cap + " — " + measured));
         ctx.assertTrue(resolved >= targetable - EPS,
-                "the standing identity minResolvedDy() >= DEEPEST_TARGETABLE_DY must hold, or the "
-                        + "budget is sized from the wrong end — " + measured);
+                net.minecraft.text.Text.literal("the standing identity minResolvedDy() >= DEEPEST_TARGETABLE_DY must hold, or the "
+                        + "budget is sized from the wrong end — " + measured));
         ctx.complete();
     }
 
@@ -1561,8 +1561,8 @@ public final class DyWindowSuite {
 
         assertNonIncreasing(ctx, dy, ladder);
         ctx.assertTrue(Math.abs(dy[courses - 1] - SlabSupport.minResolvedDy()) <= EPS,
-                "premise: the top course of a tower this tall must have saturated at the cap, or "
-                        + "the tower is not deep enough to reach the budget at all — " + ladder);
+                net.minecraft.text.Text.literal("premise: the top course of a tower this tall must have saturated at the cap, or "
+                        + "the tower is not deep enough to reach the budget at all — " + ladder));
         ctx.complete();
     }
 
@@ -1619,13 +1619,13 @@ public final class DyWindowSuite {
 
         // ── PREMISES: this really is a pass-through stack standing in a real hole ────────────
         ctx.assertTrue(Math.abs(dy[1] + 0.5) <= EPS,
-                "premise: the second slab course must sit at -0.5, or the stack above it is not "
-                        + "standing on a lowered support at all — " + ladder);
+                net.minecraft.text.Text.literal("premise: the second slab course must sit at -0.5, or the stack above it is not "
+                        + "standing on a lowered support at all — " + ladder));
         for (int i = 2; i < level.length; i++) {
             ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, level[i]),
-                    "premise: full-height course L" + i + " must be genuinely anchored, or the "
+                    net.minecraft.text.Text.literal("premise: full-height course L" + i + " must be genuinely anchored, or the "
                             + "resolver never walks through it and this cell measures nothing — "
-                            + ladder);
+                            + ladder));
         }
 
         // ── THE INVARIANT ───────────────────────────────────────────────────────────────────
@@ -1634,10 +1634,10 @@ public final class DyWindowSuite {
         // ── AND THE VALUE: a pass-through course reads exactly what it is standing on ───────
         for (int i = 3; i < level.length; i++) {
             ctx.assertTrue(Math.abs(dy[i] - dy[2]) <= EPS,
-                    "a full-height support passes its dy through UNCHANGED, so every course of "
+                    net.minecraft.text.Text.literal("a full-height support passes its dy through UNCHANGED, so every course of "
                             + "this stack must read what the first one reads (" + dy[2] + "); L"
                             + i + " reads " + dy[i] + ". A course that differs is the depth "
-                            + "budget leaking into the answer — " + ladder);
+                            + "budget leaking into the answer — " + ladder));
         }
 
         ctx.complete();
@@ -1702,18 +1702,18 @@ public final class DyWindowSuite {
 
         // ── PREMISES ────────────────────────────────────────────────────────────────────────
         ctx.assertTrue(Math.abs(dy[1] + 0.5) <= EPS,
-                "premise: the second slab course must sit at -0.5, or this stack is not standing "
-                        + "in a hole at all — " + ladder);
+                net.minecraft.text.Text.literal("premise: the second slab course must sit at -0.5, or this stack is not standing "
+                        + "in a hole at all — " + ladder));
         for (int i = 2; i < level.length; i++) {
             ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, level[i]),
-                    "premise: full-height course L" + i + " must be genuinely anchored, or the "
+                    net.minecraft.text.Text.literal("premise: full-height course L" + i + " must be genuinely anchored, or the "
                             + "resolver never walks through it and this cell measures nothing — "
-                            + ladder);
+                            + ladder));
         }
         ctx.assertTrue(level.length > budget + 2,
-                "premise: the tower must be taller than the budget plus the two slab courses, or "
+                net.minecraft.text.Text.literal("premise: the tower must be taller than the budget plus the two slab courses, or "
                         + "no course truncates and the band is never tested where it matters — "
-                        + ladder);
+                        + ladder));
 
         // ── MONOTONICITY still holds, and is still asserted: this cell ADDS a bound, it does
         //    not replace the one Stage 3 shipped. Stage 3's pop returning must go RED here too.
@@ -1727,9 +1727,9 @@ public final class DyWindowSuite {
         // RED-able at every cap.
         for (int i = 1; i < dy.length; i++) {
             ctx.assertTrue(dy[i] <= dy[i - 1] + EPS,
-                    "L" + i + " (" + dy[i] + ") reads SHALLOWER than the course it rests on, L"
+                    net.minecraft.text.Text.literal("L" + i + " (" + dy[i] + ") reads SHALLOWER than the course it rests on, L"
                             + (i - 1) + " (" + dy[i - 1] + ") — Stage 3's pop, returning at the "
-                            + "deeper cap — " + ladder);
+                            + "deeper cap — " + ladder));
         }
         ctx.complete();
     }
@@ -1797,35 +1797,35 @@ public final class DyWindowSuite {
 
         // ── THE FRAMES ARE THE SAME, in every term the exhaustion path could branch on ──────
         ctx.assertTrue(w.getBlockState(frameA) == w.getBlockState(frameB),
-                "premise: the two frames must hold the identical block state, or they are "
-                        + "distinguishable and this cell proves nothing — " + measured);
+                net.minecraft.text.Text.literal("premise: the two frames must hold the identical block state, or they are "
+                        + "distinguishable and this cell proves nothing — " + measured));
         ctx.assertTrue(w.getBlockState(seatA) == w.getBlockState(seatB),
-                "premise: the two frames must rest on the identical seat state — " + measured);
+                net.minecraft.text.Text.literal("premise: the two frames must rest on the identical seat state — " + measured));
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, frameA)
                         && SlabAnchorAttachment.isAnchored(w, frameB),
-                "premise: both frames must be anchored, in the same way — " + measured);
+                net.minecraft.text.Text.literal("premise: both frames must be anchored, in the same way — " + measured));
         ctx.assertFalse(SlabPlacementDyAttachment.hasStoredDy(w, frameA)
                         || SlabPlacementDyAttachment.hasStoredDy(w, frameB),
-                "premise: both frames must be PRE-STORE, or the walk terminates at depth 1 and "
-                        + "the exhaustion path is never consulted — " + measured);
+                net.minecraft.text.Text.literal("premise: both frames must be PRE-STORE, or the walk terminates at depth 1 and "
+                        + "the exhaustion path is never consulted — " + measured));
 
         // ── AND THEY RESOLVE HALF A BLOCK APART ─────────────────────────────────────────────
         ctx.assertTrue(Math.abs(dyA - dyB) > EPS,
-                "the whole point of this cell: two frames the exhaustion path cannot tell apart "
+                net.minecraft.text.Text.literal("the whole point of this cell: two frames the exhaustion path cannot tell apart "
                         + "must nevertheless resolve to different heights. They read the same ("
                         + dyA + "), so the fixture no longer separates them and the impossibility "
-                        + "argument against a constant exhaustion value has lost its evidence — " + measured);
+                        + "argument against a constant exhaustion value has lost its evidence — " + measured));
 
         // ── AND THE FACT THAT SEPARATES THEM IS ONE FURTHER LEVEL DOWN ──────────────────────
         ctx.assertTrue(Math.abs(seatDyA - seatDyB) > EPS,
-                "the separating fact must live in the SEAT, one level below the frames — if the "
+                net.minecraft.text.Text.literal("the separating fact must live in the SEAT, one level below the frames — if the "
                         + "seats agree, the difference came from somewhere this cell does not "
-                        + "name and the story is wrong — " + measured);
+                        + "name and the story is wrong — " + measured));
         ctx.assertTrue(Math.abs((dyA - seatDyA) - (dyB - seatDyB)) <= EPS,
-                "both frames must take the SAME arm — each sits one half-height seat below its "
+                net.minecraft.text.Text.literal("both frames must take the SAME arm — each sits one half-height seat below its "
                         + "own support — so the only thing that differs is how deep that support "
                         + "already was, which is exactly what a truncated walk cannot see — "
-                        + measured);
+                        + measured));
         ctx.complete();
     }
 
@@ -1859,14 +1859,14 @@ public final class DyWindowSuite {
                                                  String ladder) {
         for (int i = 1; i < dy.length; i++) {
             ctx.assertTrue(dy[i] >= dy[i - 1] - allowed[i] - EPS,
-                    "CLIFF: L" + i + " (" + dy[i] + ") sits " + (dy[i - 1] - dy[i]) + " below the "
+                    net.minecraft.text.Text.literal("CLIFF: L" + i + " (" + dy[i] + ") sits " + (dy[i - 1] - dy[i]) + " below the "
                             + "course it rests on, L" + (i - 1) + " (" + dy[i - 1] + "), but that "
                             + "seat may only lower it by " + allowed[i] + ". Monotonicity does not "
                             + "see this — a ladder that steps down and then falls off a cliff is "
-                            + "still non-increasing — " + ladder);
+                            + "still non-increasing — " + ladder));
             ctx.assertTrue(dy[i] <= dy[i - 1] + EPS,
-                    "POP: L" + i + " (" + dy[i] + ") reads SHALLOWER than the course it rests on, "
-                            + "L" + (i - 1) + " (" + dy[i - 1] + ") — " + ladder);
+                    net.minecraft.text.Text.literal("POP: L" + i + " (" + dy[i] + ") reads SHALLOWER than the course it rests on, "
+                            + "L" + (i - 1) + " (" + dy[i - 1] + ") — " + ladder));
         }
     }
 
@@ -1921,10 +1921,10 @@ public final class DyWindowSuite {
     private static void assertNonIncreasing(TestContext ctx, double[] dy, String ladder) {
         for (int i = 1; i < dy.length; i++) {
             ctx.assertTrue(dy[i] <= dy[i - 1] + EPS,
-                    "MONOTONICITY: L" + i + " (" + dy[i] + ") resolves SHALLOWER than the course it "
+                    net.minecraft.text.Text.literal("MONOTONICITY: L" + i + " (" + dy[i] + ") resolves SHALLOWER than the course it "
                             + "rests on, L" + (i - 1) + " (" + dy[i - 1] + ") — a tower that steps "
                             + "down and then pops back UP by " + (dy[i] - dy[i - 1]) + ". A course "
-                            + "can never rise above its own support — " + ladder);
+                            + "can never rise above its own support — " + ladder));
         }
     }
 
@@ -1950,8 +1950,8 @@ public final class DyWindowSuite {
         for (BlockPos p : level) {
             SlabPlacementDyAttachment.clear(w, p);
             ctx.assertFalse(SlabPlacementDyAttachment.hasStoredDy(w, p),
-                    "fixture: these cells measure the PRE-STORE lane — " + p + " must hold no "
-                            + "stored height, or the depth budget is never reached at all");
+                    net.minecraft.text.Text.literal("fixture: these cells measure the PRE-STORE lane — " + p + " must hold no "
+                            + "stored height, or the depth budget is never reached at all"));
         }
     }
 
@@ -2138,37 +2138,37 @@ public final class DyWindowSuite {
             // be a RECOVERY — a block found where the narrow window lost it, or a nearer one. A
             // mismatch in the other direction would mean the widening had taken a target AWAY.
             ctx.assertTrue(mismatches > 0,
-                    "THE WIDENING IS DOING NOTHING AT THE DEEP CAP. With the deeper alphabet armed "
+                    net.minecraft.text.Text.literal("THE WIDENING IS DOING NOTHING AT THE DEEP CAP. With the deeper alphabet armed "
                             + "the radius-1 window is supposed to lose targets the radius-"
                             + SlabbedOffsetRaycast.WINDOW_RADIUS + " window keeps, and none of the "
                             + rays.size() + " rays disagreed at all — so either the flag is not "
                             + "reaching the resolver or the scene grew no deep geometry, and this "
-                            + "leg proves nothing about the window.");
+                            + "leg proves nothing about the window."));
             ctx.assertTrue(recoveries == mismatches,
-                    "THE WIDENING LOST A TARGET. " + (mismatches - recoveries) + " of " + mismatches
+                    net.minecraft.text.Text.literal("THE WIDENING LOST A TARGET. " + (mismatches - recoveries) + " of " + mismatches
                             + " disagreements are not recoveries: the wider window returned a MISS "
                             + "or a FARTHER hit than the narrow one. Widening may only ever add or "
-                            + "improve a hit. first: " + firstMismatch);
+                            + "improve a hit. first: " + firstMismatch));
         } else {
             ctx.assertTrue(mismatches == 0,
-                    "STAGE 1 NEUTRALITY: widening the pick window from radius "
+                    net.minecraft.text.Text.literal("STAGE 1 NEUTRALITY: widening the pick window from radius "
                             + PREVIOUS_WINDOW_RADIUS + " to " + SlabbedOffsetRaycast.WINDOW_RADIUS
                             + " must change NO answer while every offset the build can mint stays "
                             + "within one cell of its owner. " + mismatches + " of " + rays.size()
-                            + " rays disagree; first: " + firstMismatch);
+                            + " rays disagree; first: " + firstMismatch));
         }
 
         // Vacuity: the battery has to be aimed at the geometry under test.
         ctx.assertTrue(blockHits >= rays.size() / 4,
-                "vacuity guard: a battery that mostly misses would agree trivially — only "
-                        + blockHits + " of " + rays.size() + " rays hit a block");
+                net.minecraft.text.Text.literal("vacuity guard: a battery that mostly misses would agree trivially — only "
+                        + blockHits + " of " + rays.size() + " rays hit a block"));
         ctx.assertTrue(hitsOnHalfLowered > 0,
-                "vacuity guard: no ray in the battery hit an owner resolved to -0.5, so the "
-                        + "comparison never exercised an offset shape at all");
+                net.minecraft.text.Text.literal("vacuity guard: no ray in the battery hit an owner resolved to -0.5, so the "
+                        + "comparison never exercised an offset shape at all"));
         ctx.assertTrue(hitsOnFullLowered > 0,
-                "vacuity guard: no ray hit an owner resolved to -1.0 or deeper — those are the "
+                net.minecraft.text.Text.literal("vacuity guard: no ray hit an owner resolved to -1.0 or deeper — those are the "
                         + "ONLY magnitudes whose shape leaves its owner's cell, so without one the "
-                        + "comparison proves nothing about the window at all");
+                        + "comparison proves nothing about the window at all"));
         ctx.complete();
     }
 
@@ -2233,31 +2233,31 @@ public final class DyWindowSuite {
                 + "  posAllocations x" + ratio(after.posAllocations, before.posAllocations));
 
         ctx.assertTrue(radius == 3,
-                "fixture: new placements require the radius-3 window; WINDOW_RADIUS is "
-                        + radius + ". Re-derive the accepted cost before changing it.");
+                net.minecraft.text.Text.literal("fixture: new placements require the radius-3 window; WINDOW_RADIUS is "
+                        + radius + ". Re-derive the accepted cost before changing it."));
         ctx.assertTrue(before.cellsMarched > 0 && before.shapeRaycasts > 0,
-                "fixture: the battery must do real work — " + before);
+                net.minecraft.text.Text.literal("fixture: the battery must do real work — " + before));
 
         ctx.assertTrue(after.cellsMarched == before.cellsMarched,
-                "PERF GATE: widening the window must not change the DDA — cells marched went from "
+                net.minecraft.text.Text.literal("PERF GATE: widening the window must not change the DDA — cells marched went from "
                         + before.cellsMarched + " to " + after.cellsMarched + ". A widening that "
-                        + "also marches more cells is a different cost from the one signed off.");
+                        + "also marches more cells is a different cost from the one signed off."));
 
         ctx.assertTrue(before.neighborProbes == 2L * PREVIOUS_WINDOW_RADIUS * before.cellsMarched,
-                "PERF GATE: the replaced window must probe exactly 2 neighbours per marched cell, "
+                net.minecraft.text.Text.literal("PERF GATE: the replaced window must probe exactly 2 neighbours per marched cell, "
                         + "measured " + before.neighborProbes + " over " + before.cellsMarched
-                        + " cells — if this is wrong the comparison has no baseline.");
+                        + " cells — if this is wrong the comparison has no baseline."));
         ctx.assertTrue(after.neighborProbes == 2L * radius * after.cellsMarched,
-                "PERF GATE: the shipping window must probe exactly " + (2 * radius)
+                net.minecraft.text.Text.literal("PERF GATE: the shipping window must probe exactly " + (2 * radius)
                         + " neighbours per marched cell (2 * WINDOW_RADIUS), measured "
                         + after.neighborProbes + " over " + after.cellsMarched + " cells. THIS IS "
                         + "THE ASSERTION THAT CATCHES AN EXTRA PROBE being added to the pick path "
-                        + "— a horizontal neighbour, a second pass, one more cell of headroom.");
+                        + "— a horizontal neighbour, a second pass, one more cell of headroom."));
 
         ctx.assertTrue(before.probesPerCell() == 3 && after.probesPerCell() == 2 * radius + 1,
-                "PERF GATE: the accepted cost of this stage is " + (2 * radius + 1) + " cell "
+                net.minecraft.text.Text.literal("PERF GATE: the accepted cost of this stage is " + (2 * radius + 1) + " cell "
                         + "probes per marched DDA cell where there were 3 — measured "
-                        + before.probesPerCell() + " -> " + after.probesPerCell() + ".");
+                        + before.probesPerCell() + " -> " + after.probesPerCell() + "."));
 
         // The real work — shape tests, resolver walks, allocations — is de-duplicated per ray, so
         // it does NOT grow by a ratio anyone can derive from the radius. It is pinned at the
@@ -2267,14 +2267,14 @@ public final class DyWindowSuite {
                         && before.dyResolutions == BASELINE_R1_DY_RESOLUTIONS
                         && before.posAllocations == BASELINE_R1_POS_ALLOCATIONS
                         && before.cellsMarched == BASELINE_R1_CELLS_MARCHED,
-                "PERF GATE, BASELINE FINGERPRINT: the replaced radius-1 window's work on this exact "
+                net.minecraft.text.Text.literal("PERF GATE, BASELINE FINGERPRINT: the replaced radius-1 window's work on this exact "
                         + "scene and battery is the reference every ceiling below is stated against, "
                         + "so it is pinned too. Recorded " + BASELINE_R1_CELLS_MARCHED + "/"
                         + BASELINE_R1_SHAPE_RAYCASTS + "/" + BASELINE_R1_DY_RESOLUTIONS + "/"
                         + BASELINE_R1_POS_ALLOCATIONS + " (cells/shapes/dys/allocs), measured "
                         + before + ". If you changed the scene or the battery this is EXPECTED — "
                         + "re-measure both radii from the [STAGE1-PERF] line and rebaseline all "
-                        + "eight numbers deliberately, in one commit, with the new ratios stated.");
+                        + "eight numbers deliberately, in one commit, with the new ratios stated."));
 
         assertAtOrUnder(ctx, "shape raycasts", after.shapeRaycasts, ACCEPTED_R2_SHAPE_RAYCASTS,
                 before.shapeRaycasts);
@@ -2285,35 +2285,35 @@ public final class DyWindowSuite {
                 ACCEPTED_R2_POS_ALLOCATIONS, before.posAllocations);
         long addedOuterProbes = 2L * (radius - 2) * after.cellsMarched;
         ctx.assertTrue(after.posAllocations <= ACCEPTED_R2_POS_ALLOCATIONS + addedOuterProbes,
-                "new outer-ring allocation cost must stay within its exact additional probe count");
+                net.minecraft.text.Text.literal("new outer-ring allocation cost must stay within its exact additional probe count"));
         ctx.assertTrue(after.dyResolutions == previous.dyResolutions && after.shapeRaycasts == previous.shapeRaycasts,
-                "the outer ring must not add legacy support walks or shape tests");
+                net.minecraft.text.Text.literal("the outer ring must not add legacy support walks or shape tests"));
 
         // The one ratio that IS derivable, restated as the sanity bound on the whole gate: real
         // work can never outgrow the probe count, because every unit of work is caused by a probe.
         ctx.assertTrue(after.shapeRaycasts * before.neighborProbes
                         <= before.shapeRaycasts * after.neighborProbes,
-                "PERF GATE: shape raycasts (" + before.shapeRaycasts + " -> " + after.shapeRaycasts
+                net.minecraft.text.Text.literal("PERF GATE: shape raycasts (" + before.shapeRaycasts + " -> " + after.shapeRaycasts
                         + ") outgrew the neighbour probe count (" + before.neighborProbes + " -> "
                         + after.neighborProbes + "). Every shape test is caused by a probe, so this "
-                        + "cannot happen unless the de-duplication set stopped working.");
+                        + "cannot happen unless the de-duplication set stopped working."));
         ctx.complete();
     }
 
     private static void assertAtOrUnder(TestContext ctx, String what, long measured, long accepted,
                                         long baseline) {
         ctx.assertTrue(measured >= baseline,
-                "fixture: " + what + " cannot FALL when the window widens (" + baseline + " -> "
-                        + measured + ") — that means the measurement is wrong, not the code.");
+                net.minecraft.text.Text.literal("fixture: " + what + " cannot FALL when the window widens (" + baseline + " -> "
+                        + measured + ") — that means the measurement is wrong, not the code."));
         ctx.assertTrue(measured <= accepted,
-                "PERF GATE: " + what + " on the shipping pick path is " + measured + ", past the "
+                net.minecraft.text.Text.literal("PERF GATE: " + what + " on the shipping pick path is " + measured + ", past the "
                         + accepted + " accepted when Stage 1 was signed off (radius-1 baseline "
                         + baseline + ", accepted growth x"
                         + String.format("%.3f", (double) accepted / (double) baseline)
                         + "). The pick path got MORE expensive than the widening that was live "
                         + "sign-off'd. This is the assertion that exists because this project has "
                         + "shipped a perf regression twice. Do not raise the number to make it "
-                        + "green — find what added the work, or take a new frame-time sign-off.");
+                        + "green — find what added the work, or take a new frame-time sign-off."));
     }
 
     private static String ratio(long after, long before) {
@@ -2377,11 +2377,11 @@ public final class DyWindowSuite {
             }
         }
         ctx.assertTrue(lowered > 0,
-                "fixture: the scene must contain at least one cell resolved to -0.5, found none");
+                net.minecraft.text.Text.literal("fixture: the scene must contain at least one cell resolved to -0.5, found none"));
         ctx.assertTrue(clamped > 0,
-                "fixture: the scene must contain at least one cell resolved to the -1.0 clamp — "
+                net.minecraft.text.Text.literal("fixture: the scene must contain at least one cell resolved to the -1.0 clamp — "
                         + "that is the only magnitude whose shape leaves its owner's cell, so "
-                        + "without it neither cell in this file measures the window");
+                        + "without it neither cell in this file measures the window"));
         return new Scene(lowered, clamped);
     }
 

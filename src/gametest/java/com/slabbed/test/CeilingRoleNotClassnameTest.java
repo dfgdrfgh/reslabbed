@@ -104,7 +104,7 @@ public final class CeilingRoleNotClassnameTest {
                 Block.NOTIFY_LISTENERS);
         w.setBlockState(chainPos, Blocks.IRON_CHAIN.getDefaultState(), Block.NOTIFY_LISTENERS);
         ctx.assertTrue(w.getBlockState(chainPos.up()).isAir(),
-                "premise: the standing chain must have OPEN AIR above it, or it is a hung chain");
+                net.minecraft.text.Text.literal("premise: the standing chain must have OPEN AIR above it, or it is a hung chain"));
         assertRoleIsStanding(ctx, w, chainPos, "a chain standing with air above");
 
         SlabAnchorAttachment.addAnchor(w, chainPos, w.getBlockState(chainPos));
@@ -126,7 +126,7 @@ public final class CeilingRoleNotClassnameTest {
                 Blocks.BIRCH_TRAPDOOR.getDefaultState().with(Properties.BLOCK_HALF, BlockHalf.TOP),
                 Block.NOTIFY_LISTENERS);
         ctx.assertTrue(w.getBlockState(trapdoorPos.up()).isAir(),
-                "premise: the TOP-half trapdoor must have OPEN AIR above it");
+                net.minecraft.text.Text.literal("premise: the TOP-half trapdoor must have OPEN AIR above it"));
         assertRoleIsStanding(ctx, w, trapdoorPos, "a TOP-half trapdoor with air above");
 
         SlabAnchorAttachment.addAnchor(w, trapdoorPos, w.getBlockState(trapdoorPos));
@@ -165,18 +165,18 @@ public final class CeilingRoleNotClassnameTest {
         w.setBlockState(lanternPos, Blocks.LANTERN.getDefaultState().with(Properties.HANGING, true),
                 Block.NOTIFY_LISTENERS);
         ctx.assertTrue(SlabSupport.isCeilingAttached(w, lanternPos, w.getBlockState(lanternPos)),
-                "a HANGING lantern is an intrinsic hanger and must still read as ceiling-attached "
-                        + "in every state — the role rewrite must not have touched it");
+                net.minecraft.text.Text.literal("a HANGING lantern is an intrinsic hanger and must still read as ceiling-attached "
+                        + "in every state — the role rewrite must not have touched it"));
 
         double lanternDy = SlabSupport.getYOffset(w, lanternPos, w.getBlockState(lanternPos));
         ctx.assertTrue(Math.abs(lanternDy + 0.5) <= EPS,
-                "NON-NEGOTIABLE: a hanging lantern under a lowered block must follow it down to "
-                        + "-0.5, or it detaches from what it hangs on; got " + lanternDy);
+                net.minecraft.text.Text.literal("NON-NEGOTIABLE: a hanging lantern under a lowered block must follow it down to "
+                        + "-0.5, or it detaches from what it hangs on; got " + lanternDy));
 
         SlabAnchorAttachment.addAnchor(w, lanternPos, w.getBlockState(lanternPos));
         ctx.assertTrue(!SlabAnchorAttachment.isAnchored(w, lanternPos),
-                "a hanging lantern must keep tracking its support, never freeze at a placement-time "
-                        + "anchor — freezing it is the other way to break the same ruling");
+                net.minecraft.text.Text.literal("a hanging lantern must keep tracking its support, never freeze at a placement-time "
+                        + "anchor — freezing it is the other way to break the same ruling"));
         ctx.complete();
     }
 
@@ -196,18 +196,18 @@ public final class CeilingRoleNotClassnameTest {
 
         w.setBlockState(chainPos, Blocks.IRON_CHAIN.getDefaultState(), Block.NOTIFY_LISTENERS);
         ctx.assertTrue(SlabSupport.isCeilingAttached(w, chainPos, w.getBlockState(chainPos)),
-                "a chain with a real block above it hangs from that block and must stay "
-                        + "ceiling-attached — the world query must answer YES here");
+                net.minecraft.text.Text.literal("a chain with a real block above it hangs from that block and must stay "
+                        + "ceiling-attached — the world query must answer YES here"));
         SlabAnchorAttachment.addAnchor(w, chainPos, w.getBlockState(chainPos));
         ctx.assertTrue(!SlabAnchorAttachment.isAnchored(w, chainPos),
-                "a hung chain must keep tracking the block it hangs from, never freeze");
+                net.minecraft.text.Text.literal("a hung chain must keep tracking the block it hangs from, never freeze"));
 
         // A second chain BELOW the first is still hung: the walk steps over same-family members and
         // is answered by the run's terminator, not by its first cell.
         w.setBlockState(lanternPos, Blocks.IRON_CHAIN.getDefaultState(), Block.NOTIFY_LISTENERS);
         ctx.assertTrue(SlabSupport.isCeilingAttached(w, lanternPos, w.getBlockState(lanternPos)),
-                "the second chain down a hung run must also read as hanging — the run walk must "
-                        + "step over the chain above it and find the block that caps the run");
+                net.minecraft.text.Text.literal("the second chain down a hung run must also read as hanging — the run walk must "
+                        + "step over the chain above it and find the block that caps the run"));
         ctx.complete();
     }
 
@@ -224,19 +224,19 @@ public final class CeilingRoleNotClassnameTest {
                 Blocks.LEVER.getDefaultState().with(Properties.BLOCK_FACE, BlockFace.CEILING),
                 Block.NOTIFY_LISTENERS);
         ctx.assertTrue(SlabSupport.isCeilingAttached(w, leverPos, w.getBlockState(leverPos)),
-                "a CEILING lever genuinely hangs from the block above and must stay ceiling-attached");
+                net.minecraft.text.Text.literal("a CEILING lever genuinely hangs from the block above and must stay ceiling-attached"));
 
         w.setBlockState(bellPos,
                 Blocks.BELL.getDefaultState().with(Properties.ATTACHMENT, Attachment.CEILING),
                 Block.NOTIFY_LISTENERS);
         ctx.assertTrue(SlabSupport.isCeilingAttached(w, bellPos, w.getBlockState(bellPos)),
-                "a CEILING-attached bell genuinely hangs and must stay ceiling-attached");
+                net.minecraft.text.Text.literal("a CEILING-attached bell genuinely hangs and must stay ceiling-attached"));
 
         w.setBlockState(dripPos,
                 Blocks.POINTED_DRIPSTONE.getDefaultState().with(Properties.VERTICAL_DIRECTION, Direction.DOWN),
                 Block.NOTIFY_LISTENERS);
         ctx.assertTrue(SlabSupport.isCeilingAttached(w, dripPos, w.getBlockState(dripPos)),
-                "a DOWN-pointing stalactite hangs from the ceiling and must stay ceiling-attached");
+                net.minecraft.text.Text.literal("a DOWN-pointing stalactite hangs from the ceiling and must stay ceiling-attached"));
         ctx.complete();
     }
 
@@ -274,16 +274,16 @@ public final class CeilingRoleNotClassnameTest {
                 Block.NOTIFY_LISTENERS);
 
         ctx.assertTrue(SlabSupport.isCeilingAttached(w, upperTrapdoorPos, w.getBlockState(upperTrapdoorPos)),
-                "the upper TOP-half trapdoor sits under a top slab and must stay ceiling-attached");
+                net.minecraft.text.Text.literal("the upper TOP-half trapdoor sits under a top slab and must stay ceiling-attached"));
         ctx.assertTrue(SlabSupport.isCeilingAttached(w, lowerTrapdoorPos, w.getBlockState(lowerTrapdoorPos)),
-                "the lower TOP-half trapdoor of the stack must stay ceiling-attached — the run walk "
-                        + "must step over the trapdoor above it (c611b60f's cascade)");
+                net.minecraft.text.Text.literal("the lower TOP-half trapdoor of the stack must stay ceiling-attached — the run walk "
+                        + "must step over the trapdoor above it (c611b60f's cascade)"));
 
         // The live consumer: the ceiling guard still suppresses the -0.5-from-below for the upper
         // trapdoor even though a bottom slab sits at the base of this column.
         ctx.assertTrue(!SlabSupport.shouldOffset(w, upperTrapdoorPos, w.getBlockState(upperTrapdoorPos)),
-                "a ceiling-attached subject directly under a top slab must not ALSO take the -0.5 "
-                        + "from below — shouldOffset's ceiling guard is the still-live consumer");
+                net.minecraft.text.Text.literal("a ceiling-attached subject directly under a top slab must not ALSO take the -0.5 "
+                        + "from below — shouldOffset's ceiling guard is the still-live consumer"));
         ctx.complete();
     }
 
@@ -292,8 +292,8 @@ public final class CeilingRoleNotClassnameTest {
     /** The predicate must answer "not hanging" for this cell. */
     private static void assertRoleIsStanding(TestContext ctx, ServerWorld w, BlockPos pos, String what) {
         ctx.assertTrue(!SlabSupport.isCeilingAttached(w, pos, w.getBlockState(pos)),
-                "role, not classname: " + what + " hangs from nothing and must NOT read as "
-                        + "ceiling-attached — the old block-TYPE list is what denied it an anchor");
+                net.minecraft.text.Text.literal("role, not classname: " + what + " hangs from nothing and must NOT read as "
+                        + "ceiling-attached — the old block-TYPE list is what denied it an anchor"));
     }
 
     /**
@@ -304,18 +304,18 @@ public final class CeilingRoleNotClassnameTest {
             TestContext ctx, ServerWorld w, BlockPos subject, BlockPos support, String what) {
         double before = SlabSupport.getYOffset(w, subject, w.getBlockState(subject));
         ctx.assertTrue(Math.abs(before + 0.5) <= EPS,
-                "premise: the " + what + " resting on a bottom slab should render -0.5, got " + before);
+                net.minecraft.text.Text.literal("premise: the " + what + " resting on a bottom slab should render -0.5, got " + before));
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, subject),
-                "THE FIX: a " + what + " hangs from nothing, so it must anchor at placement like "
-                        + "any other object resting on a lowered support");
+                net.minecraft.text.Text.literal("THE FIX: a " + what + " hangs from nothing, so it must anchor at placement like "
+                        + "any other object resting on a lowered support"));
 
         w.setBlockState(support, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
         ctx.assertTrue(!w.getBlockState(subject).isAir(),
-                "premise: invariance needs a surviving subject; actual="+w.getBlockState(subject));
+                net.minecraft.text.Text.literal("premise: invariance needs a surviving subject; actual="+w.getBlockState(subject)));
         double after = SlabSupport.getYOffset(w, subject, w.getBlockState(subject));
         ctx.assertTrue(Math.abs(after + 0.5) <= EPS,
-                "never-pop violation: the " + what + " popped from -0.5 to " + after
-                        + " after its support changed, though it was never re-placed");
+                net.minecraft.text.Text.literal("never-pop violation: the " + what + " popped from -0.5 to " + after
+                        + " after its support changed, though it was never re-placed"));
     }
 
     /**
@@ -330,15 +330,15 @@ public final class CeilingRoleNotClassnameTest {
         w.setBlockState(dirtPos, Blocks.DIRT.getDefaultState(), Block.NOTIFY_LISTENERS);
         SlabAnchorAttachment.addAnchor(w, dirtPos, w.getBlockState(dirtPos));
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, dirtPos),
-                "setup: dirt must anchor on the bottom slab");
+                net.minecraft.text.Text.literal("setup: dirt must anchor on the bottom slab"));
 
         w.setBlockState(supportPos, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
         SlabAnchorAttachment.addAnchor(w, supportPos, w.getBlockState(supportPos));
         ctx.assertTrue(SlabAnchorAttachment.isAnchored(w, supportPos),
-                "setup: the cantilevered stone must anchor via the adjacent-lowered-full-block lane");
+                net.minecraft.text.Text.literal("setup: the cantilevered stone must anchor via the adjacent-lowered-full-block lane"));
         double supportDy = SlabSupport.getYOffset(w, supportPos, w.getBlockState(supportPos));
         ctx.assertTrue(Math.abs(supportDy + 0.5) <= EPS,
-                "setup: the cantilevered stone support must itself read -0.5, got " + supportDy);
+                net.minecraft.text.Text.literal("setup: the cantilevered stone support must itself read -0.5, got " + supportDy));
         return supportPos;
     }
 }

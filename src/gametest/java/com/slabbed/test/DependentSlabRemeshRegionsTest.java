@@ -19,7 +19,7 @@ public final class DependentSlabRemeshRegionsTest {
         var regions = regions(ctx, pos);
         long cells = cells(regions);
         System.out.println("DEPENDENT_REGIONS isolated cells=" + cells + " ranges=" + regions.size());
-        ctx.assertTrue(cells == 825, "isolated edit must retain the 5x33x5 region, got " + cells);
+        ctx.assertTrue(cells == 825, net.minecraft.text.Text.literal("isolated edit must retain the 5x33x5 region, got " + cells));
         ctx.complete();
     }
 
@@ -34,9 +34,9 @@ public final class DependentSlabRemeshRegionsTest {
         ctx.getWorld().setBlockState(unrelated, Blocks.SPRUCE_SLAB.getDefaultState(), Block.NOTIFY_LISTENERS);
         var regions = regions(ctx, pos);
         ctx.assertTrue(contains(regions, pos.east(16)) && contains(regions, dependent),
-                "the far connected slab and occupied vertical dependent must refresh");
-        ctx.assertTrue(!contains(regions, unrelated), "an unrelated slab must not expand the refresh");
-        ctx.assertTrue(cells(regions) < 8000, "a thin run must not expand to a whole cube");
+                net.minecraft.text.Text.literal("the far connected slab and occupied vertical dependent must refresh"));
+        ctx.assertTrue(!contains(regions, unrelated), net.minecraft.text.Text.literal("an unrelated slab must not expand the refresh"));
+        ctx.assertTrue(cells(regions) < 8000, net.minecraft.text.Text.literal("a thin run must not expand to a whole cube"));
         System.out.println("DEPENDENT_REGIONS run cells=" + cells(regions) + " ranges=" + regions.size());
         ctx.complete();
     }
@@ -47,9 +47,9 @@ public final class DependentSlabRemeshRegionsTest {
         for (int x = -18; x <= 18; x++) for (int z = -18; z <= 18; z++)
             ctx.getWorld().setBlockState(pos.add(x, 0, z), Blocks.SPRUCE_SLAB.getDefaultState(), Block.NOTIFY_LISTENERS);
         var regions = regions(ctx, pos);
-        ctx.assertTrue(contains(regions, pos.east(16)), "the full horizontal resolver reach must be covered");
-        ctx.assertTrue(!contains(regions, pos.east(12).up(10)), "air above the remote floor must not be refreshed");
-        ctx.assertTrue(cells(regions) < 8000, "a floor must not refresh a 33-cubed volume");
+        ctx.assertTrue(contains(regions, pos.east(16)), net.minecraft.text.Text.literal("the full horizontal resolver reach must be covered"));
+        ctx.assertTrue(!contains(regions, pos.east(12).up(10)), net.minecraft.text.Text.literal("air above the remote floor must not be refreshed"));
+        ctx.assertTrue(cells(regions) < 8000, net.minecraft.text.Text.literal("a floor must not refresh a 33-cubed volume"));
         System.out.println("DEPENDENT_REGIONS floor cells=" + cells(regions) + " ranges=" + regions.size());
         ctx.complete();
     }

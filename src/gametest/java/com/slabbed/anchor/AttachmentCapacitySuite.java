@@ -46,7 +46,7 @@ public final class AttachmentCapacitySuite {
         ctx.assertEquals(
                 justBelowBoundary,
                 chunk.getAttached(SlabAnchorAttachment.FROZEN_FLAT_TYPE),
-                "2,047 exact frozen-flat markers should survive the current attachment path");
+                net.minecraft.text.Text.literal("2,047 exact frozen-flat markers should survive the current attachment path"));
 
         LongOpenHashSet firstOverflow =
                 sectionPrefix(chunkX, sectionY, chunkZ, FIRST_RAW_LONG_COUNT_THAT_OVERFLOWS);
@@ -56,7 +56,7 @@ public final class AttachmentCapacitySuite {
             ctx.assertEquals(
                     firstOverflow,
                     chunk.getAttached(SlabAnchorAttachment.FROZEN_FLAT_TYPE),
-                    "the attachment path must preserve all 2,048 markers exactly");
+                    net.minecraft.text.Text.literal("the attachment path must preserve all 2,048 markers exactly"));
         } catch (IllegalArgumentException exception) {
             overflow = exception;
         } finally {
@@ -105,15 +105,15 @@ public final class AttachmentCapacitySuite {
         int fabricMeasuredBytes = buf.array().length;
         ctx.assertTrue(
                 fabricMeasuredBytes <= FABRIC_ATTACHMENT_MAX_DATA_BYTES,
-                "dense built-in-height chunk sync uses " + fabricMeasuredBytes
-                        + " bytes, over Fabric's " + FABRIC_ATTACHMENT_MAX_DATA_BYTES + "-byte limit");
+                net.minecraft.text.Text.literal("dense built-in-height chunk sync uses " + fabricMeasuredBytes
+                        + " bytes, over Fabric's " + FABRIC_ATTACHMENT_MAX_DATA_BYTES + "-byte limit"));
 
         buf.readBoolean();
         LongOpenHashSet decoded = SlabAnchorAttachment.packetCodecForTesting().decode(buf);
         ctx.assertEquals(
                 allBuiltInChunkPositions,
                 decoded,
-                "dense chunk packet round-trip must preserve every frozen-flat position");
+                net.minecraft.text.Text.literal("dense chunk packet round-trip must preserve every frozen-flat position"));
         ctx.complete();
     }
 
@@ -132,7 +132,7 @@ public final class AttachmentCapacitySuite {
         }
 
         LongOpenHashSet decoded = SlabAnchorAttachment.packetCodecForTesting().decode(legacy);
-        ctx.assertEquals(expected, decoded, "the compact codec must still read legacy raw-long packets");
+        ctx.assertEquals(expected, decoded, net.minecraft.text.Text.literal("the compact codec must still read legacy raw-long packets"));
         ctx.complete();
     }
 
@@ -155,7 +155,7 @@ public final class AttachmentCapacitySuite {
         ctx.assertEquals(
                 expected,
                 decoded,
-                "sparse compact packets must preserve negative coordinates and section edges");
+                net.minecraft.text.Text.literal("sparse compact packets must preserve negative coordinates and section edges"));
         ctx.complete();
     }
 
@@ -246,14 +246,14 @@ public final class AttachmentCapacitySuite {
         int fabricMeasuredBytes = buf.array().length;
         ctx.assertTrue(
                 fabricMeasuredBytes <= FABRIC_ATTACHMENT_MAX_DATA_BYTES,
-                "a uniform-height dense chunk (" + facts.size() + " facts) syncs in "
+                net.minecraft.text.Text.literal("a uniform-height dense chunk (" + facts.size() + " facts) syncs in "
                         + fabricMeasuredBytes + " bytes, over Fabric's "
-                        + FABRIC_ATTACHMENT_MAX_DATA_BYTES + "-byte limit");
+                        + FABRIC_ATTACHMENT_MAX_DATA_BYTES + "-byte limit"));
 
         buf.readBoolean();
         Long2ByteOpenHashMap decoded = SlabPlacementDyAttachment.packetCodecForTesting().decode(buf);
         ctx.assertEquals(facts, decoded,
-                "dense uniform chunk packet round-trip must preserve every placement height");
+                net.minecraft.text.Text.literal("dense uniform chunk packet round-trip must preserve every placement height"));
         ctx.complete();
     }
 
@@ -280,12 +280,12 @@ public final class AttachmentCapacitySuite {
             int written = buf.writerIndex();
             int predicted = SlabPlacementDyAttachment.encodedByteLengthForTesting(facts);
             ctx.assertTrue(written == predicted,
-                    "palette " + paletteSize + ": the guard predicted " + predicted
-                            + " bytes but the codec wrote " + written);
+                    net.minecraft.text.Text.literal("palette " + paletteSize + ": the guard predicted " + predicted
+                            + " bytes but the codec wrote " + written));
             Long2ByteOpenHashMap decoded =
                     SlabPlacementDyAttachment.packetCodecForTesting().decode(buf);
             ctx.assertEquals(facts, decoded,
-                    "palette " + paletteSize + " must round-trip exactly");
+                    net.minecraft.text.Text.literal("palette " + paletteSize + " must round-trip exactly"));
         }
         ctx.complete();
     }
@@ -314,9 +314,9 @@ public final class AttachmentCapacitySuite {
         System.out.println("[STAGE4-CAPACITY] " + boundary);
 
         ctx.assertTrue(fits < totalPositions,
-                "a fully dense MIXED chunk was expected to exceed the sync budget; if it now fits, "
+                net.minecraft.text.Text.literal("a fully dense MIXED chunk was expected to exceed the sync budget; if it now fits, "
                         + "this characterization is stale and the guard below is untested. "
-                        + boundary);
+                        + boundary));
         // RE-MEASURED 2026-08-07 (Stage 4) on the built-in Overworld, 98,304 positions per chunk
         // column. The alphabet grew from two stored values to three, so a mixed section spends 2
         // bits per occupied position where it used to spend 1, and the boundary moved:
@@ -340,9 +340,9 @@ public final class AttachmentCapacitySuite {
         // drift does not. The re-measured figure still clears it, so the guard keeps exactly the
         // force it was given rather than being re-floated up to the new measurement.
         ctx.assertTrue(fits >= 32_768,
-                "the placement-height store must hold at least 32,768 mixed-height facts per chunk "
+                net.minecraft.text.Text.literal("the placement-height store must hold at least 32,768 mixed-height facts per chunk "
                         + "(measured 42,944-43,008 over the 3-value alphabet when this row was "
-                        + "re-measured; 64,136 over the 2-value one before it). " + boundary);
+                        + "re-measured; 64,136 over the 2-value one before it). " + boundary));
         ctx.complete();
     }
 
@@ -369,18 +369,18 @@ public final class AttachmentCapacitySuite {
             chunk.setAttached(SlabPlacementDyAttachment.PLACEMENT_DY_TYPE, saturated);
             ctx.assertEquals(saturated,
                     chunk.getAttached(SlabPlacementDyAttachment.PLACEMENT_DY_TYPE),
-                    "a chunk exactly at the sync budget must survive the attachment path intact");
+                    net.minecraft.text.Text.literal("a chunk exactly at the sync budget must survive the attachment path intact"));
 
             boolean recorded = SlabPlacementDyAttachment.record(world, overflowPos, -0.5);
             ctx.assertTrue(!recorded,
-                    "record must decline the fact that would cross the sync budget");
+                    net.minecraft.text.Text.literal("record must decline the fact that would cross the sync budget"));
             ctx.assertTrue(
                     Double.isNaN(SlabPlacementDyAttachment.storedDy(world, overflowPos)),
-                    "the declined cell must have no stored height, so it keeps its live behaviour");
+                    net.minecraft.text.Text.literal("the declined cell must have no stored height, so it keeps its live behaviour"));
             Long2ByteOpenHashMap after =
                     chunk.getAttached(SlabPlacementDyAttachment.PLACEMENT_DY_TYPE);
             ctx.assertTrue(after != null && after.size() == fits,
-                    "declining must leave the existing facts untouched");
+                    net.minecraft.text.Text.literal("declining must leave the existing facts untouched"));
         } finally {
             // Fabric stores the value before building its sync change, so always drop the dense
             // proof value — even on an unexpected throw.
@@ -414,7 +414,7 @@ public final class AttachmentCapacitySuite {
         Long2ByteOpenHashMap decoded = SlabPlacementDyAttachment.packetCodecForTesting().decode(buf);
 
         ctx.assertEquals(expected, decoded,
-                "sparse packets must preserve negative coordinates, section edges and every height");
+                net.minecraft.text.Text.literal("sparse packets must preserve negative coordinates, section edges and every height"));
         ctx.complete();
     }
 
