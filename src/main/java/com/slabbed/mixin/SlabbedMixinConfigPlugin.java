@@ -20,16 +20,11 @@ import java.util.Set;
 
 /**
  * Config plugin for {@code slabbed.mixins.json} and {@code slabbed.client.mixins.json}: the one
- * place a mixin may be withheld at load time because of the running Minecraft version or the
- * layout of a third-party mod. One jar covers Minecraft 1.21.9 through 1.21.11, and three seams
- * differ inside that range:
+ * place a mixin may be withheld at load time because of the layout of a third-party mod. This jar
+ * serves Minecraft 1.21.6 through 1.21.8; the crosshair pick lives in {@code GameRenderer.findCrosshairTarget} on
+ * every version here, so the only seam is Lithium's:
  *
  * <ul>
- *   <li><b>Crosshair pick.</b> Up to 1.21.10 the block raycast of the crosshair pick lives in
- *       {@code GameRenderer.findCrosshairTarget}; 1.21.11 moved it into a
- *       {@code ClientPlayerEntity} lambda. Exactly one of the two pick mixins applies, chosen by
- *       the Minecraft version. Both name their target by intermediary name, so neither needs the
- *       other version's mappings to compile.</li>
  *   <li><b>Lithium's block-collision sweeper.</b> Lithium 0.21 (1.21.11) splits the sweeper into
  *       {@code ...SweeperVoxelShape} and {@code ...SweeperBlockPos}, each with its own
  *       {@code computeNext}; Lithium 0.19 and 0.20 (1.21.9, 1.21.10) have one concrete sweeper.
