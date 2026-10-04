@@ -21,14 +21,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  * powered dust on the wire's frozen visual height.
  */
 /**
- * Minecraft 26.3 names the wire class {@code RedstoneWireBlock}; 26.2 named it {@code RedStoneWireBlock}.
- * One jar serves both, so this mixin names its target as a string, is marked pseudo so the absent
- * spelling is not a load error, and {@link SlabbedMixinConfigPlugin} applies exactly one of this class
- * and {@link LegacyRedStoneWireBlockMixin} per running version. The two bodies are kept identical.
+ * The 26.2 twin of {@link RedstoneWireBlockMixin}: same body, the pre-26.3 class spelling as target.
+ * {@link SlabbedMixinConfigPlugin} applies it only below 26.3. Keep the two bodies identical.
  */
 @Pseudo
-@Mixin(targets = "net.minecraft.world.level.block.RedstoneWireBlock")
-public abstract class RedstoneWireBlockMixin {
+@Mixin(targets = "net.minecraft.world.level.block.RedStoneWireBlock")
+public abstract class LegacyRedStoneWireBlockMixin {
 
     @Inject(method = "canSurvive",
             at = @At("HEAD"), cancellable = true)
