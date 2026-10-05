@@ -8,8 +8,8 @@ One file now covers Minecraft 1.21.9, 1.21.10 and 1.21.11 on Fabric. Behaviour i
 - Minecraft 1.21.9 and 1.21.10 are now supported. The crosshair pick, the Lithium collision seam and
   the `/slabdev` permission check differ between those versions and 1.21.11, and the build chooses
   the right one when the game starts.
-- On 1.21.9 and 1.21.10, Sodium 0.6 and 0.7 keep exposed height-step faces visible, matching the
-  Sodium 0.8 behaviour on 1.21.11.
+- On 1.21.9 and 1.21.10, Sodium 0.7 (proven with 0.7.3) keeps exposed height-step faces visible,
+  matching the Sodium 0.8 behaviour on 1.21.11.
 - Known gaps on 1.21.9 and 1.21.10: Better Block Entities 1.2.0 has a different structure and is not
   yet aligned with lowered placements; Countered's Terrain Slabs has no build for these two versions,
   so that compatibility is untested there.
