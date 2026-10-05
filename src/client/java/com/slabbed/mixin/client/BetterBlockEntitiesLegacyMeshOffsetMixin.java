@@ -37,7 +37,8 @@ public abstract class BetterBlockEntitiesLegacyMeshOffsetMixin {
         original.call(parts, slabbed$offsetEmitter(emitter), cullTest);
     }
 
-    @WrapMethod(method = "emitDecoratedPotQuads", remap = false)
+    // require = 0: Better Block Entities 1.0.0 and 1.1.0 have no decorated-pot helper; only 1.2 does.
+    @WrapMethod(method = "emitDecoratedPotQuads", remap = false, require = 0)
     private static void slabbed$offsetDecoratedPot(BlockStateModel model, BlockState state,
                                                    QuadEmitter emitter, DecoratedPotBlockEntity pot,
                                                    Random random, Predicate<Direction> cullTest,
