@@ -1,3 +1,24 @@
+## [0.6.2-alpha+1.20.3-1.20.4]
+
+See LAW.md — this changelog does not redefine the law.
+
+One file for Minecraft 1.20.3 and 1.20.4 (Fabric). It carries the full 0.6.1 feature set of the Fabric
+1.21.1 line: placement heights are recorded where you aim and kept for good, lowered slabs support the
+same objects, rails slope to meet their neighbours, fence posts meet a nearby slab ceiling, hung decorations
+keep their seat. Everything below this section is the inherited history of that line (the 1.20.1 section
+is the sibling build this one was made from).
+
+Needs Fabric API 0.96 or newer (the 1.20.4 builds also run on 1.20.3) and Fabric Loader 0.16 or newer, on
+Java 17 or newer.
+
+Differences on these versions:
+
+- Placement heights reach other players through Slabbed's own chunk sync message, because these versions'
+  Fabric API cannot sync chunk data on its own. Heights arrive with the chunk and after every change.
+- Creative-mode placements record their height like survival ones (these versions skip the "use up the
+  item" step for creative players; the height is recorded at the block-place event instead).
+- The decorated-pot insert particle follows the pot's stored height again (the particle exists here).
+
 ## [0.6.2-alpha+1.20.1]
 
 See LAW.md — this changelog does not redefine the law.

@@ -158,6 +158,7 @@ before this line's behaviour work closes — see the note beneath the table.
 | `com/slabbed/mixin/ScaffoldingLoweredStandMixin` | Measures scaffolding's "entity is above" test against the cell's stored height so a lowered column is stood on, climbed and descended like a flush one. |
 | `com/slabbed/mixin/CampfireCookingParticleMixin` | Translates cooking smoke to its stored campfire height. |
 | `com/slabbed/mixin/CampfireSmokeParticleMixin` | Translates campfire smoke outside the shared display-tick scope without double-shifting ambient smoke. |
+| `com/slabbed/mixin/DecoratedPotParticleMixin` | Translates pot feedback particles to the stored pot height. |
 | `com/slabbed/mixin/LeverParticleMixin` | Translates lever feedback particles to the stored lever height. |
 | `com/slabbed/mixin/CandleExtinguishParticleMixin` | Translates extinguish smoke to the stored candle height. |
 | `com/slabbed/particle/*` | Shared display-particle height scope and coordinate translation. |

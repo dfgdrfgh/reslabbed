@@ -735,8 +735,13 @@ public final class PlacementCaptureBoundaryGameTest {
                             && serializedAttachments.contains("slabbed:modern_placements"),
                     "production chunk serializer omitted required attachment payloads: keys="
                             + serializedAttachments.getKeys());
-            NbtIo.writeCompressed(serialized, chunkFile.toFile());
-            NbtCompound reloadedNbt = NbtIo.readCompressed(chunkFile.toFile());
+            NbtIo.writeCompressed(serialized, chunkFile);
+            NbtCompound reloadedNbt;
+            // Read without naming the size-tracker type: its Yarn name differs between 1.20.3 and 1.20.4.
+            try (java.io.DataInputStream in = new java.io.DataInputStream(
+                    new java.util.zip.GZIPInputStream(Files.newInputStream(chunkFile)))) {
+                reloadedNbt = NbtIo.readCompound(in);
+            }
 
             // Exact attachment reload seam used by Fabric's ChunkSerializer mixin. Reading an empty
             // payload first proves the observations below come from the bytes just read from disk.

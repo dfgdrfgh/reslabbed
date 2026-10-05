@@ -179,11 +179,15 @@ public final class NeighborUpdateInvarianceTest {
         // y bound is 7 (the full fabric-gametest empty-structure interior, rows 0..7): the deep-rest
         // subject's tower tops out at y=7, and a stale subject cell surviving between mutations would
         // silently corrupt the before/after reads.
+        // On this version the test's structure block sits at the origin cell (0,0,0); overwriting it
+        // leaves the test without a bounding box and it cannot complete. Skip that one cell.
         for (int x = 0; x <= 6; x++)
             for (int y = 0; y <= 7; y++)
-                for (int z = 0; z <= 6; z++)
+                for (int z = 0; z <= 6; z++) {
+                    if (x == 0 && y == 0 && z == 0) continue;
                     w.setBlockState(h.getAbsolutePos(new BlockPos(x, y, z)),
                             Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
+                }
     }
 
     // ── SUBJECTS: each builds a fresh rig and returns the placed subject's cell ──────────────

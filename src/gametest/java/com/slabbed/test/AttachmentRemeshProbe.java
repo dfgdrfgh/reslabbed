@@ -68,7 +68,7 @@ public final class AttachmentRemeshProbe implements ClientModInitializer {
                             Difficulty.PEACEFUL, true, new GameRules(), DataConfiguration.SAFE_MODE),
                     new GeneratorOptions(0L, false, false),
                     registries -> registries.get(RegistryKeys.WORLD_PRESET).getOrThrow(WorldPresets.FLAT)
-                            .createDimensionsRegistryHolder());
+                            .createDimensionsRegistryHolder(), null);
             return;
         }
         if (client.world == null || client.player == null || client.getServer() == null) return;
@@ -198,7 +198,7 @@ public final class AttachmentRemeshProbe implements ClientModInitializer {
                     new LevelInfo("Fence Ceiling Proof",GameMode.CREATIVE,false,Difficulty.PEACEFUL,true,
                             new GameRules(),DataConfiguration.SAFE_MODE),new GeneratorOptions(0L,false,false),
                     registries -> registries.get(RegistryKeys.WORLD_PRESET).getOrThrow(WorldPresets.FLAT)
-                            .createDimensionsRegistryHolder());
+                            .createDimensionsRegistryHolder(), null);
             return;
         }
         if (client.world==null || client.player==null || client.getServer()==null) return;

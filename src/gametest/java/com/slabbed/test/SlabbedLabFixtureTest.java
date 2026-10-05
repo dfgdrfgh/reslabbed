@@ -157,7 +157,8 @@ public final class SlabbedLabFixtureTest {
         }
 
         ServerWorld world = ctx.getWorld();
-        BlockPos origin = ctx.getAbsolutePos(BlockPos.ORIGIN);
+        // One cell above the origin: on this version the structure block occupies (0,0,0).
+        BlockPos origin = ctx.getAbsolutePos(FIXTURE_TEST_OFFSET);
 
         List<ServerStateOverlapRow> rows = new ArrayList<>();
 

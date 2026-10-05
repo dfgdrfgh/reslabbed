@@ -159,11 +159,11 @@ public final class KeepOnlyReopenProbe implements ClientModInitializer {
                 LevelInfo info = new LevelInfo("Slabbed Keep Fixture", GameMode.CREATIVE, false,
                         Difficulty.PEACEFUL, true, new GameRules(), DataConfiguration.SAFE_MODE);
                 client.createIntegratedServerLoader().createAndStart(worldName, info,
-                        new GeneratorOptions(0L, false, false), KeepOnlyReopenProbe::flat);
+                        new GeneratorOptions(0L, false, false), KeepOnlyReopenProbe::flat, null);
                 append("WORLD\t" + mode + "\t" + worldName + "\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-\tcreate_requested");
             } else {
-                // 1.20.1 opens an existing world from a parent screen and has no cancel callback.
-                client.createIntegratedServerLoader().start(client.currentScreen, worldName);
+                // 1.20.3+ opens an existing world by name with a cancel callback.
+                client.createIntegratedServerLoader().start(worldName, () -> { });
                 append("WORLD\t" + mode + "\t" + worldName + "\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-\treopen_requested");
             }
             return;

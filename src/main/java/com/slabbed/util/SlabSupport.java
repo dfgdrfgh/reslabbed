@@ -36,7 +36,7 @@ import net.minecraft.block.WallSignBlock;
 import net.minecraft.block.WallTorchBlock;
 import net.minecraft.block.enums.Attachment;
 import net.minecraft.block.enums.BedPart;
-import net.minecraft.block.enums.WallMountLocation;
+import net.minecraft.block.enums.BlockFace;
 import net.minecraft.block.enums.DoubleBlockHalf;
 import net.minecraft.block.enums.BlockHalf;
 import net.minecraft.block.enums.SlabType;
@@ -209,8 +209,8 @@ public final class SlabSupport {
     public static boolean isBeta35FloorButtonContactObject(BlockState state) {
         return state != null
                 && state.getBlock() instanceof ButtonBlock
-                && state.contains(Properties.WALL_MOUNT_LOCATION)
-                && state.get(Properties.WALL_MOUNT_LOCATION) == WallMountLocation.FLOOR;
+                && state.contains(Properties.BLOCK_FACE)
+                && state.get(Properties.BLOCK_FACE) == BlockFace.FLOOR;
     }
 
     public static boolean isBeta35BottomTrapdoorVisibleOwnerObject(BlockState state) {
@@ -1039,7 +1039,7 @@ public final class SlabSupport {
                     && state.get(Properties.VERTICAL_DIRECTION) == Direction.DOWN;
         }
         // lever / button: CEILING face hangs; FLOOR / WALL stand
-        if (state.contains(Properties.WALL_MOUNT_LOCATION) && state.get(Properties.WALL_MOUNT_LOCATION) == WallMountLocation.CEILING) {
+        if (state.contains(Properties.BLOCK_FACE) && state.get(Properties.BLOCK_FACE) == BlockFace.CEILING) {
             return true;
         }
         // bell: CEILING attachment hangs; FLOOR / WALL stand

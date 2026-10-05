@@ -43,7 +43,8 @@ public final class Mc1211GoblinRouteCanaryGameTest {
 
         ServerWorld world = ctx.getWorld();
         BlockPos origin = ctx.getAbsolutePos(BlockPos.ORIGIN);
-        BlockPos support = origin;
+        // On this version the structure block occupies the origin cell; build one cell above it.
+        BlockPos support = origin.up();
         BlockPos source = support.up();
         BlockPos upperDouble = source.up();
 

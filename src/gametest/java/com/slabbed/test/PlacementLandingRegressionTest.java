@@ -250,12 +250,12 @@ public final class PlacementLandingRegressionTest {
             PlayerEntity player = h.createMockSurvivalPlayer();
             // {name, pedestal (null = a real dirt placement onto a bottom slab, -0.5), cell content, item, expected}
             Object[][] cases = {
-                {"dirt_into_grass_on_dirt", Blocks.DIRT.getDefaultState(), Blocks.GRASS.getDefaultState(), Items.DIRT, 0.0d},
+                {"dirt_into_grass_on_dirt", Blocks.DIRT.getDefaultState(), Blocks.SHORT_GRASS.getDefaultState(), Items.DIRT, 0.0d},
                 {"dirt_into_snow_layer_on_stone", Blocks.STONE.getDefaultState(), Blocks.SNOW.getDefaultState(), Items.DIRT, 0.0d},
                 {"snow_onto_snow_layer_on_stone", Blocks.STONE.getDefaultState(), Blocks.SNOW.getDefaultState(), Items.SNOW, 0.0d},
                 {"candle_onto_candle_on_stone", Blocks.STONE.getDefaultState(), Blocks.CANDLE.getDefaultState(), Items.CANDLE, 0.0d},
-                {"torch_into_grass_on_dirt", Blocks.DIRT.getDefaultState(), Blocks.GRASS.getDefaultState(), Items.TORCH, 0.0d},
-                {"dirt_into_grass_on_lowered_dirt", null, Blocks.GRASS.getDefaultState(), Items.DIRT, -0.5d},
+                {"torch_into_grass_on_dirt", Blocks.DIRT.getDefaultState(), Blocks.SHORT_GRASS.getDefaultState(), Items.TORCH, 0.0d},
+                {"dirt_into_grass_on_lowered_dirt", null, Blocks.SHORT_GRASS.getDefaultState(), Items.DIRT, -0.5d},
                 {"candle_onto_candle_on_bottom_slab", Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM), Blocks.CANDLE.getDefaultState(), Items.CANDLE, -0.5d},
             };
             int i = 0;

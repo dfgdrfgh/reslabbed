@@ -45,21 +45,25 @@ vocabulary must reference LAW.md), S-4 (`LAW-PREFLIGHT: n|y` trailer on `src/mai
 (behavior commits require a fresh entry in the local out-of-repo ledger), S-6 (discretion — see
 above). S-3 (a keyword regex) was retired 2026-08-07; do not reintroduce it.
 
-## Line notes (Fabric 1.20.1)
+## Line notes (Fabric 1.20.3 and 1.20.4, one jar)
 
 - Java 17 source and target; no unconditional `instanceof` patterns, no `List.getFirst()`.
-- Fabric data attachments cannot sync on this version. `anchor/SlabAnchorSync` carries every attachment
-  type to clients over the `slabbed:chunk_attachments` channel: a full send when a chunk is first sent
-  to a player (`ChunkWatchAttachmentSyncMixin`) and a re-send after each server write. Any new
-  attachment type must be added to its list or it will never reach clients.
+- 1.20.3 and 1.20.4 have identical intermediary class and member sets, so one jar covers both. The
+  only 1.20.3 Fabric API build (0.91.1) has no data-attachment module; the 1.20.4 builds (0.96+)
+  declare 1.20.3 compatible and are required.
+- Fabric data attachments cannot sync on these versions. `anchor/SlabAnchorSync` carries every
+  attachment type to clients over the `slabbed:chunk_attachments` channel: a full send when a
+  chunk is first sent to a player (`ChunkWatchAttachmentSyncMixin` on `ChunkDataSender.sendChunkData`)
+  and a re-send after each server write. Any new attachment type must be added to its list.
 - `BlockItem.place` consumes the stack behind a creative check at the call site here, so the
-  placement-height capture hooks the block-place game event, which every accepted placement emits.
-  Do not move it back to the stack consume (the `creativePlacementAuthorsTheSameHeight` row guards it).
-- `RedstoneTorchBlock` extends `TorchBlock` on this version; the torch-family predicates exclude it
-  explicitly so the floor-torch set matches the other lines.
-- GameTest structures live under `data/<ns>/structures/` (plural) here; the test grid spaces cells by
-  template size, so rows that reach far from their origin use `slabbed:empty_16`.
+  placement-height capture hooks the block-place game event (the
+  `creativePlacementAuthorsTheSameHeight` row guards it). Do not move it back to the stack consume.
+- GameTest structures live under `data/<ns>/structures/` (plural); the test grid spaces cells by
+  template size, so rows that reach far from their origin use `slabbed:empty_16`. On these versions
+  the test's structure block occupies relative cell (0,0,0): a test that overwrites it cannot
+  complete (null bounding box), so arena fills skip that cell and origin-based rigs start one up.
 - The superflat ground is at y=-61; dev-client probes build their scene just above it. Blocks placed
-  high in empty sky sections render unlit on this version (vanilla), which breaks pixel-based proofs.
-- No Fabric client-GameTest API on this version: the dev-client proofs are the probe run
-  configurations in `build.gradle` (`runAttachmentClientProbe`, `runFenceClientProbe`).
+  high in empty sky sections render unlit on these versions (vanilla), which breaks pixel proofs.
+- No Fabric client-GameTest API: the dev-client proofs are the probe run configurations in
+  `build.gradle` (`runAttachmentClientProbe`, `runFenceClientProbe`). The 1.20.3 server leg is the
+  same sources and suite built against Yarn 1.20.3 (switch `minecraft_version`/`yarn_mappings`).
