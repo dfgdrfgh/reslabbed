@@ -14,6 +14,8 @@ Needs Fabric API 0.114.1 or newer.
   redstone wire power moved to a controller, entity renderers work from render states, world events moved to their own
   handler) are followed where Slabbed hooks them; behaviour is unchanged.
 - The experimental pale moss carpet, where enabled, follows the same rules as the other carpets on lowered slabs.
+- The Minecart Improvements experiment is not covered: with it enabled, carts ride at vanilla height over lowered
+  rails. Item frames keep the 1.21.1 line's behaviour (no render drop for frames without a remembered seat).
 
 ## [0.6.1-alpha+1.21.1-fabric]
 
