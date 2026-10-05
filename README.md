@@ -6,8 +6,8 @@
 
 [![Modrinth](https://img.shields.io/badge/Modrinth-Download-00AF5C?logo=modrinth&logoColor=white)](https://modrinth.com/mod/slabbed)
 [![CurseForge](https://img.shields.io/badge/CurseForge-Download-F16436?logo=curseforge&logoColor=white)](https://www.curseforge.com/minecraft/mc-mods/slabbed)
-[![Minecraft](https://img.shields.io/badge/Minecraft-1.21.1%20%7C%201.21.11%20%7C%2026.x-62B47A)](https://modrinth.com/mod/slabbed/versions)
-[![Loader](https://img.shields.io/badge/Loader-Fabric%20%7C%20NeoForge-DBD0B4)](https://modrinth.com/mod/slabbed/versions)
+[![Minecraft](https://img.shields.io/badge/Minecraft-1.20.x%20%7C%201.21.x%20%7C%2026.x-62B47A)](https://modrinth.com/mod/slabbed/versions)
+[![Loader](https://img.shields.io/badge/Loader-Fabric%20%7C%20NeoForge%20%7C%20Forge-DBD0B4)](https://modrinth.com/mod/slabbed/versions)
 [![License](https://img.shields.io/badge/License-GPL--3.0-blue)](LICENSE)
 
 **Slabbed** lets blocks and objects that normally need solid ground treat the **top surface of slabs** as valid support. Torches, lanterns, chains, flower pots, and many other objects sit flush on slab tops; full blocks stack on slabs; and the crosshair targets what you actually see — no floating, no ghosting, no fighting the vanilla placement rules.
@@ -44,9 +44,16 @@ Other partial blocks (stairs, fences, walls, trapdoors, panes) are intentionally
 
 | Minecraft | Loader(s) | Java |
 |:---|:---|:---|
+| 1.20.1 | Fabric · Forge | 17 |
+| 1.20.3 / 1.20.4 | Fabric (one file) | 17 |
 | 1.21.1 | Fabric · NeoForge | 21 |
-| 1.21.11 | Fabric | 21 |
-| 26.1 / 26.1.2 / 26.2 | Fabric | 25 |
+| 1.21.2 / 1.21.3 | Fabric (one file) | 21 |
+| 1.21.4 | Fabric | 21 |
+| 1.21.5 | Fabric | 21 |
+| 1.21.6 / 1.21.7 / 1.21.8 | Fabric (one file) | 21 |
+| 1.21.9 / 1.21.10 / 1.21.11 | Fabric (one file) | 21 |
+| 26.1 / 26.1.2 | Fabric | 25 |
+| 26.2 / 26.3 | Fabric (one file) · NeoForge | 25 |
 
 - **Environment:** client + server. Install on the client for the visual lowering and correct targeting; works in singleplayer and on servers. On multiplayer, install on both so visuals, outlines, and targeting line up.
 - **Fabric** builds require **Fabric API**. **NeoForge** builds are standalone.
