@@ -4,7 +4,7 @@ import com.slabbed.command.SlabRigHangingArtifacts;
 import com.slabbed.command.SlabRigHangingCatalog;
 import com.slabbed.command.SlabRigHangingDirectFixture;
 import com.slabbed.command.SlabRigHangingPaintingPlan;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
 
@@ -13,7 +13,7 @@ import java.util.LinkedHashSet;
 /** Pure production-fixture adapter contract; no command, persistence, or world mutation. */
 public final class SlabRigHangingDirectFixtureTest {
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void directFixtureAdaptsOnlyTheReviewedPageWithExactOwnership(GameTestHelper helper) {
         SlabRigHangingCatalog.Snapshot catalog = SlabRigHangingCatalog.snapshot();
         SlabRigHangingArtifacts.RuntimeSnapshot runtime = SlabRigHangingArtifacts.snapshot(
@@ -78,7 +78,7 @@ public final class SlabRigHangingDirectFixtureTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void directFixtureRejectsEveryUnapprovedAxis(GameTestHelper helper) {
         SlabRigHangingCatalog.Snapshot catalog = SlabRigHangingCatalog.snapshot();
         SlabRigHangingArtifacts.RuntimeSnapshot runtime = SlabRigHangingArtifacts.snapshot(

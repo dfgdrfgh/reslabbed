@@ -3,9 +3,6 @@ package com.slabbed.mixin;
 import com.slabbed.util.HangingSeatDyHolder;
 import com.slabbed.util.SlabSupport;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.network.syncher.EntityDataSerializers;
-import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.decoration.BlockAttachedEntity;
@@ -54,11 +51,7 @@ public abstract class HangingEntityRememberedSeatMixin extends BlockAttachedEnti
 
     /** Raw bits of the seat; NaN bits mean "not minted yet". Synced so the client box and drawing agree. */
     @Unique
-    private static final EntityDataAccessor<Long> SLABBED$HANG_DY =
-            SynchedEntityData.defineId(HangingEntity.class, EntityDataSerializers.LONG);
-
-    @Unique
-    private static final long SLABBED$UNSET = Double.doubleToRawLongBits(Double.NaN);
+    private static final long SLABBED$UNSET = com.slabbed.anchor.EntitySeatAttachments.HANG_UNSET;
 
     /** True while saved data is being restored; no world or chunk access happens while it is set. */
     @Unique
@@ -70,23 +63,18 @@ public abstract class HangingEntityRememberedSeatMixin extends BlockAttachedEnti
 
     @Override
     public double slabbed$hangSeatDy() {
-        double dy = Double.longBitsToDouble(this.getEntityData().get(SLABBED$HANG_DY));
+        double dy = Double.longBitsToDouble(this.getData(com.slabbed.anchor.EntitySeatAttachments.HANG_DY));
         return Double.isFinite(dy) ? dy : 0.0d;
     }
 
     @Override
     public boolean slabbed$hasHangSeat() {
-        return Double.isFinite(Double.longBitsToDouble(this.getEntityData().get(SLABBED$HANG_DY)));
+        return Double.isFinite(Double.longBitsToDouble(this.getData(com.slabbed.anchor.EntitySeatAttachments.HANG_DY)));
     }
 
     @Override
     public void slabbed$restoreHangSeatDy(double dy) {
-        this.getEntityData().set(SLABBED$HANG_DY, Double.doubleToRawLongBits(Double.isFinite(dy) ? dy : 0.0d));
-    }
-
-    @Inject(method = "defineSynchedData(Lnet/minecraft/network/syncher/SynchedEntityData$Builder;)V", at = @At("TAIL"))
-    private void slabbed$defineHangSeat(SynchedEntityData.Builder builder, CallbackInfo ci) {
-        builder.define(SLABBED$HANG_DY, SLABBED$UNSET);
+        this.setData(com.slabbed.anchor.EntitySeatAttachments.HANG_DY, Double.doubleToRawLongBits(Double.isFinite(dy) ? dy : 0.0d));
     }
 
     /**
@@ -197,9 +185,8 @@ public abstract class HangingEntityRememberedSeatMixin extends BlockAttachedEnti
      * nest inside that layout and shift the box twice.
      */
     @Override
-    public void onSyncedDataUpdated(EntityDataAccessor<?> key) {
-        super.onSyncedDataUpdated(key);
-        if (SLABBED$HANG_DY.equals(key) && this.level() != null && this.level().isClientSide()
+    public void slabbed$onHangSeatSynced(long rawBits) {
+        if (this.level() != null && this.level().isClientSide()
                 && this.pos != null && this.getDirection() != null) {
             this.recalculateBoundingBox();
         }

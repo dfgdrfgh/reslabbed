@@ -3,7 +3,6 @@ package com.slabbed.client;
 import com.slabbed.Slabbed;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.option.KeyBinding;
@@ -62,7 +61,7 @@ public final class ScreenshotCaptureService {
             return;
         }
 
-        Path gameDir = FabricLoader.getInstance().getGameDir();
+        Path gameDir = com.slabbed.loader.Loader.getGameDir();
         Path screenshotDir = gameDir.resolve("run").resolve("slabbed-screenshots");
         try {
             Files.createDirectories(screenshotDir);

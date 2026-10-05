@@ -2,7 +2,7 @@ package com.slabbed.test;
 
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
@@ -73,13 +73,13 @@ public final class BlockEntityNeverPopTest {
         }
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void hopperLoweredOnSlabIsHeightLocked(GameTestHelper helper) {
         loweredBeIsLocked(helper, Blocks.HOPPER.defaultBlockState(), "hopper");
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void chestAndFurnaceLoweredOnSlabAreHeightLocked(GameTestHelper helper) {
         loweredBeIsLocked(helper, Blocks.CHEST.defaultBlockState(), "chest");
         loweredBeIsLocked(helper, Blocks.FURNACE.defaultBlockState(), "furnace");
@@ -93,7 +93,7 @@ public final class BlockEntityNeverPopTest {
      * and its dy toggles to -0.5 the instant the slab appears — the reported snap. Reverting only the new
      * clause fails HERE.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void flatHopperIsNotPulledDownByASlabShovedUnder(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos groundRel = new BlockPos(2, 2, 2);
@@ -126,7 +126,7 @@ public final class BlockEntityNeverPopTest {
      * Regression guard: a hanging sign is a block entity too, but it HANGS and must keep following its
      * support — it must NOT be height-locked (anchored or frozen-flat) by the new block-entity clause.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void hangingSignBlockEntityIsNotHeightLocked(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos supportRel = new BlockPos(2, 3, 2);

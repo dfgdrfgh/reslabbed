@@ -1,7 +1,7 @@
 package com.slabbed.test;
 
 import com.slabbed.anchor.SlabAnchorAttachment;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -155,7 +155,7 @@ public final class DepartedOccupantFactClearTest {
      * entities" guard. The chest is the only departing occupant in this class that carries a block
      * entity, and every keep row expects no clear.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void brokenChestLeavesNoStoredHeight(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         Cell rig = build(helper, w, Blocks.CHEST.defaultBlockState());
@@ -187,7 +187,7 @@ public final class DepartedOccupantFactClearTest {
      * — both arrive as (oldState, AIR, flags 3). The pair is still discriminated in one direction:
      * the water row has a mutation that reddens the water row alone.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void poppedLeverLeavesNoStoredHeight(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         Cell rig = build(helper, w, Blocks.LEVER.defaultBlockState()
@@ -216,7 +216,7 @@ public final class DepartedOccupantFactClearTest {
      * {@code clearFactForDepartedOccupant} — a plausible "only a genuine emptying clears" narrowing.
      * This is the only clear row whose new occupant is not air.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void waterTakingTheCellClearsStoredHeight(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         Cell rig = build(helper, w, Blocks.RAIL.defaultBlockState());
@@ -238,7 +238,7 @@ public final class DepartedOccupantFactClearTest {
      * {@code if ((flags & Block.UPDATE_NEIGHBORS) == 0 && !movedByPiston) return;}. Every other clear
      * row writes at flags 3, and the keep rows expect no clear.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void strictSetBlockAirClearsStoredHeight(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         Cell rig = build(helper, w, Blocks.STONE.defaultBlockState());
@@ -265,7 +265,7 @@ public final class DepartedOccupantFactClearTest {
      * <p>NOT red before the change: at flags 2 the decision was never reached at all, so the lock was
      * kept by accident rather than by rule. Stated as a guard against the widening, not a fix.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void lowFlagInPlaceTransformKeepsStoredHeight(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         Cell rig = build(helper, w, Blocks.GRASS_BLOCK.defaultBlockState());
@@ -293,7 +293,7 @@ public final class DepartedOccupantFactClearTest {
      * at all, and nothing else in the suite pins that they are skipped (the law gate's door and bed
      * rows toggle properties on the same block, so they skip by coincidence rather than by pin).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void railShapeRewriteKeepsStoredHeight(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         Cell rig = build(helper, w, Blocks.RAIL.defaultBlockState()
@@ -327,7 +327,7 @@ public final class DepartedOccupantFactClearTest {
      * and the head half is green today via the mixin being deleted. The row is what proves that
      * coverage survives the deletion.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty", maxTicks = 200)
+    @GameTest(structure = "slabbed_gametest:empty", maxTicks = 200)
     public void retractingPistonKeepsBaseAndEmptiesHeadCell(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos pistonPos = helper.absolutePos(new BlockPos(1, 2, 3));
@@ -380,7 +380,7 @@ public final class DepartedOccupantFactClearTest {
      *
      * <p>NOT red before the change.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void movingPistonHandoffToAirClearsStoredHeight(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos pistonPos = helper.absolutePos(new BlockPos(1, 2, 3));

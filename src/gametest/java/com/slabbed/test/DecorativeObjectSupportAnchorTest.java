@@ -2,7 +2,7 @@ package com.slabbed.test;
 
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
@@ -101,18 +101,18 @@ public final class DecorativeObjectSupportAnchorTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void candleOnSlabAnchorsAndDoesNotPop(GameTestHelper helper) {
         assertDecorationOnSlabAnchorsAndDoesNotPop(helper, "candle", Blocks.CANDLE.defaultBlockState());
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void bottomTrapdoorOnSlabAnchorsAndDoesNotPop(GameTestHelper helper) {
         assertDecorationOnSlabAnchorsAndDoesNotPop(helper, "bottom_trapdoor",
                 Blocks.OAK_TRAPDOOR.defaultBlockState().setValue(BlockStateProperties.HALF, Half.BOTTOM));
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void floorLeverOnSlabAnchorsAndDoesNotPop(GameTestHelper helper) {
         assertDecorationOnSlabAnchorsAndDoesNotPop(helper, "lever", Blocks.LEVER.defaultBlockState());
     }
@@ -122,7 +122,7 @@ public final class DecorativeObjectSupportAnchorTest {
      * ordinary flush ground (NOT lowered) must never gain a spurious anchor from the freeze path —
      * otherwise it could refuse to follow a slab shoved under it later (the maintainer's WYSIWYG law).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void flatCandleNeverAnchors(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos groundRel = new BlockPos(2, 1, 2);
@@ -153,7 +153,7 @@ public final class DecorativeObjectSupportAnchorTest {
      * is a pure function of the support above regardless; this guard pins that it also never acquires a
      * stale freeze anchor via the placement hook.)
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void hangingLanternNeverAnchorsViaFreeze(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos lanternRel = new BlockPos(2, 2, 2);

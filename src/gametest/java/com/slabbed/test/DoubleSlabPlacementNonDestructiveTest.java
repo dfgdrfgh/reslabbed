@@ -2,7 +2,7 @@ package com.slabbed.test;
 
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -103,7 +103,7 @@ public final class DoubleSlabPlacementNonDestructiveTest {
      * confirm it is never downgraded. (Placing INTO an occupied double must be a no-op / route
      * elsewhere; it must never replace the double with a single slab.)
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void placementIntoPlainDoubleDoesNotDowngradeIt(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos doubleRel = new BlockPos(2, 3, 2);
@@ -136,7 +136,7 @@ public final class DoubleSlabPlacementNonDestructiveTest {
      * finalizer), then a subsequent DOWN-face placement into the cell below must leave the anchored
      * double intact — still {@code double}, still -0.5, still a persisted lowered carrier.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void placementBelowAnchoredLoweredDoubleDoesNotDowngradeIt(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         // Genuine lowered chain (same idiom as SlabOnSlabVerticalAnchorTest):
@@ -183,7 +183,7 @@ public final class DoubleSlabPlacementNonDestructiveTest {
      * is a supported Slabbed feature (it cantilevers a slab beside it) — but the full block itself must
      * stay a full block, anchored, lowered.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void placementBesideAnchoredFullBlockDoesNotDowngradeIt(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos ground = helper.absolutePos(new BlockPos(2, 1, 2));

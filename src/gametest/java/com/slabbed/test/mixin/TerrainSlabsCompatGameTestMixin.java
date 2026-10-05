@@ -23,8 +23,8 @@ public abstract class TerrainSlabsCompatGameTestMixin {
     @ModifyReturnValue(method = "isLoaded", at = @At("RETURN"), remap = false)
     private static boolean slabbed$terrainSlabsLoadedForSpawnProof(boolean original) {
         return original
-                || BottomSlabSpawnProofTest.terrainSlabsClassifierTestGate()
-                || CompatEligibilityPredicateTest.eligibilityClassifierTestGate();
+                || BottomSlabSpawnProofTest.Gate.terrainSlabsClassifierTestGate()
+                || CompatEligibilityPredicateTest.Gate.eligibilityClassifierTestGate();
     }
 
     @Redirect(
@@ -38,7 +38,7 @@ public abstract class TerrainSlabsCompatGameTestMixin {
     )
     private static boolean slabbed$terrainSlabsLoadedForSpawnProof() {
         return TerrainSlabsCompat.isLoaded()
-                || BottomSlabSpawnProofTest.terrainSlabsClassifierTestGate();
+                || BottomSlabSpawnProofTest.Gate.terrainSlabsClassifierTestGate();
     }
 
     // The ELIGIBILITY predicates need their own redirects, and the reason is easy to miss: the
@@ -59,7 +59,7 @@ public abstract class TerrainSlabsCompatGameTestMixin {
     )
     private static boolean slabbed$terrainSlabsLoadedForEligibility() {
         return TerrainSlabsCompat.isLoaded()
-                || CompatEligibilityPredicateTest.eligibilityClassifierTestGate();
+                || CompatEligibilityPredicateTest.Gate.eligibilityClassifierTestGate();
     }
 
     @Redirect(
@@ -73,6 +73,6 @@ public abstract class TerrainSlabsCompatGameTestMixin {
     )
     private static boolean slabbed$terrainSlabsLoadedForObjectOffset() {
         return TerrainSlabsCompat.isLoaded()
-                || CompatEligibilityPredicateTest.eligibilityClassifierTestGate();
+                || CompatEligibilityPredicateTest.Gate.eligibilityClassifierTestGate();
     }
 }

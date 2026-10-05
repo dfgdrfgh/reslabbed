@@ -3,8 +3,8 @@ package com.slabbed.test;
 import com.slabbed.util.SlabEnsembleCoherence;
 import com.slabbed.util.SlabEnsembleCoherence.Kind;
 import com.slabbed.util.SlabEnsembleCoherence.Verdict;
-import com.slabbed.util.SlabModelStaleSentinel;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.diagnostics.util.SlabModelStaleSentinel;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -35,7 +35,7 @@ public final class EnsembleCoherenceContractTest {
         }
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void chestOverFlushHopperInterpenetratesByHalf(GameTestHelper helper) {
         // The video's t=130s scene: flush FROZEN-FLAT hopper, ANCHORED -0.5 chest above.
         ServerLevel w = helper.getLevel();
@@ -47,7 +47,7 @@ public final class EnsembleCoherenceContractTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void deepUnderShallowLeavesGapAndUniformIsCoherent(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos lower = helper.absolutePos(new BlockPos(2, 2, 2));
@@ -62,7 +62,7 @@ public final class EnsembleCoherenceContractTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void byDesignVanillaGapsAreNeverFlagged(GameTestHelper helper) {
         // A BOTTOM slab under a block has a half-cell vanilla gap BY DESIGN — dys must not matter.
         ServerLevel w = helper.getLevel();
@@ -74,7 +74,7 @@ public final class EnsembleCoherenceContractTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void occludedOccupancySingleBlockRule(GameTestHelper helper) {
         // The t=98s trapdoor case: a bottom slab at dy=-0.5 renders entirely below its own cell floor.
         ServerLevel w = helper.getLevel();
@@ -93,7 +93,7 @@ public final class EnsembleCoherenceContractTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aFactlessTerrainSlabsBlockIsGuarded(GameTestHelper helper) {
         // Failure-mode-4, FACT-AWARE scope (renamed with the coherence-authority update — the old
         // name "terrainSlabsBlocksAreGuarded" claimed the blanket law while this body only ever
@@ -137,7 +137,7 @@ public final class EnsembleCoherenceContractTest {
      * above stays green under that mutation (its state carries no fact either way), which is why
      * the two rows cannot be one.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aFactBearingTerrainSlabsBlockIsClassified(GameTestHelper helper) {
         Block tsSlab = BuiltInRegistries.BLOCK.getValue(
                 Identifier.fromNamespaceAndPath("terrain_slabs", "geometric_remesh_scheduler_test_slab"));
@@ -192,7 +192,7 @@ public final class EnsembleCoherenceContractTest {
         }
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void reallyLoweredBlockShapesAreNotDoubleCounted(GameTestHelper helper) {
         // TEST (5) live regression, caught by the gate's own first outing: getShape is the OUTLINE leg
         // of the triad — ALREADY dy-offset for a genuinely lowered block — so classifier math that adds
@@ -218,7 +218,7 @@ public final class EnsembleCoherenceContractTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void breakNeighborhoodClassifiesPairsOnceAndNeverYellows(GameTestHelper helper) {
         // Phase 1.5: breaks reshuffle neighbor dys; the break neighborhood must be ensemble-classified
         // (each vertical pair exactly once, via its lower member) and must NEVER produce NO_BAKE
@@ -257,7 +257,7 @@ public final class EnsembleCoherenceContractTest {
         }
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void sentinelEmitsEnsembleRowOncePerPlacement(GameTestHelper helper) {
         List<LinkedHashMap<String, String>> rows = new ArrayList<>();
         SlabModelStaleSentinel.resetCold();
@@ -295,7 +295,7 @@ public final class EnsembleCoherenceContractTest {
         }
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void sentinelEmitsOccludedOccupancyOnceWithSelfPair(GameTestHelper helper) {
         List<LinkedHashMap<String, String>> rows = new ArrayList<>();
         SlabModelStaleSentinel.resetCold();
@@ -331,7 +331,7 @@ public final class EnsembleCoherenceContractTest {
         }
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void gapFillBandHeightMatchesGapDepthAndOnlyGapDepth(GameTestHelper helper) {
         // Phase 3a: the band plan is exactly the classifier GAP depth — zero for every other verdict.
         ServerLevel w = helper.getLevel();

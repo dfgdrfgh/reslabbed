@@ -2,7 +2,7 @@ package com.slabbed.test;
 
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -47,7 +47,7 @@ public final class EnsemblePlacementCoherenceTest {
         SlabAnchorAttachment.freezeLoweredOnPlace(w, pos, w.getBlockState(pos));
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void hopperPlacedOnFlushHopperMeetsTheStackNotTheSideCarrier(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         // Flush support hopper on solid ground (frozen flat, the ba80d735 law).
@@ -90,7 +90,7 @@ public final class EnsemblePlacementCoherenceTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void clickingOccludedSurfacePlacesIntoTheApparentSpace(GameTestHelper helper) {
         // Phase 2b (the t=98 five-refused-clicks scene, reconstructed): a lowered log carries an
         // OCCLUDED slab (renders level with the log top — its own cell looks empty). Clicking the
@@ -133,7 +133,7 @@ public final class EnsemblePlacementCoherenceTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void nonOccludedOccupiedTargetStillRefuses(GameTestHelper helper) {
         // Surgical guard (the S11 hijack lesson): the remap fires ONLY for occluded occupants — an
         // ordinary occupied target keeps vanilla refusal, and nothing lands anywhere.
@@ -149,7 +149,7 @@ public final class EnsemblePlacementCoherenceTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void loweredSupportStillFollowedNormally(GameTestHelper helper) {
         // Control: the coherence rule must ONLY fire on clash shapes — a block on a genuinely LOWERED
         // support keeps following it down (WYSIWYG on the stack), no freeze-flat regression.

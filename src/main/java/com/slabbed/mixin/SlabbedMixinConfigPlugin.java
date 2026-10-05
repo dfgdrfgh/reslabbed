@@ -1,6 +1,5 @@
 package com.slabbed.mixin;
 
-import net.fabricmc.loader.api.FabricLoader;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
@@ -102,7 +101,7 @@ public final class SlabbedMixinConfigPlugin implements IMixinConfigPlugin {
     @Override
     public void onLoad(String mixinPackage) {
         this.modernMinecraft = com.slabbed.compat.MinecraftVersions.AT_LEAST_26_3;
-        this.lithiumPresent = FabricLoader.getInstance().isModLoaded(LITHIUM_MOD_ID);
+        this.lithiumPresent = com.slabbed.loader.Loader.isModLoaded(LITHIUM_MOD_ID);
         this.lithiumSweeperSupported =
                 sweeperAsksCollisionContext(LITHIUM_SWEEPER_SHAPE_CLASS, SWEEPER_SHAPE_ENTRY)
                         && sweeperAsksCollisionContext(LITHIUM_SWEEPER_POS_CLASS, SWEEPER_POS_ENTRY);

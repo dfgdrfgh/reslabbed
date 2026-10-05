@@ -13,9 +13,10 @@ import com.slabbed.compat.CompatHooks;
 import com.slabbed.util.SlabSupport;
 import it.unimi.dsi.fastutil.longs.Long2DoubleOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
-import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
-import net.fabricmc.fabric.api.attachment.v1.AttachmentSyncPredicate;
-import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.attachment.AttachmentType;
+import net.neoforged.neoforge.registries.DeferredRegister;
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.FlowerPotBlock;
@@ -126,69 +127,78 @@ public final class SlabAnchorAttachment {
     );
 
     /**
-     * Packet codec for client sync. {@link AttachmentSyncPredicate#all()} is used at
+     * Packet codec for client sync. the sync codec is attached at
      * registration so anchors travel with the chunk packet automatically.
      */
     private static final StreamCodec<RegistryFriendlyByteBuf, LongOpenHashSet> PACKET_CODEC =
             ChunkPositionSetPacketCodec.INSTANCE;
 
-    public static final AttachmentType<LongOpenHashSet> ANCHOR_TYPE =
-            AttachmentRegistry.<LongOpenHashSet>create(ANCHOR_ID, builder -> builder
-                    .persistent(SET_CODEC)
-                    .syncWith(PACKET_CODEC, AttachmentSyncPredicate.all())
-            );
+    private static final DeferredRegister<AttachmentType<?>> ATTACHMENT_TYPES =
+            DeferredRegister.create(NeoForgeRegistries.ATTACHMENT_TYPES, Slabbed.MOD_ID);
+
+    private static final com.mojang.serialization.MapCodec<LongOpenHashSet> SET_MAP_CODEC =
+            SET_CODEC.fieldOf("cells");
+
     /**
-     * FREEZE-ON-PLACE flat marker: a structural piece (full block / slab) placed at dy=0 is
-     * recorded here so its flat height locks — support placed under or beside it later can no
-     * longer pull it down. The "never autonomously moves" companion of {@link #ANCHOR_TYPE}
-     * (which locks the lowered case). Read as dy=0 by {@code getYOffsetInner}; cleared when the
-     * piece is broken.
+     * One chunk attachment type per presence set: persisted only while non-empty, and synced to every
+     * watching client with the chunk (NeoForge's attachment sync, the equivalent of Fabric's
+     * {@code syncWith(..., all())}).
      */
-    public static final AttachmentType<LongOpenHashSet> FROZEN_FLAT_TYPE =
-            AttachmentRegistry.<LongOpenHashSet>create(FROZEN_FLAT_ID, builder -> builder
-                    .persistent(SET_CODEC)
-                    .syncWith(PACKET_CODEC, AttachmentSyncPredicate.all())
-            );
-    public static final AttachmentType<LongOpenHashSet> LOWERED_SLAB_CARRIER_TYPE =
-            AttachmentRegistry.<LongOpenHashSet>create(LOWERED_SLAB_CARRIER_ID, builder -> builder
-                    .persistent(SET_CODEC)
-                    .syncWith(PACKET_CODEC, AttachmentSyncPredicate.all())
-            );
+    private static AttachmentType<LongOpenHashSet> set(String path) {
+        AttachmentType<LongOpenHashSet>[] self = new AttachmentType[1];
+        self[0] = AttachmentType.<LongOpenHashSet>builder((java.util.function.Supplier<LongOpenHashSet>) LongOpenHashSet::new)
+                .serialize(SET_MAP_CODEC, set -> !set.isEmpty())
+                .sync(observing(PACKET_CODEC, () -> self[0]))
+                .build();
+        return self[0];
+    }
+
+    /** A client-side observer of synced attachment values: (holder, type, previous, synced). */
+    public interface ClientSyncObserver {
+        <T> void onSynced(net.neoforged.neoforge.attachment.IAttachmentHolder holder, AttachmentType<T> type,
+                          T previous, T synced);
+    }
+
+    private static volatile ClientSyncObserver clientSyncObserver;
+
+    /** Installed by the client so a synced value can schedule re-meshes (the Fabric lines' onAttachedSet). */
+    public static void setClientSyncObserver(ClientSyncObserver observer) {
+        clientSyncObserver = observer;
+    }
+
     /**
-     * Beta4 sidecar attachment that records authored compound ordinary full-block
-     * anchors at lane {@code dy=-1.0}. Additive to {@link #ANCHOR_TYPE}: a position
-     * may be in both (compound block also has the ordinary anchor), and the sidecar
-     * preserves authored depth across source slab removal so {@code getYOffsetInner}
-     * can return {@code dy=-1.0} without re-deriving from the now-missing slab below.
-     *
-     * <p>Beta4-narrow: compound only, no slab lane grammar, no recursion below
-     * {@code -1.0}. See {@code docs/beta4-compound-source-mode-design.md}.
+     * The plain stream-codec sync, plus a client-side notification after each decode so the renderer
+     * can re-mesh the cells that changed (what Fabric's attachment-set listener provided).
      */
-    public static final AttachmentType<LongOpenHashSet> COMPOUND_FULL_BLOCK_ANCHOR_TYPE =
-            AttachmentRegistry.<LongOpenHashSet>create(COMPOUND_FULL_BLOCK_ANCHOR_ID, builder -> builder
-                    .persistent(SET_CODEC)
-                    .syncWith(PACKET_CODEC, AttachmentSyncPredicate.all())
-            );
-    public static final AttachmentType<LongOpenHashSet> COMPOUND_VISIBLE_SIDE_LOWER_SLAB_TYPE =
-            AttachmentRegistry.<LongOpenHashSet>create(COMPOUND_VISIBLE_SIDE_LOWER_SLAB_ID, builder -> builder
-                    .persistent(SET_CODEC)
-                    .syncWith(PACKET_CODEC, AttachmentSyncPredicate.all())
-            );
-    public static final AttachmentType<LongOpenHashSet> COMPOUND_VISIBLE_SIDE_UPPER_SLAB_TYPE =
-            AttachmentRegistry.<LongOpenHashSet>create(COMPOUND_VISIBLE_SIDE_UPPER_SLAB_ID, builder -> builder
-                    .persistent(SET_CODEC)
-                    .syncWith(PACKET_CODEC, AttachmentSyncPredicate.all())
-            );
-    public static final AttachmentType<LongOpenHashSet> COMPOUND_VISIBLE_SIDE_DOUBLE_SLAB_TYPE =
-            AttachmentRegistry.<LongOpenHashSet>create(COMPOUND_VISIBLE_SIDE_DOUBLE_SLAB_ID, builder -> builder
-                    .persistent(SET_CODEC)
-                    .syncWith(PACKET_CODEC, AttachmentSyncPredicate.all())
-            );
-    public static final AttachmentType<LongOpenHashSet> COMPOUND_VISIBLE_OWNER_TOP_SLAB_TYPE =
-            AttachmentRegistry.<LongOpenHashSet>create(COMPOUND_VISIBLE_OWNER_TOP_SLAB_ID, builder -> builder
-                    .persistent(SET_CODEC)
-                    .syncWith(PACKET_CODEC, AttachmentSyncPredicate.all())
-            );
+    private static <T> net.neoforged.neoforge.attachment.AttachmentSyncHandler<T> observing(
+            StreamCodec<RegistryFriendlyByteBuf, T> codec,
+            java.util.function.Supplier<AttachmentType<T>> type) {
+        return new net.neoforged.neoforge.attachment.AttachmentSyncHandler<>() {
+            @Override
+            public void write(RegistryFriendlyByteBuf buf, T attachment, boolean initialSync) {
+                codec.encode(buf, attachment);
+            }
+
+            @Override
+            public T read(net.neoforged.neoforge.attachment.IAttachmentHolder holder, RegistryFriendlyByteBuf buf, T previousValue) {
+                T synced = codec.decode(buf);
+                ClientSyncObserver observer = clientSyncObserver;
+                if (observer != null) {
+                    observer.onSynced(holder, type.get(), previousValue, synced);
+                }
+                return synced;
+            }
+        };
+    }
+
+    public static final AttachmentType<LongOpenHashSet> ANCHOR_TYPE = set(ANCHOR_ID.getPath());
+    public static final AttachmentType<LongOpenHashSet> FROZEN_FLAT_TYPE = set(FROZEN_FLAT_ID.getPath());
+    public static final AttachmentType<LongOpenHashSet> LOWERED_SLAB_CARRIER_TYPE = set(LOWERED_SLAB_CARRIER_ID.getPath());
+    public static final AttachmentType<LongOpenHashSet> COMPOUND_FULL_BLOCK_ANCHOR_TYPE = set(COMPOUND_FULL_BLOCK_ANCHOR_ID.getPath());
+    public static final AttachmentType<LongOpenHashSet> COMPOUND_VISIBLE_SIDE_LOWER_SLAB_TYPE = set(COMPOUND_VISIBLE_SIDE_LOWER_SLAB_ID.getPath());
+    public static final AttachmentType<LongOpenHashSet> COMPOUND_VISIBLE_SIDE_UPPER_SLAB_TYPE = set(COMPOUND_VISIBLE_SIDE_UPPER_SLAB_ID.getPath());
+    public static final AttachmentType<LongOpenHashSet> COMPOUND_VISIBLE_SIDE_DOUBLE_SLAB_TYPE = set(COMPOUND_VISIBLE_SIDE_DOUBLE_SLAB_ID.getPath());
+    public static final AttachmentType<LongOpenHashSet> COMPOUND_VISIBLE_OWNER_TOP_SLAB_TYPE = set(COMPOUND_VISIBLE_OWNER_TOP_SLAB_ID.getPath());
 
     // ── FROZEN-DY value store (LAW.md restoration, Step 0) ────────────────────────────────────────
     // The law: a block's height is decided ONCE at placement and STAYS. Unlike the presence flags
@@ -264,11 +274,15 @@ public final class SlabAnchorAttachment {
     private static final StreamCodec<RegistryFriendlyByteBuf, Long2DoubleOpenHashMap> DY_MAP_PACKET_CODEC =
             ChunkPositionDyMapPacketCodec.INSTANCE;
 
+    private static AttachmentType<Long2DoubleOpenHashMap> placementDyType() {
+        return PLACEMENT_DY_TYPE;
+    }
+
     public static final AttachmentType<Long2DoubleOpenHashMap> PLACEMENT_DY_TYPE =
-            AttachmentRegistry.<Long2DoubleOpenHashMap>create(PLACEMENT_DY_ID, builder -> builder
-                    .persistent(DY_MAP_CODEC)
-                    .syncWith(DY_MAP_PACKET_CODEC, AttachmentSyncPredicate.all())
-            );
+            AttachmentType.<Long2DoubleOpenHashMap>builder((java.util.function.Supplier<Long2DoubleOpenHashMap>) SlabAnchorAttachment::newDyMap)
+                    .serialize(DY_MAP_CODEC.fieldOf("cells"), map -> !map.isEmpty())
+                    .sync(observing(DY_MAP_PACKET_CODEC, SlabAnchorAttachment::placementDyType))
+                    .build();
 
     /**
      * Step 0 master switch for the FROZEN-DY value store (LAW.md restoration): when true, reads route
@@ -378,7 +392,7 @@ public final class SlabAnchorAttachment {
                 continue;
             }
             Long2DoubleOpenHashMap map = copies.computeIfAbsent(chunk, ignored -> {
-                Long2DoubleOpenHashMap existing = chunk.getAttached(PLACEMENT_DY_TYPE);
+                Long2DoubleOpenHashMap existing = com.slabbed.loader.Attachments.get(chunk, PLACEMENT_DY_TYPE);
                 Long2DoubleOpenHashMap copy = existing == null
                         ? newDyMap()
                         : new Long2DoubleOpenHashMap(existing);
@@ -405,7 +419,7 @@ public final class SlabAnchorAttachment {
             writes++;
         }
         for (LevelChunk chunk : changedChunks.keySet()) {
-            chunk.setAttached(PLACEMENT_DY_TYPE, copies.get(chunk));
+            com.slabbed.loader.Attachments.set(chunk, PLACEMENT_DY_TYPE, copies.get(chunk));
             recordC3PublicationForTests(chunk);
         }
         return writes;
@@ -484,7 +498,7 @@ public final class SlabAnchorAttachment {
             if (chunk == null) {
                 return false;
             }
-            Long2DoubleOpenHashMap map = chunk.getAttached(PLACEMENT_DY_TYPE);
+            Long2DoubleOpenHashMap map = com.slabbed.loader.Attachments.get(chunk, PLACEMENT_DY_TYPE);
             if (map == null || map.isEmpty()) {
                 return false; // common case: no frozen entries anywhere in this chunk
             }
@@ -536,7 +550,7 @@ public final class SlabAnchorAttachment {
         if (chunk == null) {
             return PlacementDyFact.absent();
         }
-        Long2DoubleOpenHashMap map = chunk.getAttached(PLACEMENT_DY_TYPE);
+        Long2DoubleOpenHashMap map = com.slabbed.loader.Attachments.get(chunk, PLACEMENT_DY_TYPE);
         long key = pos.asLong();
         return (map != null && map.containsKey(key))
                 ? new PlacementDyFact(true, Double.doubleToRawLongBits(map.get(key)))
@@ -547,19 +561,19 @@ public final class SlabAnchorAttachment {
      * Triggers static-init class loading. Call once from the mod entrypoint so the
      * attachment is registered before any chunk loads.
      */
-    public static void register() {
-        // Touch the class so the static field initializes and registers with Fabric.
-        if (ANCHOR_TYPE == null
-                || FROZEN_FLAT_TYPE == null
-                || LOWERED_SLAB_CARRIER_TYPE == null
-                || COMPOUND_FULL_BLOCK_ANCHOR_TYPE == null
-                || COMPOUND_VISIBLE_SIDE_LOWER_SLAB_TYPE == null
-                || COMPOUND_VISIBLE_SIDE_UPPER_SLAB_TYPE == null
-                || COMPOUND_VISIBLE_SIDE_DOUBLE_SLAB_TYPE == null
-                || COMPOUND_VISIBLE_OWNER_TOP_SLAB_TYPE == null
-                || PLACEMENT_DY_TYPE == null) {
-            throw new IllegalStateException("SlabAnchorAttachment failed to register");
-        }
+    /** Registers every attachment type on the mod bus before chunks load. */
+    public static void register(IEventBus modEventBus) {
+        ATTACHMENT_TYPES.register(ANCHOR_ID.getPath(), () -> ANCHOR_TYPE);
+        ATTACHMENT_TYPES.register(FROZEN_FLAT_ID.getPath(), () -> FROZEN_FLAT_TYPE);
+        ATTACHMENT_TYPES.register(LOWERED_SLAB_CARRIER_ID.getPath(), () -> LOWERED_SLAB_CARRIER_TYPE);
+        ATTACHMENT_TYPES.register(COMPOUND_FULL_BLOCK_ANCHOR_ID.getPath(), () -> COMPOUND_FULL_BLOCK_ANCHOR_TYPE);
+        ATTACHMENT_TYPES.register(COMPOUND_VISIBLE_SIDE_LOWER_SLAB_ID.getPath(), () -> COMPOUND_VISIBLE_SIDE_LOWER_SLAB_TYPE);
+        ATTACHMENT_TYPES.register(COMPOUND_VISIBLE_SIDE_UPPER_SLAB_ID.getPath(), () -> COMPOUND_VISIBLE_SIDE_UPPER_SLAB_TYPE);
+        ATTACHMENT_TYPES.register(COMPOUND_VISIBLE_SIDE_DOUBLE_SLAB_ID.getPath(), () -> COMPOUND_VISIBLE_SIDE_DOUBLE_SLAB_TYPE);
+        ATTACHMENT_TYPES.register(COMPOUND_VISIBLE_OWNER_TOP_SLAB_ID.getPath(), () -> COMPOUND_VISIBLE_OWNER_TOP_SLAB_TYPE);
+        ATTACHMENT_TYPES.register(PLACEMENT_DY_ID.getPath(), () -> PLACEMENT_DY_TYPE);
+        ATTACHMENT_TYPES.register(modEventBus);
+        EntitySeatAttachments.register(modEventBus);
     }
 
     // ── server-side mutation ──────────────────────────────────────────
@@ -750,7 +764,7 @@ public final class SlabAnchorAttachment {
         if (chunk == null) {
             return false;
         }
-        LongOpenHashSet set = chunk.getAttached(FROZEN_FLAT_TYPE);
+        LongOpenHashSet set = com.slabbed.loader.Attachments.get(chunk, FROZEN_FLAT_TYPE);
         return set != null && set.contains(pos.asLong());
     }
 
@@ -957,12 +971,12 @@ public final class SlabAnchorAttachment {
             }
             return false;
         }
-        LongOpenHashSet existing = chunk.getAttached(type);
+        LongOpenHashSet existing = com.slabbed.loader.Attachments.get(chunk, type);
         LongOpenHashSet set = existing == null ? new LongOpenHashSet() : new LongOpenHashSet(existing);
         BlockState stateBefore = null; // 26.1.2 port: diagnostic side effect deferred until core compile is restored.
         if (set.add(pos.asLong())) {
             // setAttached triggers persistence + auto-sync for synced attachments.
-            chunk.setAttached(type, set);
+            com.slabbed.loader.Attachments.set(chunk, type, set);
             if (TRACE) {
                 Slabbed.LOGGER.info("[ANCHOR] {} add success pos={} chunk={} setSize={}",
                         label, pos.toShortString(), chunk.getPos(), set.size());
@@ -1156,12 +1170,12 @@ public final class SlabAnchorAttachment {
         removeFromAttachment(world, chunk, pos, LOWERED_SLAB_CARRIER_TYPE, "lowered_slab_carrier");
         // FROZEN-DY (Step 0): the stored placement height dies with the block, so a fresh placement in
         // the same cell captures its own aim from scratch.
-        Long2DoubleOpenHashMap dyMap = chunk.getAttached(PLACEMENT_DY_TYPE);
+        Long2DoubleOpenHashMap dyMap = com.slabbed.loader.Attachments.get(chunk, PLACEMENT_DY_TYPE);
         if (dyMap != null && dyMap.containsKey(pos.asLong())) {
             Long2DoubleOpenHashMap copy = new Long2DoubleOpenHashMap(dyMap);
             copy.defaultReturnValue(Double.NaN);
             copy.remove(pos.asLong());
-            chunk.setAttached(PLACEMENT_DY_TYPE, copy);
+            com.slabbed.loader.Attachments.set(chunk, PLACEMENT_DY_TYPE, copy);
         }
     }
 
@@ -1197,18 +1211,18 @@ public final class SlabAnchorAttachment {
         if (chunk == null) {
             return false;
         }
-        Long2DoubleOpenHashMap dyMap = chunk.getAttached(PLACEMENT_DY_TYPE);
+        Long2DoubleOpenHashMap dyMap = com.slabbed.loader.Attachments.get(chunk, PLACEMENT_DY_TYPE);
         if (dyMap != null && dyMap.containsKey(key)) {
             return true;
         }
-        return contains(chunk.getAttached(ANCHOR_TYPE), key)
-                || contains(chunk.getAttached(FROZEN_FLAT_TYPE), key)
-                || contains(chunk.getAttached(COMPOUND_FULL_BLOCK_ANCHOR_TYPE), key)
-                || contains(chunk.getAttached(COMPOUND_VISIBLE_SIDE_LOWER_SLAB_TYPE), key)
-                || contains(chunk.getAttached(COMPOUND_VISIBLE_SIDE_UPPER_SLAB_TYPE), key)
-                || contains(chunk.getAttached(COMPOUND_VISIBLE_SIDE_DOUBLE_SLAB_TYPE), key)
-                || contains(chunk.getAttached(COMPOUND_VISIBLE_OWNER_TOP_SLAB_TYPE), key)
-                || contains(chunk.getAttached(LOWERED_SLAB_CARRIER_TYPE), key);
+        return contains(com.slabbed.loader.Attachments.get(chunk, ANCHOR_TYPE), key)
+                || contains(com.slabbed.loader.Attachments.get(chunk, FROZEN_FLAT_TYPE), key)
+                || contains(com.slabbed.loader.Attachments.get(chunk, COMPOUND_FULL_BLOCK_ANCHOR_TYPE), key)
+                || contains(com.slabbed.loader.Attachments.get(chunk, COMPOUND_VISIBLE_SIDE_LOWER_SLAB_TYPE), key)
+                || contains(com.slabbed.loader.Attachments.get(chunk, COMPOUND_VISIBLE_SIDE_UPPER_SLAB_TYPE), key)
+                || contains(com.slabbed.loader.Attachments.get(chunk, COMPOUND_VISIBLE_SIDE_DOUBLE_SLAB_TYPE), key)
+                || contains(com.slabbed.loader.Attachments.get(chunk, COMPOUND_VISIBLE_OWNER_TOP_SLAB_TYPE), key)
+                || contains(com.slabbed.loader.Attachments.get(chunk, LOWERED_SLAB_CARRIER_TYPE), key);
     }
 
     private static boolean contains(LongOpenHashSet set, long key) {
@@ -1246,7 +1260,7 @@ public final class SlabAnchorAttachment {
         if (chunk == null) {
             return false;
         }
-        LongOpenHashSet existing = chunk.getAttached(type);
+        LongOpenHashSet existing = com.slabbed.loader.Attachments.get(chunk, type);
         if (existing == null || existing.isEmpty()) {
             if (TRACE) {
                 Slabbed.LOGGER.info("[ANCHOR] {} remove pos={} existed=false", label, pos.toShortString());
@@ -1260,9 +1274,9 @@ public final class SlabAnchorAttachment {
         }
         if (removed) {
             if (set.isEmpty()) {
-                chunk.removeAttached(type);
+                com.slabbed.loader.Attachments.remove(chunk, type);
             } else {
-                chunk.setAttached(type, set);
+                com.slabbed.loader.Attachments.set(chunk, type, set);
             }
             logCompoundVisibleRenderTraceMarkerSet(world, pos, type, label, "remove", false);
             // 26.1.2 port: diagnostic side effect deferred until core compile is restored.
@@ -1369,7 +1383,7 @@ public final class SlabAnchorAttachment {
         if (chunk == null) {
             return false;
         }
-        LongOpenHashSet set = chunk.getAttached(ANCHOR_TYPE);
+        LongOpenHashSet set = com.slabbed.loader.Attachments.get(chunk, ANCHOR_TYPE);
         boolean anchored = set != null && set.contains(pos.asLong());
         if (TRACE && anchored) {
             Slabbed.LOGGER.info("[ANCHOR] query true side={} pos={}",
@@ -1400,7 +1414,7 @@ public final class SlabAnchorAttachment {
         if (chunk == null) {
             return false;
         }
-        LongOpenHashSet set = chunk.getAttached(COMPOUND_FULL_BLOCK_ANCHOR_TYPE);
+        LongOpenHashSet set = com.slabbed.loader.Attachments.get(chunk, COMPOUND_FULL_BLOCK_ANCHOR_TYPE);
         boolean compound = set != null && set.contains(pos.asLong());
         if (TRACE && compound) {
             Slabbed.LOGGER.info("[ANCHOR] compound_full_block query true side={} pos={}",
@@ -1421,7 +1435,7 @@ public final class SlabAnchorAttachment {
         if (chunk == null) {
             return false;
         }
-        LongOpenHashSet set = chunk.getAttached(COMPOUND_VISIBLE_SIDE_LOWER_SLAB_TYPE);
+        LongOpenHashSet set = com.slabbed.loader.Attachments.get(chunk, COMPOUND_VISIBLE_SIDE_LOWER_SLAB_TYPE);
         boolean marked = set != null && set.contains(pos.asLong());
         if (TRACE && marked) {
             Slabbed.LOGGER.info("[ANCHOR] compound_visible_side_lower_slab query true side={} pos={}",
@@ -1442,7 +1456,7 @@ public final class SlabAnchorAttachment {
         if (chunk == null) {
             return false;
         }
-        LongOpenHashSet set = chunk.getAttached(COMPOUND_VISIBLE_SIDE_UPPER_SLAB_TYPE);
+        LongOpenHashSet set = com.slabbed.loader.Attachments.get(chunk, COMPOUND_VISIBLE_SIDE_UPPER_SLAB_TYPE);
         boolean marked = set != null && set.contains(pos.asLong());
         if (TRACE && marked) {
             Slabbed.LOGGER.info("[ANCHOR] compound_visible_side_upper_slab query true side={} pos={}",
@@ -1463,7 +1477,7 @@ public final class SlabAnchorAttachment {
         if (chunk == null) {
             return false;
         }
-        LongOpenHashSet set = chunk.getAttached(COMPOUND_VISIBLE_SIDE_DOUBLE_SLAB_TYPE);
+        LongOpenHashSet set = com.slabbed.loader.Attachments.get(chunk, COMPOUND_VISIBLE_SIDE_DOUBLE_SLAB_TYPE);
         boolean marked = set != null && set.contains(pos.asLong());
         if (TRACE && marked) {
             Slabbed.LOGGER.info("[ANCHOR] compound_visible_side_double_slab query true side={} pos={}",
@@ -1484,7 +1498,7 @@ public final class SlabAnchorAttachment {
         if (chunk == null) {
             return false;
         }
-        LongOpenHashSet set = chunk.getAttached(COMPOUND_VISIBLE_OWNER_TOP_SLAB_TYPE);
+        LongOpenHashSet set = com.slabbed.loader.Attachments.get(chunk, COMPOUND_VISIBLE_OWNER_TOP_SLAB_TYPE);
         boolean marked = set != null && set.contains(pos.asLong());
         if (TRACE && marked) {
             Slabbed.LOGGER.info("[ANCHOR] compound_visible_owner_top_slab query true side={} pos={}",
@@ -1515,7 +1529,7 @@ public final class SlabAnchorAttachment {
         if (chunk == null) {
             return isPersistentLoweredBottomSlabCarrierNonRecursive(world, pos, state);
         }
-        LongOpenHashSet set = chunk.getAttached(LOWERED_SLAB_CARRIER_TYPE);
+        LongOpenHashSet set = com.slabbed.loader.Attachments.get(chunk, LOWERED_SLAB_CARRIER_TYPE);
         boolean carrier = set != null && set.contains(pos.asLong());
         if (!carrier && isPersistentLoweredBottomSlabCarrierNonRecursive(world, pos, state)) {
             carrier = true;
@@ -1547,7 +1561,7 @@ public final class SlabAnchorAttachment {
         if (world instanceof Level w) {
             LevelChunk chunk = w.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
             if (chunk != null) {
-                LongOpenHashSet set = chunk.getAttached(LOWERED_SLAB_CARRIER_TYPE);
+                LongOpenHashSet set = com.slabbed.loader.Attachments.get(chunk, LOWERED_SLAB_CARRIER_TYPE);
                 if (set != null && set.contains(pos.asLong())) {
                     return true;
                 }

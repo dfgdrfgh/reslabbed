@@ -1,7 +1,7 @@
 package com.slabbed.test;
 
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -58,7 +58,7 @@ public final class GhostLoweredCollisionProofTest {
      * movement collision must stay vanilla (within-cell) so the broadphase
      * samples it.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void loweredFullBlockCollisionStaysWithinCell(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
 
@@ -128,7 +128,7 @@ public final class GhostLoweredCollisionProofTest {
      * a within-cell collision shape. Guards against the fix accidentally
      * disturbing un-lowered blocks.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void vanillaFullBlockCollisionUnchanged(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
 

@@ -1,7 +1,7 @@
 package com.slabbed.test;
 
 import com.slabbed.anchor.SlabAnchorAttachment;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -94,19 +94,19 @@ public final class LoweredSeatFreezeTest {
 
     /** The control: upstream's BOTTOM-slab supports were correct. Lowered bottom slab top sits a full
      *  cell below the placed cell's base, so the stone freezes at -1.0. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void stoneOnLoweredBottomSlabFreezesAtItsTop(GameTestHelper helper) {
         seatRow(helper, SlabType.BOTTOM, -0.5, -1.0);
     }
 
     /** The upstream failure case: a lowered TOP slab's top face is at its own cell top, so the stone
      *  freezes at the slab's own dy — not a follower floor. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void stoneOnLoweredTopSlabFreezesAtItsTop(GameTestHelper helper) {
         seatRow(helper, SlabType.TOP, -0.5, -0.5);
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void stoneOnLoweredDoubleSlabFreezesAtItsTop(GameTestHelper helper) {
         seatRow(helper, SlabType.DOUBLE, -0.5, -0.5);
     }
@@ -119,12 +119,12 @@ public final class LoweredSeatFreezeTest {
      * {@code -0.5}. These rows author the support at {@code -1.0}, where floor and truth diverge —
      * a {@code -0.5} here is the class-shaped bug, reproduced.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void stoneOnDeepLoweredTopSlabDoesNotTakeAFloor(GameTestHelper helper) {
         seatRow(helper, SlabType.TOP, -1.0, -1.0);
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void stoneOnDeepLoweredDoubleSlabDoesNotTakeAFloor(GameTestHelper helper) {
         seatRow(helper, SlabType.DOUBLE, -1.0, -1.0);
     }

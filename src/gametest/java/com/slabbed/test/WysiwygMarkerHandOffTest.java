@@ -2,7 +2,7 @@ package com.slabbed.test;
 
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -83,7 +83,7 @@ public final class WysiwygMarkerHandOffTest {
      * the hop, the slab froze FLAT at grid height — 0.5 above the aimed lowered side surface (the
      * audit's exact F10 symptom).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void hoppedSideClickOntoFlushGroundNeedsTheMarker(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos clicked = buildHopRig(helper, w);
@@ -124,7 +124,7 @@ public final class WysiwygMarkerHandOffTest {
      * Over-AIR hop pin (green before AND after): RC2-C treats the cantilevered post-hop slab as
      * genuine geometry and anchors it with or without the marker — marker-independent by design.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void hoppedSideClickLandsAnchoredNotFrozenFlat(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos clicked = buildHopRig(helper, w);
@@ -163,7 +163,7 @@ public final class WysiwygMarkerHandOffTest {
     }
 
     /** Control (green before AND after): the un-hopped side-click WYSIWYG route still anchors. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void unhoppedSideClickStillAnchors(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos base = helper.absolutePos(new BlockPos(3, 1, 2));

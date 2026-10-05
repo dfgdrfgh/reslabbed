@@ -2,7 +2,7 @@ package com.slabbed.test;
 
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -192,7 +192,7 @@ public final class RedstoneWireVisualStepTest {
 
     // ── row 1: the wire beside the slab reads the wire drawn on it ───────────────────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aWireBesideAHalfStepReadsTheWireDrawnOnTheSlab(GameTestHelper helper) {
         withFrozen(() -> {
             BlockPos[] wires = halfStep(helper, FLUSH);
@@ -209,7 +209,7 @@ public final class RedstoneWireVisualStepTest {
 
     // ── row 2: a wire on a top slab is drawn in its own cell — vanilla's one-way step is kept ────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aWireOnATopSlabKeepsVanillasOneWayStep(GameTestHelper helper) {
         withFrozen(() -> {
             floor(helper, 0, 5);
@@ -229,7 +229,7 @@ public final class RedstoneWireVisualStepTest {
 
     // ── row 3: power still climbs the half-step, as it always did ───────────────────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void powerStillClimbsTheHalfStep(GameTestHelper helper) {
         withFrozen(() -> {
             BlockPos[] wires = halfStep(helper, FLUSH);
@@ -243,7 +243,7 @@ public final class RedstoneWireVisualStepTest {
 
     // ── row 4: the read follows the source and the lowered wire away again ──────────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void theReadFollowsTheSourceAndTheLoweredWireAway(GameTestHelper helper) {
         withFrozen(() -> {
             BlockPos[] wires = halfStep(helper, FLUSH);
@@ -281,7 +281,7 @@ public final class RedstoneWireVisualStepTest {
 
     // ── rows 5 and 6: a staircase of half-steps carries power down as well as up ────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aStaircaseOfHalfStepsCarriesPowerDown(GameTestHelper helper) {
         withFrozen(() -> {
             BlockPos[] wires = staircase(helper);
@@ -296,7 +296,7 @@ public final class RedstoneWireVisualStepTest {
         });
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aStaircaseOfHalfStepsCarriesPowerUp(GameTestHelper helper) {
         withFrozen(() -> {
             BlockPos[] wires = staircase(helper);
@@ -311,7 +311,7 @@ public final class RedstoneWireVisualStepTest {
 
     // ── row 7: a wire lowered a whole block, drawn level with the reader, connects flat ─────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aWireLoweredAWholeBlockConnectsFlatWithTheWireBesideIt(GameTestHelper helper) {
         withFrozen(() -> {
             floor(helper, 0, 5);
@@ -333,7 +333,7 @@ public final class RedstoneWireVisualStepTest {
 
     // ── row 8: two lowered wires a whole drawn block apart connect like a vanilla full step ─────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void twoLoweredWiresAWholeBlockApartConnectLikeAFullStep(GameTestHelper helper) {
         withFrozen(() -> {
             BlockPos[] wires = halfStep(helper, LOWERED);
@@ -348,7 +348,7 @@ public final class RedstoneWireVisualStepTest {
 
     // ── row 9: a wire drawn a block and a half below the lowered wire does not read it ──────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aWireDrawnMoreThanABlockBelowDoesNotReadTheLoweredWire(GameTestHelper helper) {
         withFrozen(() -> {
             floor(helper, 0, 5);

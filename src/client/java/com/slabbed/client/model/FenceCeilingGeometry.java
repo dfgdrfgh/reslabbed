@@ -1,28 +1,28 @@
 package com.slabbed.client.model;
 
 import com.slabbed.util.FenceCeilingConnection;
-import net.fabricmc.fabric.api.client.renderer.v1.Renderer;
-import net.fabricmc.fabric.api.client.renderer.v1.mesh.MutableMesh;
-import net.fabricmc.fabric.api.client.renderer.v1.mesh.QuadEmitter;
-import net.fabricmc.fabric.api.client.renderer.v1.mesh.QuadView;
-import net.fabricmc.fabric.api.client.renderer.v1.model.FabricBlockStateModel;
-import net.minecraft.client.renderer.block.BlockAndTintGetter;
+import java.util.ArrayList;
+import java.util.List;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.block.FenceBlock;
 import net.minecraft.world.level.block.state.BlockState;
-
-import java.util.function.Predicate;
+import net.neoforged.neoforge.client.model.quad.MutableQuad;
 
 /** Adds a same-texture post segment while leaving fence rails and the placed seat unchanged. */
 public final class FenceCeilingGeometry {
     private static final float EPS = 1.0e-5f;
-    private FenceCeilingGeometry() { }
 
-    public static boolean emitIfConnected(FabricBlockStateModel model, QuadEmitter out,
-            BlockAndTintGetter view, BlockPos pos, BlockState state, float seat,
-            RandomSource random, Predicate<Direction> cullTest) {
+    private FenceCeilingGeometry() {
+    }
+
+    public static boolean collectIfConnected(BlockStateModel model, BlockAndTintGetter view, BlockPos pos,
+                                             BlockState state, float seat, RandomSource random,
+                                             List<BlockStateModelPart> out) {
         if (!(state.getBlock() instanceof FenceBlock)) {
             return false;
         }
@@ -32,50 +32,54 @@ public final class FenceCeilingGeometry {
         } catch (IndexOutOfBoundsException outsideRenderRegion) {
             return false;
         }
-        if (extension <= EPS || Renderer.get() == null) {
+        if (extension <= EPS) {
             return false;
         }
-        MutableMesh captured = Renderer.get().mutableMesh();
-        model.emitQuads(captured.emitter(), view, pos, state, random, cullTest);
-        captured.forEach(quad -> emit(out, quad, seat, extension));
+        List<BlockStateModelPart> captured = new ArrayList<>(4);
+        model.collectParts(view, pos, state, random, captured);
+        for (BlockStateModelPart part : captured) {
+            QuadPart edited = new QuadPart(part);
+            QuadPart.forEachQuad(part, (cullFace, quad) -> emit(edited, cullFace, quad, seat, extension));
+            out.add(edited);
+        }
         return true;
     }
 
-    private static void emit(QuadEmitter out, QuadView quad, float seat, float extension) {
+    private static void emit(QuadPart out, net.minecraft.core.Direction cullFace, BakedQuad quad,
+                             float seat, float extension) {
+        MutableQuad q = new MutableQuad().setFrom(quad);
         boolean post = true;
         float low = Float.POSITIVE_INFINITY;
         float high = Float.NEGATIVE_INFINITY;
         for (int i = 0; i < 4; i++) {
-            post &= quad.x(i) >= 0.375f-EPS && quad.x(i) <= 0.625f+EPS
-                    && quad.z(i) >= 0.375f-EPS && quad.z(i) <= 0.625f+EPS;
-            low = Math.min(low, quad.y(i));
-            high = Math.max(high, quad.y(i));
+            post &= q.x(i) >= 0.375f - EPS && q.x(i) <= 0.625f + EPS
+                    && q.z(i) >= 0.375f - EPS && q.z(i) <= 0.625f + EPS;
+            low = Math.min(low, q.y(i));
+            high = Math.max(high, q.y(i));
         }
-        boolean top = post && Math.abs(low-1.0f) <= EPS && Math.abs(high-1.0f) <= EPS;
-        out.copyFrom(quad);
+        boolean top = post && Math.abs(low - 1.0f) <= EPS && Math.abs(high - 1.0f) <= EPS;
+        MutableQuad moved = new MutableQuad().setFrom(quad);
         for (int i = 0; i < 4; i++) {
-            out.pos(i, quad.x(i), quad.y(i)+seat+(top ? extension : 0.0f), quad.z(i));
+            moved.setY(i, q.y(i) + seat + (top ? extension : 0.0f));
         }
-        if (top) out.cullFace(null);
-        out.emit();
-        if (!post || Math.abs(low) > EPS || Math.abs(high-1.0f) > EPS) {
+        out.add(top ? null : cullFace, moved.toBakedQuad());
+        if (!post || Math.abs(low) > EPS || Math.abs(high - 1.0f) > EPS) {
             return;
         }
-        out.copyFrom(quad);
-        out.cullFace(null);
+        MutableQuad segment = new MutableQuad().setFrom(quad);
         for (int i = 0; i < 4; i++) {
-            out.pos(i, quad.x(i), 1.0f+seat+quad.y(i)*extension, quad.z(i));
-            if (quad.y(i) > EPS) {
+            segment.setY(i, 1.0f + seat + q.y(i) * extension);
+            if (q.y(i) > EPS) {
                 for (int j = 0; j < 4; j++) {
-                    if (quad.y(j) <= EPS && Math.abs(quad.x(i)-quad.x(j)) <= EPS
-                            && Math.abs(quad.z(i)-quad.z(j)) <= EPS) {
-                        out.uv(i, quad.u(j)+(quad.u(i)-quad.u(j))*extension,
-                                quad.v(j)+(quad.v(i)-quad.v(j))*extension);
+                    if (q.y(j) <= EPS && Math.abs(q.x(i) - q.x(j)) <= EPS
+                            && Math.abs(q.z(i) - q.z(j)) <= EPS) {
+                        segment.setUv(i, q.u(j) + (q.u(i) - q.u(j)) * extension,
+                                q.v(j) + (q.v(i) - q.v(j)) * extension);
                         break;
                     }
                 }
             }
         }
-        out.emit();
+        out.add(null, segment.toBakedQuad());
     }
 }

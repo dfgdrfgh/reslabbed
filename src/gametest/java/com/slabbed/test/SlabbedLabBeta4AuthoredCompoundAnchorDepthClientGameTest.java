@@ -3,7 +3,7 @@ package com.slabbed.test;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.SlabSupport;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
-import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
+import net.neoforged.neoforge.attachment.AttachmentType;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;

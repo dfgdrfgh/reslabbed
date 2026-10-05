@@ -1,7 +1,7 @@
 {
   "required": true,
   "package": "com.slabbed.mixin.client",
-  "compatibilityLevel": "JAVA_21",
+  "compatibilityLevel": "JAVA_25",
   "client": [
     "BlockDisplayParticleMixin",
     "BlockEntityOffsetMixin",
@@ -22,5 +22,6 @@
   ],
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "minVersion": "0.8.7"
 }

@@ -3,8 +3,7 @@ package com.slabbed.test;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.compat.CompatHooks;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -117,16 +116,12 @@ public final class BlockEntityCantileverTerrainSlabsGuardTest {
     private static final Identifier TS_SLAB_ID =
             Identifier.fromNamespaceAndPath("terrain_slabs", "block_entity_cantilever_guard_test_slab");
     private static final ResourceKey<Block> TS_SLAB_KEY = ResourceKey.create(Registries.BLOCK, TS_SLAB_ID);
-    private static final Block TS_SLAB =
-            new SlabBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE_SLAB).setId(TS_SLAB_KEY));
+    private static final com.slabbed.gametest.TestBlocks.Lazy<Block> TS_SLAB = com.slabbed.gametest.TestBlocks.block(TS_SLAB_ID, () -> new SlabBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE_SLAB).setId(TS_SLAB_KEY)));
 
     /** Registers the TS-namespaced stand-in slab (before registry freeze, via the main entrypoint). */
-    public static final class TerrainSlabsBlockEntityCantileverGuardTestEntrypoint implements ModInitializer {
+    public static final class TerrainSlabsBlockEntityCantileverGuardTestEntrypoint implements com.slabbed.gametest.TestModInitializer {
         @Override
         public void onInitialize() {
-            if (!BuiltInRegistries.BLOCK.containsKey(TS_SLAB_ID)) {
-                Registry.register(BuiltInRegistries.BLOCK, TS_SLAB_ID, TS_SLAB);
-            }
         }
     }
 
@@ -152,7 +147,7 @@ public final class BlockEntityCantileverTerrainSlabsGuardTest {
         BlockPos slab = helper.absolutePos(new BlockPos(2, 3, 2));
         BlockPos chestPos = slab.above();
 
-        var slabState = (tsOwned ? TS_SLAB : Blocks.OAK_SLAB)
+        var slabState = (tsOwned ? TS_SLAB.get() : Blocks.OAK_SLAB)
                 .defaultBlockState().setValue(SlabBlock.TYPE, SlabType.BOTTOM);
         w.setBlock(slab, slabState, 2);
         w.setBlock(chestPos, Blocks.CHEST.defaultBlockState(), 2);
@@ -161,7 +156,7 @@ public final class BlockEntityCantileverTerrainSlabsGuardTest {
 
     // ── neighbour-recognition route: slabColumnYOffset (transitively TS-guarded) ────────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void hopperBesideChestOnTerrainSlabsColumnStaysFlush(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos chestPos = buildChestOnColumnSourceSlab(helper, true);
@@ -191,7 +186,7 @@ public final class BlockEntityCantileverTerrainSlabsGuardTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void hopperBesideChestOnVanillaColumnStillInheritsWhileTsOverrideActive(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos chestPos = buildChestOnColumnSourceSlab(helper, false);
@@ -237,7 +232,7 @@ public final class BlockEntityCantileverTerrainSlabsGuardTest {
         SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(w, loweredBottom, w.getBlockState(loweredBottom));
 
         w.setBlock(carrierGround, Blocks.SMOOTH_STONE_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.BOTTOM), 2);
-        var carrierState = (tsOwned ? TS_SLAB : Blocks.BIRCH_SLAB)
+        var carrierState = (tsOwned ? TS_SLAB.get() : Blocks.BIRCH_SLAB)
                 .defaultBlockState().setValue(SlabBlock.TYPE, SlabType.BOTTOM);
         w.setBlock(carrier, carrierState, 2);
         SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(w, carrier, w.getBlockState(carrier));
@@ -250,7 +245,7 @@ public final class BlockEntityCantileverTerrainSlabsGuardTest {
         return carrier;
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void hopperBesideTerrainSlabsCarrierSlabStaysFlush(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos carrier = buildLoweredCarrierOverAir(helper, true);
@@ -280,7 +275,7 @@ public final class BlockEntityCantileverTerrainSlabsGuardTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void hopperBesideVanillaCarrierSlabStillInheritsWhileTsOverrideActive(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos carrier = buildLoweredCarrierOverAir(helper, false);

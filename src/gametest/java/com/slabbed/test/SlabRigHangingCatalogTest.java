@@ -3,7 +3,7 @@ package com.slabbed.test;
 import com.slabbed.command.SlabRigHangingCatalog;
 import com.slabbed.command.SlabRigHangingArtifacts;
 import com.slabbed.util.BuildStamp;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.SharedConstants;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
@@ -45,7 +45,7 @@ public final class SlabRigHangingCatalogTest {
     private static final String EXPECTED_26_3_CATALOG_HASH =
             "1da029b4764d4bfde1dd0464041f64fff40fdbff9ae1f01dcfed7dcaf41b3d2e";
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void hangingRuntimeSnapshotBindsFullPaintingRegistry(GameTestHelper helper) {
         SlabRigHangingCatalog.Snapshot catalog = SlabRigHangingCatalog.snapshot();
         SlabRigHangingArtifacts.RuntimeSnapshot first = SlabRigHangingArtifacts.snapshot(
@@ -145,7 +145,7 @@ public final class SlabRigHangingCatalogTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void hangingRuntimeArtifactIsAtomicIdempotentAndCollisionSafe(GameTestHelper helper) {
         SlabRigHangingArtifacts.RuntimeSnapshot snapshot = SlabRigHangingArtifacts.snapshot(
                 SlabRigHangingCatalog.snapshot(), helper.getLevel().registryAccess());
@@ -225,7 +225,7 @@ public final class SlabRigHangingCatalogTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void runtimeItemPartitionIsTotalAndExact(GameTestHelper helper) {
         SlabRigHangingCatalog.Snapshot snapshot = SlabRigHangingCatalog.snapshot();
         Set<String> seen = new HashSet<>();
@@ -264,7 +264,7 @@ public final class SlabRigHangingCatalogTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void exactCoreFamilyCountsAreRuntimeDerived(GameTestHelper helper) {
         SlabRigHangingCatalog.Snapshot snapshot = SlabRigHangingCatalog.snapshot();
         Map<SlabRigHangingCatalog.Family, Integer> counts =
@@ -307,7 +307,7 @@ public final class SlabRigHangingCatalogTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void routeMatrixKeepsStateAndEvidenceOriginsSeparate(GameTestHelper helper) {
         SlabRigHangingCatalog.Snapshot snapshot = SlabRigHangingCatalog.snapshot();
         Set<String> ids = new HashSet<>();
@@ -341,7 +341,7 @@ public final class SlabRigHangingCatalogTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void exactRouteExpansionsCannotSilentlyCollapse(GameTestHelper helper) {
         SlabRigHangingCatalog.Snapshot snapshot = SlabRigHangingCatalog.snapshot();
         Map<SlabRigHangingCatalog.Family, Integer> counts =
@@ -420,7 +420,7 @@ public final class SlabRigHangingCatalogTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void wallHangingSignRoutesUseExactLateralGeometry(GameTestHelper helper) {
         SlabRigHangingCatalog.Snapshot snapshot = SlabRigHangingCatalog.snapshot();
         List<SlabRigHangingCatalog.Route> wall = snapshot.routes().stream()
@@ -506,7 +506,7 @@ public final class SlabRigHangingCatalogTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void shelfAndBellRoutesUseExecutableInputs(GameTestHelper helper) {
         SlabRigHangingCatalog.Snapshot snapshot = SlabRigHangingCatalog.snapshot();
         List<SlabRigHangingCatalog.Route> shelves = snapshot.routes().stream()
@@ -585,7 +585,7 @@ public final class SlabRigHangingCatalogTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void clickedFacesOriginsAndDynamicSubcatalogsStayDistinct(GameTestHelper helper) {
         SlabRigHangingCatalog.Snapshot snapshot = SlabRigHangingCatalog.snapshot();
         for (SlabRigHangingCatalog.Route route : snapshot.routes()) {
@@ -632,7 +632,7 @@ public final class SlabRigHangingCatalogTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void chainTerminalsAreDerivedAndDirectMeansZeroChain(GameTestHelper helper) {
         SlabRigHangingCatalog.Snapshot snapshot = SlabRigHangingCatalog.snapshot();
         for (SlabRigHangingCatalog.Route route : snapshot.routes()) {
@@ -661,7 +661,7 @@ public final class SlabRigHangingCatalogTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void hangingEntityRoutesUseEntityEffects(GameTestHelper helper) {
         SlabRigHangingCatalog.Snapshot snapshot = SlabRigHangingCatalog.snapshot();
         int items = 0;
@@ -689,7 +689,7 @@ public final class SlabRigHangingCatalogTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void chainAndTopologyAxesReachTheBoundary(GameTestHelper helper) {
         SlabRigHangingCatalog.Snapshot snapshot = SlabRigHangingCatalog.snapshot();
         if (snapshot.chainMaterials().size() != 9) {
@@ -740,7 +740,7 @@ public final class SlabRigHangingCatalogTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void semanticCaseIdsAndPagingAreStable(GameTestHelper helper) {
         SlabRigHangingCatalog.Snapshot first = SlabRigHangingCatalog.snapshot();
         SlabRigHangingCatalog.Snapshot second = SlabRigHangingCatalog.snapshot();
@@ -782,7 +782,7 @@ public final class SlabRigHangingCatalogTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void catalogHashNamesExecutableCaseUniverse(GameTestHelper helper) {
         SlabRigHangingCatalog.Snapshot snapshot = SlabRigHangingCatalog.snapshot();
         String tsv = SlabRigHangingCatalog.catalogTsv(snapshot);
@@ -965,7 +965,7 @@ public final class SlabRigHangingCatalogTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void mappedRuntimeSemanticsRejectImpossibleCatalogClaims(GameTestHelper helper) {
         SlabRigHangingCatalog.Snapshot snapshot = SlabRigHangingCatalog.snapshot();
         List<String> violations = new ArrayList<>();

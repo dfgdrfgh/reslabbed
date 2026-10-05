@@ -2,7 +2,7 @@ package com.slabbed.test;
 
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -43,7 +43,7 @@ public final class ConnectingStructuralFreezeTest {
         SlabAnchorAttachment.freezeLoweredOnPlace(w, pos, w.getBlockState(pos));
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void flatPlacedFenceHoldsWhenASlabIsShovedUnder(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos ground = helper.absolutePos(new BlockPos(2, 2, 2));
@@ -68,7 +68,7 @@ public final class ConnectingStructuralFreezeTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fencePlacedOnALoweredSupportStillFollowsIt(GameTestHelper helper) {
         // Control: the feature direction is untouched — a fence placed ON a bottom slab follows down.
         ServerLevel w = helper.getLevel();

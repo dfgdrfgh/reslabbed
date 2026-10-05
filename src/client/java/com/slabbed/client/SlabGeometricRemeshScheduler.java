@@ -208,7 +208,7 @@ public final class SlabGeometricRemeshScheduler {
      * <h2>Why this exists (the plain-anchor freeze-on-place mesh-staleness bug)</h2>
      * A block is placed and its section bakes at the pre-anchor height; then ~40&nbsp;ms later the SERVER's
      * freeze-on-place ({@code SlabAnchorAttachment.freezeLoweredOnPlace} →
-     * {@code addAnchorUnchecked} → {@code chunk.setAttached(ANCHOR_TYPE, …)}) records the anchor, which the
+     * {@code addAnchorUnchecked} → {@code com.slabbed.loader.Attachments.set(chunk, ANCHOR_TYPE, …)}) records the anchor, which the
      * synced attachment auto-pushes to the client. The client's {@code onAttachedSet(ANCHOR_TYPE)} listener
      * fires — but the BlockState never changed (the live-cursor recorder captured two placement entries
      * ~41&nbsp;ms apart with BYTE-IDENTICAL {@code afterState}, {@code afterDy}/{@code afterLaneKind}

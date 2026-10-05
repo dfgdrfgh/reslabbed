@@ -1,11 +1,11 @@
 package com.slabbed.client;
 
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import com.slabbed.Slabbed;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.network.FrozenDyModeMessages;
 import com.slabbed.network.FrozenDyModePayload;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 
@@ -31,26 +31,28 @@ public final class FrozenDyModeClient {
     }
 
     public static void init() {
-        ClientPlayConnectionEvents.INIT.register((handler, client) -> warnedThisConnection = false);
-        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> warnedThisConnection = false);
-        ClientPlayNetworking.registerGlobalReceiver(FrozenDyModePayload.TYPE, (payload, context) -> {
-            boolean serverEnabled = payload.frozenDyEnabled();
-            boolean clientEnabled = SlabAnchorAttachment.FROZEN_DY_ENABLED;
-            if (!FrozenDyModeMessages.sidesMismatch(serverEnabled, clientEnabled) || warnedThisConnection) {
-                return;
+        NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingIn event) -> warnedThisConnection = false);
+        NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut event) -> warnedThisConnection = false);
+    }
+
+    /** The clientbound receiver; the network layer runs it on the client main thread. */
+    public static void onPayload(FrozenDyModePayload payload) {
+        boolean serverEnabled = payload.frozenDyEnabled();
+        boolean clientEnabled = SlabAnchorAttachment.FROZEN_DY_ENABLED;
+        if (!FrozenDyModeMessages.sidesMismatch(serverEnabled, clientEnabled) || warnedThisConnection) {
+            return;
+        }
+        warnedThisConnection = true;
+        Slabbed.LOGGER.warn(
+                "Stored-height compatibility flag differs between the sides (server={}, client={}); "
+                        + "drawn heights and the heights the server resolves against can disagree",
+                serverEnabled, clientEnabled);
+        Component message = FrozenDyModeMessages.mismatchMessage(serverEnabled, clientEnabled);
+        Minecraft client = Minecraft.getInstance();
+        client.execute(() -> {
+            if (client.player != null) {
+                client.player.sendSystemMessage(message);
             }
-            warnedThisConnection = true;
-            Slabbed.LOGGER.warn(
-                    "Stored-height compatibility flag differs between the sides (server={}, client={}); "
-                            + "drawn heights and the heights the server resolves against can disagree",
-                    serverEnabled, clientEnabled);
-            Component message = FrozenDyModeMessages.mismatchMessage(serverEnabled, clientEnabled);
-            Minecraft client = context.client();
-            client.execute(() -> {
-                if (client.player != null) {
-                    client.player.sendSystemMessage(message);
-                }
-            });
         });
     }
 }

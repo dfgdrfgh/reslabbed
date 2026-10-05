@@ -31,21 +31,38 @@ public final class PlayerSwing {
         }
     }
 
-    /** 26.3 and newer. Isolated: resolve its references only against a game version that has them. */
+    /** 26.3 and newer, by name: this build's game version may predate both members. */
     static final class Modern {
+        private static final MethodHandle INTERACT_ANIMATION;
+        private static final MethodHandle SWING_AND_RESET;
+        static {
+            try {
+                Class<?> animation = Class.forName("net.minecraft.world.item.component.SwingAnimation");
+                INTERACT_ANIMATION = MethodHandles.publicLookup().findVirtual(ItemStack.class, "getInteractAnimation",
+                        MethodType.methodType(animation));
+                SWING_AND_RESET = MethodHandles.publicLookup().findVirtual(Player.class, "swingAndResetAttackStrength",
+                        MethodType.methodType(void.class, InteractionHand.class, animation, boolean.class));
+            } catch (ReflectiveOperationException e) {
+                throw new IllegalStateException("26.3 swing members are missing", e);
+            }
+        }
         private Modern() {
         }
-
         static void consumeAndSwing(ServerPlayer player, InteractionHand hand) {
             ItemStack held = player.getItemInHand(hand);
-            net.minecraft.world.item.component.SwingAnimation animation = held.getInteractAnimation();
-            if (!player.isCreative()) {
-                held.consume(1, player);
+            try {
+                Object animation = INTERACT_ANIMATION.invoke(held);
+                if (!player.isCreative()) {
+                    held.consume(1, player);
+                }
+                SWING_AND_RESET.invoke((Player) player, hand, animation, true);
+            } catch (RuntimeException | Error e) {
+                throw e;
+            } catch (Throwable t) {
+                throw new IllegalStateException(t);
             }
-            player.swingAndResetAttackStrength(hand, animation, true);
         }
     }
-
     /** 26.2: the two-argument swing, by name, since the 26.3 build has no such method to compile against. */
     static final class Legacy {
         private static final MethodHandle SWING;

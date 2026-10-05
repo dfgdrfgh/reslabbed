@@ -1,11 +1,11 @@
 package com.slabbed.command;
 
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.BuildStamp;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
@@ -42,8 +42,10 @@ public final class SlabbedVerCommand {
     }
 
     public static void register() {
-        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->
-                register(dispatcher));
+        NeoForge.EVENT_BUS.addListener((RegisterCommandsEvent event) -> {
+            var dispatcher = event.getDispatcher();
+            register(dispatcher);
+        });
     }
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
@@ -63,7 +65,7 @@ public final class SlabbedVerCommand {
                 false);
         source.sendSuccess(() -> Component.literal("[slabbedver] frozenDy="
                 + SlabAnchorAttachment.FROZEN_DY_ENABLED
-                + " dev=" + FabricLoader.getInstance().isDevelopmentEnvironment()), false);
+                + " dev=" + com.slabbed.loader.Loader.isDevelopmentEnvironment()), false);
         return 1;
     }
 }

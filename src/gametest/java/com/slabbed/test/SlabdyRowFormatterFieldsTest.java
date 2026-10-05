@@ -3,7 +3,7 @@ package com.slabbed.test;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.SlabSupport;
 import com.slabbed.util.SlabdyRowFormatter;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -62,7 +62,7 @@ public final class SlabdyRowFormatterFieldsTest {
      * known value. (A bottom slab is NOT used as the target: a fresh bottom slab's OWN dy is 0.0 — it
      * only lowers objects resting ON it — so it would not exercise the LOWERED path.)
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void loweredTargetRowCarriesAllParityFields(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos below = helper.absolutePos(new BlockPos(2, 1, 2));  // a plain slab beneath
@@ -133,7 +133,7 @@ public final class SlabdyRowFormatterFieldsTest {
      * {@code expectedPlace=none}). Guards the null-handling the overlay relies on when the crosshair data
      * is incomplete.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void degenerateInputsStillCarryEveryLineWithFallbacks(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos stone = helper.absolutePos(new BlockPos(2, 1, 2));

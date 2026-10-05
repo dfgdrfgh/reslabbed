@@ -1,10 +1,11 @@
 package com.slabbed.client;
 
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.bus.api.IEventBus;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.slabbed.network.ManualDyAdjustPayload;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -36,7 +37,7 @@ import net.minecraft.world.phys.HitResult;
 public final class ManualDyKeybind {
 
     private static final KeyMapping.Category CATEGORY =
-            KeyMapping.Category.register(Identifier.fromNamespaceAndPath("slabbed", "slabbed"));
+            new KeyMapping.Category(Identifier.fromNamespaceAndPath("slabbed", "slabbed"));
 
     private static KeyMapping lower;
     private static KeyMapping raise;
@@ -48,21 +49,27 @@ public final class ManualDyKeybind {
      * MUST be called from the client entrypoint: Fabric's key-mapping registry refuses once the game's
      * options object exists, so this cannot be deferred to the first tick.
      */
-    public static void init() {
-        // Unbound means InputConstants.UNKNOWN: its type AND value are read from the constant, never
-        // written as literals. The keyboard type's own name differs between game versions this jar
-        // serves (26.2 KEYSYM, 26.3 KEYBOARD) and the unbound value is not -1 on every line.
-        lower = KeyMappingHelper.registerKeyMapping(new KeyMapping(
-                "key.slabbed.manual_dy_lower",
-                InputConstants.UNKNOWN.getType(),
-                InputConstants.UNKNOWN.getValue(),
-                CATEGORY));
-        raise = KeyMappingHelper.registerKeyMapping(new KeyMapping(
-                "key.slabbed.manual_dy_raise",
-                InputConstants.UNKNOWN.getType(),
-                InputConstants.UNKNOWN.getValue(),
-                CATEGORY));
-        ClientTickEvents.END_CLIENT_TICK.register(ManualDyKeybind::tick);
+    public static void init(IEventBus modEventBus) {
+        modEventBus.addListener((RegisterKeyMappingsEvent event) -> {
+            event.registerCategory(CATEGORY);
+            // Unbound means InputConstants.UNKNOWN: its type AND value are read from the constant, never
+            // written as literals. The keyboard type's own name differs between game versions this jar
+            // serves (26.2 KEYSYM, 26.3 KEYBOARD) and the unbound value is not -1 on every line.
+            lower = new KeyMapping(
+                    "key.slabbed.manual_dy_lower",
+                    InputConstants.UNKNOWN.getType(),
+                    InputConstants.UNKNOWN.getValue(),
+                    CATEGORY);
+            raise = new KeyMapping(
+                    "key.slabbed.manual_dy_raise",
+                    InputConstants.UNKNOWN.getType(),
+                    InputConstants.UNKNOWN.getValue(),
+                    CATEGORY);
+
+            event.register(lower);
+            event.register(raise);
+        });
+        NeoForge.EVENT_BUS.addListener((ClientTickEvent.Post event) -> tick(Minecraft.getInstance()));
     }
 
     private static void tick(Minecraft client) {
@@ -92,7 +99,7 @@ public final class ManualDyKeybind {
         if (state.isAir()) {
             return;
         }
-        ClientPlayNetworking.send(new ManualDyAdjustPayload(
+        SlabbedClientNetwork.send(new ManualDyAdjustPayload(
                 pos.asLong(), (byte) (lowerFired ? -1 : 1), Block.getId(state)));
     }
 

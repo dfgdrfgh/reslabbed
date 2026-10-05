@@ -3,7 +3,6 @@ package com.slabbed.network;
 import com.slabbed.compat.UseItemOnPacketAccess;
 import com.slabbed.Slabbed;
 import com.slabbed.anchor.SlabAnchorAttachment;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -59,10 +58,9 @@ public final class PlacementDyCorrectionServer {
         }
     }
 
-    public static void registerReceiver() {
-        ServerPlayNetworking.registerGlobalReceiver(
-                PlacementDyPredictionEnvelopePayload.TYPE,
-                (payload, context) -> buffer(context.player(), payload));
+    /** The serverbound envelope receiver (network thread already marshalled to the server thread). */
+    public static void receive(ServerPlayer player, PlacementDyPredictionEnvelopePayload payload) {
+        buffer(player, payload);
     }
 
     private static void buffer(ServerPlayer player, PlacementDyPredictionEnvelopePayload payload) {
@@ -139,7 +137,7 @@ public final class PlacementDyCorrectionServer {
             return;
         }
         if (scope.sent || scope.cells.isEmpty()
-                || !ServerPlayNetworking.canSend(scope.player, PlacementDyCorrectionPayload.TYPE)) {
+                || !SlabbedNetwork.canSend(scope.player, PlacementDyCorrectionPayload.TYPE)) {
             traceCorrectionFinishForTests("SKIPPED");
             return;
         }
@@ -149,7 +147,7 @@ public final class PlacementDyCorrectionServer {
                     SlabAnchorAttachment.rawPlacementDyFact(scope.player.level(), BlockPos.of(packed));
             facts.add(new PlacementDyCorrectionPayload.CellFact(packed, fact.present(), fact.rawBits()));
         }
-        ServerPlayNetworking.send(scope.player, new PlacementDyCorrectionPayload(scope.signature, facts));
+        SlabbedNetwork.send(scope.player, new PlacementDyCorrectionPayload(scope.signature, facts));
         traceCorrectionSendForTests(scope.signature);
         PlacementDyPredictionBridge.traceCorrectionWire("SEND", scope.signature);
         scope.sent = true;

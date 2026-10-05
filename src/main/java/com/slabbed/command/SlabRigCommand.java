@@ -1,5 +1,8 @@
 package com.slabbed.command;
 
+import net.neoforged.neoforge.event.server.ServerStoppedEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.context.CommandContext;
@@ -8,8 +11,6 @@ import com.slabbed.util.BuildStamp;
 import com.slabbed.util.SlabbedDiagnosticsBridge;
 import com.slabbed.util.SlabSupport;
 import com.slabbed.util.SlabTestKit;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -38,7 +39,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
-import net.minecraft.world.level.block.entity.SignTextSlot;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraft.world.level.storage.LevelResource;
@@ -379,12 +379,14 @@ public final class SlabRigCommand {
         synchronized (SlabRigCommand.class) {
             if (!lifecycleHookRegistered) {
                 lifecycleHookRegistered = true;
-                ServerLifecycleEvents.SERVER_STOPPED.register(SlabRigCommand::clearServerSession);
+                NeoForge.EVENT_BUS.addListener((ServerStoppedEvent event) -> clearServerSession(event.getServer()));
                 SlabRigHangingDirectExecutor.register();
             }
         }
-        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->
-                register(dispatcher));
+        NeoForge.EVENT_BUS.addListener((RegisterCommandsEvent event) -> {
+            var dispatcher = event.getDispatcher();
+            register(dispatcher);
+        });
     }
 
     /** Builds the {@code slabrig} node into {@code dispatcher}. Visible for the smoke test. */
@@ -1046,11 +1048,7 @@ public final class SlabRigCommand {
         setPlannedBlock(world, signPos, sign, manifest);
         BlockEntity be = world.getBlockEntity(signPos);
         if (be instanceof SignBlockEntity signEntity) {
-            signEntity.updateText(text -> text.asMutable()
-                    .setLine(0, Component.literal(l0))
-                    .setLine(1, Component.literal(l1))
-                    .setLine(2, Component.literal(l2))
-                    .asImmutable(), SignTextSlot.FRONT);
+            com.slabbed.compat.SignTexts.setFrontLines(signEntity, l0, l1, l2);
         }
     }
 

@@ -5,7 +5,7 @@ import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.command.SlabRigCaseCatalog;
 import com.slabbed.util.BuildStamp;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -618,7 +618,7 @@ public final class RegistrySweepTest {
         h.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void sweepArtifactLifecycleRejectsStalePartialAndDuplicateRuns(GameTestHelper h) {
         SlabRigCaseCatalog.Snapshot snapshot = SlabRigCaseCatalog.snapshot();
         Path root = Paths.get(System.getProperty("user.dir", "."), "build", "tmp",
@@ -820,48 +820,48 @@ public final class RegistrySweepTest {
     }
 
     // ── shard methods (alphabetical stride; one timeout kills at most 1/8) ───
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void sweepShard0(GameTestHelper h) {
         runShard(h, 0);
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void sweepShard1(GameTestHelper h) {
         runShard(h, 1);
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void sweepShard2(GameTestHelper h) {
         runShard(h, 2);
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void sweepShard3(GameTestHelper h) {
         runShard(h, 3);
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void sweepShard4(GameTestHelper h) {
         runShard(h, 4);
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void sweepShard5(GameTestHelper h) {
         runShard(h, 5);
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void sweepShard6(GameTestHelper h) {
         runShard(h, 6);
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void sweepShard7(GameTestHelper h) {
         runShard(h, 7);
     }
 
     // ── the hard gate: already-green families must place + never drift (runs BY DEFAULT) ──
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void hardGateAllowlistFamilies(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         List<String> violations = new ArrayList<>();

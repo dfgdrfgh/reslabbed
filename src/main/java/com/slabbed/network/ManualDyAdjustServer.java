@@ -5,7 +5,6 @@ import com.slabbed.placement.ConnectorPlacementSettle;
 import com.slabbed.placement.LandingResolver;
 import com.slabbed.util.ManualDyEnvelope;
 import com.slabbed.util.SlabdyRowFormatter;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
@@ -112,20 +111,14 @@ public final class ManualDyAdjustServer {
 
     // ---- the transaction ----
 
-    public static void registerReceiver() {
-        // Fabric dispatches this on the server main thread: the networking module routes a custom
-        // payload through MinecraftServer.packetProcessor().scheduleIfPossible(listener, packet)
-        // before the handler runs — the same contract PlacementDyCorrectionServer already relies on
-        // when it mutates its own static map from a receiver.
-        ServerPlayNetworking.registerGlobalReceiver(ManualDyAdjustPayload.TYPE, (payload, context) -> {
-            ServerPlayer player = context.player();
-            if (player == null) {
-                return;
-            }
-            BlockPos pos = BlockPos.of(payload.pos());
-            Result result = apply(player, pos, payload.direction(), payload.stateId());
-            notify(player, pos, result);
-        });
+    /** The serverbound receiver; the network layer runs it on the server main thread. */
+    public static void receive(ServerPlayer player, ManualDyAdjustPayload payload) {
+        if (player == null) {
+            return;
+        }
+        BlockPos pos = BlockPos.of(payload.pos());
+        Result result = apply(player, pos, payload.direction(), payload.stateId());
+        notify(player, pos, result);
     }
 
     public static void clearPlayer(ServerPlayer player) {

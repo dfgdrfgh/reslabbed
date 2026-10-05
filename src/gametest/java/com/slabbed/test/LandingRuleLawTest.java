@@ -9,7 +9,7 @@ import com.slabbed.util.SlabEnsembleCoherence;
 import com.slabbed.util.SlabSupport;
 import com.slabbed.util.SlabbedOffsetRaycast;
 import it.unimi.dsi.fastutil.longs.Long2DoubleOpenHashMap;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
@@ -166,13 +166,13 @@ public final class LandingRuleLawTest {
      */
     private static void forceStore(ServerLevel w, BlockPos pos, double dy) {
         LevelChunk chunk = w.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
-        Long2DoubleOpenHashMap existing = chunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE);
+        Long2DoubleOpenHashMap existing = com.slabbed.loader.Attachments.get(chunk, SlabAnchorAttachment.PLACEMENT_DY_TYPE);
         Long2DoubleOpenHashMap map = existing == null
                 ? new Long2DoubleOpenHashMap()
                 : new Long2DoubleOpenHashMap(existing);
         map.defaultReturnValue(Double.NaN);
         map.put(pos.asLong(), dy);
-        chunk.setAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE, map);
+        com.slabbed.loader.Attachments.set(chunk, SlabAnchorAttachment.PLACEMENT_DY_TYPE, map);
     }
 
     /**
@@ -293,7 +293,7 @@ public final class LandingRuleLawTest {
      * <p>MUTATION that must redden this row alone: flip {@code FROZEN_DY_SHIPPED_DEFAULT} to
      * {@code "false"}.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void shippedFrozenDyDefaultIsOn(GameTestHelper h) {
         // Read the PRODUCTION literal, never a local re-derivation of the initializer.
         boolean shippedDefault = Boolean.parseBoolean(SlabAnchorAttachment.FROZEN_DY_SHIPPED_DEFAULT);
@@ -328,7 +328,7 @@ public final class LandingRuleLawTest {
      * -0.5 — the slab floats 0.5 above the aimed surface (6 TEST-17 owner-top rows, all -0.5).
      * EXPECTED RED (stored -0.5, want -1.0).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabOnVisibleTopOfMinus1FullBlockLandsFlush(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos owner = minus1FullBlockOwner(h, w);
@@ -353,7 +353,7 @@ public final class LandingRuleLawTest {
      * only a lowered FULL BLOCK below, never a slab owner) and the client predicts -0.5 =
      * LIVE_PLACEMENT_SIDE_DY_SPLIT. EXPECTED RED (stored 0.0, want -1.0).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabOnMinus1TopSlabOwnerLandsFlush(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos support = h.absolutePos(new BlockPos(3, 2, 3));
@@ -391,7 +391,7 @@ public final class LandingRuleLawTest {
      * so an oak slab can never take the marker path and lands -0.5 via the carrier fallback.
      * EXPECTED RED (stored -0.5, want -1.0).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void oakSlabParityOnCompoundOwner(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos owner = minus1FullBlockOwner(h, w);
@@ -411,7 +411,7 @@ public final class LandingRuleLawTest {
      * owner's frame: {@code dy(placed) = dy(owner) = -1.5}. TODAY {@code loweredFullBlockMagnitude}
      * clamps the side lane to -1.0. EXPECTED RED (stored -1.0, want -1.5).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void sideSlabOffMinus15OwnerSeatsMinus15(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos owner = minus15FullBlockOwner(h, w);
@@ -438,7 +438,7 @@ public final class LandingRuleLawTest {
      * <b>CONFIRMED GREEN today (C0 run: ownerStored=-0.5, mergedStored=-0.5)</b> — the pos-keyed store
      * survives the same-cell state swap. C2 makes this a rule (explicit re-store) rather than luck.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void doubleMergeKeepsOwnerStoredDy(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         // SBS tower: slab0(0.0) stone1(-0.5) slab2(-0.5). slab2 is a real-placed BOTTOM slab at -0.5.
@@ -471,7 +471,7 @@ public final class LandingRuleLawTest {
      * setPlacedBy-HEAD capture never fires for either cell → both stored NaN. EXPECTED RED
      * (stored NaN/NaN, want -1.0/-1.0). Flipped green by C3 (capture at place-RETURN + pair cells).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void doorBothCellsStoredOnLoweredOwner(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos owner = minus1FullBlockOwner(h, w);
@@ -509,7 +509,7 @@ public final class LandingRuleLawTest {
      * half-formed bed foot), HEAD=NaN.</b> The NaN-safe assertion (see below) flags the uncaptured
      * HEAD instead of letting it slip. EXPECTED RED (FOOT 0.0, HEAD NaN; want -1.0/-1.0). Green by C3.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void bedBothCellsStoredAtExactlyMinus1(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         // 3x3 synthetic -1.0 platform at y=5 (support below at y=4), all force-stored -1.0.
@@ -554,7 +554,7 @@ public final class LandingRuleLawTest {
         c3Pass(h, "landing_rule_law_test_bed_both_cells_stored_at_exactly_minus1");
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void doorToggleKeepsBothStoreBits(GameTestHelper h) {
         ServerLevel world = h.getLevel();
         BlockPos owner = minus1FullBlockOwner(h, world);
@@ -576,7 +576,7 @@ public final class LandingRuleLawTest {
         c3Pass(h, "landing_rule_law_test_door_toggle_keeps_both_store_bits");
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void doorPairNormalizesFromEitherHalf(GameTestHelper h) {
         ServerLevel world = h.getLevel();
         BlockPos owner = minus1FullBlockOwner(h, world);
@@ -591,7 +591,7 @@ public final class LandingRuleLawTest {
         c3Pass(h, "landing_rule_law_test_door_pair_normalizes_from_either_half");
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void doorMalformedPairWritesNeitherCell(GameTestHelper h) {
         ServerLevel world = h.getLevel();
         BlockPos owner = h.absolutePos(new BlockPos(3, 3, 3));
@@ -602,11 +602,15 @@ public final class LandingRuleLawTest {
         placeStack(h, malformed, owner, Direction.UP, 0.0d);
         BlockPos primary = owner.above();
         BlockPos secondary = primary.above();
+        // NeoForge applies the block notifications of an item use after the use completes, and that
+        // pass removes the malformed second half; the half that remains is still the upper one.
+        boolean secondaryMalformedOrRemoved = world.getBlockState(secondary).isAir()
+                || (world.getBlockState(secondary).getBlock() instanceof DoorBlock
+                && world.getBlockState(secondary).getValue(BlockStateProperties.DOUBLE_BLOCK_HALF)
+                == DoubleBlockHalf.UPPER);
         if (!(world.getBlockState(primary).getBlock() instanceof DoorBlock)
-                || !(world.getBlockState(secondary).getBlock() instanceof DoorBlock)
+                || !secondaryMalformedOrRemoved
                 || world.getBlockState(primary).getValue(BlockStateProperties.DOUBLE_BLOCK_HALF)
-                != DoubleBlockHalf.UPPER
-                || world.getBlockState(secondary).getValue(BlockStateProperties.DOUBLE_BLOCK_HALF)
                 != DoubleBlockHalf.UPPER
                 || !Double.isNaN(storedDy(world, primary))
                 || !Double.isNaN(storedDy(world, secondary))) {
@@ -615,7 +619,7 @@ public final class LandingRuleLawTest {
         c3Pass(h, "landing_rule_law_test_door_malformed_pair_writes_neither_cell");
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void bedNormalizesFromEitherPartAndBlockStateFacingOverride(GameTestHelper h) {
         ServerLevel world = h.getLevel();
         BlockPos support = h.absolutePos(new BlockPos(3, 4, 3));
@@ -642,7 +646,7 @@ public final class LandingRuleLawTest {
         c3Pass(h, "landing_rule_law_test_bed_normalizes_from_either_part_and_block_state_facing_override");
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void bedMalformedPairWritesNeitherCell(GameTestHelper h) {
         ServerLevel world = h.getLevel();
         BlockPos support = h.absolutePos(new BlockPos(3, 4, 3));
@@ -655,10 +659,13 @@ public final class LandingRuleLawTest {
         placeStack(h, malformed, support, Direction.UP, 0.0d);
         BlockPos primary = support.above();
         BlockPos secondary = primary.east();
+        // As for the door row: NeoForge's deferred notification pass removes the malformed second part.
+        boolean secondaryMalformedOrRemoved = world.getBlockState(secondary).isAir()
+                || (world.getBlockState(secondary).getBlock() instanceof BedBlock
+                && world.getBlockState(secondary).getValue(BlockStateProperties.BED_PART) == BedPart.HEAD);
         if (!(world.getBlockState(primary).getBlock() instanceof BedBlock)
-                || !(world.getBlockState(secondary).getBlock() instanceof BedBlock)
+                || !secondaryMalformedOrRemoved
                 || world.getBlockState(primary).getValue(BlockStateProperties.BED_PART) != BedPart.HEAD
-                || world.getBlockState(secondary).getValue(BlockStateProperties.BED_PART) != BedPart.HEAD
                 || !Double.isNaN(storedDy(world, primary))
                 || !Double.isNaN(storedDy(world, secondary))) {
             throw h.assertionException(primary, "malformed same-part bed must write neither cell");
@@ -677,7 +684,7 @@ public final class LandingRuleLawTest {
         c3Pass(h, "landing_rule_law_test_bed_cross_chunk_pair_copies_raw_bits");
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void c3_pair_generic_double_block_copies_raw_bits(GameTestHelper h) {
         ServerLevel world = h.getLevel();
         BlockPos owner = h.absolutePos(new BlockPos(3, 3, 3));
@@ -687,15 +694,15 @@ public final class LandingRuleLawTest {
                 new ItemStack(Items.STONE), owner, Direction.UP, 0.0d)));
         BlockPos lower = owner.above();
         BlockPos upper = lower.above();
-        if (!world.getBlockState(lower).is(PlacementCaptureBoundaryGameTest.PAIR_BLOCK)
-                || !world.getBlockState(upper).is(PlacementCaptureBoundaryGameTest.PAIR_BLOCK)
+        if (!world.getBlockState(lower).is(PlacementCaptureBoundaryGameTest.PAIR_BLOCK.get())
+                || !world.getBlockState(upper).is(PlacementCaptureBoundaryGameTest.PAIR_BLOCK.get())
                 || requiredStoredBits(h, world, lower) != requiredStoredBits(h, world, upper)) {
             throw h.assertionException(lower, "generic DOUBLE_BLOCK_HALF pair did not copy primary raw bits");
         }
         c3Pass(h, "landing_rule_law_test_c3_pair_generic_double_block_copies_raw_bits");
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void c3_pair_same_chunk_one_publication(GameTestHelper h) {
         ServerLevel world = h.getLevel();
         BlockPos owner = h.absolutePos(new BlockPos(3, 3, 3));
@@ -739,7 +746,7 @@ public final class LandingRuleLawTest {
         c3Pass(h, "landing_rule_law_test_c3_pair_cross_chunk_one_publication_per_chunk");
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void c3_pair_owner_shape_depth_placement_and_validation_matrix(GameTestHelper h) {
         BlockPos owner = h.absolutePos(new BlockPos(3, 6, 3));
         BlockState[] owners = {
@@ -778,7 +785,7 @@ public final class LandingRuleLawTest {
         c3Pass(h, "landing_rule_law_test_c3_pair_owner_shape_depth_placement_and_validation_matrix");
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void c3_pair_validation_negative_controls(GameTestHelper h) {
         BlockPos owner = h.absolutePos(new BlockPos(3, 5, 3));
         Vec3 inside = new Vec3(owner.getX() + 0.5d, owner.getY() - 1.5d, owner.getZ() + 0.5d);
@@ -799,10 +806,10 @@ public final class LandingRuleLawTest {
         double compat;
         try {
             com.slabbed.compat.CompatHooks.shouldSkipSlabSupportTestOverride =
-                    state -> state.getBlock() == PlacementCaptureBoundaryGameTest.PAIR_BLOCK;
+                    state -> state.getBlock() == PlacementCaptureBoundaryGameTest.PAIR_BLOCK.get();
             compat = LandingHitValidationPolicy.shiftedCenterDy(
                     owner, Blocks.STONE.defaultBlockState(), -2.0d, Direction.UP, inside,
-                    PlacementCaptureBoundaryGameTest.PAIR_BLOCK.defaultBlockState());
+                    PlacementCaptureBoundaryGameTest.PAIR_BLOCK.get().defaultBlockState());
         } finally {
             com.slabbed.compat.CompatHooks.shouldSkipSlabSupportTestOverride = previous;
         }
@@ -818,7 +825,7 @@ public final class LandingRuleLawTest {
         c3Pass(h, "landing_rule_law_test_c3_pair_validation_negative_controls");
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void loweredFarmlandTopFaceValidation(GameTestHelper h) {
         BlockPos owner = h.absolutePos(new BlockPos(3, 5, 3));
         double ownerDy = -2.0d;
@@ -938,7 +945,7 @@ public final class LandingRuleLawTest {
      * placement-time aim authority and the same deep-hit validation authority. C5 remains a distinct
      * AIM-KEYED family.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void c4ObjectsShareLandingAndHitValidationAuthority(GameTestHelper h) {
         BlockPos owner = h.absolutePos(new BlockPos(3, 5, 3));
         BlockState ownerState = Blocks.STONE.defaultBlockState();
@@ -999,7 +1006,7 @@ public final class LandingRuleLawTest {
      * lands -0.5 — the deliberate exactly--1.0 deep-rest exclusion leaks for objects (TEST-17 GAP:
      * "flower_pot at -0.5 on EXACTLY -1.0 supports"). EXPECTED RED (stored -0.5, want -1.0).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void potOnMinus1StoneSeatsFlush(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos owner = minus1FullBlockOwner(h, w);
@@ -1022,7 +1029,7 @@ public final class LandingRuleLawTest {
      * does not pick up the deep-rest -1.5 through this owner shape. Signal for C4: the object deep-rest
      * pickup is owner-shape-dependent, not depth-uniform. Flipped green by C4.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void potOnMinus15StoneSeatsFlush(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos owner = minus15FullBlockOwner(h, w);
@@ -1042,7 +1049,7 @@ public final class LandingRuleLawTest {
      * placement. The occupied cell must keep the exact frozen height authored when the empty pot was
      * placed; otherwise the potted variant falls back from -1.5 to -1.0 and visibly jumps half a block.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void pottedCornflowerUsePreservesExactMinus15Dy(GameTestHelper h) {
         ServerLevel world = h.getLevel();
         BlockPos base = h.absolutePos(new BlockPos(3, 1, 3));
@@ -1176,7 +1183,7 @@ public final class LandingRuleLawTest {
      * C5/TEST 25 boundary: carpet remains UP-only while use-created powder snow owns all-face
      * full-cube contact. The same final-state compat gate still preserves Terrain Slabs' ownership.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void c5AimKeyedFamilySharesLandingValidationAndCompatAuthority(GameTestHelper h) {
         BlockPos owner = h.absolutePos(new BlockPos(3, 4, 3));
         BlockState ownerState = Blocks.STONE.defaultBlockState();
@@ -1275,7 +1282,7 @@ public final class LandingRuleLawTest {
     }
 
     /** Real bucket world-space contact matrix for every face and representative non-stone supports. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void powderSnowUseCreatedContactCoversAllFacesAndSupportShapes(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         double ownerDy = -1.5d;
@@ -1405,7 +1412,7 @@ public final class LandingRuleLawTest {
      * all lowering, so the carpet stores flush 0.0. EXPECTED RED (stored 0.0, want -1.0). Flipped
      * green by C5 (AIM-KEYED thin-layer seat + carpet triad unification).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void carpetAimedOnLoweredOwnerSeats(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos owner = minus1FullBlockOwner(h, w);
@@ -1435,7 +1442,7 @@ public final class LandingRuleLawTest {
      * must seat (stored -1.0). TODAY explicit name guards keep powder snow flush → stored 0.0.
      * EXPECTED RED (stored 0.0, want -1.0). Flipped green by C5 (powder snow AIM-KEYED as full-cube).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void powderSnowBucketAimedSeats(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos owner = minus1FullBlockOwner(h, w);
@@ -1477,7 +1484,7 @@ public final class LandingRuleLawTest {
      * stone owner must place a body whose visible top contacts the owner's visible underside.
      * TODAY it creates powder snow in {@code owner.below()} at dy=0.0: full cubes overlap by 0.5.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void powderSnowBucketDownContactMatchesMinusHalfStoneUnderside(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos owner = h.absolutePos(new BlockPos(3, 5, 3));
@@ -1523,7 +1530,7 @@ public final class LandingRuleLawTest {
      * AIM is the discriminator: direct BlockItem.place and natural/setBlock routes have no captured
      * root aim, so carpet and powder snow stay exactly flush even beside slab geometry.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void c5AimlessAndSetBlockRoutesStayFlush(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos carpetOwner = h.absolutePos(new BlockPos(1, 3, 1));
@@ -1591,7 +1598,7 @@ public final class LandingRuleLawTest {
      * air, and breaks before ever reaching G → MISS. EXPECTED RED. Flipped green by the store-aware
      * deep probe (or SIDE depth cap) the A-1 amendment requires.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void cantileveredDeepSideSlabRemainsTargetable(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos g = h.absolutePos(new BlockPos(3, 6, 3));
@@ -1639,7 +1646,7 @@ public final class LandingRuleLawTest {
      * {@code source_not_compound_full_block_dy_-1}. The green proof calls the same pure C2 policy used
      * by the server mixin; the placement remap grammar itself remains unchanged.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void deepSideServerValidationAcceptsResolverOwnedSlab(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos base = h.absolutePos(new BlockPos(3, 1, 3));
@@ -1683,7 +1690,7 @@ public final class LandingRuleLawTest {
     }
 
     /** TEST 26: generic resolver-held placement validates against a lowered slab's occupied body. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void test26SlabOwnerServerValidationUsesTranslatedOccupiedShape(GameTestHelper h) {
         BlockPos owner = h.absolutePos(new BlockPos(3, 4, 3));
         double ownerDy = -1.5d;
@@ -1795,7 +1802,7 @@ public final class LandingRuleLawTest {
      * TEST 21/24: target-owned use validates against an interactive target's translated owner cell
      * with either an empty hand or the held item vanilla needs for the target interaction.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void deepUseServerValidationAcceptsLoweredInteractiveTarget(GameTestHelper h) {
         BlockPos owner = h.absolutePos(new BlockPos(3, 4, 3));
         double ownerDy = -1.5d;
@@ -1905,7 +1912,7 @@ public final class LandingRuleLawTest {
     /**
      * TEST 28: held-block use shifts only stateful OBJECT targets, not the whole placement family.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void deepHeldStatefulObjectUseValidationMatrix(GameTestHelper h) {
         BlockPos owner = h.absolutePos(new BlockPos(3, 4, 3));
         double ownerDy = -1.5d;
@@ -2028,7 +2035,7 @@ public final class LandingRuleLawTest {
     }
 
     /** TEST 28: a real direct-use state transition must not rewrite a frozen target's height. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void deepDirectUseStateTransitionPreservesFrozenDy(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos target = h.absolutePos(new BlockPos(3, 4, 3));
@@ -2088,7 +2095,7 @@ public final class LandingRuleLawTest {
     }
 
     /** TEST 29: a translated held-slab body must not steal a lowered target's occupied visible lane. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void test29HeldSlabTranslatedOccupancyIsRefused(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         double targetDy = -1.5d;
@@ -2275,7 +2282,7 @@ public final class LandingRuleLawTest {
      * TEST 30: a second lowered trapdoor must be refused when its legal OPEN state would strictly
      * overlap the existing lowered trapdoor, even though their CLOSED bodies are disjoint.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void test30OpenTransitionOccupancyIsRefused(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         double upperDy = -2.0d;
@@ -2491,7 +2498,7 @@ public final class LandingRuleLawTest {
     }
 
     /** Shared server-policy controls: powder contact is all-face; carpet and unrelated lanes stay narrow. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void deepServerValidationRejectsUnsupportedAndOutOfEnvelopeHits(GameTestHelper h) {
         BlockPos owner = h.absolutePos(new BlockPos(3, 4, 3));
         Vec3 inside = new Vec3(owner.getX() + 0.5d, owner.getY() - 1.45d, owner.getZ() + 1.0d);
@@ -2560,7 +2567,7 @@ public final class LandingRuleLawTest {
      * owner. This is deliberately an aggregate RED: both historical lowered geometries execute
      * before a contact mismatch is reported.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void flintAndSteelFireOnFrozenMinusOneSupportsHasExactTopSeat(GameTestHelper h) {
         ServerLevel world = h.getLevel();
         List<FireContactProbe> probes = new ArrayList<>();
@@ -2604,7 +2611,7 @@ public final class LandingRuleLawTest {
     }
 
     /** TEST 32 Gate C: fire charge uses the same created-fire contact authority as flint and steel. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fireChargeFireOnFrozenMinusOneFullSupportHasExactTopSeat(GameTestHelper h) {
         ServerLevel world = h.getLevel();
         FireContactProbe[] probe = new FireContactProbe[1];
@@ -2621,7 +2628,7 @@ public final class LandingRuleLawTest {
     }
 
     /** TEST 32 Gate C: the generic hook also preserves soul-fire state and its visible top-seat. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void soulFireOnFrozenMinusOneSoulSoilHasExactTopSeat(GameTestHelper h) {
         ServerLevel world = h.getLevel();
         FireContactProbe[] probe = new FireContactProbe[1];
@@ -2639,7 +2646,7 @@ public final class LandingRuleLawTest {
     }
 
     /** TEST 32 Gate C: an occupied target neither gains nor overwrites a created-fire anchor. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void occupiedOrFailedFireUseDoesNotPublishPlacementDy(GameTestHelper h) {
         ServerLevel world = h.getLevel();
         BlockPos owner = h.absolutePos(new BlockPos(3, 4, 3));
@@ -2675,7 +2682,7 @@ public final class LandingRuleLawTest {
     }
 
     /** TEST 32 Gate C: lighting a candle is not a new-fire placement and publishes no fire anchor. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void lightingExistingCandleDoesNotPublishFireContact(GameTestHelper h) {
         ServerLevel world = h.getLevel();
         BlockPos owner = h.absolutePos(new BlockPos(3, 4, 3));
@@ -2702,7 +2709,7 @@ public final class LandingRuleLawTest {
     }
 
     /** TEST 32 Gate C: horizontal and underside uses cannot inherit the clicked owner's lowered dy. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void sideAndDownFireUsesDoNotStealClickedOwnerDy(GameTestHelper h) {
         ServerLevel world = h.getLevel();
         withFrozen(() -> {
@@ -2970,7 +2977,7 @@ public final class LandingRuleLawTest {
      * mapped component tolerance without help; the recorder's -1.0 chain hit is 1.5 below its vanilla
      * center and must therefore receive the owner's exact frozen offset from the pure policy.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void chainOwnerFollowerHitShiftsServerValidationCenter(GameTestHelper h) {
         final double serverComponentTolerance = 1.0000001d;
         BlockState chainOwner = Blocks.IRON_CHAIN.defaultBlockState()
@@ -3130,7 +3137,7 @@ public final class LandingRuleLawTest {
      * GameTest can invoke {@link ItemStack#useOn(UseOnContext)}, but not the preceding server packet
      * component-distance guard which rejects this hit before {@code useOn} is reached.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void pointedDripstoneFollowerHitAtMinusOnePointFiveIsAdmitted(GameTestHelper h) {
         final double serverComponentTolerance = 1.0000001d;
         BlockPos owner = new BlockPos(1014, -53, 663);
@@ -3196,7 +3203,7 @@ public final class LandingRuleLawTest {
      * TEST39: a high-interior side click stays in the translated visible BOTTOM half of a frozen
      * dy=-1.0 slab while preserving that exact frozen landing height.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void loweredSideHighInteriorPlacementStaysInTranslatedVisibleBottomHalf(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos owner = h.absolutePos(new BlockPos(3, 4, 3));
@@ -3270,7 +3277,7 @@ public final class LandingRuleLawTest {
      * owner must merge the compatible slab already occupying the intended adjacent cell, without
      * merging the clicked owner or spilling into the next outward cell.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void loweredSidePlacementMergesCompatibleAdjacentTarget(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos owner = h.absolutePos(new BlockPos(3, 4, 3));
@@ -3334,7 +3341,7 @@ public final class LandingRuleLawTest {
         h.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void missingAdjacentMergeTargetFactStaysStableFlat(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos owner = h.absolutePos(new BlockPos(3, 4, 3));
@@ -3400,7 +3407,7 @@ public final class LandingRuleLawTest {
         h.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void topAdjacentMergeTargetPreservesExplicitDy(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos owner = h.absolutePos(new BlockPos(3, 4, 3));
@@ -3462,7 +3469,7 @@ public final class LandingRuleLawTest {
      * TEST39 recorded DOUBLE-owner regression: horizontal placement must interpret the player's
      * upper/lower aim inside the owner's translated visible full-height body, not its vanilla cell.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void loweredDoubleSideUpperHalfPlacementKeepsTopSlabType(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos upperOwner = h.absolutePos(new BlockPos(3, 4, 3));
@@ -3549,7 +3556,9 @@ public final class LandingRuleLawTest {
      * author the same half. The full translated cell midpoint, rather than the midpoint of an
      * individual half-body, is the placement-time boundary.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    // Eight rigs span x=3..11 and z=3..9: wider than the 8-cell structure, so this row runs in the
+    // 20-cell one (on NeoForge the neighbouring cell's barrier floor sat under the overflow column).
+    @GameTest(structure = C3_CROSS_CHUNK_STRUCTURE)
     public void loweredSlabSideHitsStayInVisibleAuthoredHalf(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         double[] depths = {-1.0d, -1.5d};
@@ -3647,7 +3656,7 @@ public final class LandingRuleLawTest {
      * TEST43 RED: a downward pointed-dripstone candidate must be refused when its frozen
      * translated body would strictly interpenetrate an already-frozen downward neighbor.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void translatedVerticalPointedDripstoneInterpenetrationIsRefused(GameTestHelper h) {
         ServerLevel world = h.getLevel();
         final double upperDy = -1.5d;
@@ -3785,7 +3794,7 @@ public final class LandingRuleLawTest {
      * TEST43 RED: a horizontal click strictly inside a translated pointed-dripstone body must
      * continue that visible vertical column in the tip direction, rather than target horizontal air.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void pointedDripstoneSideHitContinuesVisibleColumn(GameTestHelper h) {
         ServerLevel world = h.getLevel();
         final double[] depths = {-1.0d, -1.5d, -2.0d};
@@ -3908,7 +3917,7 @@ public final class LandingRuleLawTest {
      * TEST43 packet RED: translated horizontal pointed-dripstone side hits require the owner's
      * already-frozen dy as their server validation-center shift.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void pointedDripstoneSideHitUsesFrozenValidationCenter(GameTestHelper h) {
         final double serverComponentTolerance = 1.0000001d;
         final double[] depths = {-1.0d, -1.5d, -2.0d};

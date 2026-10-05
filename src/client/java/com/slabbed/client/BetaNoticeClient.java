@@ -1,11 +1,11 @@
 package com.slabbed.client;
 
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.CommandSourceStack;
 import com.mojang.brigadier.context.CommandContext;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommands;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
-import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ServerData;
@@ -33,11 +33,12 @@ public final class BetaNoticeClient {
     }
 
     public static void init() {
-        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) ->
-                dispatcher.register(ClientCommands.literal("slabbed_dismiss_beta_notice")
+        NeoForge.EVENT_BUS.addListener((RegisterClientCommandsEvent event) ->
+                event.getDispatcher().register(Commands.literal("slabbed_dismiss_beta_notice")
                         .executes(BetaNoticeClient::runDismiss)));
 
-        ClientPlayConnectionEvents.JOIN.register((handler, sender, client) -> {
+        NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingIn event) -> {
+            Minecraft client = Minecraft.getInstance();
             // Channel first: a build with no pre-release marker shows nothing, and must not burn
             // the per-world session gate deciding that.
             String channel = preReleaseChannel(runningModVersion());
@@ -64,7 +65,7 @@ public final class BetaNoticeClient {
      * players with "beta" on {@code 0.5.0-alpha.1} builds because the word was a literal while the
      * version moved underneath it; the wording is derived precisely so it cannot drift again.
      */
-    static String preReleaseChannel(String version) {
+ public static String preReleaseChannel(String version) {
         if (version == null) {
             return null;
         }
@@ -79,7 +80,7 @@ public final class BetaNoticeClient {
     }
 
     /** The join notice for a given channel. The channel word is never written literally here. */
-    static Component noticeMessage(String channel) {
+   public static Component noticeMessage(String channel) {
         return Component.literal(
                         "Slabbed is in " + channel + " — expect some rough edges while it's being developed. ")
                 .withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC)
@@ -91,16 +92,15 @@ public final class BetaNoticeClient {
 
     /** The running mod version, or {@code null} if the container cannot be resolved. */
     private static String runningModVersion() {
-        return FabricLoader.getInstance().getModContainer("slabbed")
-                .map(container -> container.getMetadata().getVersion().getFriendlyString())
-                .orElse(null);
+        return com.slabbed.loader.Loader.modVersion("slabbed").orElse(null);
     }
 
-    private static int runDismiss(CommandContext<FabricClientCommandSource> ctx) {
+    private static int runDismiss(CommandContext<CommandSourceStack> ctx) {
         Minecraft client = Minecraft.getInstance();
         String worldKey = currentWorldKey(client);
         boolean persisted = BetaNoticeDismissedWorlds.dismiss(worldKey);
-        ctx.getSource().sendFeedback(dismissFeedbackMessage(persisted));
+        Component feedback = dismissFeedbackMessage(persisted);
+        ctx.getSource().sendSuccess(() -> feedback, false);
         return 1;
     }
 
@@ -111,7 +111,7 @@ public final class BetaNoticeClient {
      * in which case {@link BetaNoticeDismissedWorlds#dismiss} is a documented no-op and the notice
      * WILL reappear next session — telling the player otherwise would be a false success message.
      */
-    static Component dismissFeedbackMessage(boolean persisted) {
+   public static Component dismissFeedbackMessage(boolean persisted) {
         if (persisted) {
             return Component.literal("Won't show the beta notice again for this world.")
                     .withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC);

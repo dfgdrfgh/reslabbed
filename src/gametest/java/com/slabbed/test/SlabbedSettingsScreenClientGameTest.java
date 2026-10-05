@@ -5,7 +5,6 @@ import com.slabbed.client.SlabbedSettingsScreen;
 import com.slabbed.config.SlabbedConfig;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.Button;
@@ -76,7 +75,7 @@ public final class SlabbedSettingsScreenClientGameTest implements FabricClientGa
                     throw new AssertionError("pressing Done must apply the pending value; the active config "
                             + "still reads " + SlabbedConfig.get().potSeat());
                 }
-                Path file = FabricLoader.getInstance().getConfigDir().resolve("slabbed.json");
+                Path file = com.slabbed.loader.Loader.getConfigDir().resolve("slabbed.json");
                 if (!Files.exists(file)) {
                     throw new AssertionError("pressing Done must persist the setting, but no config file was "
                             + "written under this run's config directory");

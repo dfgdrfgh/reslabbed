@@ -4,8 +4,7 @@ import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.compat.CompatHooks;
 import com.slabbed.placement.LandingResolver;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
@@ -65,11 +64,26 @@ import net.minecraft.world.phys.Vec3;
  * compat namespace but is not a slab — it keeps the carve-out honest.
  */
 public final class CompatEligibilityPredicateTest {
+    /**
+     * The classifier test gate in its own holder: the compat mixin reads it while the game
+     * bootstraps, and reading it must not initialise this class (whose static test blocks would
+     * then exist before the registries freeze on NeoForge).
+     */
+    public static final class Gate {
+        private Gate() {
+        }
+
+        static final ThreadLocal<Boolean> ELIGIBILITY_CLASSIFIER_TEST_GATE =
+            ThreadLocal.withInitial(() -> Boolean.FALSE);
+
+        public static boolean eligibilityClassifierTestGate() {
+            return ELIGIBILITY_CLASSIFIER_TEST_GATE.get();
+        }
+    }
+
 
     private static final double EPS = 1.0e-6;
 
-    private static final ThreadLocal<Boolean> ELIGIBILITY_CLASSIFIER_TEST_GATE =
-            ThreadLocal.withInitial(() -> Boolean.FALSE);
 
     private static final Identifier COMPAT_ID =
             Identifier.fromNamespaceAndPath("terrain_slabs", "eligibility_probe_slab");
@@ -83,52 +97,37 @@ public final class CompatEligibilityPredicateTest {
     private static final ResourceKey<Block> COMPAT_CUBE_KEY =
             ResourceKey.create(Registries.BLOCK, COMPAT_CUBE_ID);
 
-    private static final Block COMPAT_SLAB = new SlabBlock(
-            BlockBehaviour.Properties.ofFullCopy(Blocks.STONE_SLAB).setId(COMPAT_KEY));
-    private static final Block TWIN_SLAB = new SlabBlock(
-            BlockBehaviour.Properties.ofFullCopy(Blocks.STONE_SLAB).setId(TWIN_KEY));
-    private static final Block COMPAT_CUBE = new Block(
-            BlockBehaviour.Properties.ofFullCopy(Blocks.STONE).setId(COMPAT_CUBE_KEY));
+    private static final com.slabbed.gametest.TestBlocks.Lazy<Block> COMPAT_SLAB = com.slabbed.gametest.TestBlocks.block(COMPAT_ID, () -> new SlabBlock( BlockBehaviour.Properties.ofFullCopy(Blocks.STONE_SLAB).setId(COMPAT_KEY)));
+    private static final com.slabbed.gametest.TestBlocks.Lazy<Block> TWIN_SLAB = com.slabbed.gametest.TestBlocks.block(TWIN_ID, () -> new SlabBlock( BlockBehaviour.Properties.ofFullCopy(Blocks.STONE_SLAB).setId(TWIN_KEY)));
+    private static final com.slabbed.gametest.TestBlocks.Lazy<Block> COMPAT_CUBE = com.slabbed.gametest.TestBlocks.block(COMPAT_CUBE_ID, () -> new Block( BlockBehaviour.Properties.ofFullCopy(Blocks.STONE).setId(COMPAT_CUBE_KEY)));
 
     // Items, so a row can drive a REAL held-item placement through the same transaction the product
     // uses. Without them the only reachable gesture is setBlock, which authors no placement fact and
     // therefore cannot exercise the transaction discriminator at all.
-    private static final Item COMPAT_SLAB_ITEM = new BlockItem(COMPAT_SLAB,
-            new Item.Properties().setId(ResourceKey.create(Registries.ITEM, COMPAT_ID))
-                    .useBlockDescriptionPrefix());
-    private static final Item TWIN_SLAB_ITEM = new BlockItem(TWIN_SLAB,
-            new Item.Properties().setId(ResourceKey.create(Registries.ITEM, TWIN_ID))
-                    .useBlockDescriptionPrefix());
+    private static final com.slabbed.gametest.TestBlocks.Lazy<Item> COMPAT_SLAB_ITEM = com.slabbed.gametest.TestBlocks.item(COMPAT_ID, () -> new BlockItem(COMPAT_SLAB.get(), new Item.Properties().setId(ResourceKey.create(Registries.ITEM, COMPAT_ID)) .useBlockDescriptionPrefix()));
+    private static final com.slabbed.gametest.TestBlocks.Lazy<Item> TWIN_SLAB_ITEM = com.slabbed.gametest.TestBlocks.item(TWIN_ID, () -> new BlockItem(TWIN_SLAB.get(), new Item.Properties().setId(ResourceKey.create(Registries.ITEM, TWIN_ID)) .useBlockDescriptionPrefix()));
 
     /** Registers the fixtures before registry freeze. */
-    public static final class CompatEligibilityFixtureEntrypoint implements ModInitializer {
+    public static final class CompatEligibilityFixtureEntrypoint implements com.slabbed.gametest.TestModInitializer {
         @Override
         public void onInitialize() {
             if (!BuiltInRegistries.BLOCK.containsKey(COMPAT_ID)) {
-                Registry.register(BuiltInRegistries.BLOCK, COMPAT_ID, COMPAT_SLAB);
-                Registry.register(BuiltInRegistries.ITEM, COMPAT_ID, COMPAT_SLAB_ITEM);
             }
             if (!BuiltInRegistries.BLOCK.containsKey(TWIN_ID)) {
-                Registry.register(BuiltInRegistries.BLOCK, TWIN_ID, TWIN_SLAB);
-                Registry.register(BuiltInRegistries.ITEM, TWIN_ID, TWIN_SLAB_ITEM);
             }
             if (!BuiltInRegistries.BLOCK.containsKey(COMPAT_CUBE_ID)) {
-                Registry.register(BuiltInRegistries.BLOCK, COMPAT_CUBE_ID, COMPAT_CUBE);
             }
         }
     }
 
     /** GameTest-only access point consumed by the test mixin around the eligibility predicates. */
-    public static boolean eligibilityClassifierTestGate() {
-        return ELIGIBILITY_CLASSIFIER_TEST_GATE.get();
-    }
 
     private static BlockState compatSlab() {
-        return COMPAT_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.BOTTOM);
+        return COMPAT_SLAB.get().defaultBlockState().setValue(SlabBlock.TYPE, SlabType.BOTTOM);
     }
 
     private static BlockState twinSlab() {
-        return TWIN_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.BOTTOM);
+        return TWIN_SLAB.get().defaultBlockState().setValue(SlabBlock.TYPE, SlabType.BOTTOM);
     }
 
     /** Stone support column whose top carries a recorded seat of {@code seatDy}. */
@@ -181,9 +180,9 @@ public final class CompatEligibilityPredicateTest {
      * {@code TerrainSlabsCompat.shouldSkipOffset} and this row fails. Before this class existed that
      * mutation was invisible to the entire suite.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void twinsDifferOnlyByNamespaceAndTheShippedRuleSplitsThem(GameTestHelper helper) {
-        ELIGIBILITY_CLASSIFIER_TEST_GATE.set(Boolean.TRUE);
+        Gate.ELIGIBILITY_CLASSIFIER_TEST_GATE.set(Boolean.TRUE);
         try {
             BlockState compat = compatSlab();
             BlockState twin = twinSlab();
@@ -218,7 +217,7 @@ public final class CompatEligibilityPredicateTest {
                                 + " - the shipped code delegates one to the other, so they move together");
             }
         } finally {
-            ELIGIBILITY_CLASSIFIER_TEST_GATE.set(Boolean.FALSE);
+            Gate.ELIGIBILITY_CLASSIFIER_TEST_GATE.set(Boolean.FALSE);
         }
         helper.succeed();
     }
@@ -229,7 +228,7 @@ public final class CompatEligibilityPredicateTest {
      * classpath. Without this, a row asserting "compat is skipped" could be satisfied by a predicate
      * that skips everything unconditionally.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void withoutTheGateTheShippedPredicateIsInertForBothTwins(GameTestHelper helper) {
         if (CompatHooks.shouldSkipOffset(compatSlab())
                 || CompatHooks.shouldSkipOffset(twinSlab())
@@ -249,9 +248,9 @@ public final class CompatEligibilityPredicateTest {
      * clause 2), while a NON-slab block in the same namespace still is. The cube is what keeps this
      * from reading as "the gate is gone": same namespace, not a slab, still owned.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void theOwnershipGateReleasesTaggedSlabsAndKeepsNonSlabCompatBlocks(GameTestHelper helper) {
-        ELIGIBILITY_CLASSIFIER_TEST_GATE.set(Boolean.TRUE);
+        Gate.ELIGIBILITY_CLASSIFIER_TEST_GATE.set(Boolean.TRUE);
         try {
             if (!SlabSupport.isTaggedSlab(compatSlab())) {
                 throw helper.assertionException(
@@ -269,13 +268,13 @@ public final class CompatEligibilityPredicateTest {
                 throw helper.assertionException(
                         "the non-compat twin must never be compat-owned");
             }
-            if (!LandingResolver.compatOwnsFinalState(COMPAT_CUBE.defaultBlockState())) {
+            if (!LandingResolver.compatOwnsFinalState(COMPAT_CUBE.get().defaultBlockState())) {
                 throw helper.assertionException(
                         "a NON-slab compat block must remain compat-owned: the carve-out is the "
                                 + "tagged-slab shape, not the whole namespace");
             }
         } finally {
-            ELIGIBILITY_CLASSIFIER_TEST_GATE.set(Boolean.FALSE);
+            Gate.ELIGIBILITY_CLASSIFIER_TEST_GATE.set(Boolean.FALSE);
         }
         helper.succeed();
     }
@@ -288,22 +287,22 @@ public final class CompatEligibilityPredicateTest {
      * stored seat, and it must be lowered (the scene guarantees it), so the equality cannot be
      * satisfied by three zeros or three missing facts.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aPlacedCompatSlabMintsTheSameSeatAsItsTwinAndVanilla(GameTestHelper helper) {
-        ELIGIBILITY_CLASSIFIER_TEST_GATE.set(Boolean.TRUE);
+        Gate.ELIGIBILITY_CLASSIFIER_TEST_GATE.set(Boolean.TRUE);
         try {
             BlockPos vanillaSupport = loweredSupport(helper, new BlockPos(1, 2, 1), -1.0d);
             BlockPos twinSupport = loweredSupport(helper, new BlockPos(3, 2, 1), -1.0d);
             BlockPos compatSupport = loweredSupport(helper, new BlockPos(5, 2, 1), -1.0d);
 
             placeOnTop(helper, vanillaSupport, Blocks.STONE_SLAB.asItem());
-            placeOnTop(helper, twinSupport, TWIN_SLAB_ITEM);
-            placeOnTop(helper, compatSupport, COMPAT_SLAB_ITEM);
+            placeOnTop(helper, twinSupport, TWIN_SLAB_ITEM.get());
+            placeOnTop(helper, compatSupport, COMPAT_SLAB_ITEM.get());
 
             double vanilla = storedOrFail(helper, vanillaSupport.above(), Blocks.STONE_SLAB,
                     "the vanilla reference slab");
-            double twin = storedOrFail(helper, twinSupport.above(), TWIN_SLAB, "the twin slab");
-            double compat = storedOrFail(helper, compatSupport.above(), COMPAT_SLAB, "the compat slab");
+            double twin = storedOrFail(helper, twinSupport.above(), TWIN_SLAB.get(), "the twin slab");
+            double compat = storedOrFail(helper, compatSupport.above(), COMPAT_SLAB.get(), "the compat slab");
 
             if (!(vanilla < -EPS)) {
                 throw helper.assertionException(
@@ -324,7 +323,7 @@ public final class CompatEligibilityPredicateTest {
                                 + "transaction must mint it the same seat");
             }
         } finally {
-            ELIGIBILITY_CLASSIFIER_TEST_GATE.set(Boolean.FALSE);
+            Gate.ELIGIBILITY_CLASSIFIER_TEST_GATE.set(Boolean.FALSE);
         }
         helper.succeed();
     }
@@ -368,9 +367,9 @@ public final class CompatEligibilityPredicateTest {
      * and the twin calibration here must both stay green under that mutation — neither one depends
      * on the carve-out to reach its answer.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aCantileveredCompatSlabAnchorsInsteadOfFreezingFlat(GameTestHelper helper) {
-        ELIGIBILITY_CLASSIFIER_TEST_GATE.set(Boolean.TRUE);
+        Gate.ELIGIBILITY_CLASSIFIER_TEST_GATE.set(Boolean.TRUE);
         try {
             ServerLevel level = helper.getLevel();
 
@@ -411,7 +410,7 @@ public final class CompatEligibilityPredicateTest {
                                 + "would treat this genuinely lowered slab as a flush support");
             }
         } finally {
-            ELIGIBILITY_CLASSIFIER_TEST_GATE.set(Boolean.FALSE);
+            Gate.ELIGIBILITY_CLASSIFIER_TEST_GATE.set(Boolean.FALSE);
         }
         helper.succeed();
     }
@@ -423,9 +422,9 @@ public final class CompatEligibilityPredicateTest {
      * freeze a compat slab" — the carve-out only changes what the marker reads, never whether a
      * genuinely flush placement gets locked flat.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aFlushCompatSlabStillFreezesFlat(GameTestHelper helper) {
-        ELIGIBILITY_CLASSIFIER_TEST_GATE.set(Boolean.TRUE);
+        Gate.ELIGIBILITY_CLASSIFIER_TEST_GATE.set(Boolean.TRUE);
         try {
             ServerLevel level = helper.getLevel();
             BlockPos ground = helper.absolutePos(new BlockPos(8, 2, 2));
@@ -445,7 +444,7 @@ public final class CompatEligibilityPredicateTest {
                                 + "the pre-parity-slice behaviour this row guards against regressing");
             }
         } finally {
-            ELIGIBILITY_CLASSIFIER_TEST_GATE.set(Boolean.FALSE);
+            Gate.ELIGIBILITY_CLASSIFIER_TEST_GATE.set(Boolean.FALSE);
         }
         helper.succeed();
     }
@@ -465,9 +464,9 @@ public final class CompatEligibilityPredicateTest {
      * unconditional compat term for the held state in {@code LandingHitValidationPolicy}
      * (e.g. {@code || CompatHooks.shouldSkipOffset(heldState)}) — the pre-carve-out form.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aHeldCompatSlabReachesTheToleranceShiftLikeItsTwin(GameTestHelper helper) {
-        ELIGIBILITY_CLASSIFIER_TEST_GATE.set(Boolean.TRUE);
+        Gate.ELIGIBILITY_CLASSIFIER_TEST_GATE.set(Boolean.TRUE);
         try {
             // A deep-lowered vanilla bottom-slab owner; the hit sits on its translated top plane.
             // The owner is deliberately NOT compat: this row isolates the HELD-state term.
@@ -500,7 +499,7 @@ public final class CompatEligibilityPredicateTest {
             }
             double compatCubeHeld = com.slabbed.placement.LandingHitValidationPolicy.shiftedCenterDy(
                     ownerPos, ownerState, ownerDy, Direction.UP, hit,
-                    COMPAT_CUBE.defaultBlockState());
+                    COMPAT_CUBE.get().defaultBlockState());
             if (!Double.isNaN(compatCubeHeld)) {
                 throw helper.assertionException(
                         "a held NON-slab compat block must still be refused the shift (got "
@@ -508,7 +507,7 @@ public final class CompatEligibilityPredicateTest {
                                 + "family-level control for this leg lives in the ownership-gate row");
             }
         } finally {
-            ELIGIBILITY_CLASSIFIER_TEST_GATE.set(Boolean.FALSE);
+            Gate.ELIGIBILITY_CLASSIFIER_TEST_GATE.set(Boolean.FALSE);
         }
         helper.succeed();
     }
@@ -521,9 +520,9 @@ public final class CompatEligibilityPredicateTest {
      * started receiving Slabbed geometry, which is the see-through-seam defect class this line
      * already fixed once.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aTransactionlessCompatSlabCarriesNoFactAndReadsFlush(GameTestHelper helper) {
-        ELIGIBILITY_CLASSIFIER_TEST_GATE.set(Boolean.TRUE);
+        Gate.ELIGIBILITY_CLASSIFIER_TEST_GATE.set(Boolean.TRUE);
         try {
             ServerLevel level = helper.getLevel();
             // A lowered neighbour beside it, so "flush" is measured against live temptation: the
@@ -547,7 +546,7 @@ public final class CompatEligibilityPredicateTest {
                                 + "the factless fall-through must stay flush (the world-hole pin)");
             }
         } finally {
-            ELIGIBILITY_CLASSIFIER_TEST_GATE.set(Boolean.FALSE);
+            Gate.ELIGIBILITY_CLASSIFIER_TEST_GATE.set(Boolean.FALSE);
         }
         helper.succeed();
     }
@@ -564,18 +563,18 @@ public final class CompatEligibilityPredicateTest {
      * compat owner's depth before consulting the store — the pre-fix ordering — and the compat
      * column's new storey freezes a height half a block above the vanilla column's.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aPlacementAimedAtAPlacedCompatSlabInheritsItsSeat(GameTestHelper helper) {
-        ELIGIBILITY_CLASSIFIER_TEST_GATE.set(Boolean.TRUE);
+        Gate.ELIGIBILITY_CLASSIFIER_TEST_GATE.set(Boolean.TRUE);
         try {
             BlockPos twinSupport = loweredSupport(helper, new BlockPos(1, 2, 3), -1.0d);
             BlockPos compatSupport = loweredSupport(helper, new BlockPos(4, 2, 3), -1.0d);
 
-            placeOnTop(helper, twinSupport, TWIN_SLAB_ITEM);
-            placeOnTop(helper, compatSupport, COMPAT_SLAB_ITEM);
-            double twinOwner = storedOrFail(helper, twinSupport.above(), TWIN_SLAB, "the twin owner");
+            placeOnTop(helper, twinSupport, TWIN_SLAB_ITEM.get());
+            placeOnTop(helper, compatSupport, COMPAT_SLAB_ITEM.get());
+            double twinOwner = storedOrFail(helper, twinSupport.above(), TWIN_SLAB.get(), "the twin owner");
             double compatOwner =
-                    storedOrFail(helper, compatSupport.above(), COMPAT_SLAB, "the compat owner");
+                    storedOrFail(helper, compatSupport.above(), COMPAT_SLAB.get(), "the compat owner");
             if (!(twinOwner < -EPS) || Math.abs(compatOwner - twinOwner) > EPS) {
                 throw helper.assertionException(
                         "premise drift: both owners must carry the same lowered seat before the "
@@ -596,7 +595,7 @@ public final class CompatEligibilityPredicateTest {
                                 + "must consult the store before the compat exclusion");
             }
         } finally {
-            ELIGIBILITY_CLASSIFIER_TEST_GATE.set(Boolean.FALSE);
+            Gate.ELIGIBILITY_CLASSIFIER_TEST_GATE.set(Boolean.FALSE);
         }
         helper.succeed();
     }

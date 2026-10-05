@@ -1,6 +1,6 @@
 package com.slabbed.test;
 
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -27,7 +27,7 @@ import net.minecraft.world.phys.Vec3;
  */
 public final class TrampledSupportConversionTest {
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void placingSlabOnDirtPathConvertsItToDirt(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos pathRel = new BlockPos(2, 2, 2);
@@ -60,7 +60,7 @@ public final class TrampledSupportConversionTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void plantingSeedsKeepsFarmland(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos farmlandRel = new BlockPos(2, 2, 2);

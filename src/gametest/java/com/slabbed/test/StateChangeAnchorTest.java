@@ -2,7 +2,7 @@ package com.slabbed.test;
 
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
@@ -42,7 +42,7 @@ public final class StateChangeAnchorTest {
         SlabAnchorAttachment.freezeLoweredOnPlace(w, pos, w.getBlockState(pos));
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void inPlaceTransformKeepsAnchorAndDy(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos slab = helper.absolutePos(new BlockPos(3, 2, 3));
@@ -81,7 +81,7 @@ public final class StateChangeAnchorTest {
      * <p>MUTATION that must redden this row alone: drop the same-shape clause from
      * {@code SlabAnchorAttachment.replacementPreservesAnchor}.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void inPlaceSlabKindChangeWithTheSameShapeKeepsAnchorAndDy(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos support = helper.absolutePos(new BlockPos(3, 2, 3));
@@ -113,7 +113,7 @@ public final class StateChangeAnchorTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void inPlaceTransformKeepsFrozenFlat(GameTestHelper helper) {
         // 26.2 addition (audit D1 inverse case): FROZEN_FLAT must survive the same transform — the
         // unconditional strip also killed freeze-flat, letting live cantilever/column lanes sink a
@@ -135,7 +135,7 @@ public final class StateChangeAnchorTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void genuineBreakToAirClearsTheAnchor(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos slab = helper.absolutePos(new BlockPos(3, 2, 3));
@@ -154,7 +154,7 @@ public final class StateChangeAnchorTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void replaceAfterBreakLeavesNoStaleAnchor(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos slab = helper.absolutePos(new BlockPos(3, 2, 3));
@@ -170,7 +170,7 @@ public final class StateChangeAnchorTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void inPlaceReplaceToNonLockBlockClearsTheAnchor(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos slab = helper.absolutePos(new BlockPos(3, 2, 3));
@@ -198,14 +198,14 @@ public final class StateChangeAnchorTest {
      * eligibility gate rejects, so this row is expected to go RED on the unfixed tree — it names the
      * gap; the fix waits for a maintainer ruling (maintainer notes, 2026-09-03).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void inPlaceTillToFarmlandKeepsAnchorAndDy(GameTestHelper helper) {
         assertInPlaceTransformKeepsLock(helper, Blocks.DIRT.defaultBlockState(),
                 Blocks.FARMLAND.defaultBlockState(), "dirt->farmland (hoe)");
     }
 
     /** T7 sibling: the shovel's grass -> dirt path transform (dirt path is also 15/16 tall). */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void inPlaceShovelToDirtPathKeepsAnchorAndDy(GameTestHelper helper) {
         assertInPlaceTransformKeepsLock(helper, Blocks.GRASS_BLOCK.defaultBlockState(),
                 Blocks.DIRT_PATH.defaultBlockState(), "grass->dirt path (shovel)");

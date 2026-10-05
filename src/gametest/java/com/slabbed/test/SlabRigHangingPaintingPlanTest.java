@@ -3,7 +3,7 @@ package com.slabbed.test;
 import com.slabbed.command.SlabRigHangingArtifacts;
 import com.slabbed.command.SlabRigHangingCatalog;
 import com.slabbed.command.SlabRigHangingPaintingPlan;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -16,7 +16,7 @@ import java.util.Set;
 /** Pure, registered RIG-3B2A planner contract tests. */
 public final class SlabRigHangingPaintingPlanTest {
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void paintingPlannerBindsCompleteRuntimeUniverse(GameTestHelper helper) {
         SlabRigHangingPaintingPlan.Universe first = universe(helper);
         SlabRigHangingPaintingPlan.Universe second = universe(helper);
@@ -66,7 +66,7 @@ public final class SlabRigHangingPaintingPlanTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void paintingPlannerPagesOneExactBaseCaseAsSixteenSixteenSixteenFour(GameTestHelper helper) {
         SlabRigHangingPaintingPlan.Universe universe = universe(helper);
         int[] expectedSizes = {16, 16, 16, 4};
@@ -121,7 +121,7 @@ public final class SlabRigHangingPaintingPlanTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void paintingPlannerMaterializesExactFourByFourWallOverRepeatedSbsbs(GameTestHelper helper) {
         SlabRigHangingPaintingPlan.Universe universe = universe(helper);
         int pointerSelector = universe.selectors().stream()
@@ -176,7 +176,7 @@ public final class SlabRigHangingPaintingPlanTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void paintingPlannerRejectsIdentityGeometryAndRangeTampering(GameTestHelper helper) {
         SlabRigHangingPaintingPlan.Universe universe = universe(helper);
         SlabRigHangingPaintingPlan.PagePlan page =

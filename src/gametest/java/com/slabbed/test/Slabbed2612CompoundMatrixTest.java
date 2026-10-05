@@ -2,7 +2,7 @@ package com.slabbed.test;
 
 import com.slabbed.Slabbed;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
@@ -35,7 +35,7 @@ public final class Slabbed2612CompoundMatrixTest {
      * drops one more step, but lowering must CLAMP at -1.0 (never below). Asserts the proven first
      * levels and the clamp; logs the whole column.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void deepAlternatingStackClampsAtMinusOne(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos base = new BlockPos(2, 1, 2);
@@ -80,7 +80,7 @@ public final class Slabbed2612CompoundMatrixTest {
      * slab/stone/stone. The lower stone is -0.5; pins the upper stone's behaviour (rests on the lowered
      * stone's top → -0.5, the one-step follow). Logged + asserted.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fullBlockStackedOnLoweredFullBlock(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos base = new BlockPos(2, 1, 2);

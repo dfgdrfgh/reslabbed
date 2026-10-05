@@ -2,7 +2,7 @@ package com.slabbed.test;
 
 import com.slabbed.test.support.TestConnections;
 import com.slabbed.Slabbed;
-import com.slabbed.util.SlabModelStaleSentinel;
+import com.slabbed.diagnostics.util.SlabModelStaleSentinel;
 import com.slabbed.util.SlabSupport;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;

@@ -3,8 +3,6 @@ package com.slabbed.client;
 import com.slabbed.client.SlabGeometricRemeshScheduler.SectionBox;
 import com.slabbed.mixin.client.ClientLevelLevelExtractorAccessor;
 import com.slabbed.mixin.client.LevelExtractorImportantDirtyAccessor;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.extract.LevelExtractor;
 
@@ -24,7 +22,6 @@ import net.minecraft.client.renderer.extract.LevelExtractor;
  * 3×3×3 box for the geometric/compound paths), so the explicit loop is cheap and keeps the priority
  * flag under Slabbed's control.
  */
-@Environment(EnvType.CLIENT)
 public final class SlabImportantRemesh {
 
     private SlabImportantRemesh() {

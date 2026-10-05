@@ -3,7 +3,7 @@ package com.slabbed.test;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.SlabSupport;
 import it.unimi.dsi.fastutil.longs.Long2DoubleOpenHashMap;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -63,7 +63,7 @@ public final class Slabbed2612LoweringContractTest {
      * hasLoweredCarrierBelow), L3 STONE (-1.0, on vertically-lowered slab).
      * RED before the fix: L3 reads -0.5 (floats 0.5 above L2's lowered top).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void vanillaVerticalCompoundStackTopMustBeFlush(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos base = new BlockPos(2, 1, 2);
@@ -126,7 +126,7 @@ public final class Slabbed2612LoweringContractTest {
      * placed directly under it — it must NOT autonomously pop down to -0.5.
      * RED before the freeze law: the stone recomputes geometrically and lowers.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void frozenFlatBlockStaysFlatWhenSlabAddedBelow(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos blockRel = new BlockPos(2, 3, 2);
@@ -148,7 +148,7 @@ public final class Slabbed2612LoweringContractTest {
      * so it still lowers geometrically to -0.5 on a bottom slab — proving the
      * freeze is gated to placed pieces and natural terrain stays geometric.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void unfrozenBlockLowersWhenSlabAddedBelow(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos blockRel = new BlockPos(2, 3, 2);
@@ -169,7 +169,7 @@ public final class Slabbed2612LoweringContractTest {
      * slab — it must NOT be dragged down to -0.5. RED before the fix: the hanger
      * falls through the column walk and lowers.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void hangingRootsUnderFlushSupportStayFlush(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos rootsRel = new BlockPos(2, 3, 2);
@@ -200,7 +200,7 @@ public final class Slabbed2612LoweringContractTest {
      * confirms that coverage. RED if the decoration were not routed through the ceiling-hung path: it
      * would read 0.0 while its support reads -0.5 (a visible gap, the reported droop).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void hangingRootsFollowLoweredSupportAbove(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         // Lowered, anchored stone support with AIR below (so the hanger can occupy that cell).
@@ -229,7 +229,7 @@ public final class Slabbed2612LoweringContractTest {
      * powder snow on full ground (no -0.5 step / snowy-terrain DODO). It is NOT a
      * SnowBlock so isThinTopLayer never excluded it. RED before the fix: -0.5.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void powderSnowOnSlabStaysFlush(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos snowRel = new BlockPos(2, 3, 2);
@@ -247,7 +247,7 @@ public final class Slabbed2612LoweringContractTest {
      * so a box inside the visible lower-half (not reaching the slab's own cell) would pass straight
      * through without the broadphase above-check. RED before the mixin: noCollision=true (clip-in).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void loweredSlabIsSolidAtVisualLowerHalf(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         // Build a lowered slab, ANCHOR it via the real placement path (freeze law), then remove the
@@ -287,7 +287,7 @@ public final class Slabbed2612LoweringContractTest {
      * NOT inherit the neighbour's lowered position (the maintainer's no-side-contagion law). RED before the
      * fix: the placed slab snaps to -0.5 (isAdjacentSideSlabLowered, then frozen by the anchor).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void placedSlabBesideLoweredBlockStaysFlush(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         // A lowered full block: stone on a bottom slab.
@@ -310,7 +310,7 @@ public final class Slabbed2612LoweringContractTest {
      * No-regression companion: a slab PLACED on top of a lowered carrier legitimately follows it
      * down to -0.5 (support-following, not side-contagion). The snap fix must NOT break this.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void placedSlabOnLoweredCarrierStaysLowered(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos carrier = new BlockPos(2, 2, 2);
@@ -333,7 +333,7 @@ public final class Slabbed2612LoweringContractTest {
      * the ground and spread lowering onward (tree-canopy contagion). RED before the disable:
      * after the placement-intent call the block reads dy=-0.5 (anchored).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void sideAdjacentFullBlockMustNotInheritLowering(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
 
@@ -369,7 +369,7 @@ public final class Slabbed2612LoweringContractTest {
      * computed live (never stale). Replaces the removed side-adjacent anchor with geometry.
      * RED before the feature: the cantilever block reads dy=0.0 (floats above the lowered tower).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void cantileverFullBlockOverAirMergesWithLoweredTower(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
 
@@ -396,7 +396,7 @@ public final class Slabbed2612LoweringContractTest {
      * lowered tower must STAY flush (air-gating) — only air-below blocks cantilever-merge. Must
      * hold both before and after 9a24670c (it is the safety rail, not a RED).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fullBlockOnSolidGroundBesideLoweredTowerStaysFlush(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
 
@@ -422,7 +422,7 @@ public final class Slabbed2612LoweringContractTest {
      * stuck at -1.0 and sink into the flush slab. RED before the fix: the stale compound sidecar
      * returns -1.0 unconditionally while the slab below reads 0.0 (the visible merge).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void compoundAnchorBlockMustFollowSlabBelowNotSinkWhenFlushed(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos base = new BlockPos(2, 1, 2);
@@ -470,7 +470,7 @@ public final class Slabbed2612LoweringContractTest {
      * support (the "smoosh"). RED before the fix: the hanging lantern is not routed through the
      * ceiling-hung path and reads dy=0.0 while its support reads -0.5.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void hangingLanternFollowsLoweredSupportAbove(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
 
@@ -501,7 +501,7 @@ public final class Slabbed2612LoweringContractTest {
      * No-regression companion: a HANGING lantern under a FLUSH support stays flush (0.0) — no -0.5
      * gap. Holds before and after the fix (ceilingHungDecorationDy returns 0.0 for a flush support).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void hangingLanternUnderFlushSupportStaysFlush(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos support = new BlockPos(2, 4, 2);
@@ -519,7 +519,7 @@ public final class Slabbed2612LoweringContractTest {
      * NAMED lowered slab lane, must STAY flush (the maintainer's NEVER-POP). If it snaps to -0.5 at placement
      * it has inherited the neighbor's lowering — a violation. (Diagnostic for "snapping down slab".)
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabPlacedBesideLoweredSlabLaneOnFlushGroundStaysFlush(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
 
@@ -545,7 +545,7 @@ public final class Slabbed2612LoweringContractTest {
      * Adversarial pin for the compound-merge fix: a compound-anchored block on a slab that STAYS
      * genuinely lowered (-0.5) must keep reading -1.0. The fix must not collapse a real compound.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void compoundAnchorBlockStaysMinusOneOnGenuinelyLoweredSlab(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos base = new BlockPos(2, 1, 2);
@@ -570,7 +570,7 @@ public final class Slabbed2612LoweringContractTest {
      * the authored compound -1.0 is preserved (NEVER-POP survive-removal) — the fix only follows a
      * slab that is still present but flushed, it does not pop the lane up on source removal.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void compoundAnchorBlockKeepsMinusOneWhenSlabBelowRemoved(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos base = new BlockPos(2, 1, 2);
@@ -601,7 +601,7 @@ public final class Slabbed2612LoweringContractTest {
      * no own flush ground here (air below), so WYSIWYG wins over NEVER-POP. The NEVER-POP rail is kept
      * for the SOLID-ground case (see rc2SlabOnSolidGroundBesideLoweredFullBlockStaysFlush).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabCantileveredBesideLoweredCarrierFollowsToMinusHalf(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         // A lowered full block: stone on a bottom slab (dy=-0.5).
@@ -630,7 +630,7 @@ public final class Slabbed2612LoweringContractTest {
      * is REVERSED from 0.0 to -0.5. The NEVER-POP rail survives for the SOLID-ground case
      * (see rc2cSlabOnSolidGroundBesideLoweredLaneFreezesFlat).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabBesideLoweredSlabColumnAuthoredFollowsToMinusHalf(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         // Lowered slab column: ground, slab, stone(-0.5), slab(-0.5 via hasLoweredCarrierBelow).
@@ -728,20 +728,20 @@ public final class Slabbed2612LoweringContractTest {
      */
     private static void forceSyntheticSupportStoredDy(ServerLevel level, BlockPos pos, double dy) {
         LevelChunk chunk = level.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
-        Long2DoubleOpenHashMap existing = chunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE);
+        Long2DoubleOpenHashMap existing = com.slabbed.loader.Attachments.get(chunk, SlabAnchorAttachment.PLACEMENT_DY_TYPE);
         Long2DoubleOpenHashMap map = existing == null
                 ? new Long2DoubleOpenHashMap()
                 : new Long2DoubleOpenHashMap(existing);
         map.defaultReturnValue(Double.NaN);
         map.put(pos.asLong(), dy);
-        chunk.setAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE, map);
+        com.slabbed.loader.Attachments.set(chunk, SlabAnchorAttachment.PLACEMENT_DY_TYPE, map);
     }
 
     /**
      * Real-useOn regression fixture for the flush TOP chain bridge: a TOP support whose frozen
      * placement dy is exactly zero must publish that same exact value for its newly placed chain.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void flushTopChainUseOnStoresExactFrozenZeroDy(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos support = helper.absolutePos(new BlockPos(2, 4, 2));
@@ -855,7 +855,7 @@ public final class Slabbed2612LoweringContractTest {
      * native route. This proves both shape consumers have no detached 24px bridge component and that
      * the visible lowered chain body remains directly ray-hittable.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void loweredTopChainUsesOnlyShiftedNativeOutlineAndInteractionShape(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos chainAbs = buildDeepLoweredTopChainScene(helper, level);
@@ -939,7 +939,7 @@ public final class Slabbed2612LoweringContractTest {
      * that is the separate ceiling-bridge system with its own client model (see
      * {@link #chainUnderTopSlabHangsFlush}).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void chainUnderLoweredSupportFollowsDownLikeLantern(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos support = new BlockPos(2, 3, 2);
@@ -966,7 +966,7 @@ public final class Slabbed2612LoweringContractTest {
      * +0.5 "connect up" reach-up is deprecated; the ceiling-bridge MODEL (1.5-block) closes the
      * visual seam to the slab underside from grid height.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void chainUnderTopSlabHangsFlush(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos chain = new BlockPos(2, 3, 2);
@@ -982,7 +982,7 @@ public final class Slabbed2612LoweringContractTest {
      * P26-8 targeting guard: the ceiling-bridged top chain model extends above the native 16px chain.
      * The selection proxy must cover that bridge-only upper segment, not merely the native body.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void ceilingBridgedChainSelectionExtendsToVisibleBridge(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos chain = new BlockPos(2, 3, 2);
@@ -1013,7 +1013,7 @@ public final class Slabbed2612LoweringContractTest {
      * therefore stay at grid height; if they also inherit +0.5, they overlap the extended top chain and
      * visually merge.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void chainColumnUnderTopSlabKeepsDescendantsGridHeight(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos upperChain = new BlockPos(2, 3, 2);
@@ -1034,7 +1034,7 @@ public final class Slabbed2612LoweringContractTest {
      * visible chain bottom, not the TOP-slab +0.5 inherited through the chain column. Otherwise the
      * lantern rises into the chain and looks merged/smooshed.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void hangingLanternUnderCeilingBridgedChainStaysGridHeight(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos chain = new BlockPos(2, 3, 2);
@@ -1058,7 +1058,7 @@ public final class Slabbed2612LoweringContractTest {
     // height run still connects). A is WEST of B, so A's EAST side faces B.
 
     /** Stepped fence run: fence on a bottom slab (-0.5) beside a fence on stone (0.0) — EAST breaks. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void steppedFenceRunBreaksConnection(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         helper.setBlock(new BlockPos(2, 1, 2), bottomSlab());                       // support under A → lowers A
@@ -1082,7 +1082,7 @@ public final class Slabbed2612LoweringContractTest {
     }
 
     /** Control: a flat fence run (both flush on stone) still connects — mixin only breaks across a step. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void flatFenceRunStillConnects(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         helper.setBlock(new BlockPos(2, 1, 2), Blocks.STONE.defaultBlockState());
@@ -1106,7 +1106,7 @@ public final class Slabbed2612LoweringContractTest {
     }
 
     /** Stepped iron-bars (pane family) run: same CrossCollisionBlock boolean side — EAST breaks. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void steppedIronBarsRunBreaksConnection(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         helper.setBlock(new BlockPos(2, 1, 2), bottomSlab());
@@ -1130,7 +1130,7 @@ public final class Slabbed2612LoweringContractTest {
     }
 
     /** Stepped wall run: walls use WallSide side properties — broken side becomes WallSide.NONE. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void steppedWallRunBreaksConnection(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         helper.setBlock(new BlockPos(2, 1, 2), bottomSlab());
@@ -1174,7 +1174,7 @@ public final class Slabbed2612LoweringContractTest {
     // ── RC2-A: slab cantilevered over air beside a lowered FULL BLOCK → -0.5, BOTH halves ─────────
 
     /** RC2-A: a BOTTOM slab (lower-half aim) authored cantilevered over air beside a lowered full block → -0.5. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void rc2aBottomSlabCantileverBesideLoweredFullBlockLowers(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos lowered = loweredTower(helper, new BlockPos(2, 2, 2));
@@ -1188,7 +1188,7 @@ public final class Slabbed2612LoweringContractTest {
     }
 
     /** RC2-A: a TOP slab (upper-half aim) authored cantilevered over air beside a lowered full block also → -0.5. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void rc2aTopSlabCantileverBesideLoweredFullBlockLowers(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos lowered = loweredTower(helper, new BlockPos(2, 2, 2));
@@ -1201,7 +1201,7 @@ public final class Slabbed2612LoweringContractTest {
     }
 
     /** RC2-A NEVER-POP rail: a slab on its OWN solid ground beside a lowered full block stays flush (0.0). */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void rc2SlabOnSolidGroundBesideLoweredFullBlockStaysFlush(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos lowered = loweredTower(helper, new BlockPos(2, 2, 2));
@@ -1216,7 +1216,7 @@ public final class Slabbed2612LoweringContractTest {
     // ── RC2-B: fence / wall / iron-bars cantilevered over air beside a lowered neighbour → -0.5 ───
 
     /** RC2-B: a fence cantilevered over air beside a lowered full block → -0.5. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void rc2bFenceCantileverBesideLoweredFullBlockLowers(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos lowered = loweredTower(helper, new BlockPos(2, 2, 2));
@@ -1228,7 +1228,7 @@ public final class Slabbed2612LoweringContractTest {
     }
 
     /** RC2-B: a wall cantilevered over air beside a lowered full block → -0.5. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void rc2bWallCantileverBesideLoweredFullBlockLowers(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos lowered = loweredTower(helper, new BlockPos(2, 2, 2));
@@ -1240,7 +1240,7 @@ public final class Slabbed2612LoweringContractTest {
     }
 
     /** RC2-B: iron-bars cantilevered over air beside a lowered full block → -0.5 (excluded from the old fence/wall reader). */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void rc2bIronBarsCantileverBesideLoweredFullBlockLowers(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos lowered = loweredTower(helper, new BlockPos(2, 2, 2));
@@ -1252,7 +1252,7 @@ public final class Slabbed2612LoweringContractTest {
     }
 
     /** RC2-B: a fence cantilevered over air beside a lowered SLAB lane → -0.5. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void rc2bFenceCantileverBesideLoweredSlabLowers(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos base = new BlockPos(2, 1, 2);
@@ -1270,7 +1270,7 @@ public final class Slabbed2612LoweringContractTest {
     }
 
     /** RC2-B NEVER-POP rail: a fence on its OWN solid ground beside a lowered neighbour stays flush (0.0). */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void rc2bFenceOnSolidGroundBesideLoweredFullBlockStaysFlush(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos lowered = loweredTower(helper, new BlockPos(2, 2, 2));
@@ -1289,7 +1289,7 @@ public final class Slabbed2612LoweringContractTest {
      * (freeze's dy<0 anchor branch), NOT freeze FLAT. Proven by removing the lowered source AFTER
      * placement: an ANCHORED slab holds -0.5; a FROZEN_FLAT one would already have read 0.0 at placement.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void rc2cCantileverSlabAnchorsNotFreezesFlat(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos lowered = loweredTower(helper, new BlockPos(2, 2, 2));
@@ -1315,7 +1315,7 @@ public final class Slabbed2612LoweringContractTest {
      * slab LANE still freezes FLAT (0.0) — slabLoweringIsSideInheritedOnly returns true for the
      * solid-below case, so freeze records FROZEN_FLAT (LAW 1 (the placement law) for a block on its own flush ground).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void rc2cSlabOnSolidGroundBesideLoweredLaneFreezesFlat(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos base = new BlockPos(2, 1, 2);
@@ -1344,7 +1344,7 @@ public final class Slabbed2612LoweringContractTest {
      * lowered slab) must STILL read -1.0 — RC2-A/B sit AFTER the compound markers / anchor branch in
      * getYOffsetInner, so they can never down-shift a compound hit. (Pins the ordering constraint.)
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void rc2CompoundStackTopStillMinusOne(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos base = new BlockPos(2, 1, 2);
@@ -1406,7 +1406,7 @@ public final class Slabbed2612LoweringContractTest {
     // ── GAP-1: cantilever beside a COMPOUND -1.0 stack → -1.0 (slab AND fence) ─────────────────────
 
     /** GAP-1: a SLAB cantilevered over air beside a compound -1.0 stack must land -1.0 (not -0.5). */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void gap1SlabCantileverBesideCompoundMinusOneStackLowersFull(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos top = compoundLoweredTower(helper, new BlockPos(2, 1, 2));
@@ -1421,7 +1421,7 @@ public final class Slabbed2612LoweringContractTest {
     }
 
     /** GAP-1: a FENCE cantilevered over air beside a compound -1.0 stack must land -1.0 (RC2-B magnitude). */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void gap1FenceCantileverBesideCompoundMinusOneStackLowersFull(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos top = compoundLoweredTower(helper, new BlockPos(2, 1, 2));
@@ -1436,7 +1436,7 @@ public final class Slabbed2612LoweringContractTest {
     }
 
     /** GAP-1 NEVER-POP rail: a slab on its OWN solid ground beside a compound -1.0 stack stays flush (0.0). */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void gap1SlabOnSolidGroundBesideCompoundStackStaysFlush(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos top = compoundLoweredTower(helper, new BlockPos(2, 1, 2));
@@ -1449,7 +1449,7 @@ public final class Slabbed2612LoweringContractTest {
     }
 
     /** GAP-1 NEVER-POP rail (fence): a fence on its OWN solid ground beside a compound -1.0 stack stays flush (0.0). */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void gap1FenceOnSolidGroundBesideCompoundStackStaysFlush(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos top = compoundLoweredTower(helper, new BlockPos(2, 1, 2));
@@ -1469,7 +1469,7 @@ public final class Slabbed2612LoweringContractTest {
      * land -0.5, not 0.0. Pre-fix isAdjacentLoweredFullBlockSource 'continue'd on the slab neighbour
      * and no column bridged it, so the cantilever slab read 0.0 (floated half a block too high).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void gap2SlabCantileverBesideBareLoweredSlabLowers(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos bare = bareLoweredSlab(helper, level, new BlockPos(2, 3, 2));
@@ -1486,7 +1486,7 @@ public final class Slabbed2612LoweringContractTest {
     }
 
     /** GAP-2 NEVER-POP rail: a slab on its OWN solid ground beside a bare lowered slab stays flush (0.0). */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void gap2SlabOnSolidGroundBesideBareLoweredSlabStaysFlush(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos bare = bareLoweredSlab(helper, level, new BlockPos(2, 3, 2));

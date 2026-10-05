@@ -3,7 +3,7 @@ package com.slabbed.test;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.config.SlabbedConfig;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -155,7 +155,7 @@ public final class AnchoredDepthReadbackTest {
     }
 
     /** Marked-slab lane (beta35FloorTorchContactLaneDy): compound-visible side-lower support → -1.5. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void floorTorchOnMarkedSlabSurvivesReadback(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         depthSurvivesReadback(helper, buildCompoundVisibleSupport(helper, w),
@@ -163,7 +163,7 @@ public final class AnchoredDepthReadbackTest {
     }
 
     /** Fence-gate lane (beta35FenceGateContactDy): marked support dy -1.0 → gate -1.5. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fenceGateOnMarkedSlabSurvivesReadback(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         depthSurvivesReadback(helper, buildCompoundVisibleSupport(helper, w),
@@ -171,7 +171,7 @@ public final class AnchoredDepthReadbackTest {
     }
 
     /** Deep floor-torch lane WITHOUT markers: lowered slab-stack support (-0.5) → torch -1.0. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void floorTorchOnLoweredSlabStackSurvivesReadback(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         depthSurvivesReadback(helper, buildLoweredSlabStack(helper, w),
@@ -179,7 +179,7 @@ public final class AnchoredDepthReadbackTest {
     }
 
     /** Deep fence-gate lane WITHOUT markers: lowered slab-stack support (-0.5) → gate -1.0. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fenceGateOnLoweredSlabStackSurvivesReadback(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         depthSurvivesReadback(helper, buildLoweredSlabStack(helper, w),
@@ -187,7 +187,7 @@ public final class AnchoredDepthReadbackTest {
     }
 
     /** Generic floor-top-contact lane (beta35FloorTopContactLaneDy): candle on the -0.5 stack → -1.0. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void candleOnLoweredSlabStackSurvivesReadback(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         depthSurvivesReadback(helper, buildLoweredSlabStack(helper, w),
@@ -199,7 +199,7 @@ public final class AnchoredDepthReadbackTest {
      * a candle on the marked slab is -1.5 (marker-aware support dy -1.0, minus the half-block seat).
      * This is the scene that makes the lane's own existence observable (kills the M3 mutation).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void candleOnMarkedSlabSurvivesReadback(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         depthSurvivesReadback(helper, buildCompoundVisibleSupport(helper, w),
@@ -207,7 +207,7 @@ public final class AnchoredDepthReadbackTest {
     }
 
     /** Floor-torch lane on TOP of the compound full block itself (support dy -1.0, not a slab) → -1.0. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void floorTorchOnCompoundFullBlockSurvivesReadback(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         buildCompoundVisibleSupport(helper, w);
@@ -223,7 +223,7 @@ public final class AnchoredDepthReadbackTest {
      * -0.5 where a torch reads -1.0 is a live-lane design question logged in the audit ledger — the
      * read-back contract here is agnostic to it.)
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fenceGateOnCompoundFullBlockSurvivesReadback(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         buildCompoundVisibleSupport(helper, w);
@@ -238,7 +238,7 @@ public final class AnchoredDepthReadbackTest {
      * instead of the live fence/wall lane: client predicts -1.5 (marker-aware support -1.0 + 0.5 - 1.0),
      * anchored read gave -1.0 — the same +0.5 pop one family over.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fenceOnMarkedSlabSurvivesReadback(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         depthSurvivesReadback(helper, buildCompoundVisibleSupport(helper, w),
@@ -246,7 +246,7 @@ public final class AnchoredDepthReadbackTest {
     }
 
     /** Two-authority agreement pin: fence on the ordinary -0.5 stack — lane and sidecar both say -1.0. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fenceOnLoweredSlabStackSurvivesReadback(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         depthSurvivesReadback(helper, buildLoweredSlabStack(helper, w),
@@ -261,7 +261,7 @@ public final class AnchoredDepthReadbackTest {
      * shipped default happens to be. That pin is what keeps the shipped-default row's mutation
      * isolated to the shipped-default row.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void flowerPotOnMarkedSlabSurvivesReadback(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         SlabbedConfig previousConfig =
@@ -279,28 +279,28 @@ public final class AnchoredDepthReadbackTest {
     // client predicts -1.5 (marker-aware support -1.0, minus the half-block seat) but the anchored read
     // was shadowed to the compound-dy -1.0. Same +0.5 pop, five more families. ──
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void oakTrapdoorOnMarkedSlabSurvivesReadback(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         depthSurvivesReadback(helper, buildCompoundVisibleSupport(helper, w),
                 new ItemStack(Items.OAK_TRAPDOOR), -1.5, "oak trapdoor on marked slab");
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void oakDoorOnMarkedSlabSurvivesReadback(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         depthSurvivesReadback(helper, buildCompoundVisibleSupport(helper, w),
                 new ItemStack(Items.OAK_DOOR), -1.5, "oak door on marked slab");
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void oakSignOnMarkedSlabSurvivesReadback(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         depthSurvivesReadback(helper, buildCompoundVisibleSupport(helper, w),
                 new ItemStack(Items.OAK_SIGN), -1.5, "standing oak sign on marked slab");
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void floorButtonOnMarkedSlabSurvivesReadback(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         depthSurvivesReadback(helper, buildCompoundVisibleSupport(helper, w),
@@ -308,14 +308,14 @@ public final class AnchoredDepthReadbackTest {
     }
 
     /** Chest = the special-fullblock contact family (EntityBlock, never compound-self-tagged). */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void chestOnMarkedSlabSurvivesReadback(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         depthSurvivesReadback(helper, buildCompoundVisibleSupport(helper, w),
                 new ItemStack(Items.CHEST), -1.5, "chest on marked slab");
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void depthHoldsAfterNeighborCompoundEdit(GameTestHelper helper) {
         // The compound-edit half of the symptom: the marker is authored truth on the SUPPORT — breaking
         // the adjacent full block must not pop the anchored object (read-back unchanged, because the
@@ -346,7 +346,7 @@ public final class AnchoredDepthReadbackTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void plainSlabReadbackControlStaysMinusHalf(GameTestHelper helper) {
         // Control: no over-deepening — a torch on a PLAIN flush-context bottom slab still reads -0.5
         // after anchoring (the new whitelist lanes must be depth-conditional, not blanket).

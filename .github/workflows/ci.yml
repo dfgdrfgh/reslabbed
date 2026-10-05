@@ -4,7 +4,7 @@ on:
   pull_request:
   push:
     branches:
-      - "port/mc-26.3-**"
+      - "port/neoforge-26.2-**"
   workflow_dispatch:
 
 permissions:
@@ -50,40 +50,35 @@ jobs:
             exit 1
           fi
 
-      # The suite-count gate shells out to python3 from inside runGameTest; fail loudly and early
+      # The suite-count gate shells out to python3 from inside runGameTestServer; fail loudly and early
       # here rather than midway through a 30-minute job if the runner image ever drops it.
       - name: Check the suite-count gate can run
         run: python3 tools/expected-gametest-count.py
 
-      # runGameTest self-verifies its reported count against tools/expected-gametest-count.py, so a
+      # runGameTestServer self-verifies its reported count against tools/expected-gametest-count.py, so a
       # silently truncated suite fails here instead of printing a green.
       - name: Build and run server GameTests
-        run: ./gradlew --no-daemon --stacktrace --console=plain build runGameTest
+        run: ./gradlew --no-daemon --stacktrace --console=plain build runGameTestServer
 
-      # One jar serves 26.2 and 26.3 and is compiled against 26.3. The 26.2 leg compiles the same suite
-      # against 26.2 and runs it on a 26.2 runtime with the exact release jar loaded; its count gate
-      # compares the run against the classes the prepared descriptor registers (harness/README.md).
-      - name: Run the 26.2 server GameTest leg against the release jar
-        run: ./gradlew --no-daemon --stacktrace --console=plain -p harness/fabric-26.2 runGameTest verifyHarnessGameTestCount
-
-      # Every Minecraft and Fabric API reference in the jar, and every mixin target string in the
-      # registered mixins, must resolve on BOTH versions (the shipped client jars are in Loom's cache
-      # after the builds above; the Fabric API bundles in Gradle's module cache).
-      - name: Linkage and mixin-target scans on both game versions
+      # Every mixin target string in the registered mixins must resolve on the pinned game version.
+      # NeoForge patches add members (BlockState.isScaffolding), so the scanned jar is the patched
+      # Minecraft jar ModDevGradle produced for the build above plus the NeoForge universal jar's
+      # classes. The skips are exactly the mixins the config plugins withhold on this version.
+      - name: Mixin-target scan on the pinned game version
         shell: bash
         run: |
           set -euo pipefail
           GUH="${GRADLE_USER_HOME:-$HOME/.gradle}"
-          JAR=$(ls build/libs/slabbed-*+26.2-26.3.jar)
-          FA262=$(find "$GUH/caches/modules-2" -name 'fabric-api-0.152.2+26.2.jar' | head -1)
-          FA263=$(find "$GUH/caches/modules-2" -name "fabric-api-$(grep '^fabric_version=' gradle.properties | cut -d= -f2).jar" | head -1)
-          test -n "$FA262" && test -n "$FA263"
-          python3 tools/linkage-scan.py "$JAR" - "$GUH/caches/fabric-loom/26.3/minecraft-client.jar" --lib "$FA263" \
-            --allow-class 'com/slabbed/compat/mc262/'
-          python3 tools/linkage-scan.py "$JAR" - "$GUH/caches/fabric-loom/26.2/minecraft-client.jar" --lib "$FA262" \
-            --allow-class 'com/slabbed/compat/PlayerSwing$Modern' --allow-class 'com/slabbed/client/model/YOffsetEmitter'
-          CFG="--config src/main/resources/slabbed.mixins.json --config src/client/resources/slabbed.client.mixins.json --config src/diagnostics/resources/slabbed.diagnostics.client.mixins.json"
-          python3 tools/mixin-target-scan.py "$GUH/caches/fabric-loom/26.3/minecraft-client.jar" src/main/java src/client/java src/diagnostics/java $CFG \
-            --skip LegacyRedStoneWireBlockMixin
-          python3 tools/mixin-target-scan.py "$GUH/caches/fabric-loom/26.2/minecraft-client.jar" src/main/java src/client/java src/diagnostics/java $CFG \
-            --skip RedstoneWireBlockMixin --skip CushionRestsOnDrawnTopMixin
+          NEO=$(grep '^neo_version=' gradle.properties | cut -d= -f2)
+          MC=$(grep '^minecraft_version=' gradle.properties | cut -d= -f2)
+          PATCHED="build/moddev/artifacts/minecraft-patched-$NEO-merged.jar"
+          UNIVERSAL=$(find "$GUH/caches/modules-2" -name "neoforge-$NEO-universal.jar" | head -1)
+          test -f "$PATCHED" && test -n "$UNIVERSAL"
+          rm -rf build/mixin-scan && mkdir -p build/mixin-scan/x
+          (cd build/mixin-scan/x && unzip -qo "$OLDPWD/$PATCHED" '*.class' && unzip -qn "$UNIVERSAL" '*.class' && zip -qr ../combined.jar .)
+          CFG="--config src/main/resources/slabbed.mixins.json --config src/client/resources/slabbed.client.mixins.json --config src/diagnostics/resources/slabbed.diagnostics.client.mixins.json --config src/gametest/resources/slabbed-test31.mixins.json"
+          case "$MC" in
+            26.2) SKIPS="--skip CushionRestsOnDrawnTopMixin --skip RedstoneWireBlockMixin --skip LevelRendererAllChangedMixin" ;;
+            *)    SKIPS="--skip LegacyRedStoneWireBlockMixin --skip LevelRendererInvalidateCompiledGeometryMixin" ;;
+          esac
+          python3 tools/mixin-target-scan.py build/mixin-scan/combined.jar src/main/java src/client/java src/diagnostics/java src/gametest/java $CFG $SKIPS

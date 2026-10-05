@@ -40,14 +40,19 @@ public abstract class LivingEntityLoweredScaffoldingMixin {
         }
     }
 
+    /**
+     * NeoForge rewrites vanilla's {@code getInBlockState().is(Blocks.SCAFFOLDING)} in
+     * {@code handleOnClimbable} to its own {@code isScaffolding(LivingEntity)} block hook, so the
+     * descent check is redirected there: a lowered scaffolding's drawn volume counts as scaffolding.
+     */
     @Redirect(method = "handleOnClimbable",
             at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/world/level/block/state/BlockState;is(Ljava/lang/Object;)Z"))
-    private boolean slabbed$loweredVisualScaffoldingAllowsDescent(BlockState state, Object block) {
-        if (block instanceof Block target && state.is(target)) {
+                    target = "Lnet/minecraft/world/level/block/state/BlockState;isScaffolding(Lnet/minecraft/world/entity/LivingEntity;)Z"))
+    private boolean slabbed$loweredVisualScaffoldingAllowsDescent(BlockState state, LivingEntity entity) {
+        if (state.isScaffolding(entity)) {
             return true;
         }
-        return block == Blocks.SCAFFOLDING && slabbed$loweredScaffoldingVisualPos() != null;
+        return slabbed$loweredScaffoldingVisualPos() != null;
     }
 
     @Unique

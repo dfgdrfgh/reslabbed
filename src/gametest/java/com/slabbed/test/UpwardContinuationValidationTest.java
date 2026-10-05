@@ -4,7 +4,7 @@ import com.slabbed.Slabbed;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.placement.LandingHitValidationPolicy;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -37,7 +37,7 @@ public final class UpwardContinuationValidationTest {
     private static final double OWNER_DY = -1.5d;
     private static final double COMPONENT_TOLERANCE = 1.0000001d;
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void pointedDripstoneUpwardPolicyRed(GameTestHelper h) {
         FamilyResult result = exercise(h, Blocks.POINTED_DRIPSTONE.defaultBlockState()
                 .setValue(PointedDripstoneBlock.TIP_DIRECTION, Direction.UP), Items.POINTED_DRIPSTONE);
@@ -62,28 +62,28 @@ public final class UpwardContinuationValidationTest {
         h.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void verticalIronChain(GameTestHelper h) {
         requireVanillaCenter(h, exercise(h, Blocks.IRON_CHAIN.defaultBlockState(), Items.IRON_CHAIN),
                 "vertical iron chain");
         h.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void isolatedOakFence(GameTestHelper h) {
         requireVanillaCenter(h, exercise(h, Blocks.OAK_FENCE.defaultBlockState(), Items.OAK_FENCE),
                 "isolated oak fence");
         h.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void isolatedCobblestoneWall(GameTestHelper h) {
         requireVanillaCenter(h, exercise(h, Blocks.COBBLESTONE_WALL.defaultBlockState(), Items.COBBLESTONE_WALL),
                 "isolated cobblestone wall");
         h.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void isolatedIronBars(GameTestHelper h) {
         requireVanillaCenter(h, exercise(h, Blocks.IRON_BARS.defaultBlockState(), Items.IRON_BARS),
                 "isolated iron bars");

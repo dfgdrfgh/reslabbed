@@ -2,7 +2,7 @@ package com.slabbed.test;
 
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.HangingSeatDyHolder;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -60,7 +60,7 @@ public final class HangingSeatRememberedTest {
         return ((HangingSeatDyHolder) entity).slabbed$hangSeatDy();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aFrameKeepsItsSeatWhenTheWallBehindItIsRebuiltFlushAndItIsReloaded(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos wallRel = new BlockPos(2, 3, 2);
@@ -100,7 +100,7 @@ public final class HangingSeatRememberedTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aPaintingHangsOnItsWallsDrawnFaceAndIgnoresTheSlabUnderItsCell(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         // Lowered wall.
@@ -149,7 +149,7 @@ public final class HangingSeatRememberedTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aFrameSavedBeforeTheSeatExistedMintsFromItsWallOnceOnLoad(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos wallRel = new BlockPos(2, 3, 2);

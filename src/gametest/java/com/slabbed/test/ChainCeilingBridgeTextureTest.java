@@ -3,7 +3,7 @@ package com.slabbed.test;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.ChainBridgeTextureVariant;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -62,7 +62,7 @@ public final class ChainCeilingBridgeTextureTest {
      * deliberate 24px bridge. This calls the shared server-loadable policy directly so its RED is a
      * missing or incorrect production route, not a test-side approximation.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void loweredTopChainFrozenDySelectsNormalRouteWhileFlushTopSelectsBridge(GameTestHelper helper) {
         BlockState chain = Blocks.IRON_CHAIN.defaultBlockState()
                 .setValue(BlockStateProperties.AXIS, Direction.Axis.Y);
@@ -103,7 +103,7 @@ public final class ChainCeilingBridgeTextureTest {
      * a single iron bridge; mutating {@link ChainBridgeTextureVariant#forBlock} to always return IRON
      * turns this RED for every non-iron chain.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void chainBridgeTextureVariantMapsEachChainToItsOwnTexture(GameTestHelper helper) {
         assertVariant(helper, "iron_chain", ChainBridgeTextureVariant.IRON);
 
@@ -139,7 +139,7 @@ public final class ChainCeilingBridgeTextureTest {
      * render is only observable live, per lesson S7): it catches any drift between the enum and the
      * JSON, e.g. a copper variant left pointing at {@code iron_chain}.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void chainBridgeModelFilesReferenceTheExpectedTexture(GameTestHelper helper) {
         for (ChainBridgeTextureVariant variant : ChainBridgeTextureVariant.values()) {
             String resource = "/assets/slabbed/models/block/" + variant.modelPath() + ".json";
@@ -162,7 +162,7 @@ public final class ChainCeilingBridgeTextureTest {
     }
 
     private static String readClasspath(GameTestHelper helper, String resource) {
-        try (InputStream in = ChainCeilingBridgeTextureTest.class.getResourceAsStream(resource)) {
+        try (InputStream in = com.slabbed.Slabbed.class.getResourceAsStream(resource)) {
             if (in == null) {
                 throw helper.assertionException(BlockPos.ZERO,
                         "missing bridge model resource on classpath: " + resource
@@ -182,7 +182,7 @@ public final class ChainCeilingBridgeTextureTest {
      * bug; this test fails if the dy is ever changed to inherit the support's -0.5 (which would break
      * the extended-bridge model contract) or if the bridge lane stops recognising the scene.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void waxedCopperChainUnderLoweredDoubleStaysBridgedGridHeight(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
 

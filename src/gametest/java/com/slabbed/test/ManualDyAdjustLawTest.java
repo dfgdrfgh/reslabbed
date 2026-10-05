@@ -3,7 +3,7 @@ package com.slabbed.test;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.network.ManualDyAdjustServer;
 import com.slabbed.util.ManualDyEnvelope;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -184,7 +184,7 @@ public final class ManualDyAdjustLawTest {
     // ── 1. the premise every other row rests on ─────────────────────────────
 
     /** Reddened by: making the placement path skip publishing a fact for a zero-height placement. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void flatFullBlockPlacedThroughUseOnCarriesAZeroFact(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos subject = placedOnGround(h, w);
@@ -198,7 +198,7 @@ public final class ManualDyAdjustLawTest {
     // ── 2-5. the step itself and its two bounds ─────────────────────────────
 
     /** Reddened by: changing ManualDyEnvelope.STEP, or dropping the writePlacementDy call in apply. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void lowerStepsTheStoredFactByExactlyOneHalf(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos subject = placedOverAir(h, w);
@@ -212,7 +212,7 @@ public final class ManualDyAdjustLawTest {
     }
 
     /** Reddened by: inverting the sign the raise key passes into ManualDyEnvelope.step. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void raiseStepsTheStoredFactBackUpBitIdentically(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos subject = placedOnGround(h, w);
@@ -226,7 +226,7 @@ public final class ManualDyAdjustLawTest {
     }
 
     /** Reddened by: deepening ManualDyEnvelope.MIN_DY, or reporting APPLIED for a no-op step. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void lowerAtTheEnvelopeFloorClampsAndReportsTheFloor(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         if (!(ManualDyEnvelope.MIN_DY < 0.0d) || !Double.isFinite(ManualDyEnvelope.MIN_DY)) {
@@ -240,7 +240,7 @@ public final class ManualDyAdjustLawTest {
     }
 
     /** Reddened by: raising ManualDyEnvelope.MAX_DY above flush, which would re-open positive heights. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void raiseAtTheEnvelopeCeilingClampsAndReportsTheCeiling(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos subject = seededCell(h, w, new BlockPos(2, 3, 2), ManualDyEnvelope.MAX_DY);
@@ -253,7 +253,7 @@ public final class ManualDyAdjustLawTest {
     // ── 6-7. the two refusals that protect the store ────────────────────────
 
     /** Reddened by: replacing the out-of-envelope refusal with a clamp into the envelope. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void anOutOfEnvelopeStoredHeightIsRefusedNotSnapped(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos subject = seededCell(h, w, new BlockPos(2, 3, 2), 1.0d);
@@ -272,7 +272,7 @@ public final class ManualDyAdjustLawTest {
     }
 
     /** Reddened by: minting a fact for a fact-less cell instead of refusing it. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aCellWithNoRecordedHeightIsRefusedAndMintsNothing(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos subject = h.absolutePos(new BlockPos(2, 3, 2));
@@ -291,7 +291,7 @@ public final class ManualDyAdjustLawTest {
     // ── 8-9. the support gate ───────────────────────────────────────────────
 
     /** Reddened by: deleting the supported() check, which would let a block sink into the ground. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void loweringIntoTheSurfaceBelowIsRefused(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos subject = placedOnGround(h, w);
@@ -303,7 +303,7 @@ public final class ManualDyAdjustLawTest {
     }
 
     /** Reddened by: reading the support's grid top instead of its visible (stored) top. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void loweringOntoALoweredSupportIsAllowedDownToItsRealTop(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos support = seededCell(h, w, new BlockPos(2, 2, 2), -0.5d);
@@ -323,7 +323,7 @@ public final class ManualDyAdjustLawTest {
     // ── 10-11. what the request must prove about itself ─────────────────────
 
     /** Reddened by: dropping the palette-state-id comparison from apply(). */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aStaleTargetStateIsRefused(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos subject = placedOverAir(h, w);
@@ -344,7 +344,7 @@ public final class ManualDyAdjustLawTest {
     }
 
     /** Reddened by: dropping the interaction-range check, or widening its padding past vanilla's. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void anOutOfReachCellIsRefused(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos subject = seededCell(h, w, new BlockPos(6, 6, 6), 0.0d);
@@ -365,7 +365,7 @@ public final class ManualDyAdjustLawTest {
     // ── 12-14. the permission ruling (maintainer ruling, 2026-09-06) ────────
 
     /** Reddened by: dropping the permission gate, or making multiplayerPermitted return true. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void multiplayerSurvivalNonOpIsRefused(GameTestHelper h) {
         requireSharedWorldVenue(h);
         ServerLevel w = h.getLevel();
@@ -380,7 +380,7 @@ public final class ManualDyAdjustLawTest {
     }
 
     /** Reddened by: removing the creative disjunct from multiplayerPermitted. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void multiplayerCreativePlayerIsPermitted(GameTestHelper h) {
         requireSharedWorldVenue(h);
         ServerLevel w = h.getLevel();
@@ -400,7 +400,7 @@ public final class ManualDyAdjustLawTest {
      * gametest server's default operator grant is level 0, so a bare {@code op(nameAndId)} here mints
      * an operator with no power and proves nothing about the ruling's "level 2 or higher".
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void multiplayerOppedSurvivalPlayerIsPermitted(GameTestHelper h) {
         requireSharedWorldVenue(h);
         ServerLevel w = h.getLevel();
@@ -436,7 +436,7 @@ public final class ManualDyAdjustLawTest {
     // ── 15-16. what a nudge is allowed to touch ─────────────────────────────
 
     /** Reddened by: widening the write in apply() from one cell to a neighbourhood. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aNudgeMovesNoNeighbourFact(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos subject = seededCell(h, w, new BlockPos(2, 3, 2), 0.0d);
@@ -466,7 +466,7 @@ public final class ManualDyAdjustLawTest {
      * connector rule reads the drawn height, and the drawn height only follows the store with the
      * frozen read enabled.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void connectorArmsAreSettledAfterANudge(GameTestHelper h) {
         withFrozen(() -> {
             ServerLevel w = h.getLevel();
@@ -503,7 +503,7 @@ public final class ManualDyAdjustLawTest {
     // ── 17-18. the reply, and the rate limit ────────────────────────────────
 
     /** Reddened by: editing any of the four asserted strings, or the applied line splice. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void theFeedbackStringsAreTheOnesSpecified(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos subject = seededCell(h, w, new BlockPos(2, 3, 2), -1.0d);
@@ -541,7 +541,7 @@ public final class ManualDyAdjustLawTest {
     }
 
     /** Reddened by: deleting the per-player tick guard, or keying it on something other than identity. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aSecondNudgeInTheSameTickIsRefused(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos first = seededCell(h, w, new BlockPos(2, 3, 2), 0.0d);

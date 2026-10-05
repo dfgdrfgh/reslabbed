@@ -3,8 +3,7 @@ package com.slabbed.test;
 import com.slabbed.client.SlabGeometricRemeshScheduler;
 import com.slabbed.client.SlabGeometricRemeshScheduler.SectionBox;
 import com.slabbed.compat.CompatHooks;
-import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.Registry;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -42,15 +41,13 @@ public final class GeometricRemeshSchedulerTest {
     private static final Identifier TS_SLAB_ID =
             Identifier.fromNamespaceAndPath("terrain_slabs", "geometric_remesh_scheduler_test_slab");
     private static final ResourceKey<Block> TS_SLAB_KEY = ResourceKey.create(Registries.BLOCK, TS_SLAB_ID);
-    private static final Block TS_SLAB =
-            new SlabBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE_SLAB).setId(TS_SLAB_KEY));
+    private static final com.slabbed.gametest.TestBlocks.Lazy<Block> TS_SLAB = com.slabbed.gametest.TestBlocks.block(TS_SLAB_ID, () -> new SlabBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE_SLAB).setId(TS_SLAB_KEY)));
 
     /** Registers the TS-namespaced stand-in slab before registry freeze (via the main entrypoint). */
-    public static final class GeometricRemeshSchedulerTestEntrypoint implements ModInitializer {
+    public static final class GeometricRemeshSchedulerTestEntrypoint implements com.slabbed.gametest.TestModInitializer {
         @Override
         public void onInitialize() {
             if (!BuiltInRegistries.BLOCK.containsKey(TS_SLAB_ID)) {
-                Registry.register(BuiltInRegistries.BLOCK, TS_SLAB_ID, TS_SLAB);
             }
         }
     }
@@ -61,7 +58,7 @@ public final class GeometricRemeshSchedulerTest {
 
     // ── gate: which changes must trigger a re-mesh ──────────────────────────────────────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabPlacedIntoAirTriggersRemesh(GameTestHelper helper) {
         // The canonical bug scenario: a support slab appears where there was air. A geometric subject up
         // to MAX_CHAIN_DEPTH away can now be lowered, so its neighbourhood MUST re-mesh.
@@ -73,7 +70,7 @@ public final class GeometricRemeshSchedulerTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabBrokenToAirTriggersRemesh(GameTestHelper helper) {
         // The NEVER-POP-relevant inverse: breaking a support. A cantilever subject that inherited from it
         // must re-mesh (it will settle to its anchored floor, not pop — but its section must still rebake).
@@ -85,7 +82,7 @@ public final class GeometricRemeshSchedulerTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fullCubePlacedTriggersRemesh(GameTestHelper helper) {
         // A full opaque cube is a cantilever/column full-block source and a support-below in the column
         // walk. Its appearance/removal can change a neighbour's dy.
@@ -96,7 +93,7 @@ public final class GeometricRemeshSchedulerTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void blockEntityPlacedTriggersRemesh(GameTestHelper helper) {
         // Hopper/chest participate in the block-entity cantilever lane (adjacentLoweredBlockEntityMagnitude).
         if (!SlabGeometricRemeshScheduler.shouldRemeshNeighborhood(air(), Blocks.CHEST.defaultBlockState())) {
@@ -106,7 +103,7 @@ public final class GeometricRemeshSchedulerTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fencePlacedTriggersRemesh(GameTestHelper helper) {
         // A fence is a cantilever CONNECTING-BLOCK candidate (SlabSupport.isCantileverConnectingCandidate)
         // — a mid-chain propagator between a dependent cantilevered neighbour and its actual lowered
@@ -119,7 +116,7 @@ public final class GeometricRemeshSchedulerTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void wallPlacedTriggersRemesh(GameTestHelper helper) {
         // Same connecting-block lane as fences (SlabSupport.isCantileverConnectingCandidate); walls are
         // also not isSolidRender.
@@ -130,7 +127,7 @@ public final class GeometricRemeshSchedulerTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void ironBarsPlacedTriggersRemesh(GameTestHelper helper) {
         // Same connecting-block lane as fences/walls (SlabSupport.isCantileverConnectingCandidate); iron
         // bars are also not isSolidRender.
@@ -141,14 +138,14 @@ public final class GeometricRemeshSchedulerTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void terrainSlabsSurfaceTriggersRemesh(GameTestHelper helper) {
         // A TS-owned surface terminates a column walk flush; its presence/absence changes a subject's dy.
         // Force the TS-owned verdict via the same seam the TS-guard tests use.
         CompatHooks.shouldSkipSlabSupportTestOverride = st ->
                 "terrain_slabs".equals(BuiltInRegistries.BLOCK.getKey(st.getBlock()).getNamespace());
         try {
-            BlockState tsSlab = TS_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.BOTTOM);
+            BlockState tsSlab = TS_SLAB.get().defaultBlockState().setValue(SlabBlock.TYPE, SlabType.BOTTOM);
             if (!SlabGeometricRemeshScheduler.shouldRemeshNeighborhood(air(), tsSlab)) {
                 throw helper.assertionException(
                         "a Terrain-Slabs-owned surface appearing MUST schedule a re-mesh (it terminates a column walk flush)");
@@ -159,7 +156,7 @@ public final class GeometricRemeshSchedulerTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void nonSourceChangesDoNotTriggerRemesh(GameTestHelper helper) {
         // The cost gate: decorations that can never be a lowering source/support must short-circuit with
         // NO section work, so the added per-block-change cost on ordinary gameplay churn is near zero.
@@ -185,7 +182,7 @@ public final class GeometricRemeshSchedulerTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void sourceOnEitherSideTriggersRemesh(GameTestHelper helper) {
         // A non-source replaced by a source (or vice-versa) must still fire — the gate is an OR over both
         // endpoints, not "the new state only". E.g. a flower replaced by a slab.
@@ -202,7 +199,7 @@ public final class GeometricRemeshSchedulerTest {
 
     // ── dirty section box: correct scope, covers the full MAX_CHAIN_DEPTH reach ──────────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void dirtyBoxIsSectionRadiusOneAroundTheChangedSection(GameTestHelper helper) {
         // A block mid-section (x=40 -> section 2, y=72 -> section 4, z=8 -> section 0). The box must be
         // that section ±1 on every axis, in SECTION coordinates.
@@ -216,7 +213,7 @@ public final class GeometricRemeshSchedulerTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void dirtyBoxHandlesNegativeCoordinatesViaFloorDivision(GameTestHelper helper) {
         // Section coords use floor division (block >> 4), not integer truncation: block -1 is in section
         // -1, not 0. A bug that used bx/16 would put -1 in section 0 and mis-locate the box.
@@ -230,7 +227,7 @@ public final class GeometricRemeshSchedulerTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void dirtyBoxCoversFullMaxChainDepthReachInEveryDirection(GameTestHelper helper) {
         // THE CORRECTNESS INVARIANT the radius exists to guarantee: a subject up to MAX_CHAIN_DEPTH (16)
         // blocks from the changed support — in ANY axis, from ANY intra-section alignment of the support —
@@ -274,7 +271,7 @@ public final class GeometricRemeshSchedulerTest {
 
     // ── compound-visible refresh call site: block coords MUST be converted to section coords ──────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void compoundVisibleRefreshConvertsBlockCoordsToSectionCoords(GameTestHelper helper) {
         // The regression this pins (pre-4df516ab): SlabAnchorClientSync.scheduleCompoundVisibleRenderRefresh
         // fed RAW BLOCK coords to ClientLevel.setSectionRangeDirty, which takes SECTION coords (no >>4).
@@ -312,7 +309,7 @@ public final class GeometricRemeshSchedulerTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void compoundVisibleRefreshBoxMatchesTheSharedDirtySectionBoxHelper(GameTestHelper helper) {
         // Single-authority invariant: the compound-visible refresh call site and the geometric-remesh
         // mixin must both derive their dirty region from the SAME SlabGeometricRemeshScheduler.dirtySectionBox
@@ -342,7 +339,7 @@ public final class GeometricRemeshSchedulerTest {
 
     // ── plain-anchor refresh call site: block coords MUST be converted to section coords ──────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void anchorAttachmentRefreshConvertsBlockCoordsToSectionCoords(GameTestHelper helper) {
         // The freeze-on-place mesh-staleness fix. When a plain ANCHOR_TYPE / FROZEN_FLAT_TYPE /
         // LOWERED_SLAB_CARRIER_TYPE / COMPOUND_FULL_BLOCK_ANCHOR_TYPE attachment set changes on the client,
@@ -376,7 +373,7 @@ public final class GeometricRemeshSchedulerTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void anchorAttachmentRefreshBoxMatchesTheSharedDirtySectionBoxHelper(GameTestHelper helper) {
         // Single-authority invariant: the plain-anchor refresh call site, the compound-visible refresh call
         // site, and the geometric-remesh mixin must all derive their dirty region from the SAME
@@ -405,7 +402,7 @@ public final class GeometricRemeshSchedulerTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void schedulingDecisionIsPureAndStableUnderRepetition(GameTestHelper helper) {
         // Structural proof of the near-zero-cost claim for the irrelevant-change fast path: the decision is
         // a pure function (no side effects, no world read), so N repeated calls return the identical result
@@ -434,7 +431,7 @@ public final class GeometricRemeshSchedulerTest {
 
     // ── important-rebuild priority: the 30-second-snap-delay fix ─────────────────────────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabbedRequestsImportantRebuild(GameTestHelper helper) {
         // The headlessly-provable half of the 30-second-snap-delay fix. Slabbed's own client re-mesh must
         // request an IMPORTANT (near-immediate) rebuild, NOT the deferred default. The public

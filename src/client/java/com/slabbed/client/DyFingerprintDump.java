@@ -1,9 +1,10 @@
 package com.slabbed.client;
 
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
 import com.slabbed.Slabbed;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
@@ -54,7 +55,8 @@ public final class DyFingerprintDump {
     }
 
     public static void init() {
-        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+        NeoForge.EVENT_BUS.addListener((ClientTickEvent.Post slabbed$tick) -> {
+            Minecraft client = Minecraft.getInstance();
             if (client == null || client.getWindow() == null) {
                 return;
             }

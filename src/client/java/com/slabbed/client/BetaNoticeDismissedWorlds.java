@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -17,9 +16,9 @@ import java.util.Set;
  * again" on the beta notice. Deliberately scoped per-world (not a single global on/off switch)
  * so dismissing it in one world doesn't silence it in a brand new one — the maintainer's explicit request.
  */
-final class BetaNoticeDismissedWorlds {
+public final class BetaNoticeDismissedWorlds {
 
-    private static final Path FILE = FabricLoader.getInstance().getConfigDir()
+    private static final Path FILE = com.slabbed.loader.Loader.getConfigDir()
             .resolve("slabbed")
             .resolve("dismissed-beta-notice-worlds.json");
 
@@ -28,7 +27,7 @@ final class BetaNoticeDismissedWorlds {
     private BetaNoticeDismissedWorlds() {
     }
 
-    static synchronized boolean isDismissed(String worldKey) {
+public static synchronized boolean isDismissed(String worldKey) {
         if (worldKey == null) {
             return false;
         }
@@ -41,7 +40,7 @@ final class BetaNoticeDismissedWorlds {
      * and is now (or was already) recorded as dismissed; returns {@code false} for a {@code null}
      * key, which is never persisted — callers must not report success to the player in that case.
      */
-    static synchronized boolean dismiss(String worldKey) {
+public static synchronized boolean dismiss(String worldKey) {
         if (worldKey == null) {
             return false;
         }

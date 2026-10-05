@@ -3,7 +3,7 @@ package com.slabbed.test;
 import com.slabbed.Slabbed;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -99,7 +99,7 @@ public final class Slabbed2612DyFingerprintTest {
 
     // ── A. core lower ─────────────────────────────────────────────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fpPlainLower(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos b = new BlockPos(2, 2, 2);
@@ -109,7 +109,7 @@ public final class Slabbed2612DyFingerprintTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fpTopSlabFlush(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos b = new BlockPos(2, 2, 2);
@@ -121,7 +121,7 @@ public final class Slabbed2612DyFingerprintTest {
 
     // ── B. compound ───────────────────────────────────────────────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fpCompoundVertical(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos base = new BlockPos(2, 1, 2);
@@ -134,7 +134,7 @@ public final class Slabbed2612DyFingerprintTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fpCompoundAnchor(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos base = new BlockPos(2, 1, 2);
@@ -153,7 +153,7 @@ public final class Slabbed2612DyFingerprintTest {
 
     // ── C. freeze / NEVER-POP ─────────────────────────────────────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fpFrozenFlat(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos b = new BlockPos(2, 3, 2);
@@ -163,7 +163,7 @@ public final class Slabbed2612DyFingerprintTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fpFreezeControl(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos b = new BlockPos(2, 3, 2);
@@ -173,7 +173,7 @@ public final class Slabbed2612DyFingerprintTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fpSideNoContagion(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos carrier = new BlockPos(2, 2, 2);
@@ -191,7 +191,7 @@ public final class Slabbed2612DyFingerprintTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fpCantileverMerge(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos slab = new BlockPos(2, 2, 2);
@@ -205,7 +205,7 @@ public final class Slabbed2612DyFingerprintTest {
 
     // ── D. ceiling-hung ───────────────────────────────────────────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fpCeilingFlush(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos roots = new BlockPos(2, 3, 2);
@@ -217,7 +217,7 @@ public final class Slabbed2612DyFingerprintTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fpCeilingFollow(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos support = new BlockPos(2, 3, 2);
@@ -232,7 +232,7 @@ public final class Slabbed2612DyFingerprintTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fpLanternSmoosh(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos support = new BlockPos(2, 3, 2);
@@ -247,7 +247,7 @@ public final class Slabbed2612DyFingerprintTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fpChainRaise(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos chain = new BlockPos(2, 3, 2);
@@ -266,7 +266,7 @@ public final class Slabbed2612DyFingerprintTest {
      * a block above its support. Weather-deposited fill still expects 0.0 — see {@link #fpPowderSnow}
      * and the snow-layer row.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fpThinLayerCarpet(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos b = new BlockPos(2, 2, 2);
@@ -276,7 +276,7 @@ public final class Slabbed2612DyFingerprintTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fpPowderSnow(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos b = new BlockPos(2, 2, 2);
@@ -288,7 +288,7 @@ public final class Slabbed2612DyFingerprintTest {
 
     // ── bed (either-half coordination) ────────────────────────────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fpBedEitherHalf(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos foot = new BlockPos(2, 2, 2);
@@ -311,7 +311,7 @@ public final class Slabbed2612DyFingerprintTest {
 
     // ── candle floor-top contact ──────────────────────────────────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fpCandleContact(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos b = new BlockPos(2, 2, 2);
@@ -329,7 +329,7 @@ public final class Slabbed2612DyFingerprintTest {
 
     // ── trapdoor (bottom) — server-hit-target predicate coverage (closes the door/trapdoor gap) ──
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fpBottomTrapdoorLoweredOnSlab(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos b = new BlockPos(2, 2, 2);
@@ -348,7 +348,7 @@ public final class Slabbed2612DyFingerprintTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fpBottomTrapdoorFlushIsNotLoweredTarget(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos b = new BlockPos(2, 2, 2);
@@ -366,7 +366,7 @@ public final class Slabbed2612DyFingerprintTest {
 
     // ── door — server-hit-target predicate coverage ───────────────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fpDoorLoweredOnSlab(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos lower = new BlockPos(2, 2, 2);
@@ -402,7 +402,7 @@ public final class Slabbed2612DyFingerprintTest {
      * directly. The recent SlabSupport fix TS-gates the UPPER half for vegetation only, so it reads 0.0
      * on a Terrain Slabs surface but is UNCHANGED at -0.5 on a vanilla slab (no TS in this runtime).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fpVegetationLowerOnSlab(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos lower = new BlockPos(2, 2, 2);
@@ -424,7 +424,7 @@ public final class Slabbed2612DyFingerprintTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fpDoorFlushIsNotLoweredTarget(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos lower = new BlockPos(2, 2, 2);

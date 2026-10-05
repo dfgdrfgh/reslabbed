@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.slabbed.Slabbed;
 import com.slabbed.anchor.SlabAnchorAttachment;
-import com.slabbed.util.LiveCursorIntentRecorder;
+import com.slabbed.diagnostics.util.LiveCursorIntentRecorder;
 import com.slabbed.util.SlabbedOffsetRaycast;
 import com.slabbed.util.SlabSupport;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;

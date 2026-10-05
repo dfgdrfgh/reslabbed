@@ -4,7 +4,7 @@ import com.slabbed.Slabbed;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.SlabSupport;
 import it.unimi.dsi.fastutil.longs.Long2DoubleOpenHashMap;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
@@ -92,14 +92,14 @@ public final class NeighborUpdateInvarianceTest {
     /** Test-only corruption fixture: remove exactly one placement-dy fact and republish its chunk map. */
     private static void removePlacementDyOnly(GameTestHelper h, ServerLevel world, BlockPos subject) {
         LevelChunk chunk = world.getChunk(subject.getX() >> 4, subject.getZ() >> 4);
-        Long2DoubleOpenHashMap existing = chunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE);
+        Long2DoubleOpenHashMap existing = com.slabbed.loader.Attachments.get(chunk, SlabAnchorAttachment.PLACEMENT_DY_TYPE);
         if (existing == null || !existing.containsKey(subject.asLong())) {
             throw h.assertionException(subject, "premise: subject PLACEMENT_DY fact was already absent");
         }
         Long2DoubleOpenHashMap copy = new Long2DoubleOpenHashMap(existing);
         copy.defaultReturnValue(Double.NaN);
         copy.remove(subject.asLong());
-        chunk.setAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE, copy);
+        com.slabbed.loader.Attachments.set(chunk, SlabAnchorAttachment.PLACEMENT_DY_TYPE, copy);
     }
 
     /** Test-only corruption fixture: overwrite exactly one placement-dy fact with the supplied raw bits. */
@@ -107,14 +107,14 @@ public final class NeighborUpdateInvarianceTest {
             GameTestHelper h, ServerLevel world, BlockPos subject, long rawBits
     ) {
         LevelChunk chunk = world.getChunk(subject.getX() >> 4, subject.getZ() >> 4);
-        Long2DoubleOpenHashMap existing = chunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE);
+        Long2DoubleOpenHashMap existing = com.slabbed.loader.Attachments.get(chunk, SlabAnchorAttachment.PLACEMENT_DY_TYPE);
         if (existing == null || !existing.containsKey(subject.asLong())) {
             throw h.assertionException(subject, "premise: subject PLACEMENT_DY fact was absent before overwrite");
         }
         Long2DoubleOpenHashMap copy = new Long2DoubleOpenHashMap(existing);
         copy.defaultReturnValue(Double.NaN);
         copy.put(subject.asLong(), Double.longBitsToDouble(rawBits));
-        chunk.setAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE, copy);
+        com.slabbed.loader.Attachments.set(chunk, SlabAnchorAttachment.PLACEMENT_DY_TYPE, copy);
     }
 
     /** Exact height identity (byte-identical intent), with -0.0 normalized to 0.0. */
@@ -400,42 +400,42 @@ public final class NeighborUpdateInvarianceTest {
         }
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void torchOnMarkedSlabSurvivesNeighborEdits(GameTestHelper h) {
         runSubject(h, SUBJECTS.get(0));
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fenceGateOnMarkedSlabSurvivesNeighborEdits(GameTestHelper h) {
         runSubjectWithFrozenStore(h, SUBJECTS.get(1));
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fullBlockOnLoweredStackSurvivesNeighborEdits(GameTestHelper h) {
         runSubject(h, SUBJECTS.get(2));
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void flatFullBlockControlSurvivesNeighborEdits(GameTestHelper h) {
         runSubject(h, SUBJECTS.get(3));
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void flatSlabControlSurvivesNeighborEdits(GameTestHelper h) {
         runSubject(h, SUBJECTS.get(4));
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void cantileverSlabSurvivesNeighborEdits(GameTestHelper h) {
         runSubject(h, SUBJECTS.get(5));
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabOnLoweredFullBlockSurvivesNeighborEdits(GameTestHelper h) {
         runSubject(h, SUBJECTS.get(6));
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void candlePlacedFlatSurvivesNeighborEdits(GameTestHelper h) {
         runSubject(h, SUBJECTS.get(7));
     }
@@ -444,12 +444,12 @@ public final class NeighborUpdateInvarianceTest {
      * The suite's global compatibility floor is frozen OFF, so this C4 law row explicitly runs under
      * the shipped frozen-store mode. Breaking the support must leave the exact authored -1.5 value.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabOnDeepLoweredFullBlockSurvivesNeighborEdits(GameTestHelper h) {
         runSubjectWithFrozenStore(h, SUBJECTS.get(8));
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void missingPlacementDyResolvesStableFlatAcrossNeighborEdit(GameTestHelper h) {
         ServerLevel world = h.getLevel();
         boolean previous = SlabAnchorAttachment.FROZEN_DY_ENABLED;
@@ -500,7 +500,7 @@ public final class NeighborUpdateInvarianceTest {
         h.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void corruptPlacementDyResolvesStablePositiveZeroAcrossNeighborEdit(GameTestHelper h) {
         ServerLevel world = h.getLevel();
         long positiveZeroBits = Double.doubleToRawLongBits(0.0d);
@@ -567,7 +567,7 @@ public final class NeighborUpdateInvarianceTest {
      * frozen-OFF derived read is asserted to MOVE under the mutation (the disclosed
      * frozen-OFF divergence) — if it stops moving, this row has gone vacuous and fails.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void neighborFactRewriteKeepsStoredSubjectHeight(GameTestHelper h) {
         ServerLevel world = h.getLevel();
         long minusOneFiveBits = Double.doubleToRawLongBits(-1.5d);
@@ -641,12 +641,12 @@ public final class NeighborUpdateInvarianceTest {
         h.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aimedCarpetOnMinusOneOwnerSurvivesNeighborEdits(GameTestHelper h) {
         runSubjectWithFrozenStore(h, SUBJECTS.get(9));
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aimedPowderSnowOnMinusOneOwnerSurvivesNeighborEdits(GameTestHelper h) {
         runSubjectWithFrozenStore(h, SUBJECTS.get(10));
     }
@@ -662,12 +662,12 @@ public final class NeighborUpdateInvarianceTest {
      * is the block staying, and a height that vanishes on a reshape is a neighbour edit moving a
      * placed block.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fenceOnMarkedSlabSurvivesNeighborEdits(GameTestHelper h) {
         runSubjectWithFrozenStore(h, SUBJECTS.get(11));
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void c3_pair_door_toggle_and_neighbor_invariance(GameTestHelper h) {
         ServerLevel world = h.getLevel();
         BlockPos owner = h.absolutePos(new BlockPos(3, 3, 3));
@@ -705,7 +705,7 @@ public final class NeighborUpdateInvarianceTest {
         c3Pass(h, "neighbor_update_invariance_test_c3_pair_door_toggle_and_neighbor_invariance");
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void c3_pair_bed_neighbor_invariance(GameTestHelper h) {
         ServerLevel world = h.getLevel();
         BlockPos support = h.absolutePos(new BlockPos(3, 3, 3));

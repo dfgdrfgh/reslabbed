@@ -1,7 +1,7 @@
 package com.slabbed.test;
 
 import com.slabbed.anchor.SlabAnchorAttachment;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -83,7 +83,7 @@ public final class ReplaceableCellSeatTest {
 
     /** The control: stone on a flat bottom slab's top freezes -0.5. Proves the scene and the
      *  expected number before the replacement row leans on them. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void controlStoneOnBottomSlabFreezesAtItsTop(GameTestHelper helper) {
         double stored = placedStoneDy(helper, false);
         if (Math.abs(stored - (-0.5)) > EPS) {
@@ -95,7 +95,7 @@ public final class ReplaceableCellSeatTest {
 
     /** The measurement: the SAME placement through grass must freeze the SAME -0.5. Any other
      *  number is the same-cell phantom plane, frozen forever. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void stoneThroughGrassFreezesOnTheSlabBelow(GameTestHelper helper) {
         double stored = placedStoneDy(helper, true);
         if (Math.abs(stored - (-0.5)) > EPS) {

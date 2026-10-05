@@ -5,8 +5,7 @@ import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.compat.CompatHooks;
 import com.slabbed.network.PlacementDyPredictionBridge;
 import it.unimi.dsi.fastutil.longs.Long2DoubleOpenHashMap;
-import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -52,8 +51,7 @@ public final class PlacementCaptureBoundaryGameTest {
     private static final ResourceKey<Block> PAIR_BLOCK_KEY =
             ResourceKey.create(Registries.BLOCK, PAIR_BLOCK_ID);
 
-    public static final TestPairBlock PAIR_BLOCK = new TestPairBlock(
-            BlockBehaviour.Properties.ofFullCopy(Blocks.STONE).setId(PAIR_BLOCK_KEY));
+    public static final com.slabbed.gametest.TestBlocks.Lazy<TestPairBlock> PAIR_BLOCK = com.slabbed.gametest.TestBlocks.block(PAIR_BLOCK_ID, () -> new TestPairBlock( BlockBehaviour.Properties.ofFullCopy(Blocks.STONE).setId(PAIR_BLOCK_KEY)));
 
     private static final ThreadLocal<BlockItemFixture> BLOCK_ITEM_FIXTURE = new ThreadLocal<>();
 
@@ -61,7 +59,7 @@ public final class PlacementCaptureBoundaryGameTest {
             new BlockItemFixture() {
                 @Override
                 public BlockState getPlacementState(BlockItem item, BlockPlaceContext context) {
-                    return PAIR_BLOCK.defaultBlockState().setValue(
+                    return PAIR_BLOCK.get().defaultBlockState().setValue(
                             BlockStateProperties.DOUBLE_BLOCK_HALF, DoubleBlockHalf.LOWER);
                 }
 
@@ -91,10 +89,9 @@ public final class PlacementCaptureBoundaryGameTest {
                 }
             };
 
-    public static final class TestContentEntrypoint implements ModInitializer {
+    public static final class TestContentEntrypoint implements com.slabbed.gametest.TestModInitializer {
         @Override
         public void onInitialize() {
-            register(BuiltInRegistries.BLOCK, PAIR_BLOCK_ID, PAIR_BLOCK);
         }
 
         private static <T> void register(
@@ -121,7 +118,7 @@ public final class PlacementCaptureBoundaryGameTest {
         }
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void transformedScaffoldingTarget(GameTestHelper h) {
         ServerLevel world = h.getLevel();
         BlockPos clicked = h.absolutePos(new BlockPos(3, 3, 3));
@@ -143,7 +140,7 @@ public final class PlacementCaptureBoundaryGameTest {
         pass(h, "transformed_scaffolding_target");
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void successfulWithoutSetPlacedByUsesTransformedTarget(GameTestHelper h) {
         ServerLevel world = h.getLevel();
         BlockPos owner = flatOwner(h);
@@ -173,7 +170,7 @@ public final class PlacementCaptureBoundaryGameTest {
         pass(h, "successful_without_set_placed_by_uses_transformed_target");
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void replaceableCellUsesRootAim(GameTestHelper h) {
         // EXPECTATION FLIPPED 2026-08-21, deliberately. This row used to expect dy=+1.0 — the value
         // the root-aim UP formula produced with the GRASS as owner. That was the same-cell phantom
@@ -203,7 +200,7 @@ public final class PlacementCaptureBoundaryGameTest {
         pass(h, "replaceable_cell_uses_root_aim");
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void noSuperUsesUnstoredFallback(GameTestHelper h) {
         ServerLevel world = h.getLevel();
         BlockPos owner = flatOwner(h);
@@ -220,7 +217,7 @@ public final class PlacementCaptureBoundaryGameTest {
         pass(h, "no_super_uses_unstored_fallback");
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void directAimlessNoNpe(GameTestHelper h) {
         ServerLevel world = h.getLevel();
         BlockPos owner = flatOwner(h);
@@ -237,7 +234,7 @@ public final class PlacementCaptureBoundaryGameTest {
         pass(h, "direct_aimless_no_npe");
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void failedPlaceWritesNothing(GameTestHelper h) {
         ServerLevel world = h.getLevel();
         BlockPos owner = flatOwner(h);
@@ -252,7 +249,7 @@ public final class PlacementCaptureBoundaryGameTest {
         pass(h, "failed_place_writes_nothing");
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void nonItemSetBlockWritesNothing(GameTestHelper h) {
         ServerLevel world = h.getLevel();
         BlockPos pos = h.absolutePos(new BlockPos(3, 3, 3));
@@ -263,7 +260,7 @@ public final class PlacementCaptureBoundaryGameTest {
         pass(h, "non_item_set_block_writes_nothing");
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void hauntedStoreOverwritten(GameTestHelper h) {
         ServerLevel world = h.getLevel();
         BlockPos owner = flatOwner(h);
@@ -279,7 +276,7 @@ public final class PlacementCaptureBoundaryGameTest {
         pass(h, "haunted_store_overwritten");
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aNonSlabCompatOwnedFinalStateWritesNothing(GameTestHelper h) {
         // RESCOPED with the TS parity slice: the fixture the seam marks compat-owned is the PAIR
         // block, which is not a tagged slab, so it stays owned and mints nothing — that is the
@@ -292,14 +289,14 @@ public final class PlacementCaptureBoundaryGameTest {
         BlockPos owner = flatOwner(h);
         Predicate<BlockState> previous = CompatHooks.shouldSkipSlabSupportTestOverride;
         try {
-            CompatHooks.shouldSkipSlabSupportTestOverride = state -> state.getBlock() == PAIR_BLOCK;
+            CompatHooks.shouldSkipSlabSupportTestOverride = state -> state.getBlock() == PAIR_BLOCK.get();
             withPairFixture(() -> useOn(h.makeMockPlayer(GameType.SURVIVAL),
                     new ItemStack(Items.STONE), owner, Direction.UP));
         } finally {
             CompatHooks.shouldSkipSlabSupportTestOverride = previous;
         }
         BlockPos lower = owner.above();
-        if (!world.getBlockState(lower).is(PAIR_BLOCK)
+        if (!world.getBlockState(lower).is(PAIR_BLOCK.get())
                 || !Double.isNaN(stored(world, lower))
                 || !Double.isNaN(stored(world, lower.above()))) {
             throw h.assertionException(lower, "compat-owned final pair entered C3 store");
@@ -307,7 +304,7 @@ public final class PlacementCaptureBoundaryGameTest {
         pass(h, "non_slab_compat_owned_final_state_writes_nothing");
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void markerAuthorsCompleteBeforePublish(GameTestHelper h) {
         ServerLevel world = h.getLevel();
         BlockPos owner = flatOwner(h);
@@ -327,7 +324,7 @@ public final class PlacementCaptureBoundaryGameTest {
         pass(h, "marker_authors_complete_before_publish");
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void singleInitialWriter(GameTestHelper h) {
         try {
             Path root = locateProjectRoot();
@@ -359,7 +356,7 @@ public final class PlacementCaptureBoundaryGameTest {
      * read-path clause is a real LAW 1 safety assertion, not decoration: a placement-time policy on a
      * read path would move blocks that are already placed.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void potSeatPolicyIsAppliedAtBothWriters(GameTestHelper h) {
         String call = "potSeatAdjustedDy(";
         try {
@@ -474,13 +471,13 @@ public final class PlacementCaptureBoundaryGameTest {
 
     public static void forceStore(ServerLevel world, BlockPos pos, double dy) {
         LevelChunk chunk = world.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
-        Long2DoubleOpenHashMap existing = chunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE);
+        Long2DoubleOpenHashMap existing = com.slabbed.loader.Attachments.get(chunk, SlabAnchorAttachment.PLACEMENT_DY_TYPE);
         Long2DoubleOpenHashMap copy = existing == null
                 ? new Long2DoubleOpenHashMap()
                 : new Long2DoubleOpenHashMap(existing);
         copy.defaultReturnValue(Double.NaN);
         copy.put(pos.asLong(), dy);
-        chunk.setAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE, copy);
+        com.slabbed.loader.Attachments.set(chunk, SlabAnchorAttachment.PLACEMENT_DY_TYPE, copy);
     }
 
     private static BlockPos flatOwner(GameTestHelper h) {

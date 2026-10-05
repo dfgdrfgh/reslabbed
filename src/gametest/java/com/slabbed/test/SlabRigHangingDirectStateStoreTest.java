@@ -3,7 +3,7 @@ package com.slabbed.test;
 import com.slabbed.command.SlabRigHangingDirectEvidence;
 import com.slabbed.command.SlabRigHangingDirectState;
 import com.slabbed.command.SlabRigHangingDirectStateStore;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
 
@@ -50,7 +50,7 @@ public final class SlabRigHangingDirectStateStoreTest {
             "(?<![0-9a-fA-F])[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-"
                     + "[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}(?![0-9a-fA-F])");
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void legacyRawFixturesAreHashPinnedPrivateCompleteAndCopyable(GameTestHelper helper) {
         Path temporary = null;
         try {
@@ -925,7 +925,7 @@ public final class SlabRigHangingDirectStateStoreTest {
         void run() throws IOException, InterruptedException;
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void variableV2PageFourUsesPersistedFourCaseBoundary(GameTestHelper helper) {
         SlabRigHangingDirectState.Owner owner = owner(404);
         SlabRigHangingDirectState.RunIdentity identity = new SlabRigHangingDirectState.RunIdentity(
@@ -993,7 +993,7 @@ public final class SlabRigHangingDirectStateStoreTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void legacyV1StoreIsDiscoverableIdempotentAndAppendClearOnly(GameTestHelper helper) {
         Path root = null;
         Path rejectedGenesisRoot = null;
@@ -1190,7 +1190,7 @@ public final class SlabRigHangingDirectStateStoreTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void directStateCanonicalRoundTripAcceptsExactDevSentinel(GameTestHelper helper) {
         SlabRigHangingDirectState.State state = initial(sha("planned"), owner(1));
         String canonical = SlabRigHangingDirectState.canonicalTsv(state);
@@ -1241,7 +1241,7 @@ public final class SlabRigHangingDirectStateStoreTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void directStoreAppendsChainAndFreshProcessIgnoresOnlyTempRemainder(GameTestHelper helper) {
         Path root = null;
         try {
@@ -1349,7 +1349,7 @@ public final class SlabRigHangingDirectStateStoreTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void directStoreSuccessfulExistingPublicationRetriesRepairDirectoryDurability(
             GameTestHelper helper) {
         Path root = null;
@@ -1390,7 +1390,7 @@ public final class SlabRigHangingDirectStateStoreTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void directStoreCollisionTamperSymlinkAndVerifiedPrefixFailClosed(GameTestHelper helper) {
         Path root = null;
         Path symlinkRoot = null;
@@ -1456,7 +1456,7 @@ public final class SlabRigHangingDirectStateStoreTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void directStoreCacheRejectsSameSizeRestoredMtimeArtifactTamper(GameTestHelper helper) {
         Path root = null;
         try {
@@ -1511,7 +1511,7 @@ public final class SlabRigHangingDirectStateStoreTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void directStateRejectsReplayDuplicateOwnershipAndForeignClearAuthority(GameTestHelper helper) {
         SlabRigHangingDirectState.State ready = fixtureReady(initial(sha("planned-safety"), owner(4)));
         SlabRigHangingDirectState.State inFlight = beginCase(ready, 0);
@@ -1615,7 +1615,7 @@ public final class SlabRigHangingDirectStateStoreTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void directFixtureAuthorityEmptyClearAndTopDownOrderAreExact(GameTestHelper helper) {
         SlabRigHangingDirectState.State initial = initial(sha("planned-fixture"), owner(5));
         SlabRigHangingDirectState.State authoring = fixtureAuthoring(initial);
@@ -1685,7 +1685,7 @@ public final class SlabRigHangingDirectStateStoreTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void directSchedulerResetsOnUnloadAndFinalStillCapturesCausalDrop(GameTestHelper helper) {
         SlabRigHangingDirectState.State immediate = completePage(
                 fixtureReady(initial(sha("planned-delay"), owner(7))));
@@ -1859,7 +1859,7 @@ public final class SlabRigHangingDirectStateStoreTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void directStoreReusesVerifiedCellProofsAcrossClearedToPlanned(GameTestHelper helper) {
         Path root = null;
         try {
@@ -1973,7 +1973,7 @@ public final class SlabRigHangingDirectStateStoreTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void directStoreRejectsCrossOwnerPageAndMissingObservationKeepsPrefix(GameTestHelper helper) {
         Path root = null;
         try {

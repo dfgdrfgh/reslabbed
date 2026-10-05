@@ -3,7 +3,7 @@ package com.slabbed.test;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.MinecartRailFrame;
 import com.slabbed.util.RailSeatDyHolder;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
@@ -130,7 +130,7 @@ public final class MinecartRailSeatDepthTest {
      * A cart spawned on a lowered rail sits, is hittable, and carries its rider at the DRAWN rail
      * top. Asserted synchronously so only the spawn seat is under test.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aCartSpawnedOnALoweredRailSitsRidesAndCollidesAtTheDrawnRailTop(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         withFrozen(() -> {
@@ -206,7 +206,7 @@ public final class MinecartRailSeatDepthTest {
     }
 
     /** A cart driven along a uniformly lowered run keeps its drawn seat and keeps reading the RAIL. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aCartRunningAlongALoweredRailKeepsItsDrawnSeat(GameTestHelper helper) {
         withFrozen(() -> {
             BlockPos firstRail = railRun(helper, new BlockPos(1, 3, 2), 5, LOWERED);
@@ -253,7 +253,7 @@ public final class MinecartRailSeatDepthTest {
      * <p>MUTATION that must redden this row: make {@code MinecartRailFrame.seatAt} return the stored
      * seat regardless of position.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aCartAtRestRidesTheDrawnVBetweenFlushRails(GameTestHelper helper) {
         withFrozen(() -> {
             railRun(helper, new BlockPos(1, 3, 2), 1, 0.0d);
@@ -291,7 +291,7 @@ public final class MinecartRailSeatDepthTest {
      * seat change at the seam, and a momentum-driven crossing would also depend on how far a cart
      * travels per tick.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aCartCrossingBetweenLoweredAndFlushRailRebindsItsSeat(GameTestHelper helper) {
         withFrozen(() -> {
             BlockPos loweredStart = railRun(helper, new BlockPos(1, 3, 2), 2, LOWERED);
@@ -333,7 +333,7 @@ public final class MinecartRailSeatDepthTest {
      * rather than the support under it. The seat is bound here by the per-tick rebind, deliberately
      * not by the spawn hook, so the row stands on its own.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aReloadedCartKeepsItsSeatAndStillReadsTheRailCell(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         withFrozen(() -> {
@@ -388,7 +388,7 @@ public final class MinecartRailSeatDepthTest {
      * <p>HONEST BOUNDARY: this proves the CONVERSION, not the WIRING. That the renderer actually
      * calls it is proved by {@code MinecartRenderRailSnapClientGameTest} and by live observation.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void theRenderRailSnapResolvesWhereRawVanillaReturnsNull(GameTestHelper helper) {
         withFrozen(() -> {
             BlockPos rail = railRun(helper, new BlockPos(2, 3, 2), 3, LOWERED);
@@ -445,7 +445,7 @@ public final class MinecartRailSeatDepthTest {
      * given the same LOGICAL input. It proves the frame split; it does not prove the experiment's own
      * dispatch, which stays a live observation.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void theExperimentalRailSolverAlsoComputesInTheLogicalFrame(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         withFrozen(() -> {
@@ -500,7 +500,7 @@ public final class MinecartRailSeatDepthTest {
      * <p>MUTATION that must redden this row alone: remove the {@code isSameThread} early return from
      * {@code MinecartRailSeatMixin.slabbed$seatOnSpawn}.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aCartPositionedOnAWorkerThreadNeverWaitsForTheServer(GameTestHelper helper) throws InterruptedException {
         ServerLevel level = helper.getLevel();
         boolean previous = SlabAnchorAttachment.FROZEN_DY_ENABLED;

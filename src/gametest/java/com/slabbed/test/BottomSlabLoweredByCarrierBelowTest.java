@@ -2,7 +2,7 @@ package com.slabbed.test;
 
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
@@ -95,7 +95,7 @@ public final class BottomSlabLoweredByCarrierBelowTest {
      * lowered carrier". Reverting the {@code || isLoweredTopLikeSlabCarrier} widening makes the predicate
      * return {@code false} (the DOUBLE-only slab-below check ignores the lowered TOP support) — the RED.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void bottomSlabOnLoweredTopCarrierIsBackedByLoweredCarrier(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos subject = buildSubjectOnTopCarrier(helper, w);
@@ -113,7 +113,7 @@ public final class BottomSlabLoweredByCarrierBelowTest {
      * lowered DOUBLE carrier was recognised before the widening and must still be. Guards against the
      * widening accidentally narrowing the pre-existing DOUBLE path.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void bottomSlabOnLoweredDoubleCarrierStillBackedByLoweredCarrier(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos groundSlab = helper.absolutePos(new BlockPos(2, 1, 2));
@@ -150,7 +150,7 @@ public final class BottomSlabLoweredByCarrierBelowTest {
      * {@code isLoweredTopLikeSlabCarrier} recognises an un-lowered support, so the widening must not make
      * the predicate spuriously true. Proves the widening only reaches genuinely-lowered TOP carriers.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void bottomSlabOnUnloweredCarrierIsNotBackedByLoweredCarrier(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos plainTop = helper.absolutePos(new BlockPos(2, 2, 2)); // a plain, un-lowered TOP slab

@@ -3,8 +3,7 @@ package com.slabbed.test;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.compat.CompatHooks;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -81,16 +80,12 @@ public final class TerrainSlabsOwnSlabDyGuardTest {
     private static final Identifier TS_SLAB_ID =
             Identifier.fromNamespaceAndPath("terrain_slabs", "own_slab_dy_guard_test_slab");
     private static final ResourceKey<Block> TS_SLAB_KEY = ResourceKey.create(Registries.BLOCK, TS_SLAB_ID);
-    private static final Block TS_SLAB =
-            new SlabBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE_SLAB).setId(TS_SLAB_KEY));
+    private static final com.slabbed.gametest.TestBlocks.Lazy<Block> TS_SLAB = com.slabbed.gametest.TestBlocks.block(TS_SLAB_ID, () -> new SlabBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE_SLAB).setId(TS_SLAB_KEY)));
 
     /** Registers the TS-namespaced stand-in slab (before registry freeze, via the main entrypoint). */
-    public static final class TerrainSlabsOwnSlabDyGuardTestEntrypoint implements ModInitializer {
+    public static final class TerrainSlabsOwnSlabDyGuardTestEntrypoint implements com.slabbed.gametest.TestModInitializer {
         @Override
         public void onInitialize() {
-            if (!BuiltInRegistries.BLOCK.containsKey(TS_SLAB_ID)) {
-                Registry.register(BuiltInRegistries.BLOCK, TS_SLAB_ID, TS_SLAB);
-            }
         }
     }
 
@@ -131,12 +126,12 @@ public final class TerrainSlabsOwnSlabDyGuardTest {
             throw helper.assertionException(helper.relativePos(fb),
                     "setup: the full block must anchor lowered -0.5, got " + dy(w, fb));
         }
-        w.setBlock(subj, slabOf(tsOwned ? TS_SLAB : Blocks.BIRCH_SLAB, SlabType.BOTTOM), 2);
+        w.setBlock(subj, slabOf(tsOwned ? TS_SLAB.get() : Blocks.BIRCH_SLAB, SlabType.BOTTOM), 2);
         SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(w, subj, w.getBlockState(subj));
         return subj;
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void anUnauthoredTerrainSlabsBottomSlabOnLoweredFullBlockReadsFlush(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos subj = buildBottomSlabOnLoweredFullBlock(helper, true);
@@ -166,7 +161,7 @@ public final class TerrainSlabsOwnSlabDyGuardTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void vanillaBottomSlabOnLoweredFullBlockStillLowersWhileTsOverrideActive(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos subj = buildBottomSlabOnLoweredFullBlock(helper, false);
@@ -211,12 +206,12 @@ public final class TerrainSlabsOwnSlabDyGuardTest {
             throw helper.assertionException(helper.relativePos(support),
                     "setup: the DOUBLE support beside the lowered bottom slab must be a lowered top-like carrier");
         }
-        w.setBlock(subj, slabOf(tsOwned ? TS_SLAB : Blocks.BIRCH_SLAB, SlabType.BOTTOM), 2);
+        w.setBlock(subj, slabOf(tsOwned ? TS_SLAB.get() : Blocks.BIRCH_SLAB, SlabType.BOTTOM), 2);
         SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(w, subj, w.getBlockState(subj));
         return subj;
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void anUnauthoredTerrainSlabsSlabOnVerticalLoweredSupportReadsFlush(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos subj = buildSlabOnVerticalLoweredSupport(helper, true);
@@ -244,7 +239,7 @@ public final class TerrainSlabsOwnSlabDyGuardTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void vanillaSlabOnVerticalLoweredSupportStillLowersWhileTsOverrideActive(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos subj = buildSlabOnVerticalLoweredSupport(helper, false);
@@ -269,7 +264,7 @@ public final class TerrainSlabsOwnSlabDyGuardTest {
     // subject: even a persisted attachment-set marker must not survive the namespace guard.
     // ─────────────────────────────────────────────────────────────────────────────────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void terrainSlabsSideLaneCarrierMarkerNotReadForTsSubject(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos groundSlab = helper.absolutePos(new BlockPos(2, 3, 3));
@@ -284,7 +279,7 @@ public final class TerrainSlabsOwnSlabDyGuardTest {
         w.setBlock(loweredBottom, slabOf(Blocks.OAK_SLAB, SlabType.BOTTOM), 2);
         SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(w, loweredBottom, w.getBlockState(loweredBottom));
         w.setBlock(carrierGround, slabOf(Blocks.SMOOTH_STONE_SLAB, SlabType.BOTTOM), 2);
-        w.setBlock(subj, slabOf(TS_SLAB, SlabType.BOTTOM), 2);
+        w.setBlock(subj, slabOf(TS_SLAB.get(), SlabType.BOTTOM), 2);
         // Write the marker WITHOUT the override active (marker gets persisted to the attachment set).
         SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(w, subj, w.getBlockState(subj));
 

@@ -1,8 +1,9 @@
 package com.slabbed.network;
 
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.minecraft.server.level.ServerPlayer;
 import com.slabbed.anchor.SlabAnchorAttachment;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
 /**
  * Sends {@link FrozenDyModePayload} once per player join, so a client can tell whether it and the
@@ -30,13 +31,16 @@ public final class FrozenDyModeServer {
     }
 
     public static void register() {
-        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-            // A client without the mod (or with a build predating this payload) cannot receive it;
-            // sending anyway would disconnect them.
-            if (!ServerPlayNetworking.canSend(handler.player, FrozenDyModePayload.TYPE)) {
+        NeoForge.EVENT_BUS.addListener((PlayerEvent.PlayerLoggedInEvent event) -> {
+            if (!(event.getEntity() instanceof ServerPlayer player)) {
                 return;
             }
-            ServerPlayNetworking.send(handler.player, currentPayload());
+            // A client without the mod (or with a build predating this payload) cannot receive it;
+            // sending anyway would disconnect them.
+            if (!SlabbedNetwork.canSend(player, FrozenDyModePayload.TYPE)) {
+                return;
+            }
+            SlabbedNetwork.send(player, currentPayload());
         });
     }
 }

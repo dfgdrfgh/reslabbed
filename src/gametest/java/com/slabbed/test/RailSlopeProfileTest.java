@@ -3,7 +3,7 @@ package com.slabbed.test;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.RailSlopeProfile;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -151,7 +151,7 @@ public final class RailSlopeProfileTest {
 
     // ── row 1: a flat rail lifts toward a higher neighbour; the higher one stays ─────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void flatRailLiftsTowardAHigherNeighbour(GameTestHelper helper) {
         withFrozen(() -> {
             BlockPos a = rail(helper, A, LOWERED);
@@ -166,7 +166,7 @@ public final class RailSlopeProfileTest {
 
     // ── row 2: a ramp climbing onto a lowered rail is refitted shorter ───────────────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void rampRefitsShorterOntoALoweredRail(GameTestHelper helper) {
         withFrozen(() -> {
             BlockPos b = rail(helper, A.south().above(), LOWERED);
@@ -181,7 +181,7 @@ public final class RailSlopeProfileTest {
 
     // ── row 3: a lowered ramp climbing onto a flush rail is refitted longer ─────────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void rampRefitsLongerOntoAFlushRail(GameTestHelper helper) {
         withFrozen(() -> {
             BlockPos b = rail(helper, A.south().above(), 0.0d);
@@ -195,7 +195,7 @@ public final class RailSlopeProfileTest {
 
     // ── row 4: a ramp that already meets its neighbour is left exactly vanilla ──────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void rampMeetingItsNeighbourStaysVanilla(GameTestHelper helper) {
         withFrozen(() -> {
             BlockPos b = rail(helper, A.south().above(), LOWERED);
@@ -210,7 +210,7 @@ public final class RailSlopeProfileTest {
 
     // ── row 5: a rail in a dip rises to both neighbours as a V — each seam is its own ──────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aRailInADipRisesToBothNeighboursAsAV(GameTestHelper helper) {
         withFrozen(() -> {
             BlockPos a = rail(helper, A, LOWERED);
@@ -232,7 +232,7 @@ public final class RailSlopeProfileTest {
 
     // ── row 6: a curve keeps vanilla geometry, box included ──────────────────────────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aCurveKeepsVanillaGeometry(GameTestHelper helper) {
         withFrozen(() -> {
             BlockPos a = rail(helper, A, LOWERED);
@@ -250,7 +250,7 @@ public final class RailSlopeProfileTest {
 
     // ── row 7: a neighbour whose shape does not reach back is not a seam ─────────────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void anUnconnectedNeighbourIsIgnored(GameTestHelper helper) {
         withFrozen(() -> {
             // An east-west run south of A: its middle rail touches A's cell but reaches east and west.
@@ -267,7 +267,7 @@ public final class RailSlopeProfileTest {
 
     // ── row 8: a lower ramp meets a lowered rail from its own side ───────────────────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aLowerRampRefitsFromItsOwnSide(GameTestHelper helper) {
         withFrozen(() -> {
             BlockPos a = rail(helper, A.above(), LOWERED);
@@ -283,7 +283,7 @@ public final class RailSlopeProfileTest {
 
     // ── row 9: deeper seats follow the same rule ─────────────────────────────────────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void deeperSeatsFollowTheSameRule(GameTestHelper helper) {
         withFrozen(() -> {
             BlockPos a = rail(helper, A, -1.0d);
@@ -299,7 +299,7 @@ public final class RailSlopeProfileTest {
 
     // ── row 10: a ramp's flat end never lifts, and the flush rail above its foot keeps its step ─
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aRampsFlatEndNeverLifts(GameTestHelper helper) {
         withFrozen(() -> {
             BlockPos b = rail(helper, A.south().above(), LOWERED);
@@ -318,7 +318,7 @@ public final class RailSlopeProfileTest {
 
     // ── row 11: the outline box follows the profile ──────────────────────────────────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void theOutlineFollowsTheProfile(GameTestHelper helper) {
         withFrozen(() -> {
             BlockPos a = rail(helper, A, LOWERED);
@@ -334,7 +334,7 @@ public final class RailSlopeProfileTest {
 
     // ── row 12: a refitted ramp's box follows too ────────────────────────────────────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aRefittedRampsOutlineFollowsToo(GameTestHelper helper) {
         withFrozen(() -> {
             rail(helper, A.south().above(), 0.0d);
@@ -347,7 +347,7 @@ public final class RailSlopeProfileTest {
 
     // ── row 13: the east-west axis mirrors north-south, dip included ─────────────────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void eastWestAxisMirrorsNorthSouth(GameTestHelper helper) {
         withFrozen(() -> {
             BlockPos a = rail(helper, A, LOWERED);
@@ -365,7 +365,7 @@ public final class RailSlopeProfileTest {
 
     // ── row 15: a ramp never sinks below its support ─────────────────────────────────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aRampNeverSinksBelowItsSupport(GameTestHelper helper) {
         withFrozen(() -> {
             // The rail one cell up is seated a block and a half down: drawn BELOW this rail's base.
@@ -381,7 +381,7 @@ public final class RailSlopeProfileTest {
 
     // ── row 16: a rise is capped where a rail would become a wall ────────────────────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aRiseIsCappedWhereARailWouldBeAWall(GameTestHelper helper) {
         withFrozen(() -> {
             BlockPos flat = rail(helper, A, -2.0d);
@@ -401,7 +401,7 @@ public final class RailSlopeProfileTest {
 
     // ── row 17: every rail kind fits the same ────────────────────────────────────────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void everyRailKindFitsTheSame(GameTestHelper helper) {
         withFrozen(() -> {
             Block[] kinds = {Blocks.POWERED_RAIL, Blocks.DETECTOR_RAIL, Blocks.ACTIVATOR_RAIL};
@@ -420,7 +420,7 @@ public final class RailSlopeProfileTest {
 
     // ── row 14 (LAW.md pin): the slope follows the neighbour, the seat never does ────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aNeighbourEditNeverMovesTheSeat(GameTestHelper helper) {
         withFrozen(() -> {
             ServerLevel level = helper.getLevel();

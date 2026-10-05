@@ -1,55 +1,35 @@
 package com.slabbed.client.model;
 
 import com.slabbed.util.RailSlopeProfile;
-import net.fabricmc.fabric.api.client.renderer.v1.Renderer;
-import net.fabricmc.fabric.api.client.renderer.v1.mesh.MutableMesh;
-import net.fabricmc.fabric.api.client.renderer.v1.mesh.QuadEmitter;
-import net.fabricmc.fabric.api.client.renderer.v1.mesh.QuadView;
-import net.fabricmc.fabric.api.client.renderer.v1.model.FabricBlockStateModel;
-import net.minecraft.client.renderer.block.BlockAndTintGetter;
+import java.util.ArrayList;
+import java.util.List;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.world.level.block.BaseRailBlock;
 import net.minecraft.world.level.block.state.BlockState;
-
-import java.util.function.Predicate;
+import net.neoforged.neoforge.client.model.quad.MutableQuad;
 
 /**
  * Draws a straight rail on the profile {@link RailSlopeProfile} fits for it (maintainer ruling,
- * 2026-09-28).
- *
- * <p>Vanilla draws a rail as one plane: flat at 1/16, or a ramp from 1/16 to 17/16. Both are linear
- * along the rail's axis, so subtracting vanilla's rise and adding the fitted one leaves every quad
- * PLANAR — the same sprite, the same UVs, the texture stretched along the slope exactly as vanilla's
- * own ramp stretches it. No model is registered; vanilla's own quads are captured and re-emitted
- * with their vertices moved. A {@link RailSlopeProfile.Profile#kinked kinked} profile (a V) is drawn
- * as two planes: every quad is split at the middle of the cell, each half on its own plane.
- *
- * <p>The seat is applied here, once, for these quads: they are emitted straight into the section's
- * own emitter rather than through the seat-shifting wrapper, so a vertex written here is a vertex
- * drawn, with no second shift. Rail quads carry no cull face, so the step-seam cull work of the
- * ordinary path has nothing to do for them.
+ * 2026-09-28). Vanilla draws a rail as one plane; subtracting vanilla's rise and adding the fitted
+ * one leaves every quad planar with the same sprite and UVs. A kinked profile (a V) is drawn as two
+ * planes: every quad is split at the middle of the cell. The seat is applied here, once.
  */
 public final class RailSlopeGeometry {
-
     private static final float EDGE = 1.0e-4f;
     private static final float MIDDLE = 0.5f;
 
     private RailSlopeGeometry() {
     }
 
-    /**
-     * Emits the rail at {@code pos} on its fitted profile and returns true, or returns false having
-     * emitted nothing when the ordinary path must draw it: not a straight rail, or a profile vanilla
-     * already draws. The allocation-free block test runs first so every non-rail block pays nothing;
-     * the profile read is render-region guarded, and a read that steps outside the region border
-     * falls back to vanilla geometry for this bake, exactly like the seat read does (the section
-     * re-bakes with fuller bounds a frame later).
-     */
-    public static boolean emitIfFitted(FabricBlockStateModel model, QuadEmitter emitter,
-                                       BlockAndTintGetter view, BlockPos pos, BlockState state,
-                                       float dy, RandomSource random, Predicate<Direction> cullTest) {
+    public static boolean collectIfFitted(BlockStateModel model, BlockAndTintGetter view, BlockPos pos,
+                                          BlockState state, float dy, RandomSource random,
+                                          List<BlockStateModelPart> out) {
         if (!(state.getBlock() instanceof BaseRailBlock)) {
             return false;
         }
@@ -62,77 +42,65 @@ public final class RailSlopeGeometry {
         if (profile == null || profile.isVanilla()) {
             return false;
         }
-        Renderer renderer = Renderer.get();
-        if (renderer == null) {
-            return false;
-        }
-        MutableMesh captured = renderer.mutableMesh();
-        model.emitQuads(captured.emitter(), view, pos, state, random, cullTest);
+        List<BlockStateModelPart> captured = new ArrayList<>(2);
+        model.collectParts(view, pos, state, random, captured);
         boolean alongZ = profile.axis() == Direction.Axis.Z;
-        captured.forEach(quad -> emitFitted(emitter, quad, profile, alongZ, dy));
+        for (BlockStateModelPart part : captured) {
+            QuadPart edited = new QuadPart(part);
+            QuadPart.forEachQuad(part, (cullFace, quad) -> emitFitted(edited, cullFace, quad, profile, alongZ, dy));
+            out.add(edited);
+        }
         return true;
     }
 
-    private static void emitFitted(QuadEmitter out, QuadView quad, RailSlopeProfile.Profile profile,
-                                   boolean alongZ, float dy) {
+    private static void emitFitted(QuadPart out, Direction cullFace, BakedQuad quad,
+                                   RailSlopeProfile.Profile profile, boolean alongZ, float dy) {
+        MutableQuad q = new MutableQuad().setFrom(quad);
         float[] t = new float[4];
         boolean low = false;
         boolean high = false;
         for (int i = 0; i < 4; i++) {
-            t[i] = alongZ ? quad.z(i) : quad.x(i);
+            t[i] = alongZ ? q.z(i) : q.x(i);
             low |= t[i] < MIDDLE - EDGE;
             high |= t[i] > MIDDLE + EDGE;
         }
         if (profile.kinked() && low && high) {
-            int[] lowPartners = partners(quad, t, alongZ, true);
-            int[] highPartners = partners(quad, t, alongZ, false);
+            int[] lowPartners = partners(q, t, alongZ, true);
+            int[] highPartners = partners(q, t, alongZ, false);
             if (lowPartners != null && highPartners != null) {
-                emitHalf(out, quad, profile, dy, t, true, lowPartners);
-                emitHalf(out, quad, profile, dy, t, false, highPartners);
+                out.add(cullFace, half(quad, q, profile, dy, t, true, lowPartners));
+                out.add(cullFace, half(quad, q, profile, dy, t, false, highPartners));
                 return;
             }
-            // A quad that does not span the cell as a rectangle cannot be split cleanly; draw it
-            // whole on the fitted heights instead (only a modded rail model reaches this).
         }
-        out.copyFrom(quad);
+        MutableQuad whole = new MutableQuad().setFrom(quad);
         for (int i = 0; i < 4; i++) {
-            out.pos(i, quad.x(i), quad.y(i) + dy + (float) profile.liftAt(t[i]), quad.z(i));
+            whole.setY(i, q.y(i) + dy + (float) profile.liftAt(t[i]));
         }
-        out.emit();
+        out.add(cullFace, whole.toBakedQuad());
     }
 
-    /**
-     * One half of a split quad: vertices inside the half keep their place; each vertex outside it
-     * slides along the quad's edge toward its partner until it reaches the middle of the cell, its
-     * texture coordinate sliding with it. The vertex order is unchanged, so the winding is too.
-     */
-    private static void emitHalf(QuadEmitter out, QuadView quad, RailSlopeProfile.Profile profile,
-                                 float dy, float[] t, boolean lowHalf, int[] partners) {
-        out.copyFrom(quad);
+    private static BakedQuad half(BakedQuad source, MutableQuad q, RailSlopeProfile.Profile profile,
+                                  float dy, float[] t, boolean lowHalf, int[] partners) {
+        MutableQuad out = new MutableQuad().setFrom(source);
         for (int i = 0; i < 4; i++) {
             boolean inside = lowHalf ? t[i] <= MIDDLE + EDGE : t[i] >= MIDDLE - EDGE;
             if (inside) {
-                out.pos(i, quad.x(i), quad.y(i) + dy + (float) profile.liftAt(t[i]), quad.z(i));
+                out.setY(i, q.y(i) + dy + (float) profile.liftAt(t[i]));
                 continue;
             }
             int j = partners[i];
             float s = (t[i] - MIDDLE) / (t[i] - t[j]);
-            float x = lerp(quad.x(i), quad.x(j), s);
-            float y = lerp(quad.y(i), quad.y(j), s);
-            float z = lerp(quad.z(i), quad.z(j), s);
-            out.pos(i, x, y + dy + (float) profile.liftAt(MIDDLE), z);
-            out.uv(i, lerp(quad.u(i), quad.u(j), s), lerp(quad.v(i), quad.v(j), s));
+            float x = lerp(q.x(i), q.x(j), s);
+            float y = lerp(q.y(i), q.y(j), s);
+            float z = lerp(q.z(i), q.z(j), s);
+            out.setPosition(i, x, y + dy + (float) profile.liftAt(MIDDLE), z);
+            out.setUv(i, lerp(q.u(i), q.u(j), s), lerp(q.v(i), q.v(j), s));
         }
-        out.emit();
+        return out.toBakedQuad();
     }
 
-    /**
-     * For each vertex outside the half, the adjacent vertex inside it that shares its cross-axis
-     * coordinate (the other end of the same edge along the rail); {@code -1} for vertices inside.
-     * Null when some outside vertex has no such partner, i.e. the quad is not an axis-aligned
-     * rectangle spanning the middle.
-     */
-    private static int[] partners(QuadView quad, float[] t, boolean alongZ, boolean lowHalf) {
+    private static int[] partners(MutableQuad q, float[] t, boolean alongZ, boolean lowHalf) {
         int[] partners = new int[4];
         for (int i = 0; i < 4; i++) {
             boolean inside = lowHalf ? t[i] <= MIDDLE + EDGE : t[i] >= MIDDLE - EDGE;
@@ -140,12 +108,12 @@ public final class RailSlopeGeometry {
                 partners[i] = -1;
                 continue;
             }
-            float cross = alongZ ? quad.x(i) : quad.z(i);
+            float cross = alongZ ? q.x(i) : q.z(i);
             int found = -1;
             for (int step = 1; step <= 3; step += 2) {
                 int j = (i + step) & 3;
                 boolean jInside = lowHalf ? t[j] <= MIDDLE + EDGE : t[j] >= MIDDLE - EDGE;
-                float jCross = alongZ ? quad.x(j) : quad.z(j);
+                float jCross = alongZ ? q.x(j) : q.z(j);
                 if (jInside && Math.abs(jCross - cross) <= EDGE && Math.abs(t[i] - t[j]) > EDGE) {
                     found = j;
                     break;

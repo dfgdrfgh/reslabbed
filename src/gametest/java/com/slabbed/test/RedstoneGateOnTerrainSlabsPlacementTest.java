@@ -1,8 +1,7 @@
 package com.slabbed.test;
 
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -48,32 +47,30 @@ public final class RedstoneGateOnTerrainSlabsPlacementTest {
             Identifier.fromNamespaceAndPath("terrain_slabs", "redstone_gate_test_slab");
     private static final ResourceKey<Block> TEST_TERRAIN_SLAB_KEY =
             ResourceKey.create(Registries.BLOCK, TEST_TERRAIN_SLAB_ID);
-    private static final Block TEST_TERRAIN_SLAB =
-            new SlabBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE_SLAB).setId(TEST_TERRAIN_SLAB_KEY));
+    private static final com.slabbed.gametest.TestBlocks.Lazy<Block> TEST_TERRAIN_SLAB = com.slabbed.gametest.TestBlocks.block(TEST_TERRAIN_SLAB_ID, () -> new SlabBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE_SLAB).setId(TEST_TERRAIN_SLAB_KEY)));
 
     /** Registers the TS-namespaced stand-in slab block used to prove the gate is namespace-agnostic. */
-    public static final class TerrainSlabsRedstoneGateTestEntrypoint implements ModInitializer {
+    public static final class TerrainSlabsRedstoneGateTestEntrypoint implements com.slabbed.gametest.TestModInitializer {
         @Override
         public void onInitialize() {
             if (!BuiltInRegistries.BLOCK.containsKey(TEST_TERRAIN_SLAB_ID)) {
-                Registry.register(BuiltInRegistries.BLOCK, TEST_TERRAIN_SLAB_ID, TEST_TERRAIN_SLAB);
             }
         }
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void repeaterAndComparatorCanPlaceOnTerrainSlabsBottomSlab(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos tsSlab = new BlockPos(2, 1, 2);
         BlockPos tsSlabAbs = helper.absolutePos(tsSlab);
         BlockPos above = helper.absolutePos(tsSlab.above());
 
-        helper.setBlock(tsSlab, TEST_TERRAIN_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.BOTTOM));
+        helper.setBlock(tsSlab, TEST_TERRAIN_SLAB.get().defaultBlockState().setValue(SlabBlock.TYPE, SlabType.BOTTOM));
         BlockState tsSlabState = level.getBlockState(tsSlabAbs);
 
         // Setup sanity: this test double really is registered under the terrain_slabs namespace and
         // really does classify as a generic Slabbed-supporting bottom slab (the gate under test).
-        if (!"terrain_slabs".equals(BuiltInRegistries.BLOCK.getKey(TEST_TERRAIN_SLAB).getNamespace())) {
+        if (!"terrain_slabs".equals(BuiltInRegistries.BLOCK.getKey(TEST_TERRAIN_SLAB.get()).getNamespace())) {
             throw helper.assertionException(tsSlab, "test slab must be registered under the terrain_slabs namespace");
         }
         if (!SlabSupport.isBottomSlab(tsSlabState)) {
@@ -99,7 +96,7 @@ public final class RedstoneGateOnTerrainSlabsPlacementTest {
     }
 
     // REGRESSION GUARD: a plain vanilla bottom slab must keep working exactly as before.
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void repeaterAndComparatorCanPlaceOnVanillaBottomSlab(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos slab = new BlockPos(2, 1, 2);
@@ -129,13 +126,13 @@ public final class RedstoneGateOnTerrainSlabsPlacementTest {
     // completely independent of the Slabbed bottom-slab mixin gate. That is expected vanilla
     // behavior (you can place a repeater flush on top of any top slab), not something this gate
     // controls or should suppress.
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void terrainSlabsTopSlabDoesNotClaimBottomSolidity(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos pos = new BlockPos(2, 1, 2);
         BlockPos posAbs = helper.absolutePos(pos);
 
-        helper.setBlock(pos, TEST_TERRAIN_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.TOP));
+        helper.setBlock(pos, TEST_TERRAIN_SLAB.get().defaultBlockState().setValue(SlabBlock.TYPE, SlabType.TOP));
         BlockState topState = level.getBlockState(posAbs);
 
         if (SlabSupport.isBottomSlab(topState)) {

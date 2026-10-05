@@ -6,7 +6,7 @@ import com.slabbed.command.SlabRigCaseCatalog;
 import com.slabbed.command.SlabRigCaseArtifacts;
 import com.slabbed.command.SlabRigCasePageManifest;
 import com.slabbed.util.BuildStamp;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -35,7 +35,7 @@ public final class SlabRigCaseCatalogTest {
         }
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabrigDevRuntimeDigestRequiresAndHashesResources(GameTestHelper h) {
         Path parent = Path.of(System.getProperty("user.dir", "."), "build", "tmp",
                 "rig2-runtime-digest-contract");
@@ -117,7 +117,7 @@ public final class SlabRigCaseCatalogTest {
         h.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabrigCaseCatalogAccountsForEveryRuntimeItem(GameTestHelper h) {
         if (!BuildStamp.hasExactRuntimeContent()
                 || !BuildStamp.RUNTIME_CONTENT_SHA256.matches("[0-9a-f]{64}")) {
@@ -280,7 +280,7 @@ public final class SlabRigCaseCatalogTest {
         h.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabrigCaseCatalogTopologyAndPagingContract(GameTestHelper h) {
         SlabRigCaseCatalog.Snapshot snapshot = SlabRigCaseCatalog.snapshot();
         List<SlabRigCaseCatalog.Topology> topologies = snapshot.topologies();
@@ -396,7 +396,7 @@ public final class SlabRigCaseCatalogTest {
         h.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabrigCaseCatalogSerializationIsDeterministicAndComplete(GameTestHelper h) {
         SlabRigCaseCatalog.Snapshot snapshot = SlabRigCaseCatalog.snapshot();
         String first = SlabRigCaseCatalog.catalogTsv(snapshot);
@@ -423,7 +423,7 @@ public final class SlabRigCaseCatalogTest {
         h.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabrigCasePageArtifactsAndResumeCursorFailClosed(GameTestHelper h) {
         SlabRigCaseCatalog.Snapshot snapshot = SlabRigCaseCatalog.snapshot();
         SlabRigCaseCatalog.CasePage page = SlabRigCaseCatalog.page(snapshot, 1);
@@ -737,7 +737,7 @@ public final class SlabRigCaseCatalogTest {
         h.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabrigWorldIdentitySurvivesSaveAndRejectsRecreatedSamePath(GameTestHelper h) {
         Path parent = Path.of(System.getProperty("user.dir", "."), "build", "tmp", "rig2-world-id-contract");
         try {
@@ -765,7 +765,7 @@ public final class SlabRigCaseCatalogTest {
         h.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabrigCaseManifestMixedStatusCountersAreExact(GameTestHelper h) {
         SlabRigCaseCatalog.Snapshot snapshot = SlabRigCaseCatalog.snapshot();
         SlabRigCaseCatalog.CasePage page = SlabRigCaseCatalog.page(snapshot, 1);
@@ -806,7 +806,7 @@ public final class SlabRigCaseCatalogTest {
         h.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabrigCaseFullArchiveAuditDistinguishesRuntimeInductionFromClosure(GameTestHelper h) {
         List<SlabRigCaseCatalog.CatalogItem> items = List.of(new SlabRigCaseCatalog.CatalogItem(
                 0, "minecraft:stone",
@@ -881,7 +881,7 @@ public final class SlabRigCaseCatalogTest {
         h.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabrigCaseFullArchiveRejectsOlderFrozenMode(GameTestHelper h) {
         List<SlabRigCaseCatalog.CatalogItem> items = List.of(new SlabRigCaseCatalog.CatalogItem(
                 0, "minecraft:stone",

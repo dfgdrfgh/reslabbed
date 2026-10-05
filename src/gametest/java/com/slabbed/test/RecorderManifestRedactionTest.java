@@ -1,7 +1,7 @@
 package com.slabbed.test;
 
-import com.slabbed.util.LiveCursorIntentRecorder;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.diagnostics.util.LiveCursorIntentRecorder;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 
 /**
@@ -20,7 +20,7 @@ import net.minecraft.gametest.framework.GameTestHelper;
  */
 public final class RecorderManifestRedactionTest {
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void redactsAllFiveSensitiveLaunchArgs(GameTestHelper helper) {
         String command = "net.minecraft.client.main.Main --username TestPlayer --version 26.2 "
                 + "--accessToken eyJhbGciOiJSUzI1NiJ9.super-secret-jwt-token "
@@ -52,7 +52,7 @@ public final class RecorderManifestRedactionTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void handlesNullAndEmptySafely(GameTestHelper helper) {
         if (LiveCursorIntentRecorder.redactJavaCommand(null) != null) {
             throw helper.assertionException("null in must produce null out");

@@ -7,7 +7,7 @@ import com.slabbed.command.SlabRigHangingKernelArtifacts;
 import com.slabbed.command.SlabRigHangingPaintingPlan;
 import com.slabbed.util.BuildStamp;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
@@ -1125,10 +1125,11 @@ public final class SlabRigHangingPaintingKernelTest {
      */
     private static InteractionResult canonicalResult(InteractionResult result) {
         if (result instanceof InteractionResult.Success success) {
-            return switch (success.swingSource()) {
-                case PREDICTED -> InteractionResult.SUCCESS;
-                case SERVER_ONLY -> InteractionResult.SUCCESS_SERVER;
-                case NONE -> InteractionResult.CONSUME;
+            // By name: the swing-source constants are spelled differently on 26.2 and 26.3.
+            return switch (success.swingSource().name()) {
+                case "PREDICTED", "CLIENT" -> InteractionResult.SUCCESS;
+                case "SERVER_ONLY", "SERVER" -> InteractionResult.SUCCESS_SERVER;
+                default -> InteractionResult.CONSUME;
             };
         }
         return result;

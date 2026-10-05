@@ -4,14 +4,12 @@ import com.slabbed.Slabbed;
 import com.slabbed.util.SlabEnsembleCoherence;
 import com.slabbed.util.SlabbedDiagnosticsBridge;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.client.renderer.v1.mesh.MutableQuadView;
-import net.fabricmc.fabric.api.client.renderer.v1.mesh.QuadEmitter;
-import net.fabricmc.fabric.api.client.renderer.v1.mesh.QuadTransform;
-import net.fabricmc.fabric.api.client.renderer.v1.model.FabricBlockStateModel;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.MovingBlockRenderState;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.neoforged.neoforge.client.model.DelegateBlockStateModel;
 import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -22,59 +20,39 @@ import net.minecraft.world.level.block.WallBlock;
 import net.minecraft.world.level.block.state.BlockState;
 
 import java.util.List;
-import java.util.function.Predicate;
+import java.util.ArrayList;
 
 /**
- * Wraps a FabricBlockStateModel to apply a vertical offset to emitted quads.
+ * Wraps a block-state model to draw it at the block's stored height. NeoForge's level-aware
+ * {@code collectParts} is the one entry point: the chunk mesher calls it per block with the render
+ * view, so the dy resolve, the seam cull and the alternate geometries all happen here.
  */
 @SuppressWarnings({"RedundantSuppression", "DataFlowIssue"})
-public final class OffsetBlockStateModel implements BlockStateModel {
+public final class OffsetBlockStateModel extends DelegateBlockStateModel {
     private static final boolean CULL_TRACE = Boolean.getBoolean("slabbed.render.offset.cullTrace");
     /** {@code Direction.values()} clones its array on every call; this runs per block per section. */
     private static final Direction[] DIRECTIONS = Direction.values();
 
-    private final BlockStateModel wrapped;
-    private final FabricBlockStateModel fabricWrapped;
-
     public OffsetBlockStateModel(BlockStateModel wrapped) {
-        this.wrapped = wrapped;
-        this.fabricWrapped = wrapped;
+        super(wrapped);
+    }
+
+    /** The wrapped model (visible for tests). */
+    public BlockStateModel wrapped() {
+        return delegate;
     }
 
     @Override
-    public void collectParts(RandomSource random, List<BlockStateModelPart> parts) {
-        wrapped.collectParts(random, parts);
-    }
-
-    @Override
-    public Material.Baked particleMaterial() {
-        return wrapped.particleMaterial();
-    }
-
-    @Override
-    public int materialFlags() {
-        return wrapped.materialFlags();
-    }
-
-    @Override
-    public void emitQuads(QuadEmitter emitter, BlockAndTintGetter view, BlockPos pos, BlockState state, RandomSource random,
-                          Predicate<Direction> cullTest) {
-        // A moving body's reference cell is not the cell it is drawn in. Exactly two renderers build
-        // this view: the piston head renderer, whose reference cell is the cell the block came FROM,
-        // and the falling-block renderer, whose reference cell is whatever cell the entity currently
-        // overlaps. A stored placement height is a fact about a CELL, so it has no meaning on this
-        // view; a moving body's height is carried by whoever positions the body — the block-entity
-        // dispatcher for a piston body, the entity's own position for a falling block — and applying
-        // it a second time here is the double offset (maintainer ruling, 2026-09-06). Do not re-add a
-        // dy resolve on this path. The seam and cull work is meaningless here too: this view reports
-        // its own state only at its own position and nothing at any other.
+    public void collectParts(BlockAndTintGetter view, BlockPos pos, BlockState state, RandomSource random,
+                             List<BlockStateModelPart> parts) {
+        // A moving body's reference cell is not the cell it is drawn in (piston head renderer,
+        // falling-block renderer). A stored placement height is a fact about a CELL, so it has no
+        // meaning on this view; the body's positioner carries the height (maintainer ruling,
+        // 2026-09-06). Do not re-add a dy resolve on this path.
         if (slabbed$isMovingBodyView(view)) {
-            fabricWrapped.emitQuads(emitter, view, pos, state, random, cullTest);
+            delegate.collectParts(view, pos, state, random, parts);
             return;
         }
-        // Resolve the frozen model dy before deciding whether this chain owns the special bridge.
-        // A lowered TOP chain must take the ordinary shifted emitter path; only a flush TOP chain
-        // keeps the 24px bridge. DOUBLE retains its existing bridge policy in SlabSupport.
         float dy;
         if (SlabbedDiagnosticsBridge.shouldCaptureModelBake()
                 && SlabbedDiagnosticsBridge.isModelBakeArmed(pos.asLong())) {
@@ -82,97 +60,58 @@ public final class OffsetBlockStateModel implements BlockStateModel {
         } else {
             dy = slabbed$modelDy(view, pos, state);
         }
-        // A Y-axis chain hanging under a slab ceiling emits extended geometry so the column connects
-        // continuously to the slab (no gap) — the chainable connect rule, distinct from lantern follow.
-        // Guarded: its support probe reads pos.above(), which can step outside the render-region border
-        // for a block at the section's top edge (26.x throws on OOB) — fall through to normal emission.
+        // A Y-axis chain hanging under a slab ceiling draws extended geometry so the column connects
+        // continuously to the slab. Its support probe reads pos.above(), which can step outside the
+        // render-region border at a section's top edge (26.x throws): fall through to normal emission.
         try {
-            if (ChainCeilingGeometry.emitIfPresent(fabricWrapped, emitter, view, pos, state, dy, random, cullTest)) {
+            if (ChainCeilingGeometry.collectIfPresent(view, pos, state, dy, random, parts)) {
                 return;
             }
         } catch (IndexOutOfBoundsException outsideRenderRegion) {
             // fall through to the standard offset emission below (also render-region guarded)
         }
-        // MODEL_STALE sentinel capture was resolved above for this SUBJECT emission only (a neighbor
-        // probe from another section's bake pass recomputes fresh dy and would mask this pos's own
-        // mesh as stale), and never the
-        // render-region OOB fallback (that 0.0 is a border artifact, not a dy decision — the section
-        // re-bakes with fuller bounds a frame later). Gate order is load-bearing (perf contract): one
-        // volatile read, then the armed-set binary search, before any other work.
-        // DODO / step-face cull: a FLAT block (dy=0) adjacent to a lowered one ALSO owns a step face
-        // whose cullFace must be cleared — otherwise the strip the neighbour's -0.5 offset exposes
-        // culls into a see-through "ghost window". 26.1.2 previously only wrapped dy!=0 blocks, so the
-        // flat side of a lowered-vs-flat seam was left culled. Wrap (clearing cullFace on mismatched-dy
-        // faces, no Y shift when dy=0) whenever this block is offset OR any neighbour sits at a
-        // different dy. Renderer-agnostic (edits the quad's own cullFace). Port of 1.21.1 clearStepCullFaces.
-        // PERF (render-path fix-round F3): ONE seam state per block. It memoises each of the six
-        // neighbour dys on first demand and is simultaneously the offset-aware cull predicate, the
-        // step-seam probe, and the cull-face-clearing quad transform — three consumers that previously
-        // each allocated their own capturing lambda and each re-resolved the same neighbour dy (the
-        // per-quad one re-resolving it for every emitted quad). Lazy, so the early-exit behaviour of
-        // the step-seam probe and the "dy != 0 short-circuits it entirely" ordering are unchanged.
-        SeamState seam = new SeamState(view, pos, state, dy, cullTest);
-        // A straight rail whose connected neighbour sits at another seat is drawn on its fitted
-        // profile so the two drawn rails meet (RailSlopeGeometry). It takes the section's own emitter
-        // and applies the seat itself; false for every other block and for a profile vanilla already
-        // draws, which then take the ordinary path below.
-        if (RailSlopeGeometry.emitIfFitted(fabricWrapped, emitter, view, pos, state, dy, random, seam)) {
+        // ONE seam state per block: memoises the six neighbour dys and is the step-seam probe and
+        // the cull-face-clearing rule in one (fix-round F3 on the Fabric lines).
+        SeamState seam = new SeamState(view, pos, state, dy);
+        if (RailSlopeGeometry.collectIfFitted(delegate, view, pos, state, dy, random, parts)) {
             return;
         }
-        if (FenceCeilingGeometry.emitIfConnected(fabricWrapped, emitter, view, pos, state, dy, random, seam)) {
+        if (FenceCeilingGeometry.collectIfConnected(delegate, view, pos, state, dy, random, parts)) {
             return;
         }
         boolean stepSeam = dy != 0.0f || seam.anyMismatchedNeighborDy();
-        QuadEmitter out = stepSeam ? YOffsetEmitters.wrapWithTransform(emitter, dy, seam) : emitter;
-        fabricWrapped.emitQuads(out, view, pos, state, random, seam);
-        // Phase 3a band emission PULLED after live rejection (TEST (9), 2026-07-07): BAKE_LOCK_UV
-        // derives UVs from vertex positions, and band tops exceed the unit square — the UVs walk off
-        // the block's sprite into NEIGHBORING ATLAS SPRITES, painting alien texture strips on every
-        // stack. Take-2 must use explicit uv() with V clamped/tiled inside the sprite (see design doc);
-        // until then no band is emitted. The plan function + its pins remain.
-        // slabbed$emitGapFillBand(out, view, pos, dy);
+        if (!stepSeam) {
+            delegate.collectParts(view, pos, state, random, parts);
+            return;
+        }
+        List<BlockStateModelPart> raw = new ArrayList<>(4);
+        delegate.collectParts(view, pos, state, random, raw);
+        for (BlockStateModelPart part : raw) {
+            parts.add(slabbed$translate(part, dy, seam));
+        }
     }
 
     /**
-     * Phase 3a (ENSEMBLE_COHERENCE_DESIGN.md, render tiling first tranche): when this block's
-     * face-contact pair ABOVE sits higher (the measured GAP class — −1.0 under −0.5 stacks, doors over
-     * lowered slabs, hopper columns), emit an additive BAND of this block's side texture spanning the
-     * seam, so the visible mid-stack air strip closes. Same philosophy as the chain ceiling bridge:
-     * extra geometry, nothing moves, dy laws untouched. Emitted through the SAME dy-shifted emitter, so
-     * band-local y ∈ [1, 1+d] lands exactly between the two visual bodies. Vanilla-contact requirement
-     * lives in the classifier (a bottom slab's by-design half-gap is never banded); TS pairs are
-     * guarded there too. Region-border reads fall back to no band (the section re-bakes with fuller
-     * bounds a frame later — same contract as slabbed$modelDy).
+     * The offset copy of one part: every vertex moved by {@code dy}; a quad whose cull face points at
+     * a neighbour sitting at a different dy moves to the unculled bucket (its step strip is exposed,
+     * so it must be drawn), keeping its own direction for lighting. The DODO step-face fix.
      */
-    private void slabbed$emitGapFillBand(QuadEmitter out, BlockAndTintGetter view, BlockPos pos, float dy) {
-        try {
-            BlockPos above = pos.above();
-            BlockState aboveState = view.getBlockState(above);
-            if (aboveState.isAir()) {
-                return;
+    private static BlockStateModelPart slabbed$translate(BlockStateModelPart part, float dy, SeamState seam) {
+        QuadPart out = new QuadPart(part);
+        for (Direction direction : DIRECTIONS) {
+            List<BakedQuad> quads = part.getQuads(direction);
+            if (quads.isEmpty()) {
+                continue;
             }
-            double dyAbove = slabbed$neighborModelDy(view, above);
-            double d = SlabEnsembleCoherence.gapFillBandHeight(view, pos, dy, dyAbove);
-            if (d <= 1.0e-4) {
-                return;
+            Direction bucket = seam.mismatched(direction) ? null : direction;
+            for (BakedQuad quad : quads) {
+                out.add(bucket, QuadPart.translated(quad, dy));
             }
-            Material.Baked particle = wrapped.particleMaterial();
-            if (particle == null) {
-                return;
-            }
-            float top = 1.0f + (float) d;
-            for (Direction face : Direction.values()) {
-                if (face.getAxis() == Direction.Axis.Y) {
-                    continue;
-                }
-                out.square(face, 0.0f, 1.0f, 1.0f, top, 0.0f);
-                out.materialBake(particle, net.fabricmc.fabric.api.client.renderer.v1.mesh.MutableQuadView.BAKE_LOCK_UV);
-                out.color(-1, -1, -1, -1);
-                out.emit();
-            }
-        } catch (IndexOutOfBoundsException outsideRenderRegion) {
-            // no band at the region border; the re-bake with fuller bounds draws it a frame later
         }
+        for (BakedQuad quad : part.getQuads(null)) {
+            out.add(null, QuadPart.translated(quad, dy));
+        }
+        return out;
     }
 
     /**
@@ -274,28 +213,23 @@ public final class OffsetBlockStateModel implements BlockStateModel {
      * a mismatched neighbour (keeping it as the nominal face) so the strip the neighbour's offset
      * exposes is not culled into a see-through ghost window.
      */
-    private static final class SeamState implements Predicate<Direction>, QuadTransform {
+    private static final class SeamState {
         private final BlockAndTintGetter view;
         private final BlockPos pos;
         private final BlockState state;
         private final float dy;
-        private final Predicate<Direction> cullTest;
-        /** Two 6-bit masks instead of a float array: only the mismatch verdict is ever consumed, and
-         *  the trace path (off by default) is the sole reader of the dy value itself. */
+        /** Two 6-bit masks: only the mismatch verdict is ever consumed. */
         private int resolvedMask;
         private int mismatchMask;
 
-        SeamState(BlockAndTintGetter view, BlockPos pos, BlockState state, float dy,
-                  Predicate<Direction> cullTest) {
+        SeamState(BlockAndTintGetter view, BlockPos pos, BlockState state, float dy) {
             this.view = view;
             this.pos = pos;
             this.state = state;
             this.dy = dy;
-            this.cullTest = cullTest;
         }
 
-        /** True if ANY of the 6 neighbours sits at a different model dy than this block (a lowered-vs-
-         *  flat step seam). Exits on the first mismatch, so a seam block resolves only what it must. */
+        /** True if ANY of the 6 neighbours sits at a different model dy than this block. */
         boolean anyMismatchedNeighborDy() {
             for (Direction direction : DIRECTIONS) {
                 if (mismatched(direction)) {
@@ -305,52 +239,26 @@ public final class OffsetBlockStateModel implements BlockStateModel {
             return false;
         }
 
-        private boolean mismatched(Direction direction) {
+        boolean mismatched(Direction direction) {
             int bit = 1 << direction.ordinal();
             if ((resolvedMask & bit) == 0) {
                 float resolved = slabbed$neighborModelDy(view, pos.relative(direction));
                 resolvedMask |= bit;
                 if (Math.abs(resolved - dy) > 1.0e-6f) {
                     mismatchMask |= bit;
+                    if (CULL_TRACE) {
+                        BlockPos neighborPos = pos.relative(direction);
+                        BlockState neighborState;
+                        try {
+                            neighborState = view.getBlockState(neighborPos);
+                        } catch (IndexOutOfBoundsException outsideRenderRegion) {
+                            neighborState = null;
+                        }
+                        slabbed$traceCullDecision(pos, direction, dy, neighborPos, resolved, state, neighborState, false);
+                    }
                 }
             }
             return (mismatchMask & bit) != 0;
-        }
-
-        @Override
-        public boolean test(Direction direction) {
-            if (direction == null || cullTest == null) {
-                return false;
-            }
-            if (mismatched(direction)) {
-                if (CULL_TRACE) {
-                    BlockPos neighborPos = pos.relative(direction);
-                    // Trace-only re-read: the value is identical (the view is immutable for the
-                    // section compile), and keeping it out of the steady-state path costs nothing.
-                    float neighborDy = slabbed$neighborModelDy(view, neighborPos);
-                    BlockState neighborState;
-                    try {
-                        neighborState = view.getBlockState(neighborPos);
-                    } catch (IndexOutOfBoundsException outsideRenderRegion) {
-                        neighborState = null;
-                    }
-                    boolean vanillaCull = cullTest.test(direction);
-                    slabbed$traceCullDecision(pos, direction, dy, neighborPos,
-                            neighborDy, state, neighborState, vanillaCull);
-                }
-                return false;
-            }
-            return cullTest.test(direction);
-        }
-
-        @Override
-        public boolean transform(MutableQuadView quad) {
-            Direction cullFace = quad.cullFace();
-            if (cullFace != null && mismatched(cullFace)) {
-                quad.cullFace(null);
-                quad.nominalFace(cullFace);
-            }
-            return true;
         }
     }
 

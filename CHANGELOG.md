@@ -1,3 +1,22 @@
+## [0.6.2-alpha+26.2-neoforge]
+
+See LAW.md — this changelog does not redefine the law.
+
+First Slabbed build for NeoForge on Minecraft 26.2. It carries the full 0.6 feature set of the Fabric 26.2/26.3
+line: placement heights are recorded where you aim and kept for good, lowered slabs support the same objects, pistons
+carry stored heights, rails slope to meet their neighbours, fence posts meet a nearby slab ceiling, hung decorations
+keep their seat, the settings screen and the two height-nudge key bindings. Everything below this section is the
+inherited history of the Fabric line.
+
+Needs NeoForge 26.2.0.88 or newer, on Java 25. No Fabric API or Forgified Fabric API.
+
+Differences on NeoForge:
+
+- Lowered blocks are drawn through NeoForge's own block-model hooks rather than the Fabric renderer API. The result
+  is the same geometry; mods that replace the chunk renderer (Sodium) have not been checked on this build.
+- The settings screen opens from the mod list's config button as well as `/slabdy settings`.
+- Climbing a lowered scaffolding's drawn volume goes through NeoForge's scaffolding hook.
+
 ## [0.6.2-alpha+26.2-26.3]
 
 See LAW.md — this changelog does not redefine the law.

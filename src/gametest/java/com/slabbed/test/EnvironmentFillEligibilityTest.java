@@ -1,7 +1,7 @@
 package com.slabbed.test;
 
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.level.block.Blocks;
 
@@ -22,7 +22,7 @@ import net.minecraft.world.level.block.Blocks;
  */
 public final class EnvironmentFillEligibilityTest {
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void weatherDepositedFillIsExcluded(GameTestHelper helper) {
         // Snow layers carry LAYERS; powder snow is a full cube and carries none, so it needs the
         // second clause. Both are laid by weather across whole biomes — that is the hazard.
@@ -37,7 +37,7 @@ public final class EnvironmentFillEligibilityTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void playerPlacedBlocksAreNotExcluded(GameTestHelper helper) {
         // THE ANTI-REGRESSION ROW. Carpet was excluded by class name and floated above its support.
         // Reinstating the class family fails here and nowhere else.
@@ -55,7 +55,7 @@ public final class EnvironmentFillEligibilityTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void thicknessPredicateStillCoversCarpet(GameTestHelper helper) {
         // isThinTopLayer keeps its THICKNESS role — the column walks still terminate on a carpet,
         // because whatever rests on a carpet rests on the carpet. Narrowing eligibility must not have

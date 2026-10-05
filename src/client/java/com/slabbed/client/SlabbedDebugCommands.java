@@ -1,11 +1,12 @@
 package com.slabbed.client;
 
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.client.event.RegisterClientCommandsEvent;
+import net.minecraft.commands.CommandSourceStack;
 import com.mojang.brigadier.context.CommandContext;
 import com.slabbed.util.BuildStamp;
 import com.slabbed.util.SlabbedDebugCommandTree;
 import com.slabbed.util.SlabdyRowFormatter;
-import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
-import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -46,21 +47,23 @@ public final class SlabbedDebugCommands {
     }
 
     public static void register() {
-        ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
+        NeoForge.EVENT_BUS.addListener((RegisterClientCommandsEvent event) -> {
+            var dispatcher = event.getDispatcher();
             dispatcher.register(SlabbedDebugCommandTree.slabdy(SlabbedDebugCommands::session));
             dispatcher.register(SlabbedDebugCommandTree.slabdev(SlabbedDebugCommands::session));
         });
     }
 
-    private static SlabbedDebugCommandTree.Session session(CommandContext<FabricClientCommandSource> ctx) {
+    private static SlabbedDebugCommandTree.Session session(CommandContext<CommandSourceStack> ctx) {
         return new ClientSession(ctx.getSource());
     }
 
-    private record ClientSession(FabricClientCommandSource source) implements SlabbedDebugCommandTree.Session {
+    private record ClientSession(CommandSourceStack source) implements SlabbedDebugCommandTree.Session {
 
         @Override
         public void feedback(String line) {
-            source.sendFeedback(Component.literal(line));
+            Component text = Component.literal(line);
+            source.sendSuccess(() -> text, false);
         }
 
         /**
@@ -70,7 +73,7 @@ public final class SlabbedDebugCommands {
          */
         @Override
         public List<String> targetRow() {
-            Minecraft client = source.getClient();
+            Minecraft client = Minecraft.getInstance();
             if (client == null || client.level == null) {
                 return List.of();
             }
@@ -127,7 +130,7 @@ public final class SlabbedDebugCommands {
 
         @Override
         public List<String> chunkGauge() {
-            Minecraft client = source.getClient();
+            Minecraft client = Minecraft.getInstance();
             if (client == null || client.level == null || client.player == null) {
                 return List.of();
             }
@@ -144,7 +147,7 @@ public final class SlabbedDebugCommands {
 
         @Override
         public boolean settingsAvailable() {
-            return source.getClient() != null;
+            return Minecraft.getInstance() != null;
         }
 
         /**
@@ -157,7 +160,7 @@ public final class SlabbedDebugCommands {
          */
         @Override
         public void openSettings() {
-            Minecraft client = source.getClient();
+            Minecraft client = Minecraft.getInstance();
             if (client == null) {
                 return;
             }

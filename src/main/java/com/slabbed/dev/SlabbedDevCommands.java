@@ -6,7 +6,6 @@ import com.mojang.brigadier.context.CommandContext;
 import com.slabbed.dev.audit.CategoryAuditReport;
 import com.slabbed.dev.audit.CategoryAuditRunner;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.command.permission.Permission;
 import net.minecraft.command.permission.PermissionLevel;
 import net.minecraft.server.command.ServerCommandSource;
@@ -62,7 +61,7 @@ public class SlabbedDevCommands {
                 .replace(":", "-")
                 .replace(".", "-");
 
-        Path outputDir = FabricLoader.getInstance().getGameDir()
+        Path outputDir = com.slabbed.loader.Loader.getGameDir()
                 .resolve("run-headless")
                 .resolve("slabbed-audit")
                 .resolve(timestamp);

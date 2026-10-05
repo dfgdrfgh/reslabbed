@@ -1,7 +1,7 @@
 package com.slabbed.test;
 
 import com.slabbed.anchor.SlabAnchorAttachment;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -88,7 +88,7 @@ public final class RelocatedPlacementAimTest {
         }
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aFlushColumnSideClickStacksFlush(GameTestHelper helper) {
         // GH #65's shape. Side-clicking the BASE of a scaffolding column makes vanilla walk UP the
         // column and build above its top; the aim still points at the base, three cells down.
@@ -99,7 +99,7 @@ public final class RelocatedPlacementAimTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aLoweredColumnSideClickFollowsTheColumnSeat(GameTestHelper helper) {
         // The discriminator against "just force relocated placements to zero": this column carries a
         // recorded seat, and its stack must inherit that seat rather than a constant.
@@ -114,7 +114,7 @@ public final class RelocatedPlacementAimTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aTopFaceClickRelocatesSidewaysAndStaysFlush(GameTestHelper helper) {
         // A different relocation AXIS from the same item: clicking the TOP face walks HORIZONTALLY
         // along the player's facing. The aim's UP face then measures a top plane that has nothing to
@@ -126,7 +126,7 @@ public final class RelocatedPlacementAimTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aRelocatedPlacementIsNotRefusedByItsOwnPhantomDepth(GameTestHelper helper) {
         // The SECOND consumer of the same stale pairing: the canPlace interpenetration gate resolves
         // the identical aim/cell mismatch, so it judges the placement at a depth the block will never
@@ -151,7 +151,7 @@ public final class RelocatedPlacementAimTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void anUnrelocatedPlacementStillSeatsFromTheRootAim(GameTestHelper helper) {
         // THE CONTROL. Same item, no relocation — the clicked cell holds no scaffolding, so vanilla
         // returns the context untouched and the root aim is the only evidence there is. The lowered

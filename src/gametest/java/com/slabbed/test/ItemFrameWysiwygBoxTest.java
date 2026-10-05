@@ -1,7 +1,7 @@
 package com.slabbed.test;
 
 import com.slabbed.anchor.SlabAnchorAttachment;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -32,7 +32,7 @@ public final class ItemFrameWysiwygBoxTest {
         return Blocks.STONE_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.BOTTOM);
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void frameBoxFollowsLoweredSupportPositionStaysGrid(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
 
@@ -90,7 +90,7 @@ public final class ItemFrameWysiwygBoxTest {
         });
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void frameBoxOnFlushSupportKeepsVanillaBox(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos supportRel = new BlockPos(2, 3, 2);

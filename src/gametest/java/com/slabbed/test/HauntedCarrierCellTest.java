@@ -2,7 +2,7 @@ package com.slabbed.test;
 
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -67,7 +67,7 @@ public final class HauntedCarrierCellTest {
         return lane;
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void breakingACarrierSlabClearsTheMarker(GameTestHelper helper) {
         // F2: the marker must die with its slab — no haunting.
         ServerLevel w = helper.getLevel();
@@ -93,7 +93,7 @@ public final class HauntedCarrierCellTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void frozenFlatSlabIsNeverALoweredCarrier(GameTestHelper helper) {
         // F1: the false-support contradiction, reconstructed via the REAL placement route (click the
         // top of the ground beside the lane — no WYSIWYG side-click, so the slab freezes FLAT — while

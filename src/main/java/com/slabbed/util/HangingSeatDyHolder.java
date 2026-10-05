@@ -19,4 +19,8 @@ public interface HangingSeatDyHolder {
 
     /** Restores a saved seat verbatim; used by the per-class save-data hooks only. */
     void slabbed$restoreHangSeatDy(double dy);
+
+    /** The client received a synced seat value; relay the box if the decoration is laid out. */
+    default void slabbed$onHangSeatSynced(long rawBits) {
+    }
 }

@@ -1,6 +1,5 @@
 package com.slabbed.command;
 
-import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -73,7 +72,7 @@ public final class SlabRigHangingDirectStateStore {
 
     public static SlabRigHangingDirectStateStore production() {
         return new SlabRigHangingDirectStateStore(
-                FabricLoader.getInstance().getGameDir().resolve("slabbed-rig").resolve(DIRECTORY));
+                com.slabbed.loader.Loader.getGameDir().resolve("slabbed-rig").resolve(DIRECTORY));
     }
 
     public Path root() {

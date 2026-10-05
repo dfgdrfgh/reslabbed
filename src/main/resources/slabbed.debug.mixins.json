@@ -1,12 +1,15 @@
 {
   "required": false,
   "package": "com.slabbed.mixin",
-  "compatibilityLevel": "JAVA_21",
+  "compatibilityLevel": "JAVA_25",
   "mixins": [
     "debug.BlockItemGetPlacementStateDebugMixin",
     "debug.BlockItemPlaceDebugMixin",
     "debug.accessor.ItemUsageContextInvoker"
   ],
   "client": [],
-  "injectors": { "defaultRequire": 1 }
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "minVersion": "0.8.7"
 }

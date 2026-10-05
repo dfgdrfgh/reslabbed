@@ -2,7 +2,7 @@ package com.slabbed.test;
 
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -36,7 +36,7 @@ public final class ScaffoldingLoweredStandTest {
 
     private static final double EPS = 1.0e-6;
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty", maxTicks = 60)
+    @GameTest(structure = "slabbed_gametest:empty", maxTicks = 60)
     public void loweredScaffoldingIsStoodOnAtItsRealTop(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         boolean previousFrozen = SlabAnchorAttachment.FROZEN_DY_ENABLED;

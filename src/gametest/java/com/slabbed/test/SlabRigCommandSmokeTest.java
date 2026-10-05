@@ -9,10 +9,10 @@ import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.command.SlabRigCommand;
 import com.slabbed.command.SlabRigCaseArtifacts;
 import com.slabbed.command.SlabRigCaseCatalog;
-import com.slabbed.util.LiveCursorIntentRecorder;
+import com.slabbed.diagnostics.util.LiveCursorIntentRecorder;
 import com.slabbed.util.BuildStamp;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.CommandSource;
 import net.minecraft.core.BlockPos;
@@ -53,7 +53,7 @@ public final class SlabRigCommandSmokeTest {
     private static final double EPS = 1.0e-6;
     private static final int COLUMN_SPACING_FOR_TEST = 2;
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabrigIsRegisteredInProductionServerDispatcher(GameTestHelper h) {
         ServerLevel world = h.getLevel();
         CommandSourceStack source = sourceAt(world, h.absolutePos(new BlockPos(1, 2, 1)));
@@ -74,7 +74,7 @@ public final class SlabRigCommandSmokeTest {
         h.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabrigHangsCatalogIsRegisteredAndWorldFree(GameTestHelper h) {
         ServerLevel world = h.getLevel();
         BlockPos markerSupport = h.absolutePos(new BlockPos(6, 1, 6));
@@ -161,7 +161,7 @@ public final class SlabRigCommandSmokeTest {
         h.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabrigHangsDirectProductionGrammarIsExact(GameTestHelper h) {
         ServerLevel world = h.getLevel();
         CommandSourceStack source = sourceAt(world, h.absolutePos(new BlockPos(1, 2, 1)));
@@ -229,7 +229,7 @@ public final class SlabRigCommandSmokeTest {
         h.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabrigStackCatalogAndPageContract(GameTestHelper h) {
         List<String> expected = new ArrayList<>();
         for (int length = 1; length <= 5; length++) {
@@ -297,7 +297,7 @@ public final class SlabRigCommandSmokeTest {
         h.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabrigStacksStatusAndExactClear(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         Player player = h.makeMockPlayer(GameType.SURVIVAL);
@@ -372,7 +372,7 @@ public final class SlabRigCommandSmokeTest {
         h.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabrigManifestRefusalForceAndSessionGuards(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         Player player = h.makeMockPlayer(GameType.SURVIVAL);
@@ -921,7 +921,7 @@ public final class SlabRigCommandSmokeTest {
         h.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabrigTowerBuildsRigViaDispatcher(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         CommandSourceStack source = sourceFacingSouth(h, w);
@@ -971,7 +971,7 @@ public final class SlabRigCommandSmokeTest {
      * Slabbed attachment there died (isAnchored / isCompoundFullBlockAnchor /
      * isCompoundVisibleSideLowerSlab all false).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabrigRowsThenClear(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         // Feet near z=0 so the facing-SOUTH rig (rowB is base + facing*4) fits inside the 8x8x8 arena.
@@ -1021,7 +1021,7 @@ public final class SlabRigCommandSmokeTest {
      * F8(c): footprint refusal. Place one stone in the would-be footprint, run {@code rows 2} WITHOUT
      * force → refused (the stone is untouched, no rig authored); then {@code rows 2 force} → built.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabrigRowsRefusesOccupiedFootprintUnlessForced(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         CommandSourceStack source = rowsSourceFacingSouth(h, w);

@@ -4,9 +4,6 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.slabbed.util.MinecartRailFrame;
 import com.slabbed.util.RailSeatDyHolder;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.network.syncher.EntityDataSerializers;
-import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -62,9 +59,6 @@ public abstract class MinecartRailSeatMixin extends Entity implements RailSeatDy
      * Raw double bits in a synced long: exact, cheap, and one network field. An external inspector
      * reading the entity data sees an opaque long; nothing shipped reads it.
      */
-    @Unique
-    private static final EntityDataAccessor<Long> SLABBED$RAIL_DY =
-            SynchedEntityData.defineId(AbstractMinecart.class, EntityDataSerializers.LONG);
 
     @Unique
     private static final String SLABBED$RAIL_DY_KEY = "slabbed:rail_dy";
@@ -75,14 +69,13 @@ public abstract class MinecartRailSeatMixin extends Entity implements RailSeatDy
 
     @Override
     public double slabbed$railSeatDy() {
-        double dy = Double.longBitsToDouble(this.getEntityData().get(SLABBED$RAIL_DY));
+        double dy = Double.longBitsToDouble(this.getData(com.slabbed.anchor.EntitySeatAttachments.RAIL_DY));
         return Double.isFinite(dy) ? dy : 0.0d;
     }
 
     @Unique
     private void slabbed$setRailSeatDy(double dy) {
-        this.getEntityData().set(SLABBED$RAIL_DY,
-                Double.doubleToRawLongBits(Double.isFinite(dy) ? dy : 0.0d));
+        this.setData(com.slabbed.anchor.EntitySeatAttachments.RAIL_DY, Double.doubleToRawLongBits(Double.isFinite(dy) ? dy : 0.0d));
     }
 
     @Override
@@ -102,11 +95,6 @@ public abstract class MinecartRailSeatMixin extends Entity implements RailSeatDy
                 : Double.NaN;
     }
 
-    @Inject(method = "defineSynchedData(Lnet/minecraft/network/syncher/SynchedEntityData$Builder;)V",
-            at = @At("TAIL"))
-    private void slabbed$defineRailSeatDy(SynchedEntityData.Builder builder, CallbackInfo ci) {
-        builder.define(SLABBED$RAIL_DY, Double.doubleToRawLongBits(0.0d));
-    }
 
     /**
      * The ONE position entry point a new cart has. The (EntityType, Level, DDD) constructor reaches

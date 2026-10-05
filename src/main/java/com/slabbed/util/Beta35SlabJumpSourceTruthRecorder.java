@@ -3,7 +3,7 @@ package com.slabbed.util;
 import com.slabbed.Slabbed;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
-import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
+import net.neoforged.neoforge.attachment.AttachmentType;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;

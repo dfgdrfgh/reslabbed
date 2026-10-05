@@ -1,7 +1,7 @@
 package com.slabbed.test;
 
 import com.slabbed.util.SlabTestKit;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
@@ -19,7 +19,7 @@ import java.util.Set;
  */
 public final class SlabTestKitPaletteTest {
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void paletteIsAFullGridOfResolvableItems(GameTestHelper helper) {
         List<Identifier> ids = SlabTestKit.PALETTE;
         if (ids.size() != SlabTestKit.SIZE) {

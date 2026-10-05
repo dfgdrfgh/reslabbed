@@ -3,8 +3,7 @@ package com.slabbed.test;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.compat.CompatHooks;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -46,15 +45,13 @@ public final class SlabVerticalSupportTerrainSlabsGuardTest {
     private static final Identifier TS_SLAB_ID =
             Identifier.fromNamespaceAndPath("terrain_slabs", "vertical_support_guard_test_slab");
     private static final ResourceKey<Block> TS_SLAB_KEY = ResourceKey.create(Registries.BLOCK, TS_SLAB_ID);
-    private static final Block TS_SLAB =
-            new SlabBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE_SLAB).setId(TS_SLAB_KEY));
+    private static final com.slabbed.gametest.TestBlocks.Lazy<Block> TS_SLAB = com.slabbed.gametest.TestBlocks.block(TS_SLAB_ID, () -> new SlabBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE_SLAB).setId(TS_SLAB_KEY)));
 
     /** Registers the TS-namespaced stand-in slab (before registry freeze, via the main entrypoint). */
-    public static final class TerrainSlabsVerticalSupportGuardTestEntrypoint implements ModInitializer {
+    public static final class TerrainSlabsVerticalSupportGuardTestEntrypoint implements com.slabbed.gametest.TestModInitializer {
         @Override
         public void onInitialize() {
             if (!BuiltInRegistries.BLOCK.containsKey(TS_SLAB_ID)) {
-                Registry.register(BuiltInRegistries.BLOCK, TS_SLAB_ID, TS_SLAB);
             }
         }
     }
@@ -88,13 +85,13 @@ public final class SlabVerticalSupportTerrainSlabsGuardTest {
      * vertical support carrier (it is a self-rendering surface TS positions itself). With the guard,
      * both predicates return false for it once it is recognised as TS-owned.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void terrainSlabsSupportIsNotMisreadAsLoweredVerticalCarrier(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
-        BlockPos support = buildLoweredSupport(helper, TS_SLAB, SlabType.DOUBLE);
+        BlockPos support = buildLoweredSupport(helper, TS_SLAB.get(), SlabType.DOUBLE);
         BlockState supportState = w.getBlockState(support);
 
-        if (!"terrain_slabs".equals(BuiltInRegistries.BLOCK.getKey(TS_SLAB).getNamespace())) {
+        if (!"terrain_slabs".equals(BuiltInRegistries.BLOCK.getKey(TS_SLAB.get()).getNamespace())) {
             throw helper.assertionException(helper.relativePos(support),
                     "setup: the stand-in support slab must be registered under the terrain_slabs namespace");
         }
@@ -121,10 +118,10 @@ public final class SlabVerticalSupportTerrainSlabsGuardTest {
     /**
      * THE FIX, TOP variant: same exclusion for a TS-owned TOP support (the surface L8 newly added).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void terrainSlabsTopSupportIsNotMisreadAsTopLikeCarrier(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
-        BlockPos support = buildLoweredSupport(helper, TS_SLAB, SlabType.TOP);
+        BlockPos support = buildLoweredSupport(helper, TS_SLAB.get(), SlabType.TOP);
         BlockState supportState = w.getBlockState(support);
 
         CompatHooks.shouldSkipSlabSupportTestOverride = st ->
@@ -145,7 +142,7 @@ public final class SlabVerticalSupportTerrainSlabsGuardTest {
      * recognised as a carrier even while the TS-exclusion override is active (it only excludes
      * terrain_slabs-namespaced blocks). Proves the guard is namespace-scoped, not a blanket disable.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void vanillaLoweredDoubleSupportStillRecognisedWhileTsOverrideActive(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos support = buildLoweredSupport(helper, Blocks.BIRCH_SLAB, SlabType.DOUBLE);

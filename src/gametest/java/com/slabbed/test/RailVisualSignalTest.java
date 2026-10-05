@@ -2,7 +2,7 @@ package com.slabbed.test;
 
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -112,7 +112,7 @@ public final class RailVisualSignalTest {
 
     // ── row 1: a torch standing beside the slab powers the rail drawn inside that slab's cell ────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aTorchBesideTheSlabPowersTheLoweredRail(GameTestHelper helper) {
         withFrozen(() -> {
             floor(helper, 1, 4, 1, 3);
@@ -126,7 +126,7 @@ public final class RailVisualSignalTest {
 
     // ── row 10: a torch under the slab powers the rail drawn on it, as under a full block ────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aTorchUnderTheSlabPowersTheLoweredRail(GameTestHelper helper) {
         withFrozen(() -> {
             floor(helper, 1, 4, 1, 3);
@@ -143,7 +143,7 @@ public final class RailVisualSignalTest {
 
     // ── row 2: a flush rail keeps vanilla's reach — the same torch is a diagonal to it ───────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aFlushRailKeepsVanillaReach(GameTestHelper helper) {
         withFrozen(() -> {
             floor(helper, 1, 4, 1, 3);
@@ -156,7 +156,7 @@ public final class RailVisualSignalTest {
 
     // ── row 3: a source at the rail's own grid row still powers a lowered rail ──────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void theRailsOwnRowStillPowersALoweredRail(GameTestHelper helper) {
         withFrozen(() -> {
             floor(helper, 1, 4, 1, 3);
@@ -170,7 +170,7 @@ public final class RailVisualSignalTest {
 
     // ── row 4: removing the torch unpowers the rail again ────────────────────────────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void removingTheTorchUnpowersTheLoweredRail(GameTestHelper helper) {
         withFrozen(() -> {
             floor(helper, 1, 4, 1, 3);
@@ -185,7 +185,7 @@ public final class RailVisualSignalTest {
 
     // ── row 5: a lever beside the slab reaches the rail — the slab's notification is forwarded ───
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aLeverBesideTheSlabReachesTheLoweredRail(GameTestHelper helper) {
         withFrozen(() -> {
             ServerLevel level = helper.getLevel();
@@ -217,7 +217,7 @@ public final class RailVisualSignalTest {
 
     // ── row 6: a chain fed at one end still crosses the lowered rail ─────────────────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aPoweredChainCrossesALoweredRail(GameTestHelper helper) {
         withFrozen(() -> {
             BlockPos[] rails = chain(helper);
@@ -231,7 +231,7 @@ public final class RailVisualSignalTest {
 
     // ── row 7: a lowered rail fed beside its slab feeds its whole chain ──────────────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aLoweredRailFedBesideItsSlabFeedsItsChain(GameTestHelper helper) {
         withFrozen(() -> {
             BlockPos[] rails = chain(helper);
@@ -245,7 +245,7 @@ public final class RailVisualSignalTest {
 
     // ── row 8: a cart rolls through; without the feed the lowered rail brakes it ─────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aCartRollsThroughALoweredPoweredRail(GameTestHelper helper) {
         withFrozen(() -> {
             BlockPos[] rails = chain(helper);
@@ -259,7 +259,7 @@ public final class RailVisualSignalTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void withoutTheFeedTheLoweredRailBrakesTheCart(GameTestHelper helper) {
         withFrozen(() -> {
             BlockPos[] rails = chain(helper);

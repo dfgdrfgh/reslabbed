@@ -1,7 +1,7 @@
 package com.slabbed.test;
 
 import com.slabbed.placement.LandingHitValidationPolicy;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -75,7 +75,7 @@ public final class DeepObjectOwnerHitRescueTest {
      * <p>MUTATION that must redden this row alone: delete the rescue lane in
      * {@code LandingHitValidationPolicy} (restore the bare {@code ownerFamily != FULL_BLOCK} bail).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aDeepScaffoldingOwnerSideClickIsRescued(GameTestHelper h) {
         BlockPos owner = h.absolutePos(new BlockPos(2, 2, 2));
         Vec3 hit = lowSideHit(owner);
@@ -98,7 +98,7 @@ public final class DeepObjectOwnerHitRescueTest {
      * <p>MUTATION that must redden this row alone: drop {@code vanillaWouldRejectOnYAlone} from the
      * rescue lane's condition.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void anAimVanillaAlreadyAcceptsIsNotShifted(GameTestHelper h) {
         BlockPos owner = h.absolutePos(new BlockPos(2, 2, 2));
         Vec3 hit = translatedTopHit(owner);
@@ -128,7 +128,7 @@ public final class DeepObjectOwnerHitRescueTest {
      * <p>MUTATION that must redden this row alone: drop {@code presentsFullCubeInteractionFace} from
      * the rescue lane's condition.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aFenceOwnerIsStillDeniedTheShift(GameTestHelper h) {
         BlockPos owner = h.absolutePos(new BlockPos(2, 2, 2));
         Vec3 hit = lowSideHit(owner);
@@ -149,7 +149,7 @@ public final class DeepObjectOwnerHitRescueTest {
      * this row ever fails, the scene itself stopped reproducing the geometry and the three rows above
      * are measuring nothing.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aFullBlockOwnerAtTheSameDepthWasAlreadyRescued(GameTestHelper h) {
         BlockPos owner = h.absolutePos(new BlockPos(2, 2, 2));
         Vec3 hit = lowSideHit(owner);

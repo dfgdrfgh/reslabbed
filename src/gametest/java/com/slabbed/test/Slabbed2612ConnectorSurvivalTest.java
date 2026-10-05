@@ -1,7 +1,7 @@
 package com.slabbed.test;
 
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -73,7 +73,7 @@ public final class Slabbed2612ConnectorSurvivalTest {
     // ── connectors: genuinely NEW coverage beyond the existing oak-fence/iron-bars/cobble-wall tests ──
 
     /** Glass pane (PaneBlock → IronBarsBlock lineage) breaks across a step — the pane-specific path. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void steppedGlassPaneRunBreaks(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockState after = steppedAState(helper, level, Blocks.GLASS_PANE.defaultBlockState());
@@ -85,7 +85,7 @@ public final class Slabbed2612ConnectorSurvivalTest {
     }
 
     /** Control: a flat glass-pane run still connects (no flat pane control existed before). */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void flatGlassPaneRunStillConnects(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockState after = flatAState(helper, level, Blocks.GLASS_PANE.defaultBlockState());
@@ -97,7 +97,7 @@ public final class Slabbed2612ConnectorSurvivalTest {
     }
 
     /** Glass pane must be in the same lowered connector-contact family used by the visual model gate. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void glassPaneParticipatesInLoweredConnectorVisualFamily(GameTestHelper helper) {
         if (!SlabSupport.isBeta35FenceWallVariantContactObject(Blocks.GLASS_PANE.defaultBlockState())) {
             throw helper.assertionException(new BlockPos(2, 2, 2),
@@ -107,7 +107,7 @@ public final class Slabbed2612ConnectorSurvivalTest {
     }
 
     /** A stepped wall not only drops the EAST side to NONE but forces the centre post UP — pin that. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void steppedWallBreaksAndForcesUpPost(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockState after = steppedAState(helper, level, Blocks.COBBLESTONE_WALL.defaultBlockState());
@@ -123,7 +123,7 @@ public final class Slabbed2612ConnectorSurvivalTest {
     }
 
     /** A different fence material breaks across a step too (smoke pin that it's material-invariant). */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void steppedNetherBrickFenceBreaks(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockState after = steppedAState(helper, level, Blocks.NETHER_BRICK_FENCE.defaultBlockState());
@@ -135,7 +135,7 @@ public final class Slabbed2612ConnectorSurvivalTest {
     }
 
     /** A different wall material breaks across a step too. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void steppedStoneBrickWallBreaks(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockState after = steppedAState(helper, level, Blocks.STONE_BRICK_WALL.defaultBlockState());
@@ -148,7 +148,7 @@ public final class Slabbed2612ConnectorSurvivalTest {
 
     // ── survival: pure canSurvive() predicates + direct updateShape (no neighbour-tick reliance) ──────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void carpetSurvivesOnSlabTops(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos carpet = new BlockPos(2, 2, 2);
@@ -168,7 +168,7 @@ public final class Slabbed2612ConnectorSurvivalTest {
     }
 
     /** Carpet over a slab must NOT pop on a neighbour update — drive updateShape directly and check it stays carpet. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void carpetDoesNotPopOnNeighbourUpdateOverSlab(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         helper.setBlock(new BlockPos(2, 1, 2), bottomSlab());
@@ -199,7 +199,7 @@ public final class Slabbed2612ConnectorSurvivalTest {
      * <p>MUTATION that must redden this row alone: {@code -Dslabbed.potFloorSupport=true}, or
      * flipping {@link SlabSupport#POT_FLOOR_SUPPORT}'s default literal to {@code "true"}.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void flowerPotSurvivesOnSlabTop(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos pot = new BlockPos(2, 2, 2);
@@ -233,7 +233,7 @@ public final class Slabbed2612ConnectorSurvivalTest {
      * <p>MUTATION that must redden this row alone: flip the default literal in
      * {@link SlabSupport#POT_FLOOR_SUPPORT} to {@code "true"}.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void shippedPotFloorSupportDefaultIsOff(GameTestHelper helper) {
         String forced = System.getProperty("slabbed.potFloorSupport");
         if (forced != null) {
@@ -268,7 +268,7 @@ public final class Slabbed2612ConnectorSurvivalTest {
      * false}, and {@code isRedstoneSupportTopSurface(air) == false}. So we assert the wire popped, and
      * assert a fresh wire cannot survive over air.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void redstoneWireSurvivesOnSlabTops(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos wire = new BlockPos(2, 2, 2);
@@ -303,7 +303,7 @@ public final class Slabbed2612ConnectorSurvivalTest {
      * here and turn this red. Driven via {@code updateShape} DIRECTLY (no neighbour-tick reliance), which
      * is the exact path the old mixin hooked.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void chainDoesNotPopWhenSupportRemoved(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos chain = new BlockPos(2, 2, 2);
@@ -341,7 +341,7 @@ public final class Slabbed2612ConnectorSurvivalTest {
      * included) — so a future reuse of that predicate anywhere in wire connection logic, on either the
      * ordinary or the slab-supported wire, turns one of these two assertions red.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void redstoneWireDoesNotSideConnectToSturdyFullBlockNeighbor(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
 
@@ -407,7 +407,7 @@ public final class Slabbed2612ConnectorSurvivalTest {
      * the test times out — it cannot flake on the scheduled-tick delay, and it does not depend on a fixed
      * tick count.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void leverWireLampCircuitTracksPower(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
 

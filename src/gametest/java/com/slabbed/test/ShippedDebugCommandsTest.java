@@ -5,7 +5,7 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.SlabbedDebugCommandTree;
 import com.slabbed.util.SlabdyRowFormatter;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -214,7 +214,7 @@ public final class ShippedDebugCommandsTest {
      * Every node of both shipped trees parses and executes. This is the "invocable, not just
      * present" assertion, minus the client dispatcher the headless run has no access to.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void everyShippedSubcommandParsesAndExecutes(GameTestHelper helper) {
         BlockPos where = helper.absolutePos(new BlockPos(1, 1, 1));
         DevSession session = new DevSession();
@@ -290,7 +290,7 @@ public final class ShippedDebugCommandsTest {
      * in plain words and must NOT touch the missing implementation (the ReleaseSession setters throw
      * if they are called), while {@code build} still answers.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void toolBackedSubcommandsDegradeHonestlyWithoutThrowing(GameTestHelper helper) {
         BlockPos where = helper.absolutePos(new BlockPos(1, 1, 1));
         ReleaseSession session = new ReleaseSession(List.of());
@@ -326,7 +326,7 @@ public final class ShippedDebugCommandsTest {
      * genuinely lowered cell, so an exclusion of the formatter from the release artifacts (it was
      * excluded until this pass) cannot come back without this going red.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabdyRowPrintsTheRealFormatterOutputForALoweredTarget(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos below = helper.absolutePos(new BlockPos(2, 1, 2));

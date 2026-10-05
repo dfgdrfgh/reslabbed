@@ -3,8 +3,7 @@ package com.slabbed.test;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.compat.CompatHooks;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -78,15 +77,13 @@ public final class CantileverBfsTerrainSlabsGuardTest {
     private static final Identifier TS_SLAB_ID =
             Identifier.fromNamespaceAndPath("terrain_slabs", "cantilever_bfs_guard_test_slab");
     private static final ResourceKey<Block> TS_SLAB_KEY = ResourceKey.create(Registries.BLOCK, TS_SLAB_ID);
-    private static final Block TS_SLAB =
-            new SlabBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE_SLAB).setId(TS_SLAB_KEY));
+    private static final com.slabbed.gametest.TestBlocks.Lazy<Block> TS_SLAB = com.slabbed.gametest.TestBlocks.block(TS_SLAB_ID, () -> new SlabBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE_SLAB).setId(TS_SLAB_KEY)));
 
     /** Registers the TS-namespaced stand-in slab (before registry freeze, via the main entrypoint). */
-    public static final class TerrainSlabsCantileverBfsGuardTestEntrypoint implements ModInitializer {
+    public static final class TerrainSlabsCantileverBfsGuardTestEntrypoint implements com.slabbed.gametest.TestModInitializer {
         @Override
         public void onInitialize() {
             if (!BuiltInRegistries.BLOCK.containsKey(TS_SLAB_ID)) {
-                Registry.register(BuiltInRegistries.BLOCK, TS_SLAB_ID, TS_SLAB);
             }
         }
     }
@@ -122,7 +119,7 @@ public final class CantileverBfsTerrainSlabsGuardTest {
         SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(w, loweredBottom, w.getBlockState(loweredBottom));
 
         w.setBlock(carrierGround, Blocks.SMOOTH_STONE_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.BOTTOM), 2);
-        BlockState carrierState = (tsOwned ? TS_SLAB : Blocks.BIRCH_SLAB)
+        BlockState carrierState = (tsOwned ? TS_SLAB.get() : Blocks.BIRCH_SLAB)
                 .defaultBlockState().setValue(SlabBlock.TYPE, SlabType.BOTTOM);
         w.setBlock(carrier, carrierState, 2);
         SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(w, carrier, w.getBlockState(carrier));
@@ -137,7 +134,7 @@ public final class CantileverBfsTerrainSlabsGuardTest {
 
     // ── BFS 2: cantilevered fence/wall/iron-bars (cantileverLoweredConnectingMagnitude) ──────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fenceCantileverBesideTerrainSlabsCarrierStaysFlush(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos carrier = buildLoweredCarrierOverAir(helper, true);
@@ -165,7 +162,7 @@ public final class CantileverBfsTerrainSlabsGuardTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fenceCantileverBesideVanillaCarrierStillLowersWhileTsOverrideActive(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos carrier = buildLoweredCarrierOverAir(helper, false);
@@ -189,7 +186,7 @@ public final class CantileverBfsTerrainSlabsGuardTest {
 
     // ── BFS 1: cantilevered solid full block (isCantileverLoweredFullBlock via adjacentLoweredSideMagnitude) ──
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fullBlockCantileverBesideTerrainSlabsCarrierStaysFlush(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos carrier = buildLoweredCarrierOverAir(helper, true);
@@ -217,7 +214,7 @@ public final class CantileverBfsTerrainSlabsGuardTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fullBlockCantileverBesideVanillaCarrierStillLowersWhileTsOverrideActive(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos carrier = buildLoweredCarrierOverAir(helper, false);
@@ -240,7 +237,7 @@ public final class CantileverBfsTerrainSlabsGuardTest {
 
     // ── slab lane: cantilevered slab (adjacentLoweredSideMagnitude -> loweredSlabMagnitude) ──────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabCantileverBesideTerrainSlabsCarrierStaysFlush(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos carrier = buildLoweredCarrierOverAir(helper, true);
@@ -267,7 +264,7 @@ public final class CantileverBfsTerrainSlabsGuardTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabCantileverBesideVanillaCarrierStillLowersWhileTsOverrideActive(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos carrier = buildLoweredCarrierOverAir(helper, false);

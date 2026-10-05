@@ -1,7 +1,7 @@
 package com.slabbed.test;
 
-import com.slabbed.util.SlabModelStaleSentinel;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.diagnostics.util.SlabModelStaleSentinel;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
 
@@ -59,7 +59,7 @@ public final class ModelStaleSentinelAllocationGateTest {
         return allocated;
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void disarmedFastPathAllocatesNothing(GameTestHelper helper) {
         SlabModelStaleSentinel.resetCold();
         SlabModelStaleSentinel.testSessionOverride = false;
@@ -76,7 +76,7 @@ public final class ModelStaleSentinelAllocationGateTest {
         }
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void sessionOnEmptyArmedSetAllocatesNothing(GameTestHelper helper) {
         SlabModelStaleSentinel.resetCold();
         SlabModelStaleSentinel.testSessionOverride = true;
@@ -93,7 +93,7 @@ public final class ModelStaleSentinelAllocationGateTest {
         }
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void armedMissPathAllocatesNothing(GameTestHelper helper) {
         SlabModelStaleSentinel.resetCold();
         SlabModelStaleSentinel.testSessionOverride = true;

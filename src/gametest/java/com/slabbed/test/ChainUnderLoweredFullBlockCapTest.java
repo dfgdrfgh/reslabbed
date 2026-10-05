@@ -2,7 +2,7 @@ package com.slabbed.test;
 
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -53,7 +53,7 @@ public final class ChainUnderLoweredFullBlockCapTest {
         }
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void chainAndLanternFollowAnchoredLoweredFullBlockCap(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos temporarySlab = new BlockPos(2, 4, 2);
@@ -78,7 +78,7 @@ public final class ChainUnderLoweredFullBlockCapTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void chainUnderFlushUnanchoredCapStaysGridHeight(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos cap = new BlockPos(2, 5, 2);

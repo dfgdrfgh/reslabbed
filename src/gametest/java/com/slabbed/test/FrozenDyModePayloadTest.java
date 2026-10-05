@@ -6,7 +6,7 @@ import com.slabbed.network.FrozenDyModePayload;
 import com.slabbed.network.FrozenDyModeServer;
 import io.netty.buffer.Unpooled;
 import java.util.Locale;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 
@@ -27,7 +27,7 @@ public final class FrozenDyModePayloadTest {
 
     private static final String[] FORBIDDEN_JARGON = {"frozendy", "attachment", "store-only"};
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void codecRoundTrips(GameTestHelper helper) {
         // BOTH directions are required: a write or read hardcoded to one constant round-trips
         // correctly for exactly one of them.
@@ -36,7 +36,7 @@ public final class FrozenDyModePayloadTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void serverReportsLiveFlagTracksBothValues(GameTestHelper helper) {
         boolean previous = SlabAnchorAttachment.FROZEN_DY_ENABLED;
         try {
@@ -58,7 +58,7 @@ public final class FrozenDyModePayloadTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void mismatchMessageNamesTheOffSide(GameTestHelper helper) {
         String serverOff = lowerText(false, true);
         String clientOff = lowerText(true, false);

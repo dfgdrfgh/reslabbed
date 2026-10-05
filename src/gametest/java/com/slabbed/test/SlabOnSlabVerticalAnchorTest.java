@@ -2,7 +2,7 @@ package com.slabbed.test;
 
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
@@ -56,7 +56,7 @@ public final class SlabOnSlabVerticalAnchorTest {
         return Blocks.BIRCH_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.TOP);
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void breakingLowerSupportSlabDoesNotPopSlabRestingOnTop(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         // Build a genuinely lowered + PERSISTED TOP-like support, exactly the way real gameplay does
@@ -157,7 +157,7 @@ public final class SlabOnSlabVerticalAnchorTest {
      * OLD {@code < 0.0d} gate returned true while the narrowed {@code == -0.5} sub-lane returned false);
      * the fix removes that latent inconsistency so persistence never depends on the masking lane.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void bottomSlabOnCompoundMinusOneFullBlockPersistsAndDoesNotPop(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         // Compound -1.0 full block (un-anchored, geometric): stone / bottom slab / stone / bottom slab /
@@ -209,7 +209,7 @@ public final class SlabOnSlabVerticalAnchorTest {
 
     // REGRESSION GUARD: a flat (never-lowered) slab resting on another flat slab must never gain a
     // spurious anchor, nor live-derive a lowered dy.
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void flatSlabOnFlatSlabNeverAnchors(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos lowerRel = new BlockPos(2, 1, 2);
@@ -241,7 +241,7 @@ public final class SlabOnSlabVerticalAnchorTest {
     // y=0.5 plane regardless of its own lowering) must not anchor from the vertical lane, and must
     // not live-derive lowered — only TOP/DOUBLE supports propagate their recessed top upward
     // (matches isLoweredTopLikeSlabCarrier's BOTTOM exclusion).
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabOnBottomTypeSupportNeverAnchorsVertically(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos supportRel = new BlockPos(2, 1, 2);

@@ -2,7 +2,7 @@ package com.slabbed.test;
 
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
@@ -52,7 +52,7 @@ public final class BlockEntityCantileverTest {
 
     // THE LIVE REPRO: chest on a slab (lowered -0.5, anchored). Hopper #1 placed beside the chest, air
     // below, no slab of its own. Hopper #1 must inherit -0.5, not place at vanilla 0.0.
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void hopperBesideLoweredChestInheritsDy(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos chestPos = placeLoweredChest(helper);
@@ -76,7 +76,7 @@ public final class BlockEntityCantileverTest {
 
     // THE CHAIN: a second hopper beside the first (adjacency-lowered) must also inherit -0.5 — the
     // reported "NEXT horizontally chained hopper".
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void secondHopperChainedBeyondFirstInheritsDy(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos chestPos = placeLoweredChest(helper);
@@ -100,7 +100,7 @@ public final class BlockEntityCantileverTest {
 
     // THE PERSISTED ANCHOR: once the live check returns -0.5, freezeLoweredOnPlace's unchecked dy<0
     // branch must ALSO persist the anchor for a cantilever hopper (not just direct/slab placements).
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void cantileverHopperGetsPersistedAnchor(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos chestPos = placeLoweredChest(helper);
@@ -119,7 +119,7 @@ public final class BlockEntityCantileverTest {
 
     // NEVER-POP RAIL: a hopper on its OWN solid ground beside a lowered chest must NOT sink — the
     // air-gate inside isCantileverBlockEntityCandidate keeps it flush.
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void hopperOnSolidGroundBesideLoweredChestStaysFlush(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos chestPos = placeLoweredChest(helper);

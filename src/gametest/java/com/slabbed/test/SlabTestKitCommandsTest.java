@@ -7,7 +7,7 @@ import com.slabbed.command.SlabKitCommand;
 import com.slabbed.command.SlabRigCommand;
 import com.slabbed.util.SlabSupport;
 import com.slabbed.util.SlabTestKit;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.commands.CommandSource;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
@@ -46,7 +46,7 @@ public final class SlabTestKitCommandsTest {
 
     private static final double EPS = 1.0e-6;
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabrigMegaDeclaresMultiCellSubjectEnvelope(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         Player player = h.makeMockPlayer(GameType.SURVIVAL);
@@ -82,7 +82,7 @@ public final class SlabTestKitCommandsTest {
 
     // ── /slabkit ────────────────────────────────────────────────────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabkitFillsInventory(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         Player player = h.makeMockPlayer(GameType.SURVIVAL);
@@ -110,7 +110,7 @@ public final class SlabTestKitCommandsTest {
 
     // ── /slabrig mega ─────────────────────────────────────────────────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabrigMegaBuildsAndPlaces(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         // Feet at (1,2,0) facing SOUTH -> base (1,1,3); the 1-column mega footprint fits the 8x8x8 arena.
@@ -162,7 +162,7 @@ public final class SlabTestKitCommandsTest {
      * success (a stall is not a crash), and every cell the arena can actually hold — the lowered base
      * plus the reachable alternating cells above it — is non-air with the seat reading a lowered dy.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabrigTowerNHeightBuildsAlternatingTowers(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         Player player = h.makeMockPlayer(GameType.SURVIVAL);
@@ -216,7 +216,7 @@ public final class SlabTestKitCommandsTest {
      * slab-on-slab click would collapse into a double slab instead of advancing a cell, which is
      * exactly what SSBB and SSSS exercise).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabrigTowerAllFourRecipesBuildAndAlternateSlabFlavors(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         Player player = h.makeMockPlayer(GameType.SURVIVAL);
@@ -281,7 +281,7 @@ public final class SlabTestKitCommandsTest {
      * per-tower report is the compact one-line-per-tower form (exactly four report lines, never one
      * line per cell).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabrigTowerKnownGoodLadderCleanAndSummaryHonest(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         Player player = h.makeMockPlayer(GameType.SURVIVAL);
@@ -323,7 +323,7 @@ public final class SlabTestKitCommandsTest {
 
     // ── /slabcheck ────────────────────────────────────────────────────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabcheckSilentOnCleanRig(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         // A genuinely-placed cell: build a lowered slab stack and place a torch via the real useOn path,
@@ -346,7 +346,7 @@ public final class SlabTestKitCommandsTest {
         h.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabcheckDetectsManufacturedViolation(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         // Force the frozen-dy read short-circuit OFF for the duration so the live lane genuinely recomputes
@@ -389,7 +389,7 @@ public final class SlabTestKitCommandsTest {
         h.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabcheckFrozenOnReportsWouldMoveNotHardViolation(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         // Force frozen-dy ON for the duration: the render authority becomes the store, so a manufactured

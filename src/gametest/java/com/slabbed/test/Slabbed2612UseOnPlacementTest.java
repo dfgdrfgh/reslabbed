@@ -3,7 +3,7 @@ package com.slabbed.test;
 import com.slabbed.Slabbed;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -170,7 +170,7 @@ public final class Slabbed2612UseOnPlacementTest {
     }
 
     /** PROBE: a slab placed on TOP of a flush stone block via useOn lands flush (dy 0). */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void useOnPlacesSlabOnTopFlush(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos support = helper.absolutePos(new BlockPos(2, 2, 2));
@@ -188,7 +188,7 @@ public final class Slabbed2612UseOnPlacementTest {
      * an "always TOP" in the lowered/compound cases is a real remap effect; if the control is ALSO
      * always-TOP, the type signal is a harness artifact and must not be read as a bug. Logged, asserted.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void controlSlabSideTypeTracksHitHalf(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         helper.setBlock(new BlockPos(2, 3, 2), Blocks.STONE.defaultBlockState());
@@ -224,7 +224,7 @@ public final class Slabbed2612UseOnPlacementTest {
      * {@link #useOnSlabOnFlushGroundBesideLoweredStaysFrozenFlat} (clicking the FLAT GROUND's top, not the
      * lowered block, still stays 0.0 — also WYSIWYG: you aimed at the flat ground).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void useOnSlabClickingLoweredFaceWithSolidGroundBelowFollowsToMinusHalf(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         // lowered full block at (2,3,2) → -0.5. Beside it (3,3,2) the placement cell, WITH solid ground (3,2,2).
@@ -243,7 +243,7 @@ public final class Slabbed2612UseOnPlacementTest {
     }
 
     /** RC2-A via useOn: a slab placed against the side of a lowered (-0.5) full block, air below, follows to -0.5. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void useOnSlabBesideLoweredFullBlockFollowsToMinusHalf(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         // lowered full block: bottom slab + stone at (2,3,2) → -0.5. East column (3,*,2) stays air (cantilever).
@@ -260,7 +260,7 @@ public final class Slabbed2612UseOnPlacementTest {
     }
 
     /** RC2-A lower-half companion: lower-half aim against the same lowered full block also lands -0.5. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void useOnSlabBesideLoweredFullBlockLowerHalfAlsoMinusHalf(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         helper.setBlock(new BlockPos(2, 2, 2), bottomSlab());
@@ -282,7 +282,7 @@ public final class Slabbed2612UseOnPlacementTest {
      * `USEON-FP` log lines also record the slab TYPE so the midline-split (RC3 type layer) is visible.
      * If a half lands at -0.5 or the wrong cell, this is the RC3 RED — headless, before any live session.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void useOnSlabBesideCompoundStackUpperHalf(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         buildCompoundMinusOne(helper);                       // top compound stone at (2,5,2) reads -1.0
@@ -296,7 +296,7 @@ public final class Slabbed2612UseOnPlacementTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void useOnSlabBesideCompoundStackLowerHalf(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         buildCompoundMinusOne(helper);
@@ -319,7 +319,7 @@ public final class Slabbed2612UseOnPlacementTest {
      * markers here reproduce a genuine built compound owner (the bare-column tests above reject the remap and
      * place via vanilla, so they never exercised the flip).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void useOnSlabBesideCompoundOwnerPlacesClickedSideNotOpposite(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         buildCompoundMinusOne(helper);                       // top compound stone at (2,5,2) reads -1.0
@@ -355,7 +355,7 @@ public final class Slabbed2612UseOnPlacementTest {
      * (flush beside the body) — not float in a wrong cell. Mirrors the green logical-band tests but with the
      * honest hit Y. Geometric (un-anchored) compound owner.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void useOnSlabBesideCompoundHonestBandLowerHalf(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         buildCompoundMinusOne(helper);
@@ -375,7 +375,7 @@ public final class Slabbed2612UseOnPlacementTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void useOnSlabBesideCompoundHonestBandUpperHalf(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         buildCompoundMinusOne(helper);
@@ -395,7 +395,7 @@ public final class Slabbed2612UseOnPlacementTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void useOnSlabBesideCompoundAnchoredHonestBand(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         buildCompoundMinusOne(helper);
@@ -423,7 +423,7 @@ public final class Slabbed2612UseOnPlacementTest {
      * A back up to 0.0. The maintainer's live report: placing B sent BOTH to vanilla 0.0 (0.5 high). Drives the real
      * useOn path on the SERVER (the authoritative dy the client now mirrors). Honest (visible-band) hit.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void useOnCantileverSlabAgainstCantileverSlabBothStayMinusHalf(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         helper.setBlock(new BlockPos(2, 2, 2), bottomSlab());
@@ -453,7 +453,7 @@ public final class Slabbed2612UseOnPlacementTest {
      * -1.0 face (A is a PLAIN deep slab — no compound marker, the formerly unowned case) must land
      * B at -1.0 with the follow consumed as an ANCHOR, never the side-inherited FROZEN_FLAT stamp.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void useOnSlabBesidePlainDeepSlabInheritsExactDepth(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         buildCompoundMinusOne(helper);
@@ -512,7 +512,7 @@ public final class Slabbed2612UseOnPlacementTest {
      * it, its fact keeps the aim verbatim, and it carries the TWO-WRITER pin this row has always
      * held — the freeze must not stamp FROZEN_FLAT (geometric 0.0) over a lowered stored fact.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void useOnDeepSideLandingOverSolidGroundClampsToRealSeat(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         buildCompoundMinusOne(helper);
@@ -588,7 +588,7 @@ public final class Slabbed2612UseOnPlacementTest {
      * lowered target instead of falling back to vanilla height. Once both fences are at the same dy, the
      * ordinary same-level fence connection is allowed; the no-connection rule only applies across a step.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void useOnFenceClickingLoweredFenceOverAirFollowsToMinusHalf(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         helper.setBlock(new BlockPos(2, 2, 2), bottomSlab());
@@ -636,7 +636,7 @@ public final class Slabbed2612UseOnPlacementTest {
      * still read genuinely different frozen heights; that direction is covered by
      * {@code Slabbed2612ConnectorSurvivalTest}'s stepped fence/pane/wall rows.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void useOnTwoFencesOnAdjacentBottomSlabsConnectUnderFrozenDy(GameTestHelper helper) {
         boolean previousFrozen = SlabAnchorAttachment.FROZEN_DY_ENABLED;
         SlabAnchorAttachment.FROZEN_DY_ENABLED = true;
@@ -702,7 +702,7 @@ public final class Slabbed2612UseOnPlacementTest {
      * thing that can anchor it. Both are driven through the real {@code useOn} path so every cell in
      * the stack earns a published fact, the way a player's would.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void useOnLoweredPlacementIsClassifiedAnchoredUnderFrozenDy(GameTestHelper helper) {
         boolean previousFrozen = SlabAnchorAttachment.FROZEN_DY_ENABLED;
         SlabAnchorAttachment.FROZEN_DY_ENABLED = true;
@@ -775,7 +775,7 @@ public final class Slabbed2612UseOnPlacementTest {
     // ── A1: freeze-on-place via the REAL useOn path — slab on its OWN flush ground beside a lowered
     //         block must stay flat (0.0) AND record FROZEN_FLAT (NEVER-POP). ──────────────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void useOnSlabOnFlushGroundBesideLoweredStaysFrozenFlat(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         // lowered full block at (2,3,2); beside it east, flush stone ground at (3,2,2).
@@ -798,7 +798,7 @@ public final class Slabbed2612UseOnPlacementTest {
 
     // ── A2: a FULL BLOCK (not a slab) placed via useOn onto a bottom slab lowers to -0.5. ───────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void useOnFullBlockOnBottomSlabLowersToMinusHalf(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         helper.setBlock(new BlockPos(2, 2, 2), bottomSlab());
@@ -823,7 +823,7 @@ public final class Slabbed2612UseOnPlacementTest {
     // ── A7 (RE-SPEC'D — GOES C2, design §5, the maintainer-ruled D1): a slab placed via useOn on the visible top
     //         of a compound -1.0 owner lands FLUSH at -1.0. ──────────────────────────────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void useOnSlabOnTopOfCompoundFollowsToMinusOne(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         buildCompoundMinusOne(helper);                       // top compound stone at (2,5,2) = -1.0
@@ -859,7 +859,7 @@ public final class Slabbed2612UseOnPlacementTest {
     // ── A8: a slab placed via useOn cantilevered beside a lowered block ANCHORS -0.5 and KEEPS it when
     //         the lowering source is later removed (NEVER-POP-up, the real placement lane). ───────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void useOnCantileverSlabAnchorsAndSurvivesSourceRemoval(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         helper.setBlock(new BlockPos(2, 2, 2), bottomSlab());
@@ -887,7 +887,7 @@ public final class Slabbed2612UseOnPlacementTest {
      * a new bottom slab on that lowered surface. It must not reinterpret the UP hit as a DOWN merge and
      * fill the lower half underneath the clicked slab.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void useOnSlabOnTopOfLoweredTopSlabPlacesAboveVisibleFace(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         helper.setBlock(new BlockPos(2, 2, 2), bottomSlab());
@@ -944,7 +944,7 @@ public final class Slabbed2612UseOnPlacementTest {
      * stays at its lowered dy (does NOT pop back to flush) — the actual live-reported "pop upon breaking
      * at the end". Mutation-proven RED against a revert of just the mixin-gate widening.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void useOnSlabOnLoweredDoubleSlabSupportPersistsAndDoesNotPopWhenSupportBroken(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         // Build a genuinely-lowered + PERSISTED DOUBLE support the way real gameplay does (mirrors
@@ -1005,7 +1005,7 @@ public final class Slabbed2612UseOnPlacementTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabOnAnchoredCantileverBlockFollowsToMinusHalf(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         // cantilever-lowered full block: slab+stone (-0.5), anchor it, then remove the carrier slab.

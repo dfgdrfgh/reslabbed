@@ -4,7 +4,7 @@ import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.SlabSupport;
 import com.slabbed.util.SlabEnsembleCoherence;
 import it.unimi.dsi.fastutil.longs.Long2DoubleOpenHashMap;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -68,13 +68,13 @@ public final class UndersideSeatClampTest {
     /** Test-only stored fact, mirroring the production write path (see LandingRuleLawTest#forceStore). */
     private static void forceStore(ServerLevel w, BlockPos pos, double dy) {
         LevelChunk chunk = w.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
-        Long2DoubleOpenHashMap existing = chunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE);
+        Long2DoubleOpenHashMap existing = com.slabbed.loader.Attachments.get(chunk, SlabAnchorAttachment.PLACEMENT_DY_TYPE);
         Long2DoubleOpenHashMap map = existing == null
                 ? new Long2DoubleOpenHashMap()
                 : new Long2DoubleOpenHashMap(existing);
         map.defaultReturnValue(Double.NaN);
         map.put(pos.asLong(), dy);
-        chunk.setAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE, map);
+        com.slabbed.loader.Attachments.set(chunk, SlabAnchorAttachment.PLACEMENT_DY_TYPE, map);
     }
 
     private interface Body {
@@ -109,7 +109,7 @@ public final class UndersideSeatClampTest {
     }
 
     /** The reported scene: a fence post clicked onto the underside of a flush TOP slab seats at grid height. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fenceUnderFlushTopSlabSeatsAtGridHeight(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos owner = h.absolutePos(OWNER);
@@ -123,7 +123,7 @@ public final class UndersideSeatClampTest {
     }
 
     /** Same family, same clamp: a wall post under a flush TOP slab. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void wallUnderFlushTopSlabSeatsAtGridHeight(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos owner = h.absolutePos(OWNER);
@@ -137,7 +137,7 @@ public final class UndersideSeatClampTest {
     }
 
     /** A lowered BOTTOM slab over a solid floor: the -0.5 underside landing would sink the post; it seats flush. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fenceUnderLoweredBottomSlabOverFloorSeatsAtGridHeight(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos owner = h.absolutePos(OWNER);
@@ -154,7 +154,7 @@ public final class UndersideSeatClampTest {
     }
 
     /** Open descent control: the same lowered owner over AIR keeps the aimed -0.5 verbatim. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fenceUnderLoweredBottomSlabOverAirKeepsAim(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos owner = h.absolutePos(OWNER);
@@ -174,7 +174,7 @@ public final class UndersideSeatClampTest {
      * owner). This row pins that the clamp leaves a fitting body alone; the +0.5 policy itself is the
      * design's, not this row's.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void lanternUnderFlushTopSlabIsNotClamped(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos owner = h.absolutePos(OWNER);
@@ -188,7 +188,7 @@ public final class UndersideSeatClampTest {
     }
 
     /** The visible post meets the lowered slab; its above-cell movement barrier cannot veto contact. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fenceConnectsStackToLoweredCantileverTopSlab(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos owner = h.absolutePos(OWNER);
@@ -231,7 +231,7 @@ public final class UndersideSeatClampTest {
         h.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void wallBarsAndChainKeepLegalUnderSlabContact(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos owner = h.absolutePos(OWNER);
@@ -253,7 +253,7 @@ public final class UndersideSeatClampTest {
         h.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fenceStillRefusesAVisiblyTooShortGap(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos owner = h.absolutePos(OWNER);
@@ -275,7 +275,7 @@ public final class UndersideSeatClampTest {
         h.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void visibleFloorAndCeilingOverlapRemainUnsafe(GameTestHelper h) {
         BlockPos lower = BlockPos.ZERO;
         BlockPos upper = lower.above();
@@ -290,7 +290,7 @@ public final class UndersideSeatClampTest {
         h.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void topFencePostReachesTheSlabAcrossAHalfCell(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos owner = h.absolutePos(OWNER);
@@ -322,7 +322,7 @@ public final class UndersideSeatClampTest {
         h.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fenceCeilingConnectionDoesNotSpanLargerOpenings(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos owner = h.absolutePos(OWNER);

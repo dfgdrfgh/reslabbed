@@ -3,7 +3,7 @@ package com.slabbed.test;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.SlabSupport;
 import com.slabbed.util.SlabbedOffsetRaycast;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -94,7 +94,7 @@ public final class OffsetRaycastDeepLaneTest {
      * gate.below(2)'s cell — must hit the gate. The ±1 window never tested the owner from there,
      * and the marked support's outline ([-1.0,-0.5] shifted) sits below this band: total miss.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void deepBandRayHitsTheFenceGate(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos gate = buildDeepSubject(helper, w, new ItemStack(Items.OAK_FENCE_GATE));
@@ -110,7 +110,7 @@ public final class OffsetRaycastDeepLaneTest {
     }
 
     /** Pin (green before AND after): the band inside gate.below() is covered by the ±1 window. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void upperBandRayAlreadyHitsTheFenceGate(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos gate = buildDeepSubject(helper, w, new ItemStack(Items.OAK_FENCE_GATE));
@@ -123,7 +123,7 @@ public final class OffsetRaycastDeepLaneTest {
     }
 
     /** No false positives: a deep-band ray outside the gate's z-footprint must not hit the gate. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void deepBandRayPastTheFootprintStillMisses(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos gate = buildDeepSubject(helper, w, new ItemStack(Items.OAK_FENCE_GATE));
@@ -142,7 +142,7 @@ public final class OffsetRaycastDeepLaneTest {
      * torch fine WITHOUT the slab overlay — the slab no longer steals the click. (Pre-C2 this asserted the
      * SUPPORT; the overlay that produced that proxy hit was pure harm under the shipping offset raycast.)
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void deepTorchRayResolvesToTheTorchDirectly(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos torch = buildDeepSubject(helper, w, new ItemStack(Items.TORCH));

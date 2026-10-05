@@ -1,7 +1,6 @@
 package com.slabbed.compat.terrainslabs;
 
 import com.slabbed.compat.CompatSlabSurfaceKind;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
@@ -35,8 +34,8 @@ public final class TerrainSlabsCompat {
 
     public static final String MOD_ID = "terrain_slabs";
     public static final String LEGACY_MOD_ID = "terrainslabs";
-    private static final boolean LOADED = FabricLoader.getInstance().isModLoaded(MOD_ID)
-            || FabricLoader.getInstance().isModLoaded(LEGACY_MOD_ID);
+    private static final boolean LOADED = com.slabbed.loader.Loader.isModLoaded(MOD_ID)
+            || com.slabbed.loader.Loader.isModLoaded(LEGACY_MOD_ID);
 
     public static boolean isLoaded() {
         return LOADED;

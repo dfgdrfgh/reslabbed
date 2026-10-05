@@ -5,7 +5,7 @@ import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.config.SlabbedConfig;
 import com.slabbed.util.SlabSupport;
 import it.unimi.dsi.fastutil.longs.Long2DoubleOpenHashMap;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -100,13 +100,13 @@ public final class PotSeatOptionTest {
      */
     private static void forceStore(ServerLevel w, BlockPos pos, double dy) {
         LevelChunk chunk = w.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
-        Long2DoubleOpenHashMap existing = chunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE);
+        Long2DoubleOpenHashMap existing = com.slabbed.loader.Attachments.get(chunk, SlabAnchorAttachment.PLACEMENT_DY_TYPE);
         Long2DoubleOpenHashMap map = existing == null
                 ? new Long2DoubleOpenHashMap()
                 : new Long2DoubleOpenHashMap(existing);
         map.defaultReturnValue(Double.NaN);
         map.put(pos.asLong(), dy);
-        chunk.setAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE, map);
+        com.slabbed.loader.Attachments.set(chunk, SlabAnchorAttachment.PLACEMENT_DY_TYPE, map);
     }
 
     /** Ground plus an ordinary UNLOWERED bottom slab at {@code column}; returns the slab cell. */
@@ -169,7 +169,7 @@ public final class PotSeatOptionTest {
      * always add the gap. Only a flush row can see that: the side row is guarded by the seat check
      * and the full-block row's gap is zero.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void potOnBottomSlabSeatsFlushUnderFlush(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         withPotSeat(SlabbedConfig.PotSeat.FLUSH, () -> withFrozen(() -> {
@@ -192,7 +192,7 @@ public final class PotSeatOptionTest {
      * never mints 0.0"). The depth row expects -0.5, the potted-transition row expects -0.5 and the
      * full-block row expects -1.0, so only this row sees it.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void floatPotOnUnloweredBottomSlabSitsAtGrid(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         withPotSeat(SlabbedConfig.PotSeat.VANILLA_FLOAT, () -> withFrozen(() -> {
@@ -220,7 +220,7 @@ public final class PotSeatOptionTest {
      * depth 0, so its comparison is unchanged and it stays green; this row's comparison then fails,
      * no adjustment is applied, and it reddens alone.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void floatPotOnLoweredBottomSlabKeepsOneVanillaGap(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         withFrozen(() -> {
@@ -248,7 +248,7 @@ public final class PotSeatOptionTest {
      * <p>MUTATION that must redden this row alone: replace the computed gap with the constant 0.5.
      * Every other row's support is a bottom slab, where the constant equals the formula.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void floatPotOnFullBlockOwnerMatchesFlush(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         withFrozen(() -> {
@@ -277,7 +277,7 @@ public final class PotSeatOptionTest {
      * example applying it to the value the public height read returns from the store. That is the
      * single failure mode this row exists to catch, and no other row would notice it.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void existingPotKeepsItsExactFactWhenTheOptionFlips(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         withFrozen(() -> {
@@ -316,7 +316,7 @@ public final class PotSeatOptionTest {
      * <p>MUTATION that must redden this row alone: remove the seat adjustment from the marker writer.
      * It is the only row that reads the marker.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void floatPotMarkerAgreesWithTheFact(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         withFrozen(() -> {
@@ -360,7 +360,7 @@ public final class PotSeatOptionTest {
      * support below is not air). Every other row genuinely seats on the support below, so their
      * values are unchanged.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void sidePlacedPotIgnoresThePotSeatOption(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         double[] side = new double[2];
@@ -415,7 +415,7 @@ public final class PotSeatOptionTest {
      * vacuous — it reaches a preserved gap-seated fact no other row can — but it has no private
      * mutation.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void floatPotKeepsItsFactThroughThePottedTransition(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         withPotSeat(SlabbedConfig.PotSeat.VANILLA_FLOAT, () -> withFrozen(() -> {

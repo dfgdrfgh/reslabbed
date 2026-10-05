@@ -44,7 +44,7 @@ its nest members and its source file at once:
 
 - `com/slabbed/x/Foo.class`, `com/slabbed/x/Foo$Bar.class`, `com/slabbed/x/Foo.java`
   → all normalise to `com/slabbed/x/Foo`
-- any other file keeps its literal path (`fabric.mod.json`, `assets/slabbed/lang/en_us.json`, …)
+- any other file keeps its literal path (`META-INF/neoforge.mods.toml`, `assets/slabbed/lang/en_us.json`, …)
 
 ### Granularity policy
 
@@ -70,7 +70,7 @@ anything. The split above puts the fine granularity only where a leak has actual
 | --- | --- |
 | `META-INF/MANIFEST.MF` | Jar manifest; carries the `Slabbed-Git-Sha` / `Slabbed-Build-Time` identity stamp a jar must be traceable by. |
 | `LICENSE_slabbed` | The mod's licence, copied in by the `jar` block. |
-| `fabric.mod.json` | Mod descriptor. Required by the loader. |
+| `META-INF/neoforge.mods.toml` | Mod descriptor. Required by the loader. |
 | `slabbed.mixins.json` | Main mixin config. Required by the loader. |
 | `slabbed.client.mixins.json` | Client mixin config. Required by the loader. |
 | `assets/slabbed/**` | The mod's own lang file and chain-ceiling-support block models. |
@@ -86,7 +86,6 @@ anything. The split above puts the fine granularity only where a leak has actual
 | `com/slabbed/client/model/*` | Offset block-state model, Y-offset emitter, chain-ceiling geometry — the lowering render path. |
 | `com/slabbed/client/runtime/*` | Lowered side-slab retargeter — client targeting. |
 | `com/slabbed/compat/*` | Compat hooks and the slab-surface-kind enum consumed by third-party slab mods, plus the running-version seams one jar needs to serve 26.2 and 26.3 (`MinecraftVersions`, `UseItemOnPacketAccess`, `PlayerSwing`). |
-| `com/slabbed/compat/mc262/*` | The Minecraft 26.2 shim classes, compiled against 26.2 in `shim/mc-26.2` and merged here; loaded only when 26.2 is running (today: the Y-offset emitter for Fabric renderer API 14). |
 | `com/slabbed/compat/terrainslabs/*` | Terrain Slabs compat (dual mod-id gate). |
 | `com/slabbed/mixin/client/*` | The 14 client render/interaction mixins declared in `slabbed.client.mixins.json`; every member handles render offset, emitted-effect alignment, remesh, entity light or offset raycast behavior. |
 | `com/slabbed/mixin/torch/*` | `TorchBlockMixin` — torch attachment geometry. |
@@ -142,7 +141,7 @@ anything. The split above puts the fine granularity only where a leak has actual
 
 | Entry | Reason |
 | --- | --- |
-| `com/slabbed/client/SlabbedClient` | Client entrypoint (fabric.mod.json `client`). The dangling ScreenshotCaptureService/GapFillerOverlay reflective hooks were removed by the allowlist ruling; the remaining dev-only hook (DyFingerprintDump) is gated on `isDevelopmentEnvironment()` and resolves by reflection, so the release class holds no hard link to excluded classes. |
+| `com/slabbed/client/SlabbedClient` | Client entrypoint (reached from the mod constructor on the client dist). The dangling ScreenshotCaptureService/GapFillerOverlay reflective hooks were removed by the allowlist ruling; the remaining dev-only hook (DyFingerprintDump) is gated on `isDevelopmentEnvironment()` and resolves by reflection, so the release class holds no hard link to excluded classes. |
 | `com/slabbed/client/PlacementDyPredictionJournal` | The C3 client prediction journal — the shipped prediction/correction apply path. Carries the `debugCell()`/`CellDebug` observation seam on purpose: PlacementDyPredictionClientGameTest asserts journal cell state through it against the REAL shipped path, and there is no equivalent observation point outside the class. Inert unless called; nothing shipped calls it. |
 | `com/slabbed/client/BetaNoticeClient` | Shipped one-time beta notice on world join. |
 | `com/slabbed/client/BetaNoticeSessionGate` | Per-session gate for the beta notice. |
@@ -164,6 +163,12 @@ anything. The split above puts the fine granularity only where a leak has actual
 | --- | --- |
 | `com/slabbed/network/PlacementDyPredictionBridge` | Common/server-safe boundary between vanilla prediction and the C3 client journal — the shipped `openSequence`/`publishClientBatch` wire. Carries the test-trace seam (`traceCorrectionWire`, `markTestPhase`, the snapshot readers) on purpose: the trace hooks are CALLED FROM the shipped SEND/RECEIVE/APPLY path (PlacementDyCorrectionServer, SlabbedClient, the journal), are no-ops until a gametest arms them, and stripping them would remove the only way PlacementDyPredictionClientGameTest and PlacementCaptureBoundaryGameTest observe the real wire. Coverage was ruled worth more than list tidiness. |
 | `com/slabbed/network/PlacementDyCorrectionPayload` | Server→client dy correction payload. |
+| `com/slabbed/network/SlabbedNetwork` | NeoForge payload registration (all optional) and the server-side send/can-send helpers. |
+| `com/slabbed/loader/*` | The loader facade (`Loader`) and the attachment read helper with an explicit absent value (`Attachments`); the only code that names the loader. |
+| `com/slabbed/anchor/EntitySeatAttachments` | The hung-decoration and minecart seat values as NeoForge entity attachments (NeoForge refuses mixin-defined synced entity data). |
+| `com/slabbed/client/SlabbedClientReceivers` | Client-side payload receivers. |
+| `com/slabbed/client/SlabbedClientNetwork` | Client-side send/can-send helpers. |
+| `com/slabbed/client/model/QuadPart` | A block model part built from edited copies of another part's quads (the translated and seam-unculled geometry). |
 | `com/slabbed/network/PlacementDyCorrectionServer` | Server side of the dy correction wire. |
 | `com/slabbed/network/PlacementDyPredictionEnvelopePayload` | Client→server prediction envelope. |
 | `com/slabbed/network/FrozenDyModePayload` | Server→client join notice of which way this side's stored-height compatibility flag is set (maintainer ruling, 2026-09-06). |
@@ -223,7 +228,7 @@ from the compile-excluded `com/slabbed/dev/**` and from the development-only dia
 means an operator can actually INVOKE the command on a release build, default off.
 
 - Both commands register from `com/slabbed/client/SlabbedDebugCommands`, called unconditionally by
-  `SlabbedClient` — the `client` entrypoint the shipped `fabric.mod.json` declares. No
+  `SlabbedClient` — the client entrypoint the mod constructor reaches on the client dist. No
   `isDevelopmentEnvironment()` guard and no reflective hook, because either one is exactly how the
   commands became unreachable in the first place.
 - They are CLIENT commands. Every debug surface on this line is client state (a local HUD overlay,

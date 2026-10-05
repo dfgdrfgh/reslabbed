@@ -4,7 +4,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.slabbed.client.PlacementDyPredictionJournal;
-import com.slabbed.client.PlacementDyPredictionJournalGameTestAccess;
+import com.slabbed.test.client.PlacementDyPredictionJournalGameTestAccess;
 import com.slabbed.network.PlacementDyPredictionBridge;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -23,7 +23,7 @@ public abstract class PlacementDyPredictionJournalGameTestMixin {
     @WrapOperation(
             method = "commitAfterPrediction",
             at = @At(value = "INVOKE",
-                    target = "Lnet/fabricmc/fabric/api/client/networking/v1/ClientPlayNetworking;canSend(Lnet/minecraft/network/protocol/common/custom/CustomPacketPayload$Type;)Z"))
+                    target = "Lcom/slabbed/client/SlabbedClientNetwork;canSend(Lnet/minecraft/network/protocol/common/custom/CustomPacketPayload$Type;)Z"))
     private static boolean slabbed$failDeclarationForGameTest(
             CustomPacketPayload.Type<?> type,
             Operation<Boolean> original) {

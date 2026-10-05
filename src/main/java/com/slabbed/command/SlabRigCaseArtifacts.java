@@ -5,7 +5,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.slabbed.util.BuildStamp;
-import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -43,7 +42,7 @@ public final class SlabRigCaseArtifacts {
     }
 
     public static Path defaultRoot() {
-        return FabricLoader.getInstance().getGameDir().resolve("slabbed-rig");
+        return com.slabbed.loader.Loader.getGameDir().resolve("slabbed-rig");
     }
 
     /** Tool-owned persistent save identity; a deleted/recreated same-folder world gets a new UUID. */

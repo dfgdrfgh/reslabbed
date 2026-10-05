@@ -2,7 +2,7 @@ package com.slabbed.test;
 
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -226,25 +226,25 @@ public final class CeilingHungDecorationFreezeAnchorTest {
     }
 
     // --- Family member 1: isAlwaysCeilingHungDecoration -> SporeBlossomBlock ---
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void sporeBlossomUnderLoweredSupportAnchorsButHarmless(GameTestHelper helper) {
         assertAnchorsButIsHarmless(helper, "spore_blossom", Blocks.SPORE_BLOSSOM.defaultBlockState());
     }
 
     // --- Family member 2: isAlwaysCeilingHungDecoration -> HangingRootsBlock ---
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void hangingRootsUnderLoweredSupportAnchorsButHarmless(GameTestHelper helper) {
         assertAnchorsButIsHarmless(helper, "hanging_roots", Blocks.HANGING_ROOTS.defaultBlockState());
     }
 
     // --- Family member 3: isAlwaysCeilingHungDecoration -> HangingSignBlock ---
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void hangingSignUnderLoweredSupportAnchorsButHarmless(GameTestHelper helper) {
         assertAnchorsButIsHarmless(helper, "hanging_sign", Blocks.OAK_HANGING_SIGN.defaultBlockState());
     }
 
     // --- Family member 4: isDownwardSpeleothem -> a downward-pointed dripstone (broadened scope) ---
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void downwardDripstoneUnderLoweredSupportAnchorsButHarmless(GameTestHelper helper) {
         assertAnchorsButIsHarmless(helper, "downward_dripstone",
                 Blocks.POINTED_DRIPSTONE.defaultBlockState()
@@ -252,7 +252,7 @@ public final class CeilingHungDecorationFreezeAnchorTest {
     }
 
     // --- Family member 5: HANGING property true -> a hanging lantern (broadened scope) ---
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void hangingLanternUnderLoweredSupportAnchorsButHarmless(GameTestHelper helper) {
         assertAnchorsButIsHarmless(helper, "hanging_lantern",
                 Blocks.LANTERN.defaultBlockState()

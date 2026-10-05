@@ -1,7 +1,7 @@
 package com.slabbed.test;
 
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -35,7 +35,7 @@ public final class CushionOnLoweredBlockTest {
 
     private static final double EPS = 1.0e-6;
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void cushionSitsOnTheDrawnTopOfALoweredBlockAndSurvives(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos slabRel = new BlockPos(2, 2, 2);
@@ -73,7 +73,7 @@ public final class CushionOnLoweredBlockTest {
      * top exactly at its cell's bottom boundary — the other probe geometry (the -0.5 row's drawn top is
      * mid-cell). Both must hold; vanilla's outline-based anchor scan reaches the block in both cases.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void cushionSitsOnTheDrawnTopOfABlockLoweredAWholeCell(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos baseRel = new BlockPos(2, 2, 2);
@@ -101,7 +101,7 @@ public final class CushionOnLoweredBlockTest {
     }
 
     /** Control: the same click on a flush block places at the grid top — the input path itself works. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void cushionOnAFlushBlockStillSitsOnItsTop(GameTestHelper helper) {
         BlockPos blockRel = new BlockPos(2, 2, 2);
         BlockPos block = helper.absolutePos(blockRel);

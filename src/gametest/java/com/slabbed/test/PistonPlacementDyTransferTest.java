@@ -2,7 +2,7 @@ package com.slabbed.test;
 
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -222,7 +222,7 @@ public final class PistonPlacementDyTransferTest {
      * {@code SlabAnchorAttachment.clearFactForDepartedOccupant} to the moved-by-piston branch only. The
      * ticked-landing row stays green.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void pushedLoweredSlabKeepsItsFactThroughTheInterruptLanding(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         PushRig rig = buildPushRig(h, w, Blocks.PISTON, bottomSlab(), LOWERED);
@@ -250,7 +250,7 @@ public final class PistonPlacementDyTransferTest {
      * <p>MUTATION that must redden this row alone: narrow the moving-piston guard to the ordinary-
      * update branch only. The interrupt-landing row stays green.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty", maxTicks = 200)
+    @GameTest(structure = "slabbed_gametest:empty", maxTicks = 200)
     public void pushedLoweredStoneKeepsItsFactThroughTheTickedLanding(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         PushRig rig = buildPushRig(h, w, Blocks.PISTON, Blocks.STONE.defaultBlockState(), LOWERED);
@@ -280,7 +280,7 @@ public final class PistonPlacementDyTransferTest {
      * <p>MUTATION that must redden this row alone: delete the push loop in the capture, so no
      * destination fact is written. Rows that move no block stay green.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void pushedLoweredStoneArrivesBitEqualAndTheSourceClears(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         PushRig rig = buildPushRig(h, w, Blocks.PISTON, Blocks.STONE.defaultBlockState(), LOWERED);
@@ -308,7 +308,7 @@ public final class PistonPlacementDyTransferTest {
      * publish handler. By then vanilla has written the stand-in over both source cells, so a late
      * capture reads nothing and writes nothing. This is the only row that pins read-before-any-write.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void twoBlockPushAndSlimeBranchCarryEveryFactInOrder(GameTestHelper h) {
         ServerLevel w = h.getLevel();
 
@@ -351,7 +351,7 @@ public final class PistonPlacementDyTransferTest {
      * MUTATION that must redden this row alone: gate the capture on the extending case, skipping
      * retraction. Every extend row stays green.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty", maxTicks = 200)
+    @GameTest(structure = "slabbed_gametest:empty", maxTicks = 200)
     public void stickyPullCarriesTheFactBack(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos pistonPos = h.absolutePos(new BlockPos(1, 2, 3));
@@ -390,7 +390,7 @@ public final class PistonPlacementDyTransferTest {
      * under the guard-narrowing mutation named for the ticked-landing row, so the "alone" claim rests
      * on the re-added-clear mutation.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty", maxTicks = 200)
+    @GameTest(structure = "slabbed_gametest:empty", maxTicks = 200)
     public void loweredPistonBaseKeepsItsOwnFactAcrossExtendAndRetract(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos pistonPos = h.absolutePos(new BlockPos(1, 2, 3));
@@ -427,7 +427,7 @@ public final class PistonPlacementDyTransferTest {
      * block overrides the per-block removal hook without the base call, so only a clear at the chunk
      * write keeps the carried height from outliving the head.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty", maxTicks = 200)
+    @GameTest(structure = "slabbed_gametest:empty", maxTicks = 200)
     public void extendedHeadInheritsTheBaseFactAndItsShapes(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos pistonPos = h.absolutePos(new BlockPos(1, 2, 3));
@@ -510,7 +510,7 @@ public final class PistonPlacementDyTransferTest {
      * destination-carries-nothing half is trivially satisfied and only the mutation makes it
      * informative.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void destroyedBlockCarriesNothing(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockState destructible = null;
@@ -555,7 +555,7 @@ public final class PistonPlacementDyTransferTest {
      * Beyond that shared mutation this row is coverage, not mutation-discrimination, and is stated as
      * such.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void pushedBlockIsNeighbourInvariantAtItsNewCell(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         List<String> violations = new ArrayList<>();
@@ -634,7 +634,7 @@ public final class PistonPlacementDyTransferTest {
      * batch authoritative (write an explicit absent height for every destination whose source has
      * none).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty", maxTicks = 200)
+    @GameTest(structure = "slabbed_gametest:empty", maxTicks = 200)
     public void pulledFlatBlockDoesNotInheritTheVacatedHeadFact(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos pistonPos = h.absolutePos(new BlockPos(1, 2, 3));
@@ -675,7 +675,7 @@ public final class PistonPlacementDyTransferTest {
      * <p>MUTATION that must redden this row alone: drop the not-air clause from the moving-piston
      * guard. No other row lands air in a moving-piston cell.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void interruptedSourcePistonLeavesNoFactInTheAirCell(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos pistonPos = h.absolutePos(new BlockPos(1, 2, 3));

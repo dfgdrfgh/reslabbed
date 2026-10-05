@@ -4,7 +4,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.slabbed.Slabbed;
-import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -76,8 +75,8 @@ public final class SlabbedConfig {
      * {@code config/slabbed.json}. Package-visible so the file rows can assert its absence without
      * duplicating the path.
      */
-    static Path configFile() {
-        return FabricLoader.getInstance().getConfigDir().resolve("slabbed.json");
+    public static Path configFile() {
+        return com.slabbed.loader.Loader.getConfigDir().resolve("slabbed.json");
     }
 
     /**
@@ -95,7 +94,7 @@ public final class SlabbedConfig {
      * {@code IllegalArgumentException}, and a corrupt file reaches the parser, which throws
      * {@code JsonSyntaxException} — neither is an {@code IOException}.
      */
-    static SlabbedConfig readFrom(Path file) {
+ public static SlabbedConfig readFrom(Path file) {
         if (file == null || !Files.exists(file)) {
             return defaults();
         }
@@ -120,10 +119,10 @@ public final class SlabbedConfig {
             return;
         }
         active = next;
-        writeTo(configFile(), next);
+      writeTo(configFile(), next);
     }
 
-    static void writeTo(Path file, SlabbedConfig config) {
+    public static void writeTo(Path file, SlabbedConfig config) {
         if (file == null || config == null) {
             return;
         }

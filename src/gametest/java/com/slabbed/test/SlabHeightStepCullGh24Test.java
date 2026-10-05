@@ -2,7 +2,7 @@ package com.slabbed.test;
 
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
@@ -71,7 +71,7 @@ public final class SlabHeightStepCullGh24Test {
      * {@code slabbed$anyMismatchedNeighborDy} (and therefore the cull-clearing {@code stepSeam} path)
      * fires for the slab's own face.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void groundedTopSlabBesideLoweredFullBlockIsStepFace(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos ground = helper.absolutePos(new BlockPos(3, 3, 3));
@@ -106,7 +106,7 @@ public final class SlabHeightStepCullGh24Test {
     }
 
     /** Same GH#24 proof with a BOTTOM slab subject — the coverage is symmetric, not TOP-specific. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void groundedBottomSlabBesideLoweredFullBlockIsStepFace(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos ground = helper.absolutePos(new BlockPos(3, 3, 3));
@@ -143,7 +143,7 @@ public final class SlabHeightStepCullGh24Test {
      * treats this as "no mismatch" (no forced step-seam redraw needed; the pair is already visually
      * flush with each other, so there's no seam to expose).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void ungroundedSlabHomogenizesWithLoweredFullBlockNoStep(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos supportSlab = helper.absolutePos(new BlockPos(3, 3, 3));
@@ -179,7 +179,7 @@ public final class SlabHeightStepCullGh24Test {
      * report a dy mismatch — the underlying invariant must not force redraws onto ordinary,
      * unlowered slab terrain.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void twoFlushGroundedTopSlabsNeverStep(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos groundA = helper.absolutePos(new BlockPos(3, 3, 3));
@@ -217,7 +217,7 @@ public final class SlabHeightStepCullGh24Test {
      * geometric distance from the anchored full block, which IS proven to homogenize via plain
      * {@code setBlock} (matching {@link #ungroundedSlabHomogenizesWithLoweredFullBlockNoStep}).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void twoEquallyLoweredSlabsNeverStep(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos supportSlab = helper.absolutePos(new BlockPos(3, 3, 3));

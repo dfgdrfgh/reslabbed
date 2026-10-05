@@ -3,7 +3,7 @@ package com.slabbed.test;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.HangingSeatDyHolder;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
@@ -37,16 +37,16 @@ import net.minecraft.world.phys.AABB;
 public final class HangingLoadDeferralTest {
     private static final double EPS = 1.0e-6d;
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void savedFrameKeepsSeatWithoutLoadingChunks(GameTestHelper helper) { check(helper, false, true); }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void legacyFrameDefersAndMintsOnce(GameTestHelper helper) { check(helper, false, false); }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void savedWidePaintingKeepsSeatWithoutLoadingChunks(GameTestHelper helper) { check(helper, true, true); }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void legacyWidePaintingDefersAndMintsOnce(GameTestHelper helper) { check(helper, true, false); }
 
     private static double seatOf(Object entity) {

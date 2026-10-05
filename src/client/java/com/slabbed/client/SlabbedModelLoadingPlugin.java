@@ -2,29 +2,35 @@ package com.slabbed.client;
 
 import com.slabbed.client.model.ChainCeilingGeometry;
 import com.slabbed.client.model.OffsetBlockStateModel;
-import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
-import net.fabricmc.fabric.api.client.model.loading.v1.ModelModifier;
-import net.fabricmc.fabric.api.client.model.loading.v1.SimpleUnbakedExtraModel;
-import net.fabricmc.fabric.api.client.renderer.v1.model.FabricBlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.client.event.ModelEvent;
+import java.util.Map;
 
+/**
+ * Wraps every baked block-state model so lowered blocks are drawn at their stored height, and
+ * registers the standalone chain-bridge models. NeoForge's model events replace the Fabric
+ * model-loading plugin of the Fabric lines; the wrapper is the same design.
+ */
 public final class SlabbedModelLoadingPlugin {
     private SlabbedModelLoadingPlugin() {
     }
 
-    public static void init() {
-        // Standalone extra models for the chain-ceiling-support extended geometry (ChainCeilingGeometry) —
-        // one per chain texture (iron + the four copper weather states) so a bridged copper chain keeps
-        // its own texture instead of rendering as plain iron.
-        for (var variant : ChainCeilingGeometry.variants()) {
-            ModelLoadingPlugin.register(plugin -> plugin.addModel(ChainCeilingGeometry.keyFor(variant),
-                    SimpleUnbakedExtraModel.blockStateModel(ChainCeilingGeometry.modelIdFor(variant))));
-        }
-        ModelLoadingPlugin.register(plugin -> plugin.modifyBlockModelAfterBake().register(ModelModifier.WRAP_PHASE, (model, context) -> {
-            if (model instanceof FabricBlockStateModel) {
-                return new OffsetBlockStateModel((BlockStateModel) model);
-            }
+    public static void init(IEventBus modEventBus) {
+        modEventBus.addListener(ChainCeilingGeometry::registerStandalone);
+        modEventBus.addListener(SlabbedModelLoadingPlugin::modifyBakingResult);
+    }
+
+    private static void modifyBakingResult(ModelEvent.ModifyBakingResult event) {
+        Map<BlockState, BlockStateModel> models = event.getBakingResult().blockStateModels();
+        models.replaceAll((state, model) -> wrap(model));
+    }
+
+    static BlockStateModel wrap(BlockStateModel model) {
+        if (model == null || model instanceof OffsetBlockStateModel) {
             return model;
-        }));
+        }
+        return new OffsetBlockStateModel(model);
     }
 }

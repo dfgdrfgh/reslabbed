@@ -10,8 +10,7 @@ import com.slabbed.command.SlabRigHangingDirectEntityGate.CaptureScope;
 import com.slabbed.command.SlabRigHangingDirectEntityGate.EntityOutcome;
 import com.slabbed.command.SlabRigHangingDirectEntityGate.PreclaimStatus;
 import com.slabbed.command.SlabRigHangingDirectEntityGate.PreclaimDecision;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
@@ -45,7 +44,7 @@ public final class SlabRigHangingDirectEntityGateTest {
     private static final Set<UUID> LATER_VETO_UUIDS = ConcurrentHashMap.newKeySet();
     private static boolean laterVetoRegistered;
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void placementScopePreclaimsConfirmsNestsAndFinallyClears(GameTestHelper helper) {
         ServerLevel world = helper.getLevel();
         TestHandler handler = new TestHandler();
@@ -107,8 +106,7 @@ public final class SlabRigHangingDirectEntityGateTest {
             }
             int preclaimsBefore = handler.preclaims.size();
             Painting afterFinally = painting(world, helper.absolutePos(new BlockPos(4, 3, 1)));
-            if (!ServerEntityEvents.ALLOW_LOAD.invoker().onAllowLoad(
-                    afterFinally, world, null, false)) {
+            if (!com.slabbed.gametest.RigEvents.allowLoad(afterFinally, world, false)) {
                 throw helper.assertionException("closed context leaked a veto outside its scope");
             }
             if (handler.preclaims.size() != preclaimsBefore) {
@@ -122,14 +120,13 @@ public final class SlabRigHangingDirectEntityGateTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void defaultDiskMismatchAndVetoBoundariesStayExact(GameTestHelper helper) {
         ServerLevel world = helper.getLevel();
         TestHandler handler = new TestHandler();
         try (var ignored = SlabRigHangingDirectEntityGate.openTestHandlerOverride(world, handler)) {
             ItemEntity noContext = item(world, helper.absolutePos(new BlockPos(1, 3, 3)));
-            if (!ServerEntityEvents.ALLOW_LOAD.invoker().onAllowLoad(
-                    noContext, world, null, false) || !handler.preclaims.isEmpty()) {
+            if (!com.slabbed.gametest.RigEvents.allowLoad(noContext, world, false) || !handler.preclaims.isEmpty()) {
                 throw helper.assertionException("no-context entity load was not default-allow/no-op");
             }
 
@@ -138,8 +135,7 @@ public final class SlabRigHangingDirectEntityGateTest {
             CaptureScope mismatch = SlabRigHangingDirectEntityGate.openPlacement(world, mismatchKey);
             try (mismatch) {
                 ItemEntity foreignType = item(world, helper.absolutePos(new BlockPos(2, 3, 3)));
-                if (!ServerEntityEvents.ALLOW_LOAD.invoker().onAllowLoad(
-                        foreignType, world, null, false)) {
+                if (!com.slabbed.gametest.RigEvents.allowLoad(foreignType, world, false)) {
                     throw helper.assertionException("mismatched ItemEntity was vetoed by placement context");
                 }
             }
@@ -153,8 +149,7 @@ public final class SlabRigHangingDirectEntityGateTest {
             Painting diskPainting = painting(world, helper.absolutePos(new BlockPos(3, 3, 3)));
             CaptureScope disk = SlabRigHangingDirectEntityGate.openPlacement(world, diskKey);
             try (disk) {
-                if (!ServerEntityEvents.ALLOW_LOAD.invoker().onAllowLoad(
-                        diskPainting, world, EntitySpawnReason.LOAD, true)) {
+                if (!com.slabbed.gametest.RigEvents.allowLoad(diskPainting, world, true)) {
                     throw helper.assertionException("loaded-from-disk painting was vetoed");
                 }
             }
@@ -250,7 +245,7 @@ public final class SlabRigHangingDirectEntityGateTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void paintingDropMixinHandsOffExactSourceAndLeavesForeignOperationNeutral(
             GameTestHelper helper) {
         ServerLevel world = helper.getLevel();
@@ -434,7 +429,7 @@ public final class SlabRigHangingDirectEntityGateTest {
             }
 
             ItemEntity afterDrop = item(world, helper.absolutePos(new BlockPos(5, 4, 6)));
-            if (!ServerEntityEvents.ALLOW_LOAD.invoker().onAllowLoad(afterDrop, world, null, false)
+            if (!com.slabbed.gametest.RigEvents.allowLoad(afterDrop, world, false)
                     || handler.preclaims.size() != callbacksBeforeForeign) {
                 throw helper.assertionException("drop context leaked beyond exact spawnAtLocation call");
             }
@@ -446,8 +441,12 @@ public final class SlabRigHangingDirectEntityGateTest {
         if (laterVetoRegistered) {
             return;
         }
-        ServerEntityEvents.ALLOW_LOAD.register((entity, level, reason, loadedFromDisk) ->
-                loadedFromDisk || !LATER_VETO_UUIDS.remove(entity.getUUID()));
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener(
+                (net.neoforged.neoforge.event.entity.EntityJoinLevelEvent event) -> {
+                    if (!event.loadedFromDisk() && LATER_VETO_UUIDS.remove(event.getEntity().getUUID())) {
+                        event.setCanceled(true);
+                    }
+                });
         laterVetoRegistered = true;
     }
 

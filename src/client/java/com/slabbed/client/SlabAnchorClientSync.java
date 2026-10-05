@@ -1,13 +1,12 @@
 package com.slabbed.client;
 
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.level.ChunkEvent;
 import com.slabbed.Slabbed;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.SlabSupport;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
+import net.neoforged.neoforge.attachment.AttachmentType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
@@ -30,7 +29,6 @@ import java.util.Map;
  * client chunk and refresh each position in the union of the old and new
  * anchor sets.
  */
-@Environment(EnvType.CLIENT)
 public final class SlabAnchorClientSync {
 
     private static final ThreadLocal<Integer> JOURNAL_AUTHORITATIVE_APPLY_DEPTH =
@@ -54,7 +52,7 @@ public final class SlabAnchorClientSync {
             if (chunk == null) {
                 return false;
             }
-            LongOpenHashSet set = chunk.getAttached(SlabAnchorAttachment.ANCHOR_TYPE);
+            LongOpenHashSet set = com.slabbed.loader.Attachments.get(chunk, SlabAnchorAttachment.ANCHOR_TYPE);
             return set != null && set.contains(pos.asLong());
         };
         SlabAnchorAttachment.clientLoweredSlabCarrierLookup = pos -> {
@@ -66,7 +64,7 @@ public final class SlabAnchorClientSync {
             if (chunk == null) {
                 return false;
             }
-            LongOpenHashSet set = chunk.getAttached(SlabAnchorAttachment.LOWERED_SLAB_CARRIER_TYPE);
+            LongOpenHashSet set = com.slabbed.loader.Attachments.get(chunk, SlabAnchorAttachment.LOWERED_SLAB_CARRIER_TYPE);
             return set != null && set.contains(pos.asLong());
         };
         SlabAnchorAttachment.clientCompoundFullBlockAnchorLookup = pos -> {
@@ -98,24 +96,29 @@ public final class SlabAnchorClientSync {
         SlabAnchorAttachment.clientBackingPlacementDyLookup = PlacementDyPredictionJournal::backingFact;
         SlabAnchorAttachment.clientEffectivePlacementDyLookup = PlacementDyPredictionJournal::effectiveFact;
 
-        ClientChunkEvents.CHUNK_LOAD.register(SlabAnchorClientSync::onChunkLoad);
+        NeoForge.EVENT_BUS.addListener((ChunkEvent.Load event) -> {
+            if (event.getLevel() instanceof net.minecraft.client.multiplayer.ClientLevel level
+                    && event.getChunk() instanceof LevelChunk chunk) {
+                onChunkLoad(level, chunk);
+            }
+        });
     }
 
     private static void onChunkLoad(net.minecraft.client.multiplayer.ClientLevel world, LevelChunk chunk) {
         logReloadJumpSync("chunkLoad", chunk, SlabAnchorAttachment.ANCHOR_TYPE, null,
-                chunk.getAttached(SlabAnchorAttachment.ANCHOR_TYPE));
+                com.slabbed.loader.Attachments.get(chunk, SlabAnchorAttachment.ANCHOR_TYPE));
         logReloadJumpSync("chunkLoad", chunk, SlabAnchorAttachment.LOWERED_SLAB_CARRIER_TYPE, null,
-                chunk.getAttached(SlabAnchorAttachment.LOWERED_SLAB_CARRIER_TYPE));
+                com.slabbed.loader.Attachments.get(chunk, SlabAnchorAttachment.LOWERED_SLAB_CARRIER_TYPE));
         logReloadJumpSync("chunkLoad", chunk, SlabAnchorAttachment.COMPOUND_FULL_BLOCK_ANCHOR_TYPE, null,
-                chunk.getAttached(SlabAnchorAttachment.COMPOUND_FULL_BLOCK_ANCHOR_TYPE));
+                com.slabbed.loader.Attachments.get(chunk, SlabAnchorAttachment.COMPOUND_FULL_BLOCK_ANCHOR_TYPE));
         logReloadJumpSync("chunkLoad", chunk, SlabAnchorAttachment.COMPOUND_VISIBLE_SIDE_LOWER_SLAB_TYPE, null,
-                chunk.getAttached(SlabAnchorAttachment.COMPOUND_VISIBLE_SIDE_LOWER_SLAB_TYPE));
+                com.slabbed.loader.Attachments.get(chunk, SlabAnchorAttachment.COMPOUND_VISIBLE_SIDE_LOWER_SLAB_TYPE));
         logReloadJumpSync("chunkLoad", chunk, SlabAnchorAttachment.COMPOUND_VISIBLE_SIDE_UPPER_SLAB_TYPE, null,
-                chunk.getAttached(SlabAnchorAttachment.COMPOUND_VISIBLE_SIDE_UPPER_SLAB_TYPE));
+                com.slabbed.loader.Attachments.get(chunk, SlabAnchorAttachment.COMPOUND_VISIBLE_SIDE_UPPER_SLAB_TYPE));
         logReloadJumpSync("chunkLoad", chunk, SlabAnchorAttachment.COMPOUND_VISIBLE_SIDE_DOUBLE_SLAB_TYPE, null,
-                chunk.getAttached(SlabAnchorAttachment.COMPOUND_VISIBLE_SIDE_DOUBLE_SLAB_TYPE));
+                com.slabbed.loader.Attachments.get(chunk, SlabAnchorAttachment.COMPOUND_VISIBLE_SIDE_DOUBLE_SLAB_TYPE));
         logReloadJumpSync("chunkLoad", chunk, SlabAnchorAttachment.COMPOUND_VISIBLE_OWNER_TOP_SLAB_TYPE, null,
-                chunk.getAttached(SlabAnchorAttachment.COMPOUND_VISIBLE_OWNER_TOP_SLAB_TYPE));
+                com.slabbed.loader.Attachments.get(chunk, SlabAnchorAttachment.COMPOUND_VISIBLE_OWNER_TOP_SLAB_TYPE));
 
         // Register listener for future attachment changes (e.g. live anchor add/remove sync).
         registerRerenderListener(chunk, SlabAnchorAttachment.ANCHOR_TYPE);
@@ -142,7 +145,7 @@ public final class SlabAnchorClientSync {
         scheduleInitialRerenders(chunk, SlabAnchorAttachment.COMPOUND_VISIBLE_OWNER_TOP_SLAB_TYPE);
         Minecraft mc = Minecraft.getInstance();
         if (mc.levelRenderer != null) {
-            scheduleRerendersForDyMap(mc, chunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE));
+            scheduleRerendersForDyMap(mc, com.slabbed.loader.Attachments.get(chunk, SlabAnchorAttachment.PLACEMENT_DY_TYPE));
         }
     }
 
@@ -155,37 +158,55 @@ public final class SlabAnchorClientSync {
             return null;
         }
         LevelChunk chunk = mc.level.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
-        return chunk == null ? null : chunk.getAttached(attachmentType);
+        return chunk == null ? null : com.slabbed.loader.Attachments.get(chunk, attachmentType);
     }
 
-    private static void registerRerenderListener(
-            LevelChunk chunk,
-            AttachmentType<LongOpenHashSet> attachmentType
-    ) {
-        chunk.<LongOpenHashSet>onAttachedSet(attachmentType).register((oldSet, newSet) -> {
-            Minecraft mc = Minecraft.getInstance();
-            if (mc.levelRenderer == null) {
-                return;
-            }
-            logReloadJumpSync("attachedSet", chunk, attachmentType, oldSet, newSet);
-            scheduleRerendersForSet(mc, oldSet, attachmentType);
-            scheduleRerendersForSet(mc, newSet, attachmentType);
-        });
-    }
+    private static boolean observerInstalled;
 
-    /** FROZEN-DY (Step 0): re-mesh a section when its stored placement heights sync, like the flags. */
-    private static void registerDyRerenderListener(LevelChunk chunk) {
-        chunk.<it.unimi.dsi.fastutil.longs.Long2DoubleOpenHashMap>onAttachedSet(SlabAnchorAttachment.PLACEMENT_DY_TYPE)
-                .register((oldMap, newMap) -> {
+    /**
+     * One global observer of synced attachment values (installed once; NeoForge notifies per decode
+     * through the attachment's sync handler). Replaces the Fabric lines' per-chunk listeners.
+     */
+    private static synchronized void installSyncObserver() {
+        if (observerInstalled) {
+            return;
+        }
+        observerInstalled = true;
+        SlabAnchorAttachment.setClientSyncObserver(new SlabAnchorAttachment.ClientSyncObserver() {
+            @Override
+            @SuppressWarnings("unchecked")
+            public <T> void onSynced(net.neoforged.neoforge.attachment.IAttachmentHolder holder,
+                                     AttachmentType<T> type, T previous, T synced) {
+                if (!(holder instanceof LevelChunk chunk)) {
+                    return;
+                }
+                Minecraft mc = Minecraft.getInstance();
+                if (mc.levelRenderer == null) {
+                    return;
+                }
+                if (type == SlabAnchorAttachment.PLACEMENT_DY_TYPE) {
                     if (JOURNAL_AUTHORITATIVE_APPLY_DEPTH.get() > 0) {
                         return;
                     }
-                    Minecraft mc = Minecraft.getInstance();
-                    if (mc.levelRenderer == null) {
-                        return;
-                    }
-                    scheduleRerendersForDyDiff(mc, oldMap, newMap);
-                });
+                    scheduleRerendersForDyDiff(mc,
+                            (it.unimi.dsi.fastutil.longs.Long2DoubleOpenHashMap) previous,
+                            (it.unimi.dsi.fastutil.longs.Long2DoubleOpenHashMap) synced);
+                    return;
+                }
+                AttachmentType<LongOpenHashSet> setType = (AttachmentType<LongOpenHashSet>) type;
+                logReloadJumpSync("attachedSet", chunk, setType, (LongOpenHashSet) previous, (LongOpenHashSet) synced);
+                scheduleRerendersForSet(mc, (LongOpenHashSet) previous, setType);
+                scheduleRerendersForSet(mc, (LongOpenHashSet) synced, setType);
+            }
+        });
+    }
+
+    private static void registerRerenderListener(LevelChunk chunk, AttachmentType<LongOpenHashSet> attachmentType) {
+        installSyncObserver();
+    }
+
+    private static void registerDyRerenderListener(LevelChunk chunk) {
+        installSyncObserver();
     }
 
     static void beginJournalAuthoritativeApply() {
@@ -284,7 +305,7 @@ public final class SlabAnchorClientSync {
             LevelChunk chunk,
             AttachmentType<LongOpenHashSet> attachmentType
     ) {
-        LongOpenHashSet initial = chunk.getAttached(attachmentType);
+        LongOpenHashSet initial = com.slabbed.loader.Attachments.get(chunk, attachmentType);
         logReloadJumpSync("initialRerenderCheck", chunk, attachmentType, null, initial);
         if (initial != null && !initial.isEmpty()) {
             Minecraft mc = Minecraft.getInstance();

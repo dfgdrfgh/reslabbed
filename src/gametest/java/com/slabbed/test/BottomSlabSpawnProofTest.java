@@ -3,8 +3,7 @@ package com.slabbed.test;
 import com.slabbed.compat.CompatHooks;
 import com.slabbed.compat.CompatSlabSurfaceKind;
 import com.slabbed.compat.terrainslabs.TerrainSlabsCompat;
-import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
@@ -31,16 +30,30 @@ import net.minecraft.world.level.block.state.properties.SlabType;
  * ON_GROUND mob-spawn surface. Spawn eligibility and placement support are separate policies.
  */
 public final class BottomSlabSpawnProofTest {
+    /**
+     * The classifier test gate in its own holder: the compat mixin reads it while the game
+     * bootstraps, and reading it must not initialise this class (whose static test blocks would
+     * then exist before the registries freeze on NeoForge).
+     */
+    public static final class Gate {
+        private Gate() {
+        }
 
-    private static final ThreadLocal<Boolean> TERRAIN_SLABS_CLASSIFIER_TEST_GATE =
+        static final ThreadLocal<Boolean> TERRAIN_SLABS_CLASSIFIER_TEST_GATE =
             ThreadLocal.withInitial(() -> Boolean.FALSE);
+
+        public static boolean terrainSlabsClassifierTestGate() {
+            return TERRAIN_SLABS_CLASSIFIER_TEST_GATE.get();
+        }
+    }
+
+
     private static final Identifier TERRAIN_SLAB_ID =
             Identifier.fromNamespaceAndPath("terrain_slabs", "spawn_proof_test_slab");
     private static final ResourceKey<Block> TERRAIN_SLAB_KEY =
             ResourceKey.create(Registries.BLOCK, TERRAIN_SLAB_ID);
     private static final BooleanProperty GENERATED = BooleanProperty.create("generated");
-    private static final Block TERRAIN_SLAB = new TerrainSlabsSpawnProofSlab(
-            BlockBehaviour.Properties.ofFullCopy(Blocks.STONE_SLAB).setId(TERRAIN_SLAB_KEY));
+    private static final com.slabbed.gametest.TestBlocks.Lazy<Block> TERRAIN_SLAB = com.slabbed.gametest.TestBlocks.block(TERRAIN_SLAB_ID, () -> new TerrainSlabsSpawnProofSlab( BlockBehaviour.Properties.ofFullCopy(Blocks.STONE_SLAB).setId(TERRAIN_SLAB_KEY)));
 
     /** GameTest-only stand-in for Terrain Slabs' named generated-double surface route. */
     private static final class TerrainSlabsSpawnProofSlab extends SlabBlock {
@@ -57,11 +70,10 @@ public final class BottomSlabSpawnProofTest {
     }
 
     /** Registers the stand-in before registry freeze for the GameTest-only classifier fixture. */
-    public static final class TerrainSlabsSpawnProofTestEntrypoint implements ModInitializer {
+    public static final class TerrainSlabsSpawnProofTestEntrypoint implements com.slabbed.gametest.TestModInitializer {
         @Override
         public void onInitialize() {
             if (!BuiltInRegistries.BLOCK.containsKey(TERRAIN_SLAB_ID)) {
-                Registry.register(BuiltInRegistries.BLOCK, TERRAIN_SLAB_ID, TERRAIN_SLAB);
             }
         }
     }
@@ -81,15 +93,12 @@ public final class BottomSlabSpawnProofTest {
     }
 
     private static BlockState terrainSlab(SlabType type, boolean generated) {
-        return TERRAIN_SLAB.defaultBlockState()
+        return TERRAIN_SLAB.get().defaultBlockState()
                 .setValue(SlabBlock.TYPE, type)
                 .setValue(GENERATED, generated);
     }
 
     /** GameTest-only access point consumed by the test mixin around one synchronous classifier call. */
-    public static boolean terrainSlabsClassifierTestGate() {
-        return TERRAIN_SLABS_CLASSIFIER_TEST_GATE.get();
-    }
 
     private static void setSupport(GameTestHelper helper, BlockPos relativePos, BlockState state) {
         helper.getLevel().setBlock(helper.absolutePos(relativePos), state, 2);
@@ -147,7 +156,7 @@ public final class BottomSlabSpawnProofTest {
         }
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void vanillaBottomSlabsStayMobProofWhileKeepingPlacementSupport(GameTestHelper helper) {
         BlockPos dry = new BlockPos(3, 2, 3);
         BlockPos waterlogged = dry.east();
@@ -172,7 +181,7 @@ public final class BottomSlabSpawnProofTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void vanillaTopAndDoubleSlabControlsRemainSpawnEligible(GameTestHelper helper) {
         BlockPos top = new BlockPos(3, 2, 6);
         BlockPos doubled = top.east();
@@ -184,7 +193,7 @@ public final class BottomSlabSpawnProofTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fullStoneAndAirControlsRemainUnchanged(GameTestHelper helper) {
         BlockPos stone = new BlockPos(3, 2, 9);
         BlockPos air = stone.east();
@@ -201,7 +210,7 @@ public final class BottomSlabSpawnProofTest {
         assertCowSpawnSurface(helper, relativePos, false, "dry vanilla bottom slab / cow");
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void terrainSlabsBottomLikeSurfacesKeepNaturalSpawnProofing(GameTestHelper helper) {
         BlockPos bottom = new BlockPos(3, 2, 12);
         BlockPos top = bottom.east();
@@ -212,8 +221,8 @@ public final class BottomSlabSpawnProofTest {
         setSupport(helper, ordinaryDouble, terrainSlab(SlabType.DOUBLE, false));
         setSupport(helper, generatedDouble, terrainSlab(SlabType.DOUBLE, true));
 
-        boolean priorGate = TERRAIN_SLABS_CLASSIFIER_TEST_GATE.get();
-        TERRAIN_SLABS_CLASSIFIER_TEST_GATE.set(Boolean.TRUE);
+        boolean priorGate = Gate.TERRAIN_SLABS_CLASSIFIER_TEST_GATE.get();
+        Gate.TERRAIN_SLABS_CLASSIFIER_TEST_GATE.set(Boolean.TRUE);
         try {
             assertSurfaceKind(helper, bottom, CompatSlabSurfaceKind.BOTTOM_LIKE, "terrain_slabs bottom");
             assertZombieSpawnSurface(helper, bottom, false, "terrain_slabs bottom / zombie");
@@ -227,7 +236,7 @@ public final class BottomSlabSpawnProofTest {
             assertZombieSpawnSurface(helper, generatedDouble, false, "terrain_slabs generated double / zombie");
             assertCowSpawnSurface(helper, top, true, "terrain_slabs top / cow passive control");
         } finally {
-            TERRAIN_SLABS_CLASSIFIER_TEST_GATE.set(priorGate);
+            Gate.TERRAIN_SLABS_CLASSIFIER_TEST_GATE.set(priorGate);
         }
         helper.succeed();
     }

@@ -1,9 +1,10 @@
 package com.slabbed.command;
 
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import com.slabbed.util.SlabTestKit;
-import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -33,8 +34,10 @@ public final class SlabKitCommand {
 
     /** Wires {@code /slabkit} into the server dispatcher for every world. */
     public static void register() {
-        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) ->
-                register(dispatcher));
+        NeoForge.EVENT_BUS.addListener((RegisterCommandsEvent event) -> {
+            var dispatcher = event.getDispatcher();
+            register(dispatcher);
+        });
     }
 
     /** Builds the {@code slabkit} node into {@code dispatcher}. Visible for the smoke test. */

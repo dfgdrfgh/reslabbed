@@ -1,7 +1,7 @@
 package com.slabbed.test;
 
 import com.slabbed.anchor.SlabAnchorAttachment;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
@@ -56,7 +56,7 @@ public final class BoatVisibleSurfacePlacementTest {
         }
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aBoatAimedDownAtALoweredTopLandsOnThatTop(GameTestHelper helper) {
         withFrozen(() -> {
             BlockPos targetRel = new BlockPos(3, 2, 3);

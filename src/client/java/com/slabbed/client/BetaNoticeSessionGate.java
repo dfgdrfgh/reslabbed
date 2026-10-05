@@ -13,7 +13,7 @@ import java.util.Set;
  * never dismissed. The whole point of per-world dismissal is defeated if a session-wide cap
  * suppresses it anyway.
  */
-final class BetaNoticeSessionGate {
+public final class BetaNoticeSessionGate {
 
     private static final Set<String> shownKeysThisSession = new HashSet<>();
     private static boolean shownForUnknownContextThisSession = false;
@@ -27,7 +27,7 @@ final class BetaNoticeSessionGate {
      * {@code null} key (an unidentifiable context, e.g. Realms) is tracked separately from every
      * real key, capped at once per session for that bucket rather than per-world.
      */
-    static synchronized boolean shouldShow(String worldKey) {
+    public static synchronized boolean shouldShow(String worldKey) {
         if (BetaNoticeDismissedWorlds.isDismissed(worldKey)) {
             return false;
         }
@@ -38,7 +38,7 @@ final class BetaNoticeSessionGate {
     }
 
     /** Records that the notice was just shown for {@code worldKey} in this session. */
-    static synchronized void markShown(String worldKey) {
+    public static synchronized void markShown(String worldKey) {
         if (worldKey == null) {
             shownForUnknownContextThisSession = true;
         } else {
@@ -47,7 +47,7 @@ final class BetaNoticeSessionGate {
     }
 
     /** Test-only: clears session state so gametests don't leak state into each other. */
-    static synchronized void resetForTest() {
+    public static synchronized void resetForTest() {
         shownKeysThisSession.clear();
         shownForUnknownContextThisSession = false;
     }

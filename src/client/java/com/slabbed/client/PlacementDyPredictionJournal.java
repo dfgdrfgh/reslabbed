@@ -1,5 +1,9 @@
 package com.slabbed.client;
 
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.level.LevelEvent;
+import net.neoforged.neoforge.event.level.ChunkEvent;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import com.slabbed.compat.UseItemOnPacketAccess;
 import com.slabbed.Slabbed;
 import com.slabbed.anchor.SlabAnchorAttachment;
@@ -10,10 +14,6 @@ import it.unimi.dsi.fastutil.longs.Long2DoubleOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2LongOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLevelEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
@@ -148,10 +148,19 @@ public final class PlacementDyPredictionJournal {
         }
         initialized = true;
         PlacementDyPredictionBridge.installClientBatchConsumer(PlacementDyPredictionJournal::stage);
-        ClientPlayConnectionEvents.INIT.register((handler, client) -> reset(null));
-        ClientPlayConnectionEvents.DISCONNECT.register((handler, client) -> reset(null));
-        ClientLevelEvents.AFTER_CLIENT_LEVEL_CHANGE.register((client, level) -> reset(level));
-        ClientChunkEvents.CHUNK_UNLOAD.register(PlacementDyPredictionJournal::onChunkUnload);
+        NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingIn event) -> reset(null));
+        NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut event) -> reset(null));
+        NeoForge.EVENT_BUS.addListener((LevelEvent.Load event) -> {
+            if (event.getLevel() instanceof net.minecraft.client.multiplayer.ClientLevel level) {
+                reset(level);
+            }
+        });
+        NeoForge.EVENT_BUS.addListener((ChunkEvent.Unload event) -> {
+            if (event.getLevel() instanceof net.minecraft.client.multiplayer.ClientLevel level
+                    && event.getChunk() instanceof net.minecraft.world.level.chunk.LevelChunk chunk) {
+                onChunkUnload(level, chunk);
+            }
+        });
     }
 
     /** Stage only. The batch is not effective and owns no cell until its envelope is sent. */
@@ -207,11 +216,11 @@ public final class PlacementDyPredictionJournal {
                 batch.signature(),
                 batch.cells().stream().map(cell -> cell.pos().asLong()).toList());
         try {
-            if (!ClientPlayNetworking.canSend(PlacementDyPredictionEnvelopePayload.TYPE)) {
+            if (!SlabbedClientNetwork.canSend(PlacementDyPredictionEnvelopePayload.TYPE)) {
                 Slabbed.LOGGER.warn("[C3] prediction declaration channel unavailable; overlay not installed");
                 return packet;
             }
-            ClientPlayNetworking.send(envelope);
+            SlabbedClientNetwork.send(envelope);
         } catch (RuntimeException exception) {
             Slabbed.LOGGER.warn("[C3] prediction declaration send failed; overlay not installed", exception);
             return packet;

@@ -1,8 +1,8 @@
 package com.slabbed.test;
 
-import com.slabbed.util.SlabModelStaleSentinel;
+import com.slabbed.diagnostics.util.SlabModelStaleSentinel;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
@@ -60,7 +60,7 @@ public final class ModelStaleSentinelContractTest {
 
     // ── divergence rule ─────────────────────────────────────────────────────────────────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void divergentBakeRedsAfterPersistenceWindowAndNotBefore(GameTestHelper helper) {
         List<LinkedHashMap<String, String>> rows = freshSentinel();
         try {
@@ -95,7 +95,7 @@ public final class ModelStaleSentinelContractTest {
         }
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void redLatchesOncePerArming(GameTestHelper helper) {
         List<LinkedHashMap<String, String>> rows = freshSentinel();
         try {
@@ -116,7 +116,7 @@ public final class ModelStaleSentinelContractTest {
         }
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void healedDivergenceResetsTheStreakAndNeverReds(GameTestHelper helper) {
         List<LinkedHashMap<String, String>> rows = freshSentinel();
         try {
@@ -149,7 +149,7 @@ public final class ModelStaleSentinelContractTest {
 
     // ── absence rule (the I1/I2/I5 family shape) ────────────────────────────────────────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void absentBaselineShiftRedsWithNoBake(GameTestHelper helper) {
         List<LinkedHashMap<String, String>> rows = freshSentinel();
         try {
@@ -191,7 +191,7 @@ public final class ModelStaleSentinelContractTest {
         }
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void armPlacementNeighborhoodCapturesBaselinesEndToEnd(GameTestHelper helper) {
         List<LinkedHashMap<String, String>> rows = freshSentinel();
         try {
@@ -226,7 +226,7 @@ public final class ModelStaleSentinelContractTest {
 
     // ── green paths, immunities, bounds ─────────────────────────────────────────────────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void bakeMatchingLiveStaysGreenAndTtlEvicts(GameTestHelper helper) {
         List<LinkedHashMap<String, String>> rows = freshSentinel();
         try {
@@ -254,7 +254,7 @@ public final class ModelStaleSentinelContractTest {
         }
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void blockChangeDisarmsSilently(GameTestHelper helper) {
         List<LinkedHashMap<String, String>> rows = freshSentinel();
         try {
@@ -276,7 +276,7 @@ public final class ModelStaleSentinelContractTest {
         }
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void noBaselineNoBakeGoesYellowNotRed(GameTestHelper helper) {
         List<LinkedHashMap<String, String>> rows = freshSentinel();
         try {
@@ -297,7 +297,7 @@ public final class ModelStaleSentinelContractTest {
         }
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void armedCapBoundsTheSet(GameTestHelper helper) {
         freshSentinel();
         try {
@@ -316,7 +316,7 @@ public final class ModelStaleSentinelContractTest {
         }
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void renderPolicyDivergenceFromLogicalDyDoesNotFalseRed(GameTestHelper helper) {
         // Adversarial review finding #1: when the render dy policy diverges from logical dy, arming or
         // judging with one policy while the mesher bakes the other guarantees a false DIVERGENT on a
@@ -358,7 +358,7 @@ public final class ModelStaleSentinelContractTest {
         }
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void yellowThenLateWrongBakeStillReds(GameTestHelper helper) {
         List<LinkedHashMap<String, String>> rows = freshSentinel();
         try {
@@ -393,7 +393,7 @@ public final class ModelStaleSentinelContractTest {
 
     // ── session gate + suppression ──────────────────────────────────────────────────────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void sessionGateBlocksArming(GameTestHelper helper) {
         SlabModelStaleSentinel.resetCold();
         SlabModelStaleSentinel.testSessionOverride = false;
@@ -410,7 +410,7 @@ public final class ModelStaleSentinelContractTest {
         }
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void suppressionGraceDefersJudging(GameTestHelper helper) {
         List<LinkedHashMap<String, String>> rows = freshSentinel();
         try {

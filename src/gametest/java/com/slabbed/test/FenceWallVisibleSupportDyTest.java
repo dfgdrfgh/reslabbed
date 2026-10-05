@@ -3,8 +3,7 @@ package com.slabbed.test;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.compat.CompatHooks;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -70,15 +69,13 @@ public final class FenceWallVisibleSupportDyTest {
     private static final Identifier TS_SLAB_ID =
             Identifier.fromNamespaceAndPath("terrain_slabs", "fence_wall_support_guard_test_slab");
     private static final ResourceKey<Block> TS_SLAB_KEY = ResourceKey.create(Registries.BLOCK, TS_SLAB_ID);
-    private static final Block TS_SLAB =
-            new SlabBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE_SLAB).setId(TS_SLAB_KEY));
+    private static final com.slabbed.gametest.TestBlocks.Lazy<Block> TS_SLAB = com.slabbed.gametest.TestBlocks.block(TS_SLAB_ID, () -> new SlabBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE_SLAB).setId(TS_SLAB_KEY)));
 
     /** Registers the TS-namespaced stand-in slab (before registry freeze, via the main entrypoint). */
-    public static final class TerrainSlabsFenceWallSupportGuardTestEntrypoint implements ModInitializer {
+    public static final class TerrainSlabsFenceWallSupportGuardTestEntrypoint implements com.slabbed.gametest.TestModInitializer {
         @Override
         public void onInitialize() {
             if (!BuiltInRegistries.BLOCK.containsKey(TS_SLAB_ID)) {
-                Registry.register(BuiltInRegistries.BLOCK, TS_SLAB_ID, TS_SLAB);
             }
         }
     }
@@ -100,7 +97,7 @@ public final class FenceWallVisibleSupportDyTest {
      * widening reaches it. Reverting the widening ({@code || isLoweredTopLikeSlabCarrier}) makes the button
      * read flush (0.0) — the RED for this fix.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void floorButtonOnDoubleSupportOnLoweredTopCarrierFollowsSupportDown(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos groundSlab = helper.absolutePos(new BlockPos(2, 1, 2));
@@ -155,7 +152,7 @@ public final class FenceWallVisibleSupportDyTest {
      * resting on a lowered DOUBLE carrier already followed the support down before the widening; it must
      * still do so. Guards against the widening accidentally narrowing the pre-existing DOUBLE path.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void floorButtonOnDoubleSupportOnLoweredDoubleCarrierStillFollowsSupportDown(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos groundSlab = helper.absolutePos(new BlockPos(2, 1, 2));
@@ -199,7 +196,7 @@ public final class FenceWallVisibleSupportDyTest {
      * the {@code isTsExcludedFromVerticalSupport(state)} early return makes the button read -0.5 EVEN under
      * the override (the smoosh) — the RED for this guard.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void terrainSlabsOwnedSupportIsNotReportedLowered(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos groundSlab = helper.absolutePos(new BlockPos(2, 1, 2));
@@ -216,7 +213,7 @@ public final class FenceWallVisibleSupportDyTest {
 
         // Subject: a TS-namespaced DOUBLE slab beside the lowered bottom — persisted lowered via the side-lane
         // (the reachable non-bottom subject-lane path that bypassed the below-support guard).
-        w.setBlock(subject, TS_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.DOUBLE), 2);
+        w.setBlock(subject, TS_SLAB.get().defaultBlockState().setValue(SlabBlock.TYPE, SlabType.DOUBLE), 2);
         SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(w, subject, w.getBlockState(subject));
         if (!SlabAnchorAttachment.isPersistentLoweredSlabCarrier(w, subject, w.getBlockState(subject))) {
             throw helper.assertionException(helper.relativePos(subject),
@@ -256,7 +253,7 @@ public final class FenceWallVisibleSupportDyTest {
      * resting on it even while the TS-exclusion override is active (it only excludes terrain_slabs blocks).
      * Proves the guard is namespace-scoped, not a blanket disable of the whole helper.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void vanillaSupportStillLowersButtonWhileTsOverrideActive(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos groundSlab = helper.absolutePos(new BlockPos(2, 1, 2));

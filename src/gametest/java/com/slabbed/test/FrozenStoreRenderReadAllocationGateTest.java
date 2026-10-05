@@ -3,7 +3,7 @@ package com.slabbed.test;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.compat.CompatHooks;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
@@ -161,7 +161,7 @@ public final class FrozenStoreRenderReadAllocationGateTest {
      * path: a real placement WRITES a stored fact, and the absent-fact answer is precisely what this
      * gate exists to keep free. The premise is asserted below rather than assumed.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void frozenRenderReadOfAnUnstoredCellAllocatesNothingOverTheChunkProbe(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos pos = helper.absolutePos(new BlockPos(2, 2, 2));

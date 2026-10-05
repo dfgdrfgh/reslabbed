@@ -1,50 +1,40 @@
 package com.slabbed.client;
 
 import com.slabbed.Slabbed;
-import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.loader.api.FabricLoader;
-
+import com.slabbed.loader.Loader;
 import java.lang.reflect.InvocationTargetException;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
+import net.neoforged.fml.ModLoadingContext;
 
-public final class SlabbedClient implements ClientModInitializer {
-    @Override
-    public void onInitializeClient() {
+/** Client-side initialisation, reached only through the reflective hook in {@code Slabbed}. */
+public final class SlabbedClient {
+    private SlabbedClient() {
+    }
+
+    public static void init(IEventBus modEventBus) {
         PlacementDyPredictionJournal.init();
-        net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.registerGlobalReceiver(
-                com.slabbed.network.PlacementDyCorrectionPayload.TYPE,
-                (payload, context) -> {
-                    com.slabbed.network.PlacementDyPredictionBridge.traceCorrectionWire(
-                            "RECEIVE", payload.signature());
-                    PlacementDyPredictionJournal.onCorrection(context.client().level, payload);
-                });
         initRuntimeDiagnostics("logInspectSessionStart", "inspect diagnostics",
                 Boolean.getBoolean("slabbed.inspect") || Boolean.getBoolean("slabbed.b2.live.trace"));
-        SlabbedModelLoadingPlugin.init();
+        SlabbedModelLoadingPlugin.init(modEventBus);
         SlabAnchorClientSync.init();
         initRuntimeDiagnostics("initBsFbLiveTraceClient", "BS/FB live trace client",
                 Boolean.getBoolean("slabbed.bsfb.live.trace"));
         initDyFingerprintDump();
         BetaNoticeClient.init();
         FrozenDyModeClient.init();
-        // Ships in EVERY jar, default off — the standing debug-tooling rule, under the maintainer's
-        // 2026-08-07 reading that the command must be INVOCABLE on a shipped jar rather than merely
-        // present as bytes. Unconditional on purpose: no isDevelopmentEnvironment() guard and no
-        // reflective hook, because either one is exactly how /slabdy and /slabdev came to be
-        // unreachable on this line. Cost is two Brigadier trees built once at client init; the
-        // commands install no tick hook, no HUD element and no world-save writer, and touch nothing
-        // until someone types them. The /slabrig family does NOT follow them out of the gate — it
-        // stays dev-gated in Slabbed.initDevFeatures and excluded from the release artifacts.
+        // Ships in EVERY jar, default off — the standing debug-tooling rule: /slabdy and /slabdev
+        // must be invocable on a shipped jar. Unconditional on purpose.
         SlabbedDebugCommands.register();
-        // Two UNBOUND key mappings for the manual height nudge. Registered here, not lazily: Fabric's
-        // key-mapping registry refuses once the options object exists, so a deferred registration is a
-        // hard startup exception. Same shipped-default-off shape as the commands above: the tick body
-        // returns on an unbound-pair check before it touches the crosshair, the level or the network.
-        ManualDyKeybind.init();
+        // Two UNBOUND key mappings for the manual height nudge, registered on the mod bus event.
+        ManualDyKeybind.init(modEventBus);
+        ModLoadingContext.get().getActiveContainer().registerExtensionPoint(IConfigScreenFactory.class,
+                (container, parent) -> new SlabbedSettingsScreen());
     }
 
     private static void initDyFingerprintDump() {
         // Tier-2 client dy-fingerprint dump (RELEASE_SANITY_CHECKLIST §3); dev-only, excluded from the jar.
-        if (!FabricLoader.getInstance().isDevelopmentEnvironment()) {
+        if (!Loader.isDevelopmentEnvironment()) {
             return;
         }
         invokeStaticInit("com.slabbed.client.DyFingerprintDump", "dy fingerprint dump");
@@ -56,13 +46,6 @@ public final class SlabbedClient implements ClientModInitializer {
         }
         invokeStaticNoArg("com.slabbed.util.RuntimeDiagnostics", methodName, label);
     }
-
-    // The ScreenshotCaptureService and GapFillerOverlay reflective hooks were removed by the
-    // release-allowlist ruling: both target classes are compile-excluded from the client source set
-    // on this line (build.gradle sourceSets.client excludes), so Class.forName could NEVER succeed —
-    // the hooks were permanently dangling and only logged a warning. GapFillerOverlay's removal also
-    // lets SlabbedClientFlags (whose only member fed that hook) leave the release artifacts without
-    // stranding a getstatic on a missing class.
 
     private static void invokeStaticInit(String className, String label) {
         invokeStaticNoArg(className, "init", label);

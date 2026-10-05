@@ -3,7 +3,7 @@ package com.slabbed.test;
 import com.slabbed.Slabbed;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -113,7 +113,7 @@ public final class Slabbed2612RestingDyTest {
 
     // ── special full blocks on a bottom slab → -0.5 (generic lower, NOT a contact -1.0) ───────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void specialFullBlocksOnBottomSlabLowerHalf(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos slab = new BlockPos(2, 1, 2);
@@ -131,7 +131,7 @@ public final class Slabbed2612RestingDyTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void restingFlushOnTopAndDoubleSlab(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos slab = new BlockPos(2, 1, 2);
@@ -152,7 +152,7 @@ public final class Slabbed2612RestingDyTest {
 
     // ── floor objects on a bottom slab → -0.5 ─────────────────────────────────────────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void floorObjectsOnBottomSlabLowerHalf(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos slab = new BlockPos(2, 1, 2);
@@ -176,7 +176,7 @@ public final class Slabbed2612RestingDyTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void loweredRailLowerBodyHasVisibleOwnerRescue(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos slab = new BlockPos(2, 1, 2);
@@ -231,7 +231,7 @@ public final class Slabbed2612RestingDyTest {
 
     // ── upward pointed dripstone on a bottom slab → -0.5 and lowered target shape ─────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void upwardPointedDripstoneOnBottomSlabLowersHalf(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos slab = new BlockPos(2, 1, 2);
@@ -265,7 +265,7 @@ public final class Slabbed2612RestingDyTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void loweredPointedDripstoneLowerBodyHasVisibleOwnerRescue(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos slab = new BlockPos(2, 1, 2);
@@ -312,7 +312,7 @@ public final class Slabbed2612RestingDyTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void upwardSulfurSpikeOnBottomSlabLowersHalf(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos slab = new BlockPos(2, 1, 2);
@@ -346,7 +346,7 @@ public final class Slabbed2612RestingDyTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void loweredSulfurSpikeLowerBodyHasVisibleOwnerRescue(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos slab = new BlockPos(2, 1, 2);
@@ -393,7 +393,7 @@ public final class Slabbed2612RestingDyTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void downwardPointedDripstoneChainFollowsLoweredCeilingSupport(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos temporarySlab = new BlockPos(2, 3, 2);
@@ -418,7 +418,7 @@ public final class Slabbed2612RestingDyTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void downwardSulfurSpikeChainFollowsLoweredCeilingSupport(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos temporarySlab = new BlockPos(2, 3, 2);
@@ -455,7 +455,7 @@ public final class Slabbed2612RestingDyTest {
      * dedicated client bridge model that closes the gap for the slab case specifically. An
      * ordinary cap has no such model, so leaving its chain ungrounded left a real gap.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void downwardPointedDripstoneUnderIronChainFollowsLoweredCeilingSupport(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos temporarySlab = new BlockPos(2, 4, 2);
@@ -484,7 +484,7 @@ public final class Slabbed2612RestingDyTest {
      * Chain assertion reversed under the same live ruling as the dripstone row above (maintainer,
      * 2026-09-01): a chain under an ordinary lowered cap follows that cap exactly.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void downwardSulfurSpikeUnderIronChainFollowsLoweredCeilingSupport(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos temporarySlab = new BlockPos(2, 4, 2);
@@ -509,7 +509,7 @@ public final class Slabbed2612RestingDyTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void downwardPointedDripstoneColumnUnderCeilingBridgedChainStaysFlush(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos chain = new BlockPos(2, 4, 2);
@@ -530,7 +530,7 @@ public final class Slabbed2612RestingDyTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void downwardSulfurSpikeColumnUnderCeilingBridgedChainStaysFlush(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos chain = new BlockPos(2, 4, 2);
@@ -551,7 +551,7 @@ public final class Slabbed2612RestingDyTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void downwardPointedDripstoneColumnUnderTopSlabKeepsDescendantsGridHeight(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos upper = new BlockPos(2, 3, 2);
@@ -568,7 +568,7 @@ public final class Slabbed2612RestingDyTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void downwardSulfurSpikeColumnUnderTopSlabKeepsDescendantsGridHeight(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos upper = new BlockPos(2, 3, 2);
@@ -587,7 +587,7 @@ public final class Slabbed2612RestingDyTest {
 
     // ── ceiling-hung decorations directly under a TOP slab → FLUSH 0.0 (D2 2026-07-03 ruling) ─────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void ceilingHungUnderTopSlabHangFlush(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos ceil = new BlockPos(2, 3, 2);
@@ -622,7 +622,7 @@ public final class Slabbed2612RestingDyTest {
      * <p>Read both rows together — they are the boundary. Snow flush alone would pass a predicate
      * that excludes everything; carpet seated alone would pass one that excludes nothing.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void weatherFillStaysFlushWhilePlacedLayersSeat(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos slab = new BlockPos(2, 1, 2);
@@ -663,7 +663,7 @@ public final class Slabbed2612RestingDyTest {
      * so on a Terrain Slabs surface the UPPER half reads 0.0 — but on a VANILLA slab (no TS loaded in the
      * gametest runtime) it is UNCHANGED at -0.5. Both halves therefore read -0.5 here.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void doubleTallPlantsOnBottomSlabLowerBothHalves(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos slab = new BlockPos(2, 1, 2);
@@ -691,7 +691,7 @@ public final class Slabbed2612RestingDyTest {
 
     // ── slab MATERIAL sweep: behavior keys on slab TYPE not material → all -0.5 ────────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabMaterialSweepAllLowerHalf(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos slab = new BlockPos(2, 1, 2);
@@ -713,7 +713,7 @@ public final class Slabbed2612RestingDyTest {
     // ── lowered-support CONTACT cases (the -1.0 only appears here, support already lowered) ────────
 
     /** A candle on a slab that is ITSELF lowered (-0.5) gets the floor-top contact dy = support-0.5 = -1.0. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void candleOnLoweredSlabContactMinusOne(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         // ground / slab(0) / stone(-0.5) / slab(-0.5, lowered lane) / candle
@@ -740,7 +740,7 @@ public final class Slabbed2612RestingDyTest {
      * {@code isCeilingAttached} keying on the BellBlock class might leave it at 0.0 — measured: it does NOT,
      * the floor bell lowers correctly. No gap.)
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void floorBellOnBottomSlabLowersHalf(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         helper.setBlock(new BlockPos(2, 1, 2), bottomSlab());
@@ -752,7 +752,7 @@ public final class Slabbed2612RestingDyTest {
 
     // ── stairs on a bottom slab → -0.5 ────────────────────────────────────────────────────────────
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void stairsOnBottomSlabLowerHalf(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos slab = new BlockPos(2, 1, 2);
@@ -770,7 +770,7 @@ public final class Slabbed2612RestingDyTest {
     // ── ceiling-attached trapdoor (HALF=TOP) directly under a TOP slab — measure-and-lock ─────────
 
     /** An OAK_TRAPDOOR[half=TOP] is ceiling-attached; under a FLUSH top slab it stays flush (D2 ruling). */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void trapdoorTopUnderTopSlabStaysFlush(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         helper.setBlock(new BlockPos(2, 3, 2), topSlab());
@@ -798,7 +798,7 @@ public final class Slabbed2612RestingDyTest {
     }
 
     /** Slab under the HEAD only still lowers BOTH halves (either-half rule, complement to the foot fixture). */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void bedHeadOnSlabLowersBothHalves(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos foot = new BlockPos(2, 2, 2);
@@ -813,7 +813,7 @@ public final class Slabbed2612RestingDyTest {
     }
 
     /** A bed resting on a TOP slab stays flush (top slabs don't lower resting objects). */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void bedOnTopSlabStaysFlush(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos foot = new BlockPos(2, 2, 2);
@@ -830,7 +830,7 @@ public final class Slabbed2612RestingDyTest {
     // ── object resting on a LOWERED full block (compound contact) — measure-and-lock ──────────────
 
     /** A floor torch resting on a stone that is itself lowered (-0.5) — does it follow / contact? Measured. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void floorTorchOnLoweredFullBlockContact(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         helper.setBlock(new BlockPos(2, 1, 2), bottomSlab());
@@ -853,7 +853,7 @@ public final class Slabbed2612RestingDyTest {
      * means the torch sits on the EAST face of the block to its WEST, so torch at (3,2,2) attaches to the
      * lowered stone at (2,2,2). Measured + locked.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void wallTorchOnLoweredBlockFollows(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         helper.setBlock(new BlockPos(2, 1, 2), bottomSlab());

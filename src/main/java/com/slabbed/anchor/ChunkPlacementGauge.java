@@ -55,7 +55,7 @@ public final class ChunkPlacementGauge {
     public static List<String> report(LevelChunk chunk, RegistryAccess registryAccess) {
         List<AttachmentUsage> usages = new ArrayList<>();
 
-        Long2DoubleOpenHashMap dyMap = chunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE);
+        Long2DoubleOpenHashMap dyMap = com.slabbed.loader.Attachments.get(chunk, SlabAnchorAttachment.PLACEMENT_DY_TYPE);
         int dyEntries = dyMap == null ? 0 : dyMap.size();
         usages.add(new AttachmentUsage("placement heights", dyEntries,
                 dyMap == null || dyMap.isEmpty()
@@ -119,8 +119,8 @@ public final class ChunkPlacementGauge {
             LevelChunk chunk,
             RegistryAccess registryAccess,
             String name,
-            net.fabricmc.fabric.api.attachment.v1.AttachmentType<LongOpenHashSet> type) {
-        LongOpenHashSet set = chunk.getAttached(type);
+            net.neoforged.neoforge.attachment.AttachmentType<LongOpenHashSet> type) {
+        LongOpenHashSet set = com.slabbed.loader.Attachments.get(chunk, type);
         usages.add(new AttachmentUsage(name, set == null ? 0 : set.size(),
                 set == null || set.isEmpty()
                         ? 0

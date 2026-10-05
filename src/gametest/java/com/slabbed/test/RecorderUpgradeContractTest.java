@@ -1,8 +1,8 @@
 package com.slabbed.test;
 
-import com.slabbed.util.LiveCursorIntentRecorder;
-import com.slabbed.util.SlabModelStaleSentinel;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.diagnostics.util.LiveCursorIntentRecorder;
+import com.slabbed.diagnostics.util.SlabModelStaleSentinel;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -67,7 +67,7 @@ public final class RecorderUpgradeContractTest {
         return row;
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void sideDySplitPairRuleFires(GameTestHelper helper) {
         Path dir = setup("split");
         try {
@@ -89,7 +89,7 @@ public final class RecorderUpgradeContractTest {
         }
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void matchingPairStaysUnflagged(GameTestHelper helper) {
         Path dir = setup("nosplit");
         try {
@@ -105,7 +105,7 @@ public final class RecorderUpgradeContractTest {
         }
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void breakEventRecordsPopDetectionCells(GameTestHelper helper) {
         Path dir = setup("break");
         try {
@@ -132,7 +132,7 @@ public final class RecorderUpgradeContractTest {
         }
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void realPlacementCarriesSideAndPriorState(GameTestHelper helper) {
         Path dir = setup("prior");
         try {
@@ -173,7 +173,7 @@ public final class RecorderUpgradeContractTest {
         }
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void sentinelLivenessCountersSurfaceInSummary(GameTestHelper helper) {
         Path dir = setup("liveness");
         try {

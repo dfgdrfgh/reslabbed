@@ -2,7 +2,7 @@ package com.slabbed.test;
 
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -111,7 +111,7 @@ public final class WaterlogReadSymmetryTest {
     }
 
     /** F5 core: waterlogging the MARKED slab must move NOTHING — not the slab, not its dependent. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void waterloggingAMarkedSlabMovesNothing(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos slab = buildMarkedLowerSlab(helper, w);
@@ -130,7 +130,7 @@ public final class WaterlogReadSymmetryTest {
     }
 
     /** Fence-gate dependent (the fenceWall support-helper gate): waterlogging the marked slab moves nothing. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void fenceGateDependentSurvivesWaterloggedMarkedSlab(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos slab = buildMarkedLowerSlab(helper, w);
@@ -147,7 +147,7 @@ public final class WaterlogReadSymmetryTest {
     }
 
     /** Floor-button dependent (the fenceWall support-helper gate at its own choke point). */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void floorButtonDependentSurvivesWaterloggedMarkedSlab(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos slab = buildMarkedLowerSlab(helper, w);
@@ -164,7 +164,7 @@ public final class WaterlogReadSymmetryTest {
     }
 
     /** The side-UPPER marker predicate: a waterlogged marked TOP slab keeps -1.0. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void waterloggingAMarkedUpperSlabMovesNothing(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos slab = FrozenDySceneFixture.authored(helper, () -> {
@@ -191,7 +191,7 @@ public final class WaterlogReadSymmetryTest {
     }
 
     /** De-waterlog (sponge) direction: the round-trip is a geometric no-op. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void spongeRoundTripIsAGeometricNoOp(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos slab = buildMarkedLowerSlab(helper, w);
@@ -203,7 +203,7 @@ public final class WaterlogReadSymmetryTest {
     }
 
     /** Carrier symmetry: a persistent-lowered CARRIER slab keeps -0.5 when waterlogged. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void waterloggingACarrierSlabKeepsItLowered(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         // Genuine lowered stack: ground, slab(0), stone(-0.5), slab(-0.5 via carrier-below lane).
@@ -234,7 +234,7 @@ public final class WaterlogReadSymmetryTest {
      * must be genuinely LOWERED at anchor time (a flush slab freeze-flats instead), so anchor the
      * -0.5 slab atop a lowered stack — the isAnchored leg of the slab branch has no fluid gate.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void anchoredSlabWaterlogReferenceStaysLowered(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos base = helper.absolutePos(new BlockPos(2, 1, 2));
@@ -267,7 +267,7 @@ public final class WaterlogReadSymmetryTest {
     // derivations, and interaction surfaces — the two-authority split had moved one hop away. ──
 
     /** Owner-top marker family (the surviving-mutant rider from F5a): waterlog moves nothing. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void waterloggingAnOwnerTopSlabMovesNothing(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos slab = FrozenDySceneFixture.authored(helper, () -> {
@@ -302,7 +302,7 @@ public final class WaterlogReadSymmetryTest {
      * never anchored and popped flush when the support broke, while its dry twin held. Never-pop must
      * not depend on the water the slab was placed into.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabPlacedUnderwaterOnLoweredSupportNeverPops(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos base = helper.absolutePos(new BlockPos(2, 1, 2));
@@ -340,7 +340,7 @@ public final class WaterlogReadSymmetryTest {
      * not pop the unmarked slab riding it (isLoweredTopLikeSlabCarrier's gate fired before its
      * marker read).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void waterloggingALoweredTopSupportKeepsTheSlabAboveLowered(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos base = helper.absolutePos(new BlockPos(3, 1, 2));
@@ -385,7 +385,7 @@ public final class WaterlogReadSymmetryTest {
      * Lane-OWNER role (deep-sweep finding 3a): bucketing a marked lane owner must not pop an
      * unmarked side member inheriting -0.5 through the live side-lane BFS.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void waterloggingALaneOwnerKeepsSideMembersLowered(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos owner = buildMarkedLowerSlab(helper, w);
@@ -406,7 +406,7 @@ public final class WaterlogReadSymmetryTest {
      * Anchored deep-cantilever magnitude (deep-sweep finding 5a): bucketing an anchored -1.0
      * cantilever slab beside a compound stack must not half-pop it to -0.5.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void waterloggingAnAnchoredCantileverKeepsItsDepth(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos support = buildMarkedLowerSlab(helper, w);
@@ -432,7 +432,7 @@ public final class WaterlogReadSymmetryTest {
      * outlines lowered — its interaction shape must agree (the dy-triad law), not refuse the
      * lawful-lowered fallback because of the fluid.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void waterloggedMarkedSlabInteractionShapeMatchesOutline(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos slab = buildMarkedLowerSlab(helper, w);
@@ -457,7 +457,7 @@ public final class WaterlogReadSymmetryTest {
     }
 
     /** No over-lowering: an UNMARKED, unanchored waterlogged slab on flush ground stays flush. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void plainWaterloggedSlabStaysFlushControl(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos ground = helper.absolutePos(new BlockPos(2, 1, 2));
@@ -512,7 +512,7 @@ public final class WaterlogReadSymmetryTest {
      * reads are fluid-blind since F5, so without the marker the slab reads lowered but never
      * persists, and breaking the source FB pops it (never-pop broken underwater).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void underwaterCompoundSidePlacementAuthorsLowerMarker(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos fb = buildCompoundSourceFb(helper, w);
@@ -559,7 +559,7 @@ public final class WaterlogReadSymmetryTest {
      * F5c side-UPPER authoring: the same water-cell placement with the hit in the FB's UPPER visible
      * band must land a TOP slab carrying the side-UPPER marker, like its dry twin.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void underwaterCompoundSideUpperPlacementAuthorsUpperMarker(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos fb = buildCompoundSourceFb(helper, w);
@@ -611,7 +611,7 @@ public final class WaterlogReadSymmetryTest {
      * like its dry twin anyway. This scene pins that healed symmetry — it REDs if the fallback or
      * the shared state predicate ever grows a fluid gate back.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void underwaterSlabOnLoweredFullBlockAuthorsCarrier(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos base = helper.absolutePos(new BlockPos(2, 1, 2));
@@ -660,7 +660,7 @@ public final class WaterlogReadSymmetryTest {
      * If this scene is green with the :118 fluid term still in place, the term is SHADOWED (the
      * F5b fluid-blind freeze writer anchors the rider) and stays under the surviving-mutant rule.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void underwaterRiderOnLoweredTopSupportSurvivesSupportBreak(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos base = helper.absolutePos(new BlockPos(3, 1, 2));
@@ -714,7 +714,7 @@ public final class WaterlogReadSymmetryTest {
      * F5c side-carrier authoring, placed-state gate (:132): a slab placed into a WATER cell beside a
      * marked lane slab must author the carrier marker like its dry twin.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void underwaterSlabBesideLaneAuthorsSideCarrier(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos source = buildMarkedLowerSlab(helper, w);
@@ -753,7 +753,7 @@ public final class WaterlogReadSymmetryTest {
      * source must author the carrier marker — the source's water is height-neutral (F5 core scene)
      * and must not blind the lane extension.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabBesideWaterloggedLaneSourceAuthorsSideCarrier(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos source = buildMarkedLowerSlab(helper, w);
@@ -791,7 +791,7 @@ public final class WaterlogReadSymmetryTest {
      * the mutation that re-adds the source fluid term REDs exactly this scene (the dry-cell twin
      * above is bottom-route-shadowed and pins the lane instead).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void submergedSlabBesideWaterloggedLaneSourceAuthorsSideCarrier(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos source = buildMarkedLowerSlab(helper, w);
@@ -845,7 +845,7 @@ public final class WaterlogReadSymmetryTest {
      * not pop it — the ceiling-family exclusion list kicked any waterlogged subject to 0.0 while
      * walk A (lanterns) ignores fluid.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void waterloggedChainUnderMarkedUpperSlabKeepsMergedDy(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos slab = buildMarkedUpperTopSlabRig(helper, w);
@@ -862,7 +862,7 @@ public final class WaterlogReadSymmetryTest {
     }
 
     /** F5c ceiling-subject symmetry, TOP-trapdoor twin (the other walk-B/C-only waterloggable family). */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void waterloggedTopTrapdoorUnderMarkedUpperSlabKeepsMergedDy(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos slab = buildMarkedUpperTopSlabRig(helper, w);
@@ -883,7 +883,7 @@ public final class WaterlogReadSymmetryTest {
      * routes through ceilingHungDecorationDy, which never had a subject fluid gate — this is the
      * asymmetry the chain/trapdoor scenes close.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void waterloggedHangingLanternUnderMarkedUpperSlabReference(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos slab = buildMarkedUpperTopSlabRig(helper, w);

@@ -2,7 +2,7 @@ package com.slabbed.test;
 
 import com.slabbed.Slabbed;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -162,7 +162,7 @@ public final class DeepCompoundTowerLawTest {
      * {@code deepAlternatingStackClampsAtMinusOne} range, but built via real placement instead of
      * {@code setBlock}, and asserted as a law-conformant flush sequence rather than "clamped".
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void towerDepthWithinCapFlush(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos ground = h.absolutePos(new BlockPos(3, 1, 3));
@@ -184,7 +184,7 @@ public final class DeepCompoundTowerLawTest {
      * assertion reports whatever the live gap is; do not hand-tune this comment's number without
      * re-running the test — record the exact observed value in the RED report to the architect.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void towerDepthMinus15Flush(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos ground = h.absolutePos(new BlockPos(3, 0, 3));
@@ -203,7 +203,7 @@ public final class DeepCompoundTowerLawTest {
      * NOT self-correct or grow cleanly — everything placed above the first bad cell keeps stacking
      * on the WRONG value, so slab4 also reads shallow instead of the expected -1.5. EXPECTED RED.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void towerDepthMinus20Flush(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos ground = h.absolutePos(new BlockPos(3, 0, 3));
@@ -219,7 +219,7 @@ public final class DeepCompoundTowerLawTest {
      * orthogonal to the depth-cap bug: it is RED only if a neighbor edit ALSO reintroduces
      * recomputation, which would be a second, independent LAW violation stacked on top of the cap.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void towerStaysAfterBaseMutation(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos ground = h.absolutePos(new BlockPos(3, 0, 3));
@@ -263,7 +263,7 @@ public final class DeepCompoundTowerLawTest {
      * the cell DIRECTLY below a deep cell — is covered by NeighborUpdateInvarianceTest's
      * slab_on_deep_lowered_full_block subject (expected red with frozen OFF, the documented hole class).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void towerStaysAfterSupportColumnSideMutation(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos ground = h.absolutePos(new BlockPos(3, 0, 3));
@@ -312,7 +312,7 @@ public final class DeepCompoundTowerLawTest {
      * is logged, not asserted: the hole's exact magnitude is pinned by the expected-red matrix subject,
      * and this test must stay green when the hole is eventually fixed.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void deepRestBreakBelowHoleHealsWithFrozenDy(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos ground = h.absolutePos(new BlockPos(3, 0, 3));
@@ -375,7 +375,7 @@ public final class DeepCompoundTowerLawTest {
      * naturally lowers the slab, so the test forces the package-private {@code addAnchorUnchecked}
      * via reflection — test-only, does not touch production visibility.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void anchoredTopSlabOverCeilingAttachedChainDoesNotRecurse(GameTestHelper h) {
         ServerLevel w = h.getLevel();
         BlockPos groundAbs = h.absolutePos(new BlockPos(3, 1, 3));

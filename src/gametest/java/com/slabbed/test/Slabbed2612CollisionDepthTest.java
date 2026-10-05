@@ -3,7 +3,7 @@ package com.slabbed.test;
 import com.slabbed.Slabbed;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
@@ -47,7 +47,7 @@ public final class Slabbed2612CollisionDepthTest {
      * <p>MUTATION that must redden this row alone: remove {@code AbstractArrowOffsetClipMixin}
      * from {@code slabbed.mixins.json} (the helper rows stay green — that is the point).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty", maxTicks = 60)
+    @GameTest(structure = "slabbed_gametest:empty", maxTicks = 60)
     public void aRealArrowSticksInTheDrawnLowerHalf(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos abs = loweredStone(helper);
@@ -84,7 +84,7 @@ public final class Slabbed2612CollisionDepthTest {
      * <p>MUTATION that must redden this row alone: remove {@code ProjectileBlockClipOffsetMixin}
      * from {@code slabbed.mixins.json}.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty", maxTicks = 60)
+    @GameTest(structure = "slabbed_gametest:empty", maxTicks = 60)
     public void aRealSnowballImpactsTheDrawnLowerHalf(GameTestHelper helper) {
         loweredStone(helper);
         net.minecraft.world.entity.projectile.throwableitemprojectile.Snowball ball =
@@ -118,7 +118,7 @@ public final class Slabbed2612CollisionDepthTest {
      * through two fully green suites, because no row ever loaded {@code ProjectileUtil}. Loading the
      * class is the check; this row makes the load unconditional.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void colliderClipMixinTargetsApplyOnLoad(GameTestHelper helper) {
         String[] targets = {
                 net.minecraft.world.entity.projectile.arrow.AbstractArrow.class.getName(),
@@ -154,7 +154,7 @@ public final class Slabbed2612CollisionDepthTest {
      * <p>MUTATION that must redden this row alone: make {@code SlabbedMixinConfigPlugin.withheld}
      * report the explosion mixin withheld regardless of its Lithium argument.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aRealExplosionIsShelteredByTheDrawnLowerHalf(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos abs = loweredStone(helper);
@@ -179,7 +179,7 @@ public final class Slabbed2612CollisionDepthTest {
                     "premise drift: the victim's box must sit inside the hang band; box=" + box);
         }
         float seen = net.minecraft.world.level.ServerExplosion.getSeenPercent(centre, victim);
-        boolean lithium = net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("lithium");
+        boolean lithium = com.slabbed.loader.Loader.isModLoaded("lithium");
         Slabbed.LOGGER.info("EXPLOSION-OCCLUSION | seenPercent={} lithiumPresent={}", seen, lithium);
         if (lithium) {
             if (Math.abs(seen - 1.0f) > EPS) {
@@ -214,7 +214,7 @@ public final class Slabbed2612CollisionDepthTest {
      * name only, return true when the resource is missing, or compare the call's owner to the
      * wrong class.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void lithiumSweeperByteCheckRecognisesTheRedirectedCall(GameTestHelper helper) {
         boolean vanillaIterator = com.slabbed.mixin.SlabbedMixinConfigPlugin.sweeperAsksCollisionContext(
                 "net/minecraft/world/level/BlockCollisions", "computeNext()Ljava/lang/Object;");
@@ -248,7 +248,7 @@ public final class Slabbed2612CollisionDepthTest {
      * <p>MUTATION that must redden this row alone in a Lithium venue: make
      * {@code LithiumBlockCollisionSweeperPosLoweredAboveMixin} return the cell's own shape.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void theHangBandReportsTheCellBelowAsSupport(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos abs = loweredStone(helper);
@@ -291,7 +291,7 @@ public final class Slabbed2612CollisionDepthTest {
      * <p>MUTATION that must redden this row alone in a Lithium venue: withhold the two Lithium
      * sweeper mixins. Without Lithium: remove {@code BlockCollisionsLoweredAboveMixin}.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty", maxTicks = 60)
+    @GameTest(structure = "slabbed_gametest:empty", maxTicks = 60)
     public void aSmallEntityPushedThroughTheHangBandStopsAtTheDrawnBody(GameTestHelper helper) {
         BlockPos abs = loweredStone(helper);
         net.minecraft.world.entity.item.ItemEntity mover =
@@ -354,7 +354,7 @@ public final class Slabbed2612CollisionDepthTest {
      * <p>MUTATION that must redden this row alone: skip the owner search in
      * {@code SlabbedOffsetColliderClip.OwnerSearch#consumeCell}.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void colliderClipHitsTheDrawnLowerHalf(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos abs = loweredStone(helper);
@@ -379,7 +379,7 @@ public final class Slabbed2612CollisionDepthTest {
      * supplement may add obstructions the drawn world has, never resurrect the phantom the per-state
      * fix removed.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void colliderClipKeepsTheBandAboveTheDrawnTopClear(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos abs = loweredStone(helper);
@@ -405,7 +405,7 @@ public final class Slabbed2612CollisionDepthTest {
      * <p>MUTATION that must redden this row alone: make {@code clipForOcclusion} run the search on
      * non-MISS hits too (returning a nearer owner hit would fail the identity check).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void occlusionFastPathReturnsVanillasOwnHit(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos abs = loweredStone(helper);
@@ -439,7 +439,7 @@ public final class Slabbed2612CollisionDepthTest {
      * <p>MUTATION that must redden this row alone: drop the blockMode check in
      * {@code SlabbedOffsetColliderClip#supplement}.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void nonColliderModesPassThroughUntouched(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos abs = loweredStone(helper);
@@ -469,7 +469,7 @@ public final class Slabbed2612CollisionDepthTest {
      * <p>MUTATION that must redden this row alone: invert or drop the distance comparison in
      * {@code supplement}.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void projectileTakesTheNearerOwnerHit(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos abs = loweredStone(helper);
@@ -514,7 +514,7 @@ public final class Slabbed2612CollisionDepthTest {
      * <p>MUTATION that must redden this row: restore the {@code instanceof StairBlock} restriction on
      * {@code SlabSupportStateMixin#slabbed$collisionQueryExit}.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void theClimbOntoALoweredBlockMatchesTheClimbYouCanSee(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         // Slab the player stands on, and beside it a bottom slab carrying the lowered block.
@@ -585,7 +585,7 @@ public final class Slabbed2612CollisionDepthTest {
      * <p>MUTATION that must redden this row alone: restore the {@code instanceof StairBlock} restriction
      * on {@code SlabSupportStateMixin#slabbed$collisionQueryExit}.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aLoweredFullBlockIsSolidExactlyWhereDrawn(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos slabRel = new BlockPos(2, 1, 2);
@@ -644,7 +644,7 @@ public final class Slabbed2612CollisionDepthTest {
      * the stack, then clear the cell directly below the top stone so ONLY the block's own hanging
      * collision can fill that space, and assert a small box inside the visible lower portion collides.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void compoundMinusOneBlockIsSolidWhereDrawn(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos base = new BlockPos(2, 1, 2);
@@ -686,7 +686,7 @@ public final class Slabbed2612CollisionDepthTest {
      * C5 carpet collision consumes the same stored -1.0 authority as its model and outline. The
      * hanging helper must expose the carpet's vanilla-thin collision in the cell where it is drawn.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aimedCarpetMinusOneCollisionFollowsStoredSeat(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos belowRel = new BlockPos(2, 2, 2);
@@ -718,7 +718,7 @@ public final class Slabbed2612CollisionDepthTest {
      * Powder snow keeps vanilla's contextual collision policy. A stored -1.0 seat moves its logical
      * body/outline, but Slabbed must not invent an unconditional solid hanging shape.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aimedPowderSnowMinusOneDoesNotInventSolidCollision(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos belowRel = new BlockPos(2, 2, 2);
@@ -748,7 +748,7 @@ public final class Slabbed2612CollisionDepthTest {
      * This does not prove climb feel or rendered VIS, but it catches the server collision failure that
      * would make scaffolding behave like a solid wall after its visual body lowers onto a slab.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void loweredScaffoldingSideInteriorStaysPassThrough(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos slabRel = new BlockPos(2, 1, 2);
@@ -785,7 +785,7 @@ public final class Slabbed2612CollisionDepthTest {
      * player-aware scaffolding collision and climb state; Slabbed's lowered-above broadphase helper
      * must not inject an unconditional solid scaffolding shape into the cell below.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void loweredScaffoldingDoesNotInjectSolidHangingCollision(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos slabRel = new BlockPos(2, 1, 2);
@@ -810,7 +810,7 @@ public final class Slabbed2612CollisionDepthTest {
      * P26-1 FEEL guard: when scaffolding is visually lowered into the cell below, a player occupying
      * that lowered visual volume must still count as being inside climbable scaffolding.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void loweredScaffoldingVisualVolumeIsClimbable(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos slabRel = new BlockPos(2, 1, 2);
@@ -843,7 +843,7 @@ public final class Slabbed2612CollisionDepthTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void loweredStairCollisionFollowsVisualStepableHeight(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos slabRel = new BlockPos(2, 1, 2);
@@ -855,7 +855,7 @@ public final class Slabbed2612CollisionDepthTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void chainedLoweredStairCollisionFollowsVisualStepableHeight(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos slabRel = new BlockPos(2, 1, 2);

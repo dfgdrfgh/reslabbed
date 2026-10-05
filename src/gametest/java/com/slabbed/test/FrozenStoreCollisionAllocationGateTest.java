@@ -2,7 +2,7 @@ package com.slabbed.test;
 
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;
@@ -72,7 +72,7 @@ public final class FrozenStoreCollisionAllocationGateTest {
      * PLACEMENT_DY entries, frozen-ON. The store-aware probe must early-out on the absent chunk map —
      * one getChunk + one getAttached, zero extra allocation versus the frozen-OFF walk.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void frozenOnCollisionProbeAddsNoAllocationOverFrozenOff(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos pos = helper.absolutePos(new BlockPos(2, 2, 2));

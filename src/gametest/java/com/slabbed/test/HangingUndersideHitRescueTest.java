@@ -1,7 +1,7 @@
 package com.slabbed.test;
 
 import com.slabbed.placement.LandingHitValidationPolicy;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -75,7 +75,7 @@ public final class HangingUndersideHitRescueTest {
      *
      * <p>MUTATION that must redden this row alone: delete the hanging-underside lane.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aChainUnderALoweredLanternIsRescued(GameTestHelper h) {
         BlockPos owner = h.absolutePos(new BlockPos(2, 2, 2));
         BlockState lantern = hangingLantern();
@@ -99,7 +99,7 @@ public final class HangingUndersideHitRescueTest {
      *
      * <p>MUTATION that must redden this row alone: drop the {@code bodyMinY > EPSILON} term.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aStandingLanternIsNotRescued(GameTestHelper h) {
         BlockPos owner = h.absolutePos(new BlockPos(2, 2, 2));
         BlockState standing = Blocks.LANTERN.defaultBlockState().setValue(LanternBlock.HANGING, Boolean.FALSE);
@@ -128,7 +128,7 @@ public final class HangingUndersideHitRescueTest {
      * shares that mutation with the standing-lantern row above — both are the hang term, stated for
      * two different families, and either failing alone still localises the break).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aTipUpDripstoneIsStillDeniedTheShift(GameTestHelper h) {
         BlockPos owner = h.absolutePos(new BlockPos(2, 2, 2));
         BlockState tipUp = Blocks.POINTED_DRIPSTONE.defaultBlockState()
@@ -152,7 +152,7 @@ public final class HangingUndersideHitRescueTest {
      * Stated here as well so a future edit to THIS lane cannot quietly widen onto it while the two
      * distant pins keep passing for their own unrelated reasons.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void anOakFenceIsStillDeniedTheShift(GameTestHelper h) {
         BlockPos owner = h.absolutePos(new BlockPos(2, 2, 2));
         BlockState fence = Blocks.OAK_FENCE.defaultBlockState();
@@ -174,7 +174,7 @@ public final class HangingUndersideHitRescueTest {
      *
      * <p>MUTATION that must redden this row alone: drop {@code vanillaWouldRejectOnYAlone}.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void anAimVanillaAlreadyAcceptsKeepsVanillaCentre(GameTestHelper h) {
         BlockPos owner = h.absolutePos(new BlockPos(2, 2, 2));
         BlockState lantern = hangingLantern();

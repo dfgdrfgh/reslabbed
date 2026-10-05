@@ -1,17 +1,15 @@
 # Slabbed
 
-Slabbed is a Fabric mod for Minecraft 26.2 and 26.3 that makes slab-supported placement, stored height,
+Slabbed is a NeoForge mod for Minecraft 26.2 (this line; the Fabric line serves 26.2 and 26.3) that makes slab-supported placement, stored height,
 targeting, and rendering agree. Its governing invariant is simple: a placed block keeps the height
 chosen when it was placed; a later neighbour edit must not move it. See `LAW.md` for the exact rule.
 
 ## This line
 
-- Minecraft 26.2 and 26.3 on Fabric, from one jar. Fabric Loader and Fabric API (0.152.2 or newer
-  on 26.2) are required. Java 25 builds and runs it.
-- Version: see `gradle.properties`; the current cycle is `0.6.2-alpha+26.2-26.3`.
-- The jar is compiled against 26.3; the few places where 26.2 differs are chosen when the game starts
-  (`com.slabbed.compat`, and `shim/mc-26.2` for classes that must be compiled against 26.2). Every
-  release is proven on both versions with the `harness/fabric-26.2` leg and the two scanners in `tools/`.
+- Minecraft 26.2 on NeoForge 26.2.0.88 or newer. No Fabric API or Forgified Fabric API. Java 25 builds and runs it.
+- Version: see `gradle.properties`; the current cycle is `0.6.2-alpha+26.2-neoforge`.
+- One jar per Minecraft version on NeoForge (the 26.3 jar is built from the same source). The suite runs through
+  `./gradlew runGameTestServer`; the model layer uses NeoForge's block-model hooks (`com.slabbed.client.model`).
 - Other Minecraft versions and loaders live on their own branches (`port/...`) and reach the same
   features when they are ported; this branch is where 0.6 is developed first.
 - `CHANGELOG.md` describes what the current build changes for players, including its known
@@ -31,7 +29,7 @@ chosen when it was placed; a later neighbour edit must not move it. See `LAW.md`
 
 ## Installation
 
-Install the normal Slabbed jar and Fabric API. Keep client and server Slabbed versions aligned for a
+Install the Slabbed NeoForge jar. Keep client and server Slabbed versions aligned for a
 real multiplayer deployment, and never use a TEST jar as a release artifact. The
 `-Dslabbed.frozenDy` compatibility flag for worlds built before 0.5 must match on both sides as well;
 the CHANGELOG's Known limitations explain what it does and what it costs.
@@ -47,10 +45,11 @@ switched off in a normal download.
 
 ## Building and testing
 
-`./gradlew25 build runGameTest` on a clean `build/run/gameTest` runs the server suite; the reported
-count must match `python3 tools/expected-gametest-count.py`. `./gradlew25 runClientGameTest` runs
-the client suite; it is green only when the log shows one `CLIENT_GAMETEST | <class> | PASS` line
-per registered entrypoint. `CLAUDE.md` / `AGENTS.md` hold the rules for coding agents.
+`./gradlew build runGameTestServer` on a clean `build/run/gameTest` runs the server suite (JDK 25; `./gradlew25`
+pins one); the reported count must match `python3 tools/expected-gametest-count.py`.
+`./gradlew runClient -Dslabbed.neoforge.clientWorldProof=true` opens a fresh flat world in the dev client, places
+a block on a bottom slab through the real item path and prints one `NF26_CLIENT_WORLD_PROOF_SUMMARY` line that
+must read `result=GREEN`. `CLAUDE.md` / `AGENTS.md` hold the rules for coding agents.
 
 ## License and feedback
 

@@ -3,8 +3,7 @@ package com.slabbed.test;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.compat.CompatHooks;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -49,15 +48,13 @@ public final class CompatOffsetDeferralPinTest {
             Identifier.fromNamespaceAndPath("terrain_slabs", "compat_offset_deferral_pin_slab");
     private static final ResourceKey<Block> COMPAT_SLAB_KEY =
             ResourceKey.create(Registries.BLOCK, COMPAT_SLAB_ID);
-    private static final Block COMPAT_SLAB =
-            new SlabBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE_SLAB).setId(COMPAT_SLAB_KEY));
+    private static final com.slabbed.gametest.TestBlocks.Lazy<Block> COMPAT_SLAB = com.slabbed.gametest.TestBlocks.block(COMPAT_SLAB_ID, () -> new SlabBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE_SLAB).setId(COMPAT_SLAB_KEY)));
 
     /** Registers the compat-namespaced stand-in slab before registry freeze, via the main entrypoint. */
-    public static final class CompatOffsetDeferralPinTestEntrypoint implements ModInitializer {
+    public static final class CompatOffsetDeferralPinTestEntrypoint implements com.slabbed.gametest.TestModInitializer {
         @Override
         public void onInitialize() {
             if (!BuiltInRegistries.BLOCK.containsKey(COMPAT_SLAB_ID)) {
-                Registry.register(BuiltInRegistries.BLOCK, COMPAT_SLAB_ID, COMPAT_SLAB);
             }
         }
     }
@@ -75,7 +72,7 @@ public final class CompatOffsetDeferralPinTest {
     }
 
     private static BlockState compatBottomSlab() {
-        return COMPAT_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.BOTTOM);
+        return COMPAT_SLAB.get().defaultBlockState().setValue(SlabBlock.TYPE, SlabType.BOTTOM);
     }
 
     /** Reads {@code getYOffset} as the SHIPPED jar does: the gametest JVM pins frozen-dy OFF, and the
@@ -90,7 +87,7 @@ public final class CompatOffsetDeferralPinTest {
         }
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void theDeferralIsLifted_aStoredFactOnACompatSlabIsReadable(GameTestHelper helper) {
         // THE FLIPPED TRIPWIRE. Until the parity slice, this row asserted 0.0 — the skip ran before
         // the store and even a recorded height was unreadable, which is what made every placed compat
@@ -118,7 +115,7 @@ public final class CompatOffsetDeferralPinTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void worldgenCompatTerrainReadsFlush(GameTestHelper helper) {
         // The world-hole guard: compat terrain with no fact must read flush regardless of what ever
         // happens to the deferral. This row must stay green through any future lift.
@@ -154,7 +151,7 @@ public final class CompatOffsetDeferralPinTest {
      * headless seam carries. This row pins the mint's correctness so that when the live divergence is
      * found, it cannot be "fixed" by breaking the part that already works.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void vanillaSlabOnCompatSlabTopMintsTheContinuationSeat(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos supportRel = new BlockPos(2, 2, 2);
@@ -196,7 +193,7 @@ public final class CompatOffsetDeferralPinTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void theSeamGatesByNamespaceAndOnlyWhenSet(GameTestHelper helper) {
         // The seam's own contract: on, it marks exactly the compat namespace; off, the real hook
         // answers false with the mod absent. Without this pair the two rows above could pass with a

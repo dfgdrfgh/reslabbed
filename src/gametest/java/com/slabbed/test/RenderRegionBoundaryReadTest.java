@@ -1,7 +1,7 @@
 package com.slabbed.test;
 
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.level.BlockGetter;
@@ -79,7 +79,7 @@ public final class RenderRegionBoundaryReadTest {
         }
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aBoundsEscapePropagatesInsteadOfBeingAbsorbed(GameTestHelper helper) {
         BlockPos relative = new BlockPos(1, 1, 1);
         helper.setBlock(relative, Blocks.STONE_SLAB);
@@ -104,7 +104,7 @@ public final class RenderRegionBoundaryReadTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aRegionThatCanSeeItsEvidenceAnswersTheSameAsTheLevel(GameTestHelper helper) {
         // The other half. A bound that broke ordinary resolution would pass the row above and be
         // useless; this pins that a view which CAN see everything answers exactly what the level does.

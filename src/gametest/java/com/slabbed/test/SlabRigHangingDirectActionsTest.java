@@ -7,7 +7,7 @@ import com.slabbed.command.SlabRigHangingDirectActions;
 import com.slabbed.command.SlabRigHangingDirectEntityGate;
 import com.slabbed.command.SlabRigHangingDirectFixture;
 import com.slabbed.command.SlabRigHangingPaintingPlan;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerLevel;

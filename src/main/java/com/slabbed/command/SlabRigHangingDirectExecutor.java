@@ -1,12 +1,16 @@
 package com.slabbed.command;
 
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.tick.LevelTickEvent;
+import net.neoforged.neoforge.event.server.ServerStoppingEvent;
+import net.neoforged.neoforge.event.server.ServerStoppedEvent;
+import net.neoforged.neoforge.event.server.ServerStartedEvent;
+import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import com.mojang.brigadier.context.CommandContext;
 import com.slabbed.Slabbed;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.BuildStamp;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -145,12 +149,24 @@ public final class SlabRigHangingDirectExecutor {
             }
             registered = true;
             SlabRigHangingDirectEntityGate.installHandler(ENTITY_HANDLER);
-            ServerLifecycleEvents.SERVER_STARTED.register(SlabRigHangingDirectExecutor::serverStarted);
-            ServerLifecycleEvents.SERVER_STOPPING.register(SlabRigHangingDirectExecutor::serverStopping);
-            ServerLifecycleEvents.SERVER_STOPPED.register(SlabRigHangingDirectExecutor::serverStopped);
-            ServerTickEvents.END_LEVEL_TICK.register(SlabRigHangingDirectExecutor::endLevelTick);
-            ServerEntityEvents.ENTITY_LOAD.register(SlabRigHangingDirectExecutor::entityLoaded);
-            ServerEntityEvents.ENTITY_UNLOAD.register(SlabRigHangingDirectExecutor::entityUnloaded);
+            NeoForge.EVENT_BUS.addListener((ServerStartedEvent event) -> serverStarted(event.getServer()));
+            NeoForge.EVENT_BUS.addListener((ServerStoppingEvent event) -> serverStopping(event.getServer()));
+            NeoForge.EVENT_BUS.addListener((ServerStoppedEvent event) -> serverStopped(event.getServer()));
+            NeoForge.EVENT_BUS.addListener((LevelTickEvent.Post event) -> {
+                if (event.getLevel() instanceof ServerLevel level) {
+                    endLevelTick(level);
+                }
+            });
+            NeoForge.EVENT_BUS.addListener((EntityJoinLevelEvent event) -> {
+                if (event.getLevel() instanceof ServerLevel level) {
+                    entityLoaded(event.getEntity(), level);
+                }
+            });
+            NeoForge.EVENT_BUS.addListener((EntityLeaveLevelEvent event) -> {
+                if (event.getLevel() instanceof ServerLevel level) {
+                    entityUnloaded(event.getEntity(), level);
+                }
+            });
         }
     }
 

@@ -9,11 +9,7 @@ import com.slabbed.command.SlabRigHangingDirectEvidence;
 import com.slabbed.command.SlabRigHangingDirectExecutor;
 import com.slabbed.command.SlabRigHangingDirectState;
 import com.slabbed.command.SlabRigHangingDirectStateStore;
-import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
-import net.fabricmc.loader.api.FabricLoader;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.commands.CommandSource;
@@ -1128,18 +1124,18 @@ public final class SlabRigHangingDirectExecutorTest {
      * only their filesystem destination is swapped, and the swap closes after executor shutdown clears
      * every in-memory ownership index.
      */
-    public static final class StoreBootstrap implements ModInitializer {
+    public static final class StoreBootstrap implements com.slabbed.gametest.TestModInitializer {
         private static Path root;
         private static SlabRigHangingDirectExecutor.StoreOverride override;
         private static SlabRigHangingDirectStateStore independentVerifier;
 
         @Override
         public void onInitialize() {
-            root = FabricLoader.getInstance().getGameDir().resolve("slabbed-rig-integration-")
+            root = com.slabbed.loader.Loader.getGameDir().resolve("slabbed-rig-integration-")
                     .resolve(UUID.randomUUID().toString());
             override = SlabRigHangingDirectExecutor.openTestStoreOverride(root);
             independentVerifier = new SlabRigHangingDirectStateStore(root);
-            ServerLifecycleEvents.SERVER_STOPPED.register(server -> {
+            net.neoforged.neoforge.common.NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.server.ServerStoppedEvent event) -> {
                 if (override != null) {
                     override.close();
                     override = null;
@@ -1365,7 +1361,7 @@ public final class SlabRigHangingDirectExecutorTest {
             if (!(unloadLive instanceof Painting unloadPainting)) {
                 throw helper.assertionException("unload/reload target painting is absent");
             }
-            ServerEntityEvents.ENTITY_UNLOAD.invoker().onUnload(unloadPainting, world);
+            com.slabbed.gametest.RigEvents.entityUnload(unloadPainting, world);
             SlabRigHangingDirectState.State unloaded = head(helper);
             SlabRigHangingDirectState.TickCredit unloadedCredit = unloaded.scheduler().credits()
                     .stream().filter(credit -> credit.paintingUuid().equals(unloadTarget.paintingUuid()))
@@ -1375,7 +1371,7 @@ public final class SlabRigHangingDirectExecutorTest {
                 throw helper.assertionException(
                         "entity-unload lifecycle did not pause/reset exact tick authority");
             }
-            ServerEntityEvents.ENTITY_LOAD.invoker().onLoad(unloadPainting, world);
+            com.slabbed.gametest.RigEvents.entityLoad(unloadPainting, world);
             reconstructed = head(helper);
             SlabRigHangingDirectState.TickCredit reloadedCredit = reconstructed.scheduler().credits()
                     .stream().filter(credit -> credit.paintingUuid().equals(unloadTarget.paintingUuid()))

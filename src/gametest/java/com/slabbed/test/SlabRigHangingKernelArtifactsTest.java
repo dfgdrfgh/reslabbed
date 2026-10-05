@@ -1,7 +1,7 @@
 package com.slabbed.test;
 
 import com.slabbed.command.SlabRigHangingKernelArtifacts;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 
 import java.io.IOException;
@@ -25,7 +25,7 @@ public final class SlabRigHangingKernelArtifactsTest {
     private static final SlabRigHangingKernelArtifacts.Position SECOND_BACKING = pos(5, 3, 3);
     private static final SlabRigHangingKernelArtifacts.Position SECOND_GUARD = pos(5, 4, 3);
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void kernelArtifactsValidateExactThreePhaseChain(GameTestHelper helper) {
         SlabRigHangingKernelArtifacts.PhaseManifest planned = planned();
         SlabRigHangingKernelArtifacts.PhaseManifest immediate = immediate(planned);
@@ -52,7 +52,7 @@ public final class SlabRigHangingKernelArtifactsTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void kernelArtifactsCanonicalizeOrderingWithoutIdentityDrift(GameTestHelper helper) {
         SlabRigHangingKernelArtifacts.PhaseManifest first = planned();
         SlabRigHangingKernelArtifacts.CasePlan original = first.page().cases().getFirst();
@@ -76,7 +76,7 @@ public final class SlabRigHangingKernelArtifactsTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void kernelArtifactsBindComponentAndSurvivalEvidenceIntoIdentity(GameTestHelper helper) {
         SlabRigHangingKernelArtifacts.PhaseManifest planned = planned();
         SlabRigHangingKernelArtifacts.PhaseManifest baseline = immediate(planned);
@@ -99,7 +99,7 @@ public final class SlabRigHangingKernelArtifactsTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void kernelArtifactsRejectTamperedPredecessorOwnershipAndClaims(GameTestHelper helper) {
         SlabRigHangingKernelArtifacts.PhaseManifest planned = planned();
         SlabRigHangingKernelArtifacts.PhaseManifest immediate = immediate(planned);
@@ -218,7 +218,7 @@ public final class SlabRigHangingKernelArtifactsTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void kernelArtifactPublicationIsAtomicIdempotentAndCollisionSafe(GameTestHelper helper) {
         Path root = Path.of("build", "run", "gameTest", "rig3b2a-artifact-tests",
                 UUID.randomUUID().toString()).toAbsolutePath();

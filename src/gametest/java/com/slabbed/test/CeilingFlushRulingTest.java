@@ -1,7 +1,7 @@
 package com.slabbed.test;
 
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -75,7 +75,7 @@ public final class CeilingFlushRulingTest {
     }
 
     /** Walk B (direct): a flush TOP slab appearing above a placed TOP trapdoor must not move it. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void topTrapdoorStaysFlushWhenTopSlabPlacedAbove(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos wall = helper.absolutePos(new BlockPos(2, 2, 3));
@@ -92,7 +92,7 @@ public final class CeilingFlushRulingTest {
     }
 
     /** Walk C (cascading): the lower of two stacked TOP trapdoors under a flush top slab stays flush. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void cascadedTopTrapdoorStaysFlushUnderTopSlab(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos wallLow = helper.absolutePos(new BlockPos(2, 2, 3));
@@ -115,7 +115,7 @@ public final class CeilingFlushRulingTest {
     }
 
     /** Walk A (always-hung family): hanging roots under a flush top slab hang flush, not +0.5. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void hangingRootsUnderFlushTopSlabStayFlush(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos slab = helper.absolutePos(new BlockPos(2, 3, 2));
@@ -136,7 +136,7 @@ public final class CeilingFlushRulingTest {
      * SlabSupportStateMixin makes any TOP/DOUBLE slab underside sturdy, so ceiling levers genuinely
      * survive under top slabs in this codebase; the ruling must keep them flush.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void ceilingLeverUnderFlushTopSlabStaysFlush(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos slab = helper.absolutePos(new BlockPos(2, 3, 2));
@@ -153,7 +153,7 @@ public final class CeilingFlushRulingTest {
     }
 
     /** Ceiling BUTTON — same family, same ruling. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void ceilingButtonUnderFlushTopSlabStaysFlush(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos slab = helper.absolutePos(new BlockPos(2, 3, 2));
@@ -175,7 +175,7 @@ public final class CeilingFlushRulingTest {
      * of relying on two static snapshots being the same code path (medium sweeper: a future anchor or
      * cache on the ceiling path could break the transition without breaking either snapshot).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void topTrapdoorHoldsFlushThroughSlabPlaceAndBreak(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos wall = helper.absolutePos(new BlockPos(2, 2, 3));
@@ -221,7 +221,7 @@ public final class CeilingFlushRulingTest {
      * NOTE: this scene does NOT exercise the aboveDy+0.5 compensation formula — only the marked-upper
      * controls below prove that leg (-1.0 -> -0.5).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void trapdoorUnderSideLoweredTopSlabReadsMergedFlush(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos slab = buildSideLoweredTopSlab(helper, w);
@@ -235,7 +235,7 @@ public final class CeilingFlushRulingTest {
     }
 
     /** Same healing pin for walk A (same state-dependent air-gate mechanism; see the trapdoor pin above). */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void hangingRootsUnderSideLoweredTopSlabReadMergedFlush(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos slab = buildSideLoweredTopSlab(helper, w);
@@ -284,7 +284,7 @@ public final class CeilingFlushRulingTest {
      * A's lowered tail for every top-slab top; the ruling exposed the tail's missing +0.5 merge
      * compensation and the lower hanger sank to raw -1.0 while its carrier sat at -0.5.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void cascadedHangingSignUnderMarkedUpperSlabFollowsCarrier(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos slab = buildMarkedUpperTopSlab(helper, w);
@@ -306,7 +306,7 @@ public final class CeilingFlushRulingTest {
      * see this leg (exposed when the compensation-drop mutation survived the suite). The geometric
      * leg is what serves support-arrives-later / worldgen / command-placed cells.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void unanchoredTrapdoorUnderMarkedUpperSlabReadsGeometricMerge(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos slab = buildMarkedUpperTopSlab(helper, w);
@@ -322,7 +322,7 @@ public final class CeilingFlushRulingTest {
     }
 
     /** the maintainer's live-confirmed merge: trapdoor under the -1.0 marked slab reads -0.5 — survives the ruling. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void controlTrapdoorUnderMarkedUpperSlabKeepsCompensation(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos slab = buildMarkedUpperTopSlab(helper, w);
@@ -336,7 +336,7 @@ public final class CeilingFlushRulingTest {
     }
 
     /** Walk A compensation control: roots under the -1.0 marked slab read -0.5 — survives the ruling. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void controlHangingRootsUnderMarkedUpperSlabKeepCompensation(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
         BlockPos slab = buildMarkedUpperTopSlab(helper, w);

@@ -1,6 +1,6 @@
 package com.slabbed.test;
 
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -127,7 +127,7 @@ public final class ThinLayerOwnCellPlacementTest {
     }
 
     /** Flush ground: every thin block sits on plain dirt (petals refuse stone). Vanilla's own behaviour is the oracle. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void clickingAThinBlockOnFlushGroundPlacesIntoItsOwnCell(GameTestHelper helper) {
         runCases(helper, i -> {
             BlockPos rel = new BlockPos(1 + i * 2, 1, 2);
@@ -141,7 +141,7 @@ public final class ThinLayerOwnCellPlacementTest {
      * Lowered support: dirt placed on a bottom slab, so it carries a recorded half-block seat. The
      * thin block on top is the mod's own case; the click on it must still stay in its cell.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void clickingAThinBlockOnALoweredSupportPlacesIntoItsOwnCell(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         Player builder = helper.makeMockPlayer(GameType.SURVIVAL);

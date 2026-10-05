@@ -3,8 +3,7 @@ package com.slabbed.test;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.compat.CompatHooks;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -68,15 +67,13 @@ public final class SlabLaneConduitTerrainSlabsGuardTest {
     private static final Identifier TS_SLAB_ID =
             Identifier.fromNamespaceAndPath("terrain_slabs", "slab_lane_conduit_guard_test_slab");
     private static final ResourceKey<Block> TS_SLAB_KEY = ResourceKey.create(Registries.BLOCK, TS_SLAB_ID);
-    private static final Block TS_SLAB =
-            new SlabBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE_SLAB).setId(TS_SLAB_KEY));
+    private static final com.slabbed.gametest.TestBlocks.Lazy<Block> TS_SLAB = com.slabbed.gametest.TestBlocks.block(TS_SLAB_ID, () -> new SlabBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE_SLAB).setId(TS_SLAB_KEY)));
 
     /** Registers the TS-namespaced stand-in conduit slab (before registry freeze, via the main entrypoint). */
-    public static final class TerrainSlabsSlabLaneConduitGuardTestEntrypoint implements ModInitializer {
+    public static final class TerrainSlabsSlabLaneConduitGuardTestEntrypoint implements com.slabbed.gametest.TestModInitializer {
         @Override
         public void onInitialize() {
             if (!BuiltInRegistries.BLOCK.containsKey(TS_SLAB_ID)) {
-                Registry.register(BuiltInRegistries.BLOCK, TS_SLAB_ID, TS_SLAB);
             }
         }
     }
@@ -129,7 +126,7 @@ public final class SlabLaneConduitTerrainSlabsGuardTest {
      * really reaches it). GREEN: with the override the TS conduit breaks the chain and the subject reads
      * flush (no side inheritance).
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabSubjectDoesNotInheritLoweredLaneThroughTerrainSlabsConduit(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
 
@@ -141,7 +138,7 @@ public final class SlabLaneConduitTerrainSlabsGuardTest {
 
         buildVanillaLaneOwner(helper, owner);
         w.setBlock(conduitGround, Blocks.STONE.defaultBlockState(), 2);
-        w.setBlock(conduit, TS_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.BOTTOM), 2);
+        w.setBlock(conduit, TS_SLAB.get().defaultBlockState().setValue(SlabBlock.TYPE, SlabType.BOTTOM), 2);
         w.setBlock(subjectGround, Blocks.STONE.defaultBlockState(), 2);
         w.setBlock(subject, Blocks.BIRCH_SLAB.defaultBlockState().setValue(SlabBlock.TYPE, SlabType.BOTTOM), 2);
 
@@ -177,7 +174,7 @@ public final class SlabLaneConduitTerrainSlabsGuardTest {
      * must STILL propagate the lowered lane onto the subject, even while the TS-exclusion override is
      * active — the guard is namespace-scoped, not a blanket disable of the BFS.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void slabSubjectStillInheritsLoweredLaneThroughVanillaMidSlabWhileTsOverrideActive(GameTestHelper helper) {
         ServerLevel w = helper.getLevel();
 

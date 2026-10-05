@@ -6,7 +6,6 @@ import com.slabbed.util.SlabSupport;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -5904,7 +5903,7 @@ public final class SlabbedLabClientGameTest implements FabricClientGameTest {
     }
 
     static Path resolveClientGameTestScreenshotDir() {
-        Path gameDir = FabricLoader.getInstance().getGameDir();
+        Path gameDir = com.slabbed.loader.Loader.getGameDir();
         Path directScreenshots = gameDir.resolve("screenshots");
         if (Files.isDirectory(directScreenshots)) {
             return directScreenshots;

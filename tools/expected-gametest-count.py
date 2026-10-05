@@ -34,12 +34,13 @@ Usage (from the repo root):
 If the live run reports fewer:  rm -rf build/run/gameTest  and re-run.
 """
 import json
+import re
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-MOD_JSON = ROOT / "src/gametest/resources/fabric.mod.json"
-HARNESS_TESTS = 1  # one test contributed by the harness itself
+REGISTRAR = ROOT / "src/gametest/java/com/slabbed/gametest/SlabbedGameTestClasses.java"
+HARNESS_TESTS = 1  # vanilla minecraft:always_pass runs alongside the namespace-filtered suite
 
 
 def strip_comments(text: str) -> str:
@@ -69,7 +70,9 @@ def strip_comments(text: str) -> str:
 
 
 def main() -> int:
-    entrypoints = json.loads(MOD_JSON.read_text())["entrypoints"]["fabric-gametest"]
+    src = REGISTRAR.read_text()
+    block = src[src.index("CLASSES = List.of("):src.index(");", src.index("CLASSES = List.of("))]
+    entrypoints = re.findall(r'"([\w.$]+)"', block)
     total = 0
     for cls in entrypoints:
         src = ROOT / "src/gametest/java" / (cls.replace(".", "/") + ".java")
@@ -81,7 +84,7 @@ def main() -> int:
 
     # Advisory only — never folded into the gated number above, because these do not run in the
     # same task. Printed so the uncovered surface is stated out loud on every check.
-    client = json.loads(MOD_JSON.read_text())["entrypoints"].get("fabric-client-gametest", [])
+    client = []  # no client-GameTest runner on this line; the native probe runs are the client proofs
     if client:
         print(f"NOT COVERED BY THIS GATE: {len(client)} fabric-client-gametest classes. They run "
               f"only under `./gradlew25 runClientGameTest`, which no build or CI step invokes. "

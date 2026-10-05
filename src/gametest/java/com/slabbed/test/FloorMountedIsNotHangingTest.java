@@ -2,7 +2,7 @@ package com.slabbed.test;
 
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.SlabSupport;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -85,13 +85,13 @@ public final class FloorMountedIsNotHangingTest {
     }
 
     /** A floor lever seats like the stone control did on the same support: -1.0. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void floorLeverOnLoweredBottomSlabSeatsOnIt(GameTestHelper helper) {
         floorSeatRow(helper, Blocks.LEVER.asItem(), "floor lever", -1.0);
     }
 
     /** A standing Y-chain with open air above hangs from nothing and seats the same way. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void standingChainOnLoweredBottomSlabSeatsOnIt(GameTestHelper helper) {
         // 26.x split chains into IRON_CHAIN/COPPER_CHAIN; there is no plain CHAIN constant.
         floorSeatRow(helper, Blocks.IRON_CHAIN.asItem(), "standing chain", -1.0);
@@ -99,7 +99,7 @@ public final class FloorMountedIsNotHangingTest {
 
     /** Premise sanity for the lever row: the placed lever really is FLOOR-attached, so the row above
      *  is arguing about a floor subject and not a wall one. */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void placedLeverIsFloorAttached(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();
         BlockPos supportRel = new BlockPos(2, 2, 2);

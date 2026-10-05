@@ -1,0 +1,21 @@
+modLoader="javafml"
+loaderVersion="${loader_version_range}"
+license="${mod_license}"
+
+[[mods]]
+modId="slabbed_diagnostics"
+version="${mod_version}"
+displayName="Slabbed Development Diagnostics"
+description='''
+Development diagnostics companion for Slabbed. Never published.
+'''
+
+[[mixins]]
+config="slabbed.diagnostics.client.mixins.json"
+
+[[dependencies.slabbed_diagnostics]]
+modId="slabbed"
+type="required"
+versionRange="*"
+ordering="AFTER"
+side="BOTH"

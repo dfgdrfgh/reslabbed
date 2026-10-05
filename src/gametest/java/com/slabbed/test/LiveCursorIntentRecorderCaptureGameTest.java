@@ -4,9 +4,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.slabbed.Slabbed;
-import com.slabbed.util.LiveCursorIntentRecorder;
+import com.slabbed.diagnostics.util.LiveCursorIntentRecorder;
 import com.slabbed.util.PlacementVerificationVerdict;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -34,7 +34,7 @@ import java.util.concurrent.CountDownLatch;
  * HEADLESS capture-path proof for the revived {@link LiveCursorIntentRecorder}.
  *
  * <p>The pre-existing contract test ({@code SlabbedLabLiveCursorIntentRecorderContractClientGameTest})
- * is a {@link net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest} and needs the client
+ * is a {@code FabricClientGameTest} (Fabric lines) and needs the client
  * gametest harness ({@code runClientGameTest}); this branch's legacy client tests are Yarn-mapped and
  * deferred, so that harness is not exercised in the normal {@code runGameTest} suite. This headless
  * server {@code GameTest} drives the recorder's public API directly and asserts the on-disk capture
@@ -46,7 +46,7 @@ import java.util.concurrent.CountDownLatch;
  */
 public final class LiveCursorIntentRecorderCaptureGameTest {
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void test23_packet_scope_sequence_correlation_and_boundaries(GameTestHelper helper) {
         Path dir = Path.of("build", "test23-packet-scope-correlation", "run-" + System.nanoTime());
         System.setProperty(LiveCursorIntentRecorder.ENABLE_PROPERTY, "true");
@@ -222,7 +222,7 @@ public final class LiveCursorIntentRecorderCaptureGameTest {
         }
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void c3_early_non_success_none_shape(GameTestHelper helper) {
         Path dir = Path.of("build", "c3-recorder-early-none", "run-" + System.nanoTime());
         System.setProperty(LiveCursorIntentRecorder.ENABLE_PROPERTY, "true");
@@ -304,7 +304,7 @@ public final class LiveCursorIntentRecorderCaptureGameTest {
         }
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void verifier_truth_action_only_placement_is_inconclusive(GameTestHelper helper) {
         Path dir = Path.of("build", "verifier-truth-recorder-action-only", "run-" + System.nanoTime());
         System.setProperty(LiveCursorIntentRecorder.ENABLE_PROPERTY, "true");
@@ -488,7 +488,7 @@ public final class LiveCursorIntentRecorderCaptureGameTest {
         }
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void verifier_truth_reducer_matrix_all_final_outcomes_and_precedence(GameTestHelper helper) {
         LinkedHashMap<String, String> greenEvidence = fullyObservedVerifierAction();
         PlacementVerificationVerdict.Result green =
@@ -1011,7 +1011,7 @@ public final class LiveCursorIntentRecorderCaptureGameTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void verifier_truth_reducer_only_red_is_discoverable(GameTestHelper helper) {
         Path dir = Path.of("build", "verifier-truth-recorder-reducer-red", "run-" + System.nanoTime());
         System.setProperty(LiveCursorIntentRecorder.ENABLE_PROPERTY, "true");
@@ -1096,7 +1096,7 @@ public final class LiveCursorIntentRecorderCaptureGameTest {
         }
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void verifier_truth_green_never_routes_to_mismatches(GameTestHelper helper) {
         Path dir = Path.of("build", "verifier-truth-recorder-green", "run-" + System.nanoTime());
         System.setProperty(LiveCursorIntentRecorder.ENABLE_PROPERTY, "true");
@@ -1165,7 +1165,7 @@ public final class LiveCursorIntentRecorderCaptureGameTest {
         }
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void verifier_truth_client_server_rows_merge_into_one_logical_attempt(
             GameTestHelper helper) {
         Path dir = Path.of(
@@ -1610,7 +1610,7 @@ public final class LiveCursorIntentRecorderCaptureGameTest {
         }
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void verifier_truth_expired_attempt_precedes_new_action_timestamp(
             GameTestHelper helper) {
         Path dir = Path.of(
@@ -1690,7 +1690,7 @@ public final class LiveCursorIntentRecorderCaptureGameTest {
         }
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void verifier_truth_conflict_overlay_rebuilds_missing_components(
             GameTestHelper helper) {
         Path dir = Path.of(
@@ -1764,7 +1764,7 @@ public final class LiveCursorIntentRecorderCaptureGameTest {
         }
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void recorderExposesOrdinaryNumericHeightFailures(GameTestHelper helper) {
         Path dir = Path.of("build", "c4-recorder-truth", "run-" + System.nanoTime());
         System.setProperty(LiveCursorIntentRecorder.ENABLE_PROPERTY, "true");
@@ -1834,7 +1834,7 @@ public final class LiveCursorIntentRecorderCaptureGameTest {
         }
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void recorderWritesSessionAndSummaryWhenEnabled(GameTestHelper helper) {
         Path dir = Path.of("build", "gametest-live-cursor-recorder", "capture-" + System.nanoTime());
         System.setProperty(LiveCursorIntentRecorder.ENABLE_PROPERTY, "true");
@@ -1888,7 +1888,7 @@ public final class LiveCursorIntentRecorderCaptureGameTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void recorderOwnsAllNonterminalIdsAndWriteOrder(GameTestHelper helper) {
         Path dir = Path.of(
                 "build",
@@ -2046,7 +2046,7 @@ public final class LiveCursorIntentRecorderCaptureGameTest {
         helper.succeed();
     }
 
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void manifestIsWrittenWithRedactedJavaCommand(GameTestHelper helper) {
         Path dir = Path.of("build", "gametest-live-cursor-recorder", "manifest-" + System.nanoTime());
         System.setProperty(LiveCursorIntentRecorder.ENABLE_PROPERTY, "true");

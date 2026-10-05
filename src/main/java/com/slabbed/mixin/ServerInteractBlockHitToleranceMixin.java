@@ -3,7 +3,6 @@ package com.slabbed.mixin;
 import com.slabbed.compat.UseItemOnPacketAccess;
 import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
-import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.slabbed.Slabbed;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.network.PlacementDyCorrectionServer;
@@ -28,6 +27,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -167,17 +167,19 @@ public abstract class ServerInteractBlockHitToleranceMixin {
             String heldItem) {
     }
 
-    @WrapOperation(
+    /**
+     * Arms the C3 author correction once the use packet's sequence is recorded. NeoForge's patched
+     * handler writes the sequence straight into the {@code ackBlockChangesUpTo} field (vanilla calls
+     * the method of that name), so this hooks the field write, after it.
+     */
+    @Inject(
             method = "handleUseItemOn",
-            at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;ackBlockChangesUpTo(I)V")
+            at = @At(value = "FIELD",
+                    target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;ackBlockChangesUpTo:I",
+                    opcode = Opcodes.PUTFIELD,
+                    shift = At.Shift.AFTER)
     )
-    private void slabbed$c3ArmAuthorCorrectionAfterAck(
-            ServerGamePacketListenerImpl listener,
-            int sequence,
-            Operation<Void> original
-    ) {
-        original.call(listener, sequence);
+    private void slabbed$c3ArmAuthorCorrectionAfterAck(ServerboundUseItemOnPacket packet, CallbackInfo ci) {
         PlacementDyCorrectionServer.arm(player, SLABBED_C3_PACKET.get());
     }
 

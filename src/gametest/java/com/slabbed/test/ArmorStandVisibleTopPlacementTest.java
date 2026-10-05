@@ -1,7 +1,7 @@
 package com.slabbed.test;
 
 import com.slabbed.anchor.SlabAnchorAttachment;
-import net.fabricmc.fabric.api.gametest.v1.GameTest;
+import com.slabbed.gametest.GameTest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -102,7 +102,7 @@ public final class ArmorStandVisibleTopPlacementTest {
      * accepted — the direction the old check got wrong, and the one a merely-stricter check would
      * silently keep getting wrong.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aStandIsAcceptedWhenOnlyTheGridBandIsBlocked(GameTestHelper helper) {
         withFrozen(() -> {
             BlockPos supportRel = new BlockPos(2, 2, 2);
@@ -135,7 +135,7 @@ public final class ArmorStandVisibleTopPlacementTest {
      * exactly the seat below the flush control. This is the tripwire for a second drop being applied
      * on the placement side, which would sink every stand half a block into the ground.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aStandOnALoweredSupportStandsOnItsDrawnTop(GameTestHelper helper) {
         withFrozen(() -> {
             BlockPos loweredRel = new BlockPos(2, 2, 2);
@@ -179,7 +179,7 @@ public final class ArmorStandVisibleTopPlacementTest {
      * clicked block is replaceable — here a single snow layer growing on the lowered block, where the
      * spawn cell IS the clicked cell.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aStandOnAReplaceableClickedBlockUsesTheSupportBelowIt(GameTestHelper helper) {
         withFrozen(() -> {
             BlockPos supportRel = new BlockPos(2, 2, 2);
@@ -209,7 +209,7 @@ public final class ArmorStandVisibleTopPlacementTest {
      * height, so vanilla's refusal here is preserved exactly — this is the store gate's tripwire, not
      * a claim that the refusal is desirable.
      */
-    @GameTest(structure = "fabric-gametest-api-v1:empty")
+    @GameTest(structure = "slabbed_gametest:empty")
     public void aStandOnAnUnloweredSlabKeepsVanillasRefusal(GameTestHelper helper) {
         withFrozen(() -> {
             BlockPos slabRel = new BlockPos(2, 2, 2);
