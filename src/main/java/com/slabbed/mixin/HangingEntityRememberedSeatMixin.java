@@ -61,15 +61,29 @@ public abstract class HangingEntityRememberedSeatMixin extends BlockAttachedEnti
         super(type, level);
     }
 
+    /** Set while a just-synced seat is being applied: NeoForge stores the value only after the sync read returns. */
+    @Unique
+    private boolean slabbed$seatArriving;
+
+    @Unique
+    private long slabbed$arrivingSeatBits;
+
+    @Unique
+    private long slabbed$seatBits() {
+        return this.slabbed$seatArriving
+                ? this.slabbed$arrivingSeatBits
+                : this.getData(com.slabbed.anchor.EntitySeatAttachments.HANG_DY);
+    }
+
     @Override
     public double slabbed$hangSeatDy() {
-        double dy = Double.longBitsToDouble(this.getData(com.slabbed.anchor.EntitySeatAttachments.HANG_DY));
+        double dy = Double.longBitsToDouble(this.slabbed$seatBits());
         return Double.isFinite(dy) ? dy : 0.0d;
     }
 
     @Override
     public boolean slabbed$hasHangSeat() {
-        return Double.isFinite(Double.longBitsToDouble(this.getData(com.slabbed.anchor.EntitySeatAttachments.HANG_DY)));
+        return Double.isFinite(Double.longBitsToDouble(this.slabbed$seatBits()));
     }
 
     @Override
@@ -188,7 +202,14 @@ public abstract class HangingEntityRememberedSeatMixin extends BlockAttachedEnti
     public void slabbed$onHangSeatSynced(long rawBits) {
         if (this.level() != null && this.level().isClientSide()
                 && this.pos != null && this.getDirection() != null) {
-            this.recalculateBoundingBox();
+            // The attachment map still holds the previous value here; lay out from the arriving bits.
+            this.slabbed$seatArriving = true;
+            this.slabbed$arrivingSeatBits = rawBits;
+            try {
+                this.recalculateBoundingBox();
+            } finally {
+                this.slabbed$seatArriving = false;
+            }
         }
     }
 }

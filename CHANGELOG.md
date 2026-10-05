@@ -18,6 +18,10 @@ Differences on NeoForge:
   is the same geometry; mods that replace the chunk renderer (Sodium) have not been checked on this build.
 - The settings screen opens from the mod list's config button as well as `/slabdy settings`.
 - Climbing a lowered scaffolding's drawn volume goes through NeoForge's scaffolding hook.
+- Slabbed must be installed on both the client and the server on NeoForge (its synced chunk and entity data are
+  registered as required attachment types).
+- The two manual height-nudge keys do nothing on a server that does not run Slabbed.
+- No Sable or Relatively Placed Blocks compatibility on these builds yet (the Fabric 26.x line has none either).
 
 ## [0.6.2-alpha+26.2-26.3]
 

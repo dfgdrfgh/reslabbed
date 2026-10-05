@@ -14,7 +14,14 @@ public final class SlabbedClientNetwork {
         return connection != null && connection.hasChannel(type);
     }
 
+    /**
+     * Sends only when the server negotiated the payload: NeoForge checks the channel at send time and
+     * throws on the client tick otherwise, so a server without Slabbed must simply be ignored.
+     */
     public static void send(CustomPacketPayload payload) {
+        if (!canSend(payload.type())) {
+            return;
+        }
         ClientPacketDistributor.sendToServer(payload);
     }
 }
