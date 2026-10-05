@@ -10,6 +10,9 @@ decorations keep their seat. Everything below this section is the inherited hist
 Needs Fabric API 0.119.4 or newer (the renderer API this build draws lowered blocks through).
 
 - Pale moss carpet, new in 1.21.4, follows the same rules as the other carpets on lowered slabs.
+- The Minecart Improvements experiment is not covered: with it enabled, carts ride at vanilla height over
+  lowered rails. Item frames keep the 1.21.1 line's behaviour (no render drop for frames without a
+  remembered seat).
 - The 1.21.2 game refactors (block neighbour updates carry a wire orientation, minecart movement moved to a
   controller, redstone wire power moved to a controller, entity renderers work from render states, world
   events moved to their own handler) are followed where Slabbed hooks them; behaviour is unchanged.

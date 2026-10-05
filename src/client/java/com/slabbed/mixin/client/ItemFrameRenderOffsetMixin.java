@@ -56,6 +56,11 @@ public abstract class ItemFrameRenderOffsetMixin {
             return 0.0d;
         }
         BlockState attachedState = world.getBlockState(attachedPos);
+        // Donor parity (Fabric 1.21.1): a frame's own cell is air, and air never earns a legacy render
+        // drop there; this line's pale-moss check no longer treats air as a thin top layer, so say it here.
+        if (attachedState.isAir()) {
+            return 0.0d;
+        }
         return SlabSupport.shouldOffset(world, attachedPos, attachedState) ? -0.5d : 0.0d;
     }
 }
