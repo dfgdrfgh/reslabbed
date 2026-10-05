@@ -6,7 +6,9 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.ChainBlock;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.world.WorldAccess;
+import net.minecraft.world.WorldView;
+import net.minecraft.world.tick.ScheduledTickView;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.WorldView;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -32,11 +34,13 @@ public abstract class ChainBlockNeighborSurvivalMixin {
     @Inject(method = "getStateForNeighborUpdate", at = @At("RETURN"), cancellable = true)
     private void slabbed$survivalGuard(
             BlockState state,
-            Direction direction,
-            BlockState neighborState,
-            WorldAccess world,
+            WorldView world,
+            ScheduledTickView tickView,
             BlockPos pos,
+            Direction direction,
             BlockPos neighborPos,
+            BlockState neighborState,
+            Random random,
             CallbackInfoReturnable<BlockState> cir
     ) {
         BlockState result = cir.getReturnValue();

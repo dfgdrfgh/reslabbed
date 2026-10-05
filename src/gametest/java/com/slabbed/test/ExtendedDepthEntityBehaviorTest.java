@@ -1,5 +1,9 @@
 package com.slabbed.test;
 
+import net.minecraft.entity.vehicle.AbstractChestBoatEntity;
+import net.minecraft.entity.vehicle.AbstractBoatEntity;
+import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.vehicle.DefaultMinecartController;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -22,7 +26,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.server.world.ChunkTicketType;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.test.AfterBatch;
 import net.minecraft.test.BeforeBatch;
@@ -44,7 +47,6 @@ import net.minecraft.world.RaycastContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
 
 /** Physical-behavior proof for the attached entity consumers already supported by Slabbed. */
 public final class ExtendedDepthEntityBehaviorTest {
@@ -54,9 +56,6 @@ public final class ExtendedDepthEntityBehaviorTest {
     private static final String BOAT_BATCH = "slabbed_extended_depth_boats";
     private static final String ARMOR_STAND_BATCH = "slabbed_extended_depth_armor_stands";
     private static final String RAIL_BATCH = "slabbed_rail_coordinates";
-    private static final ChunkTicketType<Long> ENTITY_TEST_TICKET =
-            ChunkTicketType.create("slabbed_gametest_entity_ticking", Long::compareTo);
-    private static final AtomicLong ENTITY_TICKET_IDS = new AtomicLong();
     private static boolean frozenBeforeBatch;
     private static boolean frozenBeforeBoatBatch;
     private static boolean frozenBeforeArmorStandBatch;
@@ -164,7 +163,8 @@ public final class ExtendedDepthEntityBehaviorTest {
         flat.setVelocity(Vec3d.ZERO);
         deep.setVelocity(Vec3d.ZERO);
 
-        long readinessDeadline = context.getTick() + 40L;
+        // Chunk tickets on a neighbouring chunk can take several seconds to reach entity ticking on 1.21.4.
+        long readinessDeadline = context.getTick() + 200L;
         context.createTimedTaskRunner().createAndAdd(() -> {
             boolean flatShouldTick = world.shouldTickEntity(flat.getBlockPos());
             boolean deepShouldTick = world.shouldTickEntity(deep.getBlockPos());
@@ -226,8 +226,12 @@ public final class ExtendedDepthEntityBehaviorTest {
                     }
                     deepPassenger.stopRiding();
                     ActionResult interaction = deep.interact(player, Hand.MAIN_HAND);
-                    if (!interaction.isAccepted() || !deep.hasPassenger(player)) {
-                        failures.add("minecart interaction did not mount the player: " + interaction);
+                    // 1.21.2–1.21.4 vanilla mounts the player and then reports PASS (the server path
+                    // asks startRiding twice; the second answer is "already riding"). The mount is the
+                    // behaviour under test, so it is judged by state, with the result kept in the message.
+                    if (!deep.hasPassenger(player)) {
+                        failures.add("minecart interaction did not mount the player: " + interaction
+                                + " passengers=" + deep.getPassengerList());
                     }
 
                     if (!failures.isEmpty()) {
@@ -316,11 +320,11 @@ public final class ExtendedDepthEntityBehaviorTest {
         aimAt(player, Vec3d.ofCenter(water));
         player.setStackInHand(Hand.MAIN_HAND, new ItemStack(Items.OAK_BOAT));
         var fluidResult = player.getStackInHand(Hand.MAIN_HAND).use(world, player, Hand.MAIN_HAND);
-        List<BoatEntity> fluidBoats = world.getEntitiesByClass(
-                BoatEntity.class, new Box(water).expand(2.0d), Entity::isAlive);
-        if (!fluidResult.getResult().isAccepted() || fluidBoats.size() != 1) {
+        List<AbstractBoatEntity> fluidBoats = world.getEntitiesByClass(
+                AbstractBoatEntity.class, new Box(water).expand(2.0d), Entity::isAlive);
+        if (!fluidResult.isAccepted() || fluidBoats.size() != 1) {
             context.throwGameTestException("vanilla fluid boat placement changed result="
-                    + fluidResult.getResult() + " boats=" + fluidBoats.size());
+                    + fluidResult + " boats=" + fluidBoats.size());
             return;
         }
         fluidBoats.getFirst().discard();
@@ -349,12 +353,12 @@ public final class ExtendedDepthEntityBehaviorTest {
         }
         player.setStackInHand(Hand.MAIN_HAND, new ItemStack(Items.OAK_BOAT));
         var occludedResult = player.getStackInHand(Hand.MAIN_HAND).use(world, player, Hand.MAIN_HAND);
-        List<BoatEntity> occludedBoats = world.getEntitiesByClass(
-                BoatEntity.class, new Box(hiddenSupport).expand(3.0d, 5.0d, 3.0d), Entity::isAlive);
-        if (!occludedResult.getResult().isAccepted() || occludedBoats.size() != 1
+        List<AbstractBoatEntity> occludedBoats = world.getEntitiesByClass(
+                AbstractBoatEntity.class, new Box(hiddenSupport).expand(3.0d, 5.0d, 3.0d), Entity::isAlive);
+        if (!occludedResult.isAccepted() || occludedBoats.size() != 1
                 || occludedBoats.getFirst().getPos().squaredDistanceTo(vanillaOccluder.getPos()) > EPSILON) {
             context.throwGameTestException("boat use did not preserve the nearer vanilla hit result="
-                    + occludedResult.getResult() + " boats=" + occludedBoats.size());
+                    + occludedResult + " boats=" + occludedBoats.size());
             return;
         }
         context.complete();
@@ -446,8 +450,9 @@ public final class ExtendedDepthEntityBehaviorTest {
         var done = new java.util.concurrent.CountDownLatch(1);
         Thread worker = new Thread(() -> {
             try {
-                cart.set(new net.minecraft.entity.vehicle.ChestMinecartEntity(
-                        world, rail.getX() + 0.5d, rail.getY() + 0.0625d, rail.getZ() + 0.5d));
+                cart.set(AbstractMinecartEntity.create(
+                        world, rail.getX() + 0.5d, rail.getY() + 0.0625d, rail.getZ() + 0.5d,
+                        EntityType.CHEST_MINECART, SpawnReason.TRIGGERED, ItemStack.EMPTY, null));
             } catch (Throwable failure) {
                 error.set(failure);
             } finally {
@@ -489,17 +494,17 @@ public final class ExtendedDepthEntityBehaviorTest {
             railShape(world, deepRail, shape, DEEP_DY);
             for (int above = 0; above <= 1; above++) {
                 double y = flatRail.getY() + 0.0625d + above;
-                MinecartEntity flat = new MinecartEntity(world, flatRail.getX() + 0.5d, y, flatRail.getZ() + 0.5d);
-                MinecartEntity deep = new MinecartEntity(world, deepRail.getX() + 0.5d, y, deepRail.getZ() + 0.5d);
+                MinecartEntity flat = AbstractMinecartEntity.create(world, flatRail.getX() + 0.5d, y, flatRail.getZ() + 0.5d, EntityType.MINECART, SpawnReason.TRIGGERED, ItemStack.EMPTY, null);
+                MinecartEntity deep = AbstractMinecartEntity.create(world, deepRail.getX() + 0.5d, y, deepRail.getZ() + 0.5d, EntityType.MINECART, SpawnReason.TRIGGERED, ItemStack.EMPTY, null);
                 Vec3d delta = new Vec3d(0.0d, DEEP_DY, 10.0d);
                 requireRailSnap(shape + " direct " + above,
-                        flat.snapPositionToRail(flat.getX(), flat.getY(), flat.getZ()),
-                        deep.snapPositionToRail(deep.getX(), deep.getY(), deep.getZ()), delta, failures);
+                        ((DefaultMinecartController) flat.getController()).snapPositionToRail(flat.getX(), flat.getY(), flat.getZ()),
+                        ((DefaultMinecartController) deep.getController()).snapPositionToRail(deep.getX(), deep.getY(), deep.getZ()), delta, failures);
                 checks++;
                 for (double offset : new double[]{-0.3d, 0.3d}) {
                     requireRailSnap(shape + " offset " + offset + " lookup " + above,
-                            flat.snapPositionToRailWithOffset(flat.getX(), flat.getY(), flat.getZ(), offset),
-                            deep.snapPositionToRailWithOffset(deep.getX(), deep.getY(), deep.getZ(), offset), delta, failures);
+                            ((DefaultMinecartController) flat.getController()).method_61619(flat.getX(), flat.getY(), flat.getZ(), offset),
+                            ((DefaultMinecartController) deep.getController()).method_61619(deep.getX(), deep.getY(), deep.getZ(), offset), delta, failures);
                     checks++;
                 }
                 NbtCompound saved = new NbtCompound();
@@ -509,8 +514,8 @@ public final class ExtendedDepthEntityBehaviorTest {
                 if (saved.getDouble("slabbed:rail_dy") != DEEP_DY) failures.add("minecart height missing from NBT");
                 requireBox("reloaded minecart", deep.getBoundingBox(), restored.getBoundingBox(), failures);
                 requireRailSnap("reloaded " + shape,
-                        deep.snapPositionToRail(deep.getX(), deep.getY(), deep.getZ()),
-                        restored.snapPositionToRail(restored.getX(), restored.getY(), restored.getZ()),
+                        ((DefaultMinecartController) deep.getController()).snapPositionToRail(deep.getX(), deep.getY(), deep.getZ()),
+                        ((DefaultMinecartController) restored.getController()).snapPositionToRail(restored.getX(), restored.getY(), restored.getZ()),
                         Vec3d.ZERO, failures);
             }
         }
@@ -520,8 +525,8 @@ public final class ExtendedDepthEntityBehaviorTest {
         }
         railShape(world, deepRail, RailShape.EAST_WEST, DEEP_DY);
         List<EntityTickingTicket> taskForcedChunks = forceEntityTickingChunks(world, deepRail, deepRail.south(4));
-        MinecartEntity cart = new MinecartEntity(world, deepRail.getX() + 0.5d,
-                deepRail.getY() + DEEP_DY + 0.0625d, deepRail.getZ() + 4.5d);
+        MinecartEntity cart = AbstractMinecartEntity.create(world, deepRail.getX() + 0.5d,
+                deepRail.getY() + DEEP_DY + 0.0625d, deepRail.getZ() + 4.5d, EntityType.MINECART, SpawnReason.TRIGGERED, ItemStack.EMPTY, null);
         cart.setNoGravity(true);
         cart.setVelocity(Vec3d.ZERO);
         double[] offRailStart = {Double.NaN};
@@ -594,25 +599,35 @@ public final class ExtendedDepthEntityBehaviorTest {
         });
     }
 
+    /**
+     * Entities in a fixture that straddles a chunk border must tick in every chunk it touches. On
+     * 1.21.4 a plain level ticket on the neighbouring chunk never reaches entity ticking on the test
+     * server, while the harness's force-loaded structure chunk does, so the fixture force-loads the
+     * same way and remembers which chunks it added, releasing only those.
+     */
     private static List<EntityTickingTicket> forceEntityTickingChunks(ServerWorld world, BlockPos... positions) {
         List<EntityTickingTicket> added = new ArrayList<>();
         for (BlockPos position : positions) {
             ChunkPos chunk = new ChunkPos(position);
             if (added.stream().anyMatch(ticket -> ticket.chunk().equals(chunk))) continue;
-            long id = ENTITY_TICKET_IDS.incrementAndGet();
-            world.getChunkManager().addTicket(ENTITY_TEST_TICKET, chunk, 2, id);
-            added.add(new EntityTickingTicket(chunk, id));
+            boolean alreadyForced = world.getForcedChunks().contains(chunk.toLong());
+            if (!alreadyForced) {
+                world.setChunkForced(chunk.x, chunk.z, true);
+            }
+            added.add(new EntityTickingTicket(chunk, alreadyForced));
         }
         return added;
     }
 
     private static void releaseEntityTickingChunks(ServerWorld world, List<EntityTickingTicket> chunks) {
         for (EntityTickingTicket ticket : chunks) {
-            world.getChunkManager().removeTicket(ENTITY_TEST_TICKET, ticket.chunk(), 2, ticket.id());
+            if (!ticket.alreadyForced()) {
+                world.setChunkForced(ticket.chunk().x, ticket.chunk().z, false);
+            }
         }
     }
 
-    private record EntityTickingTicket(ChunkPos chunk, long id) {
+    private record EntityTickingTicket(ChunkPos chunk, boolean alreadyForced) {
     }
 
     private static void runAfterEntityTicking(
@@ -626,7 +641,8 @@ public final class ExtendedDepthEntityBehaviorTest {
         boolean[] started = {false};
         boolean[] ran = {false};
         long[] startTick = {-1L};
-        long readinessDeadline = context.getTick() + 40L;
+        // Chunk tickets on a neighbouring chunk can take several seconds to reach entity ticking on 1.21.4.
+        long readinessDeadline = context.getTick() + 200L;
         context.createTimedTaskRunner().createAndAdd(() -> {
             for (Entity entity : entities) {
                 if (!world.shouldTickEntity(entity.getBlockPos()) || entity.age <= 0) {
@@ -845,14 +861,14 @@ public final class ExtendedDepthEntityBehaviorTest {
             boolean chest,
             String label) {
         BlockPos deepSupport = flatSupport.south(8);
-        BoatEntity flat = placeBoat(context, world, player, flatSupport, 0.0d, item, chest, "flat " + label);
+        AbstractBoatEntity flat = placeBoat(context, world, player, flatSupport, 0.0d, item, chest, "flat " + label);
         if (flat == null) return null;
-        BoatEntity deep = placeBoat(context, world, player, deepSupport, DEEP_DY, item, chest, "deep " + label);
+        AbstractBoatEntity deep = placeBoat(context, world, player, deepSupport, DEEP_DY, item, chest, "deep " + label);
         if (deep == null) return null;
         return new BoatPair(flatSupport, deepSupport, flat, deep);
     }
 
-    private static BoatEntity placeBoat(
+    private static AbstractBoatEntity placeBoat(
             TestContext context,
             ServerWorld world,
             PlayerEntity player,
@@ -871,14 +887,14 @@ public final class ExtendedDepthEntityBehaviorTest {
         ItemStack stack = new ItemStack(item);
         player.setStackInHand(Hand.MAIN_HAND, stack);
         var result = stack.use(world, player, Hand.MAIN_HAND);
-        if (!result.getResult().isAccepted()) {
-            context.throwGameTestException(label + " actual BoatItem.use failed: " + result.getResult());
+        if (!result.isAccepted()) {
+            context.throwGameTestException(label + " actual BoatItem.use failed: " + result);
             return null;
         }
-        List<BoatEntity> boats = world.getEntitiesByClass(
-                BoatEntity.class,
+        List<AbstractBoatEntity> boats = world.getEntitiesByClass(
+                AbstractBoatEntity.class,
                 new Box(support).expand(2.0d, 5.0d, 2.0d),
-                boat -> boat.isAlive() && (chest == (boat instanceof ChestBoatEntity)));
+                boat -> boat.isAlive() && (chest == (boat instanceof AbstractChestBoatEntity)));
         if (boats.size() != 1) {
             context.throwGameTestException(label + " expected exactly one placed boat, found=" + boats.size());
             return null;
@@ -1073,7 +1089,7 @@ public final class ExtendedDepthEntityBehaviorTest {
     private record BoatPair(
             BlockPos flatSupport,
             BlockPos deepSupport,
-            BoatEntity flat,
-            BoatEntity deep) {
+            AbstractBoatEntity flat,
+            AbstractBoatEntity deep) {
     }
 }

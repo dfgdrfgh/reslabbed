@@ -6,8 +6,8 @@ import com.slabbed.client.runtime.PistonMovingRenderScope;
 import com.slabbed.util.RuntimeDiagnostics;
 import com.slabbed.util.SlabSupport;
 import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel;
-import net.fabricmc.fabric.api.renderer.v1.model.ForwardingBakedModel;
-import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
+import net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter;
+import net.minecraft.client.render.model.WrapperBakedModel;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.CarpetBlock;
 import net.minecraft.block.ChainBlock;
@@ -31,14 +31,23 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 /**
  * Wraps a BakedModel to apply a vertical offset to emitted quads
  * (e.g., torches on bottom slabs) without relying on MatrixStack hacks.
+ *
+ * <p>1.21.4 renderer API: the wrapper is a vanilla {@link WrapperBakedModel} that implements the
+ * Fabric block-quad entry point; the emitter is a parameter and the renderer culls faces EARLY
+ * through {@code cullTest}, so the step-seam faces are kept by wrapping that test as well as by
+ * clearing the quad's own cull face. The block-model modifier wraps the top-level model of every
+ * block state, so a multipart or weighted model is wrapped once at the top; a nested wrapper
+ * (should a part be wrapped too) emits plain, so the seat is applied exactly once per emission.
  */
 @SuppressWarnings({"RedundantSuppression", "DataFlowIssue"})
-public final class OffsetBlockStateModel extends ForwardingBakedModel {
+public final class OffsetBlockStateModel extends WrapperBakedModel implements FabricBakedModel {
+    private static final ThreadLocal<int[]> EMIT_DEPTH = ThreadLocal.withInitial(() -> new int[1]);
     private static volatile BlockPos slabbed$tracePos = null;
     private static volatile RenderOffsetSample slabbed$lastTrace = RenderOffsetSample.missing();
     private static volatile BlockPos slabbed$modelDyOwnerTracePos = null;
@@ -68,7 +77,11 @@ public final class OffsetBlockStateModel extends ForwardingBakedModel {
     private static final boolean RENDER_OFFSET_TRACE = Boolean.getBoolean("slabbed.render.offset.trace");
 
     public OffsetBlockStateModel(BakedModel wrapped) {
-        this.wrapped = wrapped;
+        super(wrapped);
+    }
+
+    public BakedModel wrapped() {
+        return wrapped;
     }
 
     @Override
@@ -190,18 +203,34 @@ public final class OffsetBlockStateModel extends ForwardingBakedModel {
     }
 
     /**
-     * Fabric renderer entry point used by Indigo/Sodium+Indium.
+     * Fabric renderer entry point used by Indigo/Sodium.
      */
     @Override
-    public void emitBlockQuads(BlockRenderView view, BlockState state, BlockPos pos, Supplier<Random> randomSupplier,
-                               RenderContext context) {
+    public void emitBlockQuads(QuadEmitter emitter, BlockRenderView view, BlockState state, BlockPos pos,
+                               Supplier<Random> randomSupplier, Predicate<Direction> cullTest) {
+        int[] depth = EMIT_DEPTH.get();
+        if (depth[0] > 0) {
+            // Nested wrapper (a wrapped part inside a wrapped multipart): the outer emission owns the seat.
+            emitWrappedBlockQuads(emitter, view, state, pos, randomSupplier, cullTest);
+            return;
+        }
+        depth[0]++;
+        try {
+            slabbed$emitBlockQuads(emitter, view, state, pos, randomSupplier, cullTest);
+        } finally {
+            depth[0]--;
+        }
+    }
+
+    private void slabbed$emitBlockQuads(QuadEmitter emitter, BlockRenderView view, BlockState state, BlockPos pos,
+                                        Supplier<Random> randomSupplier, Predicate<Direction> cullTest) {
         // A vertical chain hanging directly under a slab ceiling support renders the elongated
         // 0..24 (1.5-block) chain model at dy=0 so render == outline/hitbox, physically bridging
         // the half-block gap above a hanging lantern. Supersedes the standard dy=+0.5 chain branch.
         if (ChainCeilingGeometry.usesAlternateGeometry(view, pos, state)) {
             BakedModel alt = ChainCeilingGeometry.bakedOrNull();
             if (alt != null) {
-                context.bakedModelConsumer().accept(alt, state);
+                alt.emitBlockQuads(emitter, view, state, pos, randomSupplier, cullTest);
                 return;
             }
         }
@@ -292,7 +321,7 @@ public final class OffsetBlockStateModel extends ForwardingBakedModel {
         // and before the dy == 0 fast path (a flush ramp onto a lowered rail must still be fitted);
         // false for every other block and for a profile vanilla already draws, which then take the
         // ordinary path below.
-        if (RailSlopeGeometry.emitIfFitted(wrapped, view, state, pos, randomSupplier, context, dy)) {
+        if (RailSlopeGeometry.emitIfFitted(wrapped, view, state, pos, randomSupplier, emitter, dy)) {
             return;
         }
 
@@ -305,7 +334,7 @@ public final class OffsetBlockStateModel extends ForwardingBakedModel {
         // Mirrors the 1.21.11 model-path fix; see docs/CULL-WINDOW-FIX-DESIGN.md.
         // Reuse the self dy already computed above (sourceDy is getYOffset for non-carpet) so the
         // step-cull check below does not recompute this block's own offset 4 more times per block.
-        if (FenceCeilingGeometry.emitIfConnected(wrapped,view,state,pos,randomSupplier,context,dy)) {
+        if (FenceCeilingGeometry.emitIfConnected(wrapped, view, state, pos, randomSupplier, emitter, dy)) {
             return;
         }
         final double selfStepDy = (state.getBlock() instanceof CarpetBlock)
@@ -319,9 +348,15 @@ public final class OffsetBlockStateModel extends ForwardingBakedModel {
             slabbed$recordMc1211FullMeshBoundsSample(view, pos, state, wrapped, dy,
                     0, 0, Double.NaN, Double.NaN, Double.NaN, Double.NaN,
                     "dy_zero_no_transform");
-            emitWrappedBlockQuads(view, state, pos, randomSupplier, context);
+            emitWrappedBlockQuads(emitter, view, state, pos, randomSupplier, cullTest);
             return;
         }
+        // The renderer culls early through this test, before any quad reaches the transform below:
+        // a face at a lowered-vs-flat seam must survive it so the exposed strip is drawn.
+        final Predicate<Direction> stepAwareCullTest = clearStepCullFaces
+                ? face -> !(face != null && SlabSupport.isSlabHeightStepFace(view, pos, state, face))
+                        && cullTest.test(face)
+                : cullTest;
 
         final float yOffset = dy;
         final BakedModel traceModel = wrapped;
@@ -332,7 +367,7 @@ public final class OffsetBlockStateModel extends ForwardingBakedModel {
                 Double.NEGATIVE_INFINITY,
                 Double.POSITIVE_INFINITY,
                 Double.NEGATIVE_INFINITY};
-        context.pushTransform(quad -> {
+        emitter.pushTransform(quad -> {
             totalQuadsSeen[0]++;
             // Un-cull lowered-step seam faces so the strip exposed by the offset is drawn,
             // not culled into a see-through window. Preserve nominalFace so lighting/orientation
@@ -358,7 +393,7 @@ public final class OffsetBlockStateModel extends ForwardingBakedModel {
             return true;
         });
         try {
-            emitWrappedBlockQuads(view, state, pos, randomSupplier, context);
+            emitWrappedBlockQuads(emitter, view, state, pos, randomSupplier, stepAwareCullTest);
             slabbed$recordMc1211FullMeshBoundsSample(view, pos, state, traceModel, dy,
                     totalQuadsSeen[0],
                     verticesVisited[0],
@@ -368,7 +403,7 @@ public final class OffsetBlockStateModel extends ForwardingBakedModel {
                     meshBounds[3],
                     "quad_transform_aggregate");
         } finally {
-            context.popTransform();
+            emitter.popTransform();
         }
     }
 
@@ -384,14 +419,11 @@ public final class OffsetBlockStateModel extends ForwardingBakedModel {
         return false;
     }
 
-    private void emitWrappedBlockQuads(BlockRenderView view, BlockState state, BlockPos pos,
-                                       Supplier<Random> randomSupplier, RenderContext context) {
-        if (wrapped instanceof FabricBakedModel fabricWrapped) {
-            fabricWrapped.emitBlockQuads(view, state, pos, randomSupplier, context);
-            return;
-        }
-
-        context.bakedModelConsumer().accept(wrapped, state);
+    private void emitWrappedBlockQuads(QuadEmitter emitter, BlockRenderView view, BlockState state, BlockPos pos,
+                                       Supplier<Random> randomSupplier, Predicate<Direction> cullTest) {
+        // Every baked model carries the Fabric entry point (interface injection); a vanilla model's
+        // default routes through the vanilla encoder with the same early cull test.
+        wrapped.emitBlockQuads(emitter, view, state, pos, randomSupplier, cullTest);
     }
 
     private static void slabbed$logCompoundVisibleRenderTraceModelDy(

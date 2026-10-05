@@ -14,8 +14,7 @@ public abstract class ClientParticleSinkCaptureMixin {
 
     @Redirect(
             method = {
-                    "addParticle(Lnet/minecraft/particle/ParticleEffect;DDDDDD)V",
-                    "addParticle(Lnet/minecraft/particle/ParticleEffect;ZDDDDDD)V"
+                    "addParticle(Lnet/minecraft/particle/ParticleEffect;DDDDDD)V"
             },
             at = @At(
                     value = "INVOKE",
@@ -34,6 +33,7 @@ public abstract class ClientParticleSinkCaptureMixin {
 
     @Redirect(
             method = {
+                    "addParticle(Lnet/minecraft/particle/ParticleEffect;ZZDDDDDD)V",
                     "addImportantParticle(Lnet/minecraft/particle/ParticleEffect;DDDDDD)V",
                     "addImportantParticle(Lnet/minecraft/particle/ParticleEffect;ZDDDDDD)V"
             },

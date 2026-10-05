@@ -6,9 +6,6 @@ import com.slabbed.client.model.OffsetBlockStateModel;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.model.loading.v1.ModelModifier;
 import net.minecraft.client.render.model.BakedModel;
-import net.minecraft.client.render.model.MultipartBakedModel;
-import net.minecraft.client.render.model.WeightedBakedModel;
-import net.minecraft.client.util.ModelIdentifier;
 
 public final class SlabbedModelLoadingPlugin {
     private SlabbedModelLoadingPlugin() {
@@ -22,20 +19,17 @@ public final class SlabbedModelLoadingPlugin {
             // time via BakedModelManager#getModel(Identifier) (Fabric-injected overload).
             plugin.addModels(ChainCeilingGeometry.MODEL_ID);
 
-            plugin.modifyModelAfterBake().register(ModelModifier.WRAP_PHASE,
-                    (model, context) -> wrapModel(context.topLevelId(), model));
+            // 1.21.4: block-state models have their own after-bake event; the top-level model of every
+            // block state (multipart and weighted included) is wrapped once.
+            plugin.modifyBlockModelAfterBake().register(ModelModifier.WRAP_PHASE,
+                    (model, context) -> wrapModel(model));
         });
     }
 
-    static BakedModel wrapModel(ModelIdentifier topLevelId, BakedModel model) {
-        if (model == null
-                || (topLevelId != null && ModelIdentifier.INVENTORY_VARIANT.equals(topLevelId.getVariant()))
-                || model instanceof OffsetBlockStateModel
-                || model instanceof MultipartBakedModel
-                || model instanceof WeightedBakedModel) {
+    static BakedModel wrapModel(BakedModel model) {
+        if (model == null || model instanceof OffsetBlockStateModel) {
             return model;
         }
-
         return new OffsetBlockStateModel(model);
     }
 }

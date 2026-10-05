@@ -2,12 +2,9 @@ package com.slabbed.client.model;
 
 import com.slabbed.util.FenceCeilingConnection;
 import net.fabricmc.fabric.api.renderer.v1.Renderer;
-import net.fabricmc.fabric.api.renderer.v1.RendererAccess;
-import net.fabricmc.fabric.api.renderer.v1.mesh.MeshBuilder;
+import net.fabricmc.fabric.api.renderer.v1.mesh.MutableMesh;
 import net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter;
 import net.fabricmc.fabric.api.renderer.v1.mesh.QuadView;
-import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel;
-import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
 import net.minecraft.block.FenceBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.render.model.BakedModel;
@@ -21,26 +18,21 @@ public final class FenceCeilingGeometry {
     private static final float EPS=1.0e-5f;
     private FenceCeilingGeometry() { }
 
-    public static boolean emitIfConnected(BakedModel wrapped,BlockRenderView view,BlockState state,
-            BlockPos pos,Supplier<Random> randomSupplier,RenderContext context,float seat) {
+    public static boolean emitIfConnected(BakedModel wrapped, BlockRenderView view, BlockState state,
+            BlockPos pos, Supplier<Random> randomSupplier, QuadEmitter out, float seat) {
         if (!(state.getBlock() instanceof FenceBlock)) return false;
         float extension;
         try { extension=(float)FenceCeilingConnection.postTop(view,pos,state,seat)-1.0f; }
         catch (IndexOutOfBoundsException outsideRenderRegion) { return false; }
-        Renderer renderer=RendererAccess.INSTANCE.getRenderer();
+        Renderer renderer=Renderer.get();
         if (extension<=EPS || renderer==null) return false;
-        MeshBuilder captured=renderer.meshBuilder();
-        QuadEmitter capture=captured.getEmitter();
-        context.pushTransform(quad -> { capture.copyFrom(quad);capture.emit();return false; });
-        try {
-            if (wrapped instanceof FabricBakedModel fabric) {
-                fabric.emitBlockQuads(view,state,pos,randomSupplier,context);
-            } else context.bakedModelConsumer().accept(wrapped,state);
-        } finally { context.popTransform(); }
-        captured.build().forEach(quad -> emit(context.getEmitter(),quad,seat,extension));
+        // Capture the wrapped model's own quads unculled (every face is needed to find the post), then
+        // re-emit each one on its seat, the post top extended up to the ceiling support.
+        MutableMesh captured=renderer.mutableMesh();
+        wrapped.emitBlockQuads(captured.emitter(),view,state,pos,randomSupplier,face -> false);
+        captured.forEach(quad -> emit(out,quad,seat,extension));
         return true;
     }
-
     private static void emit(QuadEmitter out, QuadView quad, float seat, float extension) {
         boolean post = true;
         float low = Float.POSITIVE_INFINITY;

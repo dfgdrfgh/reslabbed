@@ -1,5 +1,7 @@
 package com.slabbed.test;
 
+import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.resource.featuretoggle.FeatureFlags;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.client.ClientDy;
 import it.unimi.dsi.fastutil.longs.Long2ByteOpenHashMap;
@@ -62,9 +64,9 @@ public final class AttachmentRemeshProbe implements ClientModInitializer {
             String worldName = "attachment-remesh-proof-" + Long.toUnsignedString(System.nanoTime());
             client.createIntegratedServerLoader().createAndStart(worldName,
                     new LevelInfo("Attachment Remesh Proof", GameMode.CREATIVE, false,
-                            Difficulty.PEACEFUL, true, new GameRules(), DataConfiguration.SAFE_MODE),
+                            Difficulty.PEACEFUL, true, new GameRules(FeatureFlags.DEFAULT_ENABLED_FEATURES), DataConfiguration.SAFE_MODE),
                     new GeneratorOptions(0L, false, false),
-                    registries -> registries.get(RegistryKeys.WORLD_PRESET).getOrThrow(WorldPresets.FLAT)
+                    registries -> registries.getOrThrow(RegistryKeys.WORLD_PRESET).getOrThrow(WorldPresets.FLAT).value()
                             .createDimensionsRegistryHolder(), null);
             return;
         }
@@ -177,8 +179,9 @@ public final class AttachmentRemeshProbe implements ClientModInitializer {
             int count = 0;
             for (int x = image.getWidth() * 3 / 10; x < image.getWidth() * 7 / 10; x++)
                 for (int y = image.getHeight() * 3 / 10; y < image.getHeight() * 7 / 10; y++) {
-                    int rgb = image.getColor(x, y);
-                    int red = rgb & 255, green = (rgb >> 8) & 255, blue = (rgb >> 16) & 255;
+                    int rgb = image.getColorArgb(x, y);
+                    // 1.21.4 reads ARGB (the older getColor packed ABGR).
+                    int red = (rgb >> 16) & 255, green = (rgb >> 8) & 255, blue = rgb & 255;
                     if (red > 60 && red > green * 1.4 && red > blue * 1.4) count++;
                 }
             System.out.println("[ATTACHMENT_REMESH] frame=" + name + " red-pixels=" + count);
@@ -193,8 +196,8 @@ public final class AttachmentRemeshProbe implements ClientModInitializer {
             requested=true;
             client.createIntegratedServerLoader().createAndStart("fence-ceiling-proof",
                     new LevelInfo("Fence Ceiling Proof",GameMode.CREATIVE,false,Difficulty.PEACEFUL,true,
-                            new GameRules(),DataConfiguration.SAFE_MODE),new GeneratorOptions(0L,false,false),
-                    registries -> registries.get(RegistryKeys.WORLD_PRESET).getOrThrow(WorldPresets.FLAT)
+                            new GameRules(FeatureFlags.DEFAULT_ENABLED_FEATURES),DataConfiguration.SAFE_MODE),new GeneratorOptions(0L,false,false),
+                    registries -> registries.getOrThrow(RegistryKeys.WORLD_PRESET).getOrThrow(WorldPresets.FLAT).value()
                             .createDimensionsRegistryHolder(),null);
             return;
         }
@@ -245,7 +248,7 @@ public final class AttachmentRemeshProbe implements ClientModInitializer {
             int count=0;
             for (int x=image.getWidth()/2-2;x<=image.getWidth()/2+2;x++)
                 for (int y=image.getHeight()/2-2;y<=image.getHeight()/2+2;y++) {
-                    int rgb=image.getColor(x,y),red=rgb&255,green=(rgb>>8)&255,blue=(rgb>>16)&255;
+                    int rgb=image.getColorArgb(x,y),red=(rgb>>16)&255,green=(rgb>>8)&255,blue=rgb&255; // ARGB on 1.21.4
                     if (red>blue+15 && green>blue+5) count++;
                 }
             System.out.println("[FENCE_CEILING_PROBE] frame="+name+" post_pixels="+count);

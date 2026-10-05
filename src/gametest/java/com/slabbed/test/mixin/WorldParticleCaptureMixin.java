@@ -22,9 +22,9 @@ public abstract class WorldParticleCaptureMixin {
         ParticleCapture.record(effect, false, false, x, y, z, velocityX, velocityY, velocityZ);
     }
 
-    @Inject(method = "addParticle(Lnet/minecraft/particle/ParticleEffect;ZDDDDDD)V", at = @At("HEAD"))
+    @Inject(method = "addParticle(Lnet/minecraft/particle/ParticleEffect;ZZDDDDDD)V", at = @At("HEAD"))
     private void slabbed$recordParticleWithOverride(
-            ParticleEffect effect, boolean alwaysSpawn,
+            ParticleEffect effect, boolean alwaysSpawn, boolean canSpawnOnMinimal,
             double x, double y, double z,
             double velocityX, double velocityY, double velocityZ,
             CallbackInfo callback

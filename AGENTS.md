@@ -38,6 +38,28 @@ Keep the "do not re-add X" guard comments — they are anti-regression tripwires
   `build`; debug/dev tooling ships in every jar default-off, but the file-writing audit/recorder
   packages never ship.
 
+## Line notes (Fabric 1.21.4)
+
+- Java 21. Fabric API 0.119.4+1.21.4 is the renderer API floor: `OffsetBlockStateModel` is a vanilla
+  `WrapperBakedModel` implementing the Fabric block-quad entry point (emitter parameter, early cull test).
+  The cull test is wrapped so lowered-vs-flat seam faces survive early culling; the fence and rail
+  geometry capture the wrapped model's quads into a `MutableMesh` and re-emit them. The block-model
+  modifier wraps the top-level model of every block state once; a nested wrapper emits plain.
+- 1.21.2 refactors followed here: `getStateForNeighborUpdate` is (state, world view, tick view, pos,
+  direction, neighbour pos, neighbour state, random); `neighborUpdate` carries a `WireOrientation`;
+  `replaceWithStateForNeighborUpdate` takes (direction, reacting pos, neighbour pos, neighbour state);
+  wire power lives on `RedstoneController.calculateWirePowerAt`; minecart rail movement, snaps and
+  position writes live on `DefaultMinecartController` (the seat is split between the entity mixin and
+  the controller mixin through `SlabbedRailSeatCarrier`); world events are handled by
+  `WorldEventHandler`; entity renderers work from render states (the legacy render offsets travel on
+  the state through `SlabbedRenderStateDy`); `World.addParticle` with overrides takes two booleans;
+  `BlockCollisionSpliterator` builds its iterator in the shape-context constructor.
+- Pale moss carpet is its own block class: judged by type wherever carpets are, and the carpet outline
+  mixin targets both classes.
+- No Fabric client-GameTest API runs on this line: the dev-client proofs are the probe run
+  configurations in `build.gradle`. `tools/mixin-target-scan.py` against the merged Yarn jar
+  (common + client-only) resolves every mixin target string; run it after any mixin change.
+
 ## Commit hygiene
 
 `git config core.hooksPath tools/hooks` once per checkout. Gates: S-1 (any tracked doc using law

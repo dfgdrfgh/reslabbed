@@ -36,7 +36,7 @@ public abstract class BlockItemPlaceTraceMixin {
             new ThreadLocal<>();
 
     private static boolean slabbed$isTracedBlock(Block block, World world, BlockPos pos) {
-        return block instanceof SlabBlock || block instanceof CarpetBlock || block.getDefaultState().isOpaqueFullCube(world, pos);
+        return block instanceof SlabBlock || block instanceof CarpetBlock || block.getDefaultState().isOpaqueFullCube();
     }
 
     @Inject(method = "place", at = @At("HEAD"))

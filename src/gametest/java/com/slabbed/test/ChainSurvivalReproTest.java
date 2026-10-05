@@ -90,7 +90,7 @@ public final class ChainSurvivalReproTest {
                 "chain not placed at " + chainPos.toShortString()
                 + ", found: " + chainState.getBlock().getTranslationKey());
 
-        BlockState result = chainState.getStateForNeighborUpdate(Direction.UP, world.getBlockState(slabPos), world, chainPos, slabPos);
+        BlockState result = chainState.getStateForNeighborUpdate(world, world, chainPos, Direction.UP, slabPos, world.getBlockState(slabPos), world.getRandom());
         ctx.assertTrue(!result.isAir(),
                 "chain under TOP slab must survive initial recheck; got AIR"
                 + " (slabbed$hasAxisSupport misreporting TOP slab underside)");
@@ -129,7 +129,7 @@ public final class ChainSurvivalReproTest {
         BlockState afterPropagation = world.getBlockState(chainPos);
 
         // Fallback: force the recheck path directly.
-        BlockState forced = afterPropagation.getStateForNeighborUpdate(Direction.UP, Blocks.AIR.getDefaultState(), world, chainPos, slabPos);
+        BlockState forced = afterPropagation.getStateForNeighborUpdate(world, world, chainPos, Direction.UP, slabPos, Blocks.AIR.getDefaultState(), world.getRandom());
         ctx.assertTrue(!forced.isAir(),
                 "chain should remain after TOP slab removed under vanilla floating policy; world state="
                 + afterPropagation.getBlock().getTranslationKey()
@@ -169,7 +169,7 @@ public final class ChainSurvivalReproTest {
 
         BlockState afterPropagation = world.getBlockState(chainPos);
 
-        BlockState forced = afterPropagation.getStateForNeighborUpdate(Direction.UP, Blocks.AIR.getDefaultState(), world, chainPos, slabPos);
+        BlockState forced = afterPropagation.getStateForNeighborUpdate(world, world, chainPos, Direction.UP, slabPos, Blocks.AIR.getDefaultState(), world.getRandom());
         ctx.assertTrue(!forced.isAir(),
                 "chain should remain after DOUBLE slab removed under vanilla floating policy; world state="
                 + afterPropagation.getBlock().getTranslationKey()
@@ -230,7 +230,7 @@ public final class ChainSurvivalReproTest {
 
         // Explicitly force the recheck with direction=WEST, neighborPos=sideNeighborPos.
         // This is the exact per-direction call the world makes.
-        BlockState forced = after.getStateForNeighborUpdate(Direction.WEST, Blocks.AIR.getDefaultState(), world, chainPos, sideNeighborPos);
+        BlockState forced = after.getStateForNeighborUpdate(world, world, chainPos, Direction.WEST, sideNeighborPos, Blocks.AIR.getDefaultState(), world.getRandom());
         ctx.assertTrue(!forced.isAir(),
                 "chain survival recheck (direction=WEST) must not return AIR"
                 + " when TOP slab is still above; got AIR"
@@ -282,7 +282,7 @@ public final class ChainSurvivalReproTest {
                 + after.getBlock().getTranslationKey());
 
         // Force recheck from below.
-        BlockState forced = after.getStateForNeighborUpdate(Direction.DOWN, Blocks.AIR.getDefaultState(), world, upperChainPos, lowerChainPos);
+        BlockState forced = after.getStateForNeighborUpdate(world, world, upperChainPos, Direction.DOWN, lowerChainPos, Blocks.AIR.getDefaultState(), world.getRandom());
         ctx.assertTrue(!forced.isAir(),
                 "upper chain forced recheck must not return AIR; TOP slab above"
                 + " should satisfy isCeilingSupportBottomSurface via Y-axis walk up");
@@ -307,7 +307,7 @@ public final class ChainSurvivalReproTest {
         ctx.assertTrue(state.isOf(CHAIN_BLOCK),
                 "chain not placed at " + chainPos.toShortString());
 
-        BlockState forced = state.getStateForNeighborUpdate(Direction.UP, world.getBlockState(chainPos.up()), world, chainPos, chainPos.up());
+        BlockState forced = state.getStateForNeighborUpdate(world, world, chainPos, Direction.UP, chainPos.up(), world.getBlockState(chainPos.up()), world.getRandom());
         ctx.assertTrue(!forced.isAir(),
                 "unsupported chain forced recheck must remain non-AIR under vanilla floating policy; got "
                 + forced.getBlock().getTranslationKey()
@@ -349,7 +349,7 @@ public final class ChainSurvivalReproTest {
         ctx.assertTrue(chainState.isOf(CHAIN_BLOCK),
                 "X-axis chain not placed at " + chainPos.toShortString());
 
-        BlockState forced = chainState.getStateForNeighborUpdate(Direction.EAST, world.getBlockState(supportPos), world, chainPos, supportPos);
+        BlockState forced = chainState.getStateForNeighborUpdate(world, world, chainPos, Direction.EAST, supportPos, world.getBlockState(supportPos), world.getRandom());
         ctx.assertTrue(!forced.isAir(),
                 "X-axis chain with stone east must survive recheck; got AIR"
                 + " (horizontal axis walk isSideSolidFullSquare(WEST) failed)");
@@ -377,7 +377,7 @@ public final class ChainSurvivalReproTest {
         world.setBlockState(supportPos, Blocks.AIR.getDefaultState(), Block.NOTIFY_ALL);
 
         BlockState after = world.getBlockState(chainPos);
-        BlockState forced = after.getStateForNeighborUpdate(Direction.EAST, Blocks.AIR.getDefaultState(), world, chainPos, supportPos);
+        BlockState forced = after.getStateForNeighborUpdate(world, world, chainPos, Direction.EAST, supportPos, Blocks.AIR.getDefaultState(), world.getRandom());
         ctx.assertTrue(!forced.isAir(),
                 "X-axis chain must remain after sole east support removed under vanilla floating policy; world="
                 + after.getBlock().getTranslationKey()
@@ -416,7 +416,7 @@ public final class ChainSurvivalReproTest {
                 + after.getBlock().getTranslationKey());
 
         // Force the exact per-direction recheck the world makes.
-        BlockState forced = after.getStateForNeighborUpdate(Direction.NORTH, Blocks.AIR.getDefaultState(), world, chainPos, unrelatedPos);
+        BlockState forced = after.getStateForNeighborUpdate(world, world, chainPos, Direction.NORTH, unrelatedPos, Blocks.AIR.getDefaultState(), world.getRandom());
         ctx.assertTrue(!forced.isAir(),
                 "X-axis chain forced recheck (direction=NORTH) must not drop"
                 + " chain; east stone still provides axis support");
@@ -452,7 +452,7 @@ public final class ChainSurvivalReproTest {
                 + " support is still present; found "
                 + after.getBlock().getTranslationKey());
 
-        BlockState forced = after.getStateForNeighborUpdate(Direction.EAST, Blocks.AIR.getDefaultState(), world, chainPos, unrelatedPos);
+        BlockState forced = after.getStateForNeighborUpdate(world, world, chainPos, Direction.EAST, unrelatedPos, Blocks.AIR.getDefaultState(), world.getRandom());
         ctx.assertTrue(!forced.isAir(),
                 "Z-axis chain forced recheck (direction=EAST) must not drop"
                 + " chain; south stone still provides axis support");
@@ -505,7 +505,7 @@ public final class ChainSurvivalReproTest {
         ctx.assertTrue(chainState.isOf(CHAIN_BLOCK),
                 "chain under bottom slab not placed");
 
-        BlockState forced = chainState.getStateForNeighborUpdate(Direction.UP, world.getBlockState(slabPos), world, chainPos, slabPos);
+        BlockState forced = chainState.getStateForNeighborUpdate(world, world, chainPos, Direction.UP, slabPos, world.getBlockState(slabPos), world.getRandom());
         ctx.assertTrue(!forced.isAir(),
                 "Y-axis chain under BOTTOM slab must survive via generic"
                 + " isSideSolidFullSquare(DOWN) — slab's y=0 face is a full"
@@ -541,7 +541,7 @@ public final class ChainSurvivalReproTest {
                 "chainB not placed");
 
         BlockState stateA = world.getBlockState(chainA);
-        BlockState forced = stateA.getStateForNeighborUpdate(Direction.WEST, world.getBlockState(chainA.offset(Direction.WEST)), world, chainA, chainA.offset(Direction.WEST));
+        BlockState forced = stateA.getStateForNeighborUpdate(world, world, chainA, Direction.WEST, chainA.offset(Direction.WEST), world.getBlockState(chainA.offset(Direction.WEST)), world.getRandom());
         ctx.assertTrue(!forced.isAir(),
                 "X-axis chainA must survive recheck via through-chain walk"
                 + " to stone at chainA+2×east; got AIR"
@@ -571,7 +571,7 @@ public final class ChainSurvivalReproTest {
                 "preferred chain not placed at " + chainPos.toShortString()
                 + ", found: " + chainState.getBlock().getTranslationKey());
 
-        BlockState result = chainState.getStateForNeighborUpdate(Direction.UP, world.getBlockState(slabPos), world, chainPos, slabPos);
+        BlockState result = chainState.getStateForNeighborUpdate(world, world, chainPos, Direction.UP, slabPos, world.getBlockState(slabPos), world.getRandom());
         ctx.assertTrue(!result.isAir(),
                 "copper chain under TOP slab must survive initial recheck; got AIR"
                 + " (possible uncovered OxidizableChainBlock path)");
@@ -598,7 +598,7 @@ public final class ChainSurvivalReproTest {
 
         BlockState after = world.getBlockState(chainPos);
 
-        BlockState forced = after.getStateForNeighborUpdate(Direction.EAST, Blocks.AIR.getDefaultState(), world, chainPos, supportPos);
+        BlockState forced = after.getStateForNeighborUpdate(world, world, chainPos, Direction.EAST, supportPos, Blocks.AIR.getDefaultState(), world.getRandom());
         ctx.assertTrue(!forced.isAir(),
                 "X-axis copper chain must remain after sole support removed under vanilla floating policy; world="
                 + after.getBlock().getTranslationKey()
@@ -631,7 +631,7 @@ public final class ChainSurvivalReproTest {
                 "X-axis preferred chain must survive unrelated NORTH update with"
                 + " east support intact; found " + after.getBlock().getTranslationKey());
 
-        BlockState forced = after.getStateForNeighborUpdate(Direction.NORTH, Blocks.AIR.getDefaultState(), world, chainPos, unrelatedPos);
+        BlockState forced = after.getStateForNeighborUpdate(world, world, chainPos, Direction.NORTH, unrelatedPos, Blocks.AIR.getDefaultState(), world.getRandom());
         ctx.assertTrue(!forced.isAir(),
                 "X-axis copper chain forced recheck(direction=NORTH) must not drop"
                 + " when east support remains");
@@ -688,7 +688,7 @@ public final class ChainSurvivalReproTest {
                 "chain popped after same-tick multi-neighbor burst with TOP slab"
                 + " support intact; final=" + finalState.getBlock().getTranslationKey());
 
-        BlockState forced = finalState.getStateForNeighborUpdate(Direction.NORTH, world.getBlockState(north), world, chainPos, north);
+        BlockState forced = finalState.getStateForNeighborUpdate(world, world, chainPos, Direction.NORTH, north, world.getBlockState(north), world.getRandom());
         ctx.assertTrue(!forced.isAir(),
                 "forced recheck after same-tick neighbor burst returned AIR"
                 + " despite TOP slab support remaining");
@@ -739,7 +739,7 @@ public final class ChainSurvivalReproTest {
                 "chain popped during gameplay-like placement/removal ordering; final="
                 + finalState.getBlock().getTranslationKey());
 
-        BlockState forced = finalState.getStateForNeighborUpdate(Direction.WEST, world.getBlockState(scaffoldPos), world, chainPos, scaffoldPos);
+        BlockState forced = finalState.getStateForNeighborUpdate(world, world, chainPos, Direction.WEST, scaffoldPos, world.getBlockState(scaffoldPos), world.getRandom());
         ctx.assertTrue(!forced.isAir(),
                 "forced recheck after gameplay-like ordering returned AIR"
                 + " with TOP slab support still above");
@@ -795,7 +795,7 @@ public final class ChainSurvivalReproTest {
                     "chain popped after nearby piston extend/retract with TOP slab support intact; final="
                     + finalState.getBlock().getTranslationKey());
 
-            BlockState forced = finalState.getStateForNeighborUpdate(Direction.WEST, world.getBlockState(chainPos.west()), world, chainPos, chainPos.west());
+            BlockState forced = finalState.getStateForNeighborUpdate(world, world, chainPos, Direction.WEST, chainPos.west(), world.getBlockState(chainPos.west()), world.getRandom());
             ctx.assertTrue(!forced.isAir(),
                     "forced recheck after nearby piston pulse returned AIR despite TOP slab support");
 
@@ -839,7 +839,7 @@ public final class ChainSurvivalReproTest {
                     "chain should remain after piston moved TOP slab support away under vanilla floating policy; found "
                     + after.getBlock().getTranslationKey());
 
-            BlockState forced = after.getStateForNeighborUpdate(Direction.UP, world.getBlockState(slabPos), world, chainPos, slabPos);
+            BlockState forced = after.getStateForNeighborUpdate(world, world, chainPos, Direction.UP, slabPos, world.getBlockState(slabPos), world.getRandom());
             ctx.assertTrue(!forced.isAir(),
                     "chain should remain after piston moved TOP slab support away under vanilla floating policy; world="
                     + after.getBlock().getTranslationKey()
@@ -888,7 +888,7 @@ public final class ChainSurvivalReproTest {
                     "chain popped during nearby observer pulse ordering with TOP slab support intact; final="
                     + finalState.getBlock().getTranslationKey());
 
-            BlockState forced = finalState.getStateForNeighborUpdate(Direction.WEST, world.getBlockState(observerPos), world, chainPos, observerPos);
+            BlockState forced = finalState.getStateForNeighborUpdate(world, world, chainPos, Direction.WEST, observerPos, world.getBlockState(observerPos), world.getRandom());
             ctx.assertTrue(!forced.isAir(),
                     "forced recheck after observer pulse ordering returned AIR despite TOP slab support");
 

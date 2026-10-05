@@ -32,7 +32,7 @@ public abstract class BlockDisplayParticleMixin {
     @ModifyVariable(
             method = {
                     "addParticle(Lnet/minecraft/particle/ParticleEffect;DDDDDD)V",
-                    "addParticle(Lnet/minecraft/particle/ParticleEffect;ZDDDDDD)V",
+                    "addParticle(Lnet/minecraft/particle/ParticleEffect;ZZDDDDDD)V",
                     "addImportantParticle(Lnet/minecraft/particle/ParticleEffect;DDDDDD)V",
                     "addImportantParticle(Lnet/minecraft/particle/ParticleEffect;ZDDDDDD)V"
             },

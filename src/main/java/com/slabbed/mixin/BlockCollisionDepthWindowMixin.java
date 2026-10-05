@@ -1,5 +1,6 @@
 package com.slabbed.mixin;
 
+import net.minecraft.block.ShapeContext;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.upgrade.WorldUpgradeRuntimePolicy;
 import com.slabbed.util.SlabbedOffsetRaycast;
@@ -20,10 +21,12 @@ import java.util.function.BiFunction;
 /** Stored collision owners must be visited even when their bodies lie below their cells (LAW.md). */
 @Mixin(BlockCollisionSpliterator.class)
 public abstract class BlockCollisionDepthWindowMixin {
-    @ModifyArgs(method = "<init>", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/util/CuboidBlockIterator;<init>(IIIIII)V"))
+    // 1.21.2+: the entity constructor delegates to the shape-context one, which builds the iterator.
+    @ModifyArgs(method = "<init>(Lnet/minecraft/world/CollisionView;Lnet/minecraft/block/ShapeContext;"
+            + "Lnet/minecraft/util/math/Box;ZLjava/util/function/BiFunction;)V",
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/util/CuboidBlockIterator;<init>(IIIIII)V"))
     private void slabbed$includeDeepCollisionOwners(Args args, CollisionView collisionView,
-                                                     Entity entity, Box box, boolean forEntity,
+                                                     ShapeContext context, Box box, boolean forEntity,
                                                      BiFunction<BlockPos.Mutable, VoxelShape, ?> resultFunction) {
         if (SlabAnchorAttachment.FROZEN_DY_ENABLED
                 || collisionView instanceof World world

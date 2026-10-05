@@ -2,12 +2,9 @@ package com.slabbed.client.model;
 
 import com.slabbed.util.RailSlopeProfile;
 import net.fabricmc.fabric.api.renderer.v1.Renderer;
-import net.fabricmc.fabric.api.renderer.v1.RendererAccess;
-import net.fabricmc.fabric.api.renderer.v1.mesh.MeshBuilder;
+import net.fabricmc.fabric.api.renderer.v1.mesh.MutableMesh;
 import net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter;
 import net.fabricmc.fabric.api.renderer.v1.mesh.QuadView;
-import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel;
-import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
 import net.minecraft.block.AbstractRailBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.render.model.BakedModel;
@@ -62,7 +59,7 @@ public final class RailSlopeGeometry {
      */
     public static boolean emitIfFitted(BakedModel wrapped, BlockRenderView view, BlockState state,
                                        BlockPos pos, Supplier<Random> randomSupplier,
-                                       RenderContext context, float dy) {
+                                       QuadEmitter out, float dy) {
         if (!(state.getBlock() instanceof AbstractRailBlock)) {
             return false;
         }
@@ -75,32 +72,20 @@ public final class RailSlopeGeometry {
         if (profile == null || profile.isVanilla()) {
             return false;
         }
-        Renderer renderer = RendererAccess.INSTANCE.getRenderer();
+        Renderer renderer = Renderer.get();
         if (renderer == null) {
             return false;
         }
-        MeshBuilder captured = renderer.meshBuilder();
-        QuadEmitter capture = captured.getEmitter();
-        context.pushTransform(quad -> {
-            capture.copyFrom(quad);
-            capture.emit();
-            return false;
-        });
-        try {
-            if (wrapped instanceof FabricBakedModel fabricWrapped) {
-                fabricWrapped.emitBlockQuads(view, state, pos, randomSupplier, context);
-            } else {
-                context.bakedModelConsumer().accept(wrapped, state);
-            }
-        } finally {
-            context.popTransform();
-        }
+        // CAPTURE on this renderer API: the wrapped model emits into a scratch mesh (rail quads carry
+        // no cull face, so nothing is culled early), and each captured quad is re-emitted fitted.
+        MutableMesh captured = renderer.mutableMesh();
+        wrapped.emitBlockQuads(captured.emitter(), view, state, pos, randomSupplier, face -> false);
         boolean alongZ = profile.axis() == Direction.Axis.Z;
-        captured.build().forEach(quad -> emitFitted(context, quad, profile, alongZ, dy));
+        captured.forEach(quad -> emitFitted(out, quad, profile, alongZ, dy));
         return true;
     }
 
-    private static void emitFitted(RenderContext context, QuadView quad, RailSlopeProfile.Profile profile,
+    private static void emitFitted(QuadEmitter out, QuadView quad, RailSlopeProfile.Profile profile,
                                    boolean alongZ, float dy) {
         float[] t = new float[4];
         boolean low = false;
@@ -114,14 +99,13 @@ public final class RailSlopeGeometry {
             int[] lowPartners = partners(quad, t, alongZ, true);
             int[] highPartners = partners(quad, t, alongZ, false);
             if (lowPartners != null && highPartners != null) {
-                emitHalf(context, quad, profile, dy, t, true, lowPartners);
-                emitHalf(context, quad, profile, dy, t, false, highPartners);
+                emitHalf(out, quad, profile, dy, t, true, lowPartners);
+                emitHalf(out, quad, profile, dy, t, false, highPartners);
                 return;
             }
             // A quad that does not span the cell as a rectangle cannot be split cleanly; draw it
             // whole on the fitted heights instead (only a modded rail model reaches this).
         }
-        QuadEmitter out = context.getEmitter();
         out.copyFrom(quad);
         for (int i = 0; i < 4; i++) {
             out.pos(i, quad.x(i), quad.y(i) + dy + (float) profile.liftAt(t[i]), quad.z(i));
@@ -134,9 +118,8 @@ public final class RailSlopeGeometry {
      * slides along the quad's edge toward its partner until it reaches the middle of the cell, its
      * texture coordinate sliding with it. The vertex order is unchanged, so the winding is too.
      */
-    private static void emitHalf(RenderContext context, QuadView quad, RailSlopeProfile.Profile profile,
+    private static void emitHalf(QuadEmitter out, QuadView quad, RailSlopeProfile.Profile profile,
                                  float dy, float[] t, boolean lowHalf, int[] partners) {
-        QuadEmitter out = context.getEmitter();
         out.copyFrom(quad);
         for (int i = 0; i < 4; i++) {
             boolean inside = lowHalf ? t[i] <= MIDDLE + EDGE : t[i] >= MIDDLE - EDGE;

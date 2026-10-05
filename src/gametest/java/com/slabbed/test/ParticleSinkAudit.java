@@ -1,5 +1,7 @@
 package com.slabbed.test;
 
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.world.WorldEventHandler;
 import com.slabbed.Slabbed;
 import com.slabbed.particle.BlockDisplayParticleContext;
 import com.slabbed.util.SlabSupport;
@@ -133,7 +135,8 @@ public final class ParticleSinkAudit {
     public static Snapshot forceWorldEvent(
             WorldRenderer renderer, ClientWorld world, int eventId, BlockPos owner, int data
     ) {
-        return observeForced(world, owner, () -> renderer.processWorldEvent(eventId, owner, data));
+        return observeForced(world, owner, () -> new WorldEventHandler(MinecraftClient.getInstance(), world, renderer)
+                .processWorldEvent(eventId, owner, data));
     }
 
     private static Snapshot observeForced(ClientWorld world, BlockPos owner, Runnable action) {

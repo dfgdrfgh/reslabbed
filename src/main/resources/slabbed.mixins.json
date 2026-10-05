@@ -18,6 +18,7 @@
     "PaintingRememberedSeatMixin",
     "HangingSurvivalOnGridMixin",
     "MinecartPhysicalOffsetMixin",
+    "DefaultMinecartControllerPhysicalOffsetMixin",
     "PistonPlacementDyTransferMixin",
     "PistonMovingBlockDyMixin",
     "SnowBlockStoredSupportMixin",

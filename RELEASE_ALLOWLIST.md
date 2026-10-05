@@ -98,7 +98,7 @@ exclusion can leave a manifest advertising a class the archive no longer has. Th
 | `com/slabbed/compat/*` | Compat dispatch and the slab-surface-kind enum consumed by third-party slab mods. Dispatch is documented subtractive-only and unreachable when the target mod is absent. |
 | `com/slabbed/compat/terrainslabs/*` | Terrain Slabs compat, mod-id gated. |
 | `com/slabbed/placement/*` | Placement-law decision helpers: `LandingResolver` (one immutable server height from the player's root aim), `LandingHitValidationPolicy` (server-side interact/use validation against a deeply-lowered cell), `ConnectorPlacementSettle` (settles fence/wall/pane/bars connections after a placement's height is published). None does file I/O, registration, rendering or diagnostics. |
-| `com/slabbed/client/model/*` | Offset block-state model, the Y-offset emitter, the alternate chain-ceiling geometry, and the fitted rail geometry that draws a rail on its seat-fitted slope — the lowering render path. |
+| `com/slabbed/client/model/*` | Offset block-state model, the alternate chain-ceiling geometry, and the fitted rail geometry that draws a rail on its seat-fitted slope — the lowering render path. |
 | `com/slabbed/client/runtime/PistonMovingRenderScope` | Prevents nested piston models from applying the destination height twice. |
 | `com/slabbed/mixin/client/*` | Client mixins declared in `slabbed.client.mixins.json`. Non-recursive on purpose. |
 | `com/slabbed/mixin/torch/*` | `TorchBlockMixin` — torch attachment geometry. |
@@ -150,6 +150,7 @@ before this line's behaviour work closes — see the note beneath the table.
 | `com/slabbed/mixin/PaintingRememberedSeatMixin` | A painting remembers the drawn face it was hung on: seat minted once, synced, saved, physical (maintainer ruling, 2026-09-13). |
 | `com/slabbed/mixin/HangingSurvivalOnGridMixin` | A seated painting judges attachment on the grid cells behind it, not its seated box. |
 | `com/slabbed/mixin/MinecartPhysicalOffsetMixin` | Keeps rail coordinates distinct from physical minecart movement, passengers and targeting; the cart's seat follows the rail's drawn slope, and the collision sweep runs at the top of it (maintainer ruling, 2026-09-28). |
+| `com/slabbed/mixin/DefaultMinecartControllerPhysicalOffsetMixin` | The movement half of the minecart seat (1.21.2+ controller): logical rail coordinates, physical position writes on the drawn slope. |
 | `com/slabbed/mixin/PistonPlacementDyTransferMixin` | Carries stored heights through vanilla piston movement. |
 | `com/slabbed/mixin/PistonMovingBlockDyMixin` | Preserves moving-cell heights when their final block state is installed. |
 | `com/slabbed/mixin/SnowBlockStoredSupportMixin` | Preserves snow support-face checks on translated collision shapes. |
@@ -173,6 +174,7 @@ before this line's behaviour work closes — see the note beneath the table.
 | Entry | Reason |
 | --- | --- |
 | `com/slabbed/client/ClientDy` | Client-only dy policy for visual alignment of thin carpet layers on bottom slabs. |
+| `com/slabbed/client/SlabbedRenderStateDy` | Render-only legacy height carried on an entity render state between update and position offset (1.21.2+ render states). |
 | `com/slabbed/client/PlacementDyPredictionClient` | Thin client wiring for `PlacementDyOverlay`: level identity, the raw backing read, targeted rerenders, and lifecycle events. Never writes the chunk's placement-dy attachment itself. |
 | `com/slabbed/client/SlabAnchorClientSync` | Receives anchor sync from the server. |
 | `com/slabbed/client/SlabbedModelLoadingPlugin` | Installs the offset block-state model and the alternate chain-ceiling geometry. |
@@ -188,6 +190,7 @@ before this line's behaviour work closes — see the note beneath the table.
 | `com/slabbed/util/RailSlopeProfile` | The drawn profile of a straight rail: each end fitted to the seat of the rail it connects to. Pure; the one rule the client rail geometry and the outline box are both computed from. Reads seats, writes nothing (maintainer ruling, 2026-09-28). |
 | `com/slabbed/util/RailVisualSignal` | The cell a lowered rail is drawn in and the redstone arriving at that row — the read the powered-rail hooks share. Reads seats, writes nothing (maintainer ruling, 2026-09-28). |
 | `com/slabbed/util/WireVisualSignal` | The wire drawn inside a neighbouring cell and the one-block reach of a wire's read — the read the wire's incoming-signal hook uses. Reads seats, writes nothing (maintainer ruling, 2026-09-28). |
+| `com/slabbed/util/SlabbedRailSeatCarrier` | The minecart's bound rail seat, shared by the entity and movement-controller mixins (1.21.2+ split). |
 | `com/slabbed/util/SlabSupport` | Support-surface resolution and the visual Y offset — the core of the feature. |
 | `com/slabbed/util/SlabbedOffsetRaycast` | Offset-aware nearest-hit raycast — the targeting overhaul. |
 | `com/slabbed/util/RuntimeDiagnostics` | The release-safe diagnostics boundary: every method is gated behind a `System.getProperty` flag (default off) or an `isEnabled()` check, and is the sole caller shipped code uses to reach recording/inspection behaviour. Architecture keeping diagnostics gated, not diagnostics leaking in — analogous in role to the donor line's `SlabbedAuditBridge`, though this line has not yet consolidated onto that class; see the dev-tooling port phase. |

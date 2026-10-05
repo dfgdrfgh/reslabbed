@@ -1,5 +1,7 @@
 package com.slabbed.test;
 
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.registry.RegistryKey;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.block.AbstractBlock;
 import net.minecraft.block.Block;
@@ -42,8 +44,10 @@ public final class TerrainSlabsTestShim implements ModInitializer {
     public static final Identifier TEST_TS_SLAB_ID = Identifier.of("terrain_slabs", "test_slab");
 
     /** Namespace-matched stand-in for a real (modern) Terrain Slabs slab surface. */
+    // 1.21.2+: a block's settings must carry its registry key before construction ("Block id not set").
     public static final Block TEST_TS_SLAB =
-            new GeneratedCapableSlabBlock(AbstractBlock.Settings.create().strength(1.0f));
+            new GeneratedCapableSlabBlock(AbstractBlock.Settings.create().strength(1.0f)
+                    .registryKey(RegistryKey.of(RegistryKeys.BLOCK, TEST_TS_SLAB_ID)));
 
     /**
      * Legacy-namespace stand-in ({@code terrainslabs:grass_slab}) confirming the dual mod-id
@@ -52,7 +56,8 @@ public final class TerrainSlabsTestShim implements ModInitializer {
     public static final Identifier LEGACY_TS_SLAB_ID = Identifier.of("terrainslabs", "grass_slab");
 
     public static final Block LEGACY_TS_SLAB =
-            new GeneratedCapableSlabBlock(AbstractBlock.Settings.create().strength(1.0f));
+            new GeneratedCapableSlabBlock(AbstractBlock.Settings.create().strength(1.0f)
+                    .registryKey(RegistryKey.of(RegistryKeys.BLOCK, LEGACY_TS_SLAB_ID)));
 
     @Override
     public void onInitialize() {
@@ -60,7 +65,9 @@ public final class TerrainSlabsTestShim implements ModInitializer {
         Registry.register(Registries.BLOCK, LEGACY_TS_SLAB_ID, LEGACY_TS_SLAB);
         // Item form so a Terrain Slabs slab can be item-placed through the real placement path.
         Registry.register(Registries.ITEM, TEST_TS_SLAB_ID,
-                new net.minecraft.item.BlockItem(TEST_TS_SLAB, new net.minecraft.item.Item.Settings()));
+                new net.minecraft.item.BlockItem(TEST_TS_SLAB, new net.minecraft.item.Item.Settings()
+                        .registryKey(RegistryKey.of(RegistryKeys.ITEM, TEST_TS_SLAB_ID))
+                        .useBlockPrefixedTranslationKey()));
     }
 
     /** Vanilla slab plus the Terrain Slabs-style {@code generated} property (default false). */

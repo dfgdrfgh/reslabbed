@@ -3,6 +3,7 @@ package com.slabbed.mixin.client;
 import com.slabbed.client.ClientDy;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.CarpetBlock;
+import net.minecraft.block.PaleMossCarpetBlock;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
@@ -12,7 +13,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(CarpetBlock.class)
+// 1.21.4 adds the pale moss carpet, its own block class with a carpet's role: same outline rule.
+@Mixin({CarpetBlock.class, PaleMossCarpetBlock.class})
 public class CarpetDyShapeMixin {
 
     @Inject(method = "getOutlineShape", at = @At("RETURN"), cancellable = true)

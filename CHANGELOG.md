@@ -1,3 +1,19 @@
+## [0.6.2-alpha+1.21.4-fabric]
+
+See LAW.md — this changelog does not redefine the law.
+
+First Slabbed build for Minecraft 1.21.4 (part of the promised 1.21.2–1.21.10 range). It carries the full
+feature set of the 1.21.1 line: placement heights are recorded where you aim and kept for good, lowered slabs
+support the same objects, rails slope to meet their neighbours, fence posts meet a nearby slab ceiling, hung
+decorations keep their seat. Everything below this section is the inherited history of the 1.21.1 line.
+
+Needs Fabric API 0.119.4 or newer (the renderer API this build draws lowered blocks through).
+
+- Pale moss carpet, new in 1.21.4, follows the same rules as the other carpets on lowered slabs.
+- The 1.21.2 game refactors (block neighbour updates carry a wire orientation, minecart movement moved to a
+  controller, redstone wire power moved to a controller, entity renderers work from render states, world
+  events moved to their own handler) are followed where Slabbed hooks them; behaviour is unchanged.
+
 ## [0.6.1-alpha+1.21.1-fabric]
 
 See LAW.md — this changelog does not redefine the law.

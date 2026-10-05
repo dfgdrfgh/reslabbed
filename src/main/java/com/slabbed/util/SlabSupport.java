@@ -82,7 +82,7 @@ public final class SlabSupport {
     }
 
     private static boolean isPaleMossCarpet(Block block) {
-        return block == Registries.BLOCK.get(Identifier.of("minecraft", "pale_moss_carpet"));
+        return block instanceof net.minecraft.block.PaleMossCarpetBlock;
     }
 
     /**

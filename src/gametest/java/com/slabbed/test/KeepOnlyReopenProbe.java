@@ -1,5 +1,7 @@
 package com.slabbed.test;
 
+import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.resource.featuretoggle.FeatureFlags;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.client.ClientDy;
 import com.slabbed.client.model.OffsetBlockStateModel;
@@ -157,7 +159,7 @@ public final class KeepOnlyReopenProbe implements ClientModInitializer {
             worldRequested = true;
             if ("author".equals(mode)) {
                 LevelInfo info = new LevelInfo("Slabbed Keep Fixture", GameMode.CREATIVE, false,
-                        Difficulty.PEACEFUL, true, new GameRules(), DataConfiguration.SAFE_MODE);
+                        Difficulty.PEACEFUL, true, new GameRules(FeatureFlags.DEFAULT_ENABLED_FEATURES), DataConfiguration.SAFE_MODE);
                 client.createIntegratedServerLoader().createAndStart(worldName, info,
                         new GeneratorOptions(0L, false, false), KeepOnlyReopenProbe::flat, null);
                 append("WORLD\t" + mode + "\t" + worldName + "\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-\tcreate_requested");
@@ -184,8 +186,8 @@ public final class KeepOnlyReopenProbe implements ClientModInitializer {
         }
     }
 
-    private static DimensionOptionsRegistryHolder flat(DynamicRegistryManager registries) {
-        return registries.get(RegistryKeys.WORLD_PRESET).getOrThrow(WorldPresets.FLAT).createDimensionsRegistryHolder();
+    private static DimensionOptionsRegistryHolder flat(RegistryWrapper.WrapperLookup registries) {
+        return registries.getOrThrow(RegistryKeys.WORLD_PRESET).getOrThrow(WorldPresets.FLAT).value().createDimensionsRegistryHolder();
     }
 
     private static boolean ready(MinecraftClient client) {

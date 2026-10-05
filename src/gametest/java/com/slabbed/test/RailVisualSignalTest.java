@@ -1,5 +1,7 @@
 package com.slabbed.test;
 
+import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.EntityType;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.SlabSupport;
 import net.minecraft.block.BlockState;
@@ -303,7 +305,7 @@ public final class RailVisualSignalTest {
             BlockPos dip = rails[2];
             AbstractMinecartEntity cart = AbstractMinecartEntity.create(world,
                     dip.getX() + 0.5d, dip.getY() + RAIL_LIFT, dip.getZ() + 0.5d,
-                    AbstractMinecartEntity.Type.RIDEABLE, ItemStack.EMPTY, null);
+                    EntityType.MINECART, SpawnReason.TRIGGERED, ItemStack.EMPTY, null);
             if (cart == null) {
                 throw failure("premise: could not create a minecart");
             }
@@ -338,7 +340,7 @@ public final class RailVisualSignalTest {
         ServerWorld world = ctx.getWorld();
         AbstractMinecartEntity cart = AbstractMinecartEntity.create(world,
                 start.getX() + 0.5d, start.getY() + RAIL_LIFT, start.getZ() + 0.5d,
-                AbstractMinecartEntity.Type.RIDEABLE, ItemStack.EMPTY, null);
+                EntityType.MINECART, SpawnReason.TRIGGERED, ItemStack.EMPTY, null);
         if (cart == null) {
             throw failure("premise: could not create a minecart");
         }
