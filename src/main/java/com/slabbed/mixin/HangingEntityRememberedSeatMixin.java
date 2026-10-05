@@ -73,6 +73,12 @@ public abstract class HangingEntityRememberedSeatMixin extends BlockAttachedEnti
         return (HangingSeatDyHolder) this;
     }
 
+    /** The remembered seat height, or 0 for a decoration subclass that carries no seat holder. */
+    @Unique
+    private double slabbed$seatDyOrZero() {
+        return this instanceof HangingSeatDyHolder holder ? holder.slabbed$hangSeatDy() : 0.0d;
+    }
+
     @Override
     public void readNbt(NbtCompound nbt) {
         this.slabbed$readingData = true;
@@ -111,6 +117,11 @@ public abstract class HangingEntityRememberedSeatMixin extends BlockAttachedEnti
 
     @Unique
     private boolean slabbed$tryMintHangSeat() {
+        // Only item frames and paintings carry a remembered seat on this version; another mod's
+        // decoration subclass has none and must never be cast to the holder.
+        if (!(this instanceof HangingSeatDyHolder)) {
+            return false;
+        }
         if (this.slabbed$readingData || this.slabbed$seat().slabbed$hasHangSeat()
                 || this.getAttachedBlockPos() == null || this.getHorizontalFacing() == null) {
             return false;
@@ -135,7 +146,7 @@ public abstract class HangingEntityRememberedSeatMixin extends BlockAttachedEnti
 
     @Inject(method = "updateAttachmentPosition()V", at = @At("TAIL"))
     private void slabbed$hangBoxOnRememberedSeat(CallbackInfo ci) {
-        double dy = this.slabbed$seat().slabbed$hangSeatDy();
+        double dy = this.slabbed$seatDyOrZero();
         if (Math.abs(dy) >= 1.0e-6d) {
             this.setBoundingBox(this.getBoundingBox().offset(0.0d, dy, 0.0d));
         }
@@ -146,7 +157,7 @@ public abstract class HangingEntityRememberedSeatMixin extends BlockAttachedEnti
 
     @Override
     public void slabbed$beginSurvivalOnGrid() {
-        double dy = this.slabbed$seat().slabbed$hangSeatDy();
+        double dy = this.slabbed$seatDyOrZero();
         if (Math.abs(dy) >= 1.0e-6d) {
             slabbed$shiftedBoxDuringSurvival = this.getBoundingBox();
             this.setBoundingBox(slabbed$shiftedBoxDuringSurvival.offset(0.0d, -dy, 0.0d));
