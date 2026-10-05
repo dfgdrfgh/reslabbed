@@ -1,4 +1,6 @@
 package com.slabbed.test;
+import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.resource.featuretoggle.FeatureFlags;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.client.ClientDy;
 import com.slabbed.client.model.OffsetBlockStateModel;
@@ -196,7 +198,7 @@ public final class ExtendedDepthClientProbe implements ClientModInitializer {
         if (!worldRequested && client != null && client.isFinishedLoading()) {
             worldRequested = true;
             LevelInfo info = new LevelInfo("Slabbed Extended Depth Probe", GameMode.CREATIVE, false,
-                    Difficulty.PEACEFUL, true, new GameRules(), DataConfiguration.SAFE_MODE);
+                    Difficulty.PEACEFUL, true, new GameRules(FeatureFlags.DEFAULT_ENABLED_FEATURES), DataConfiguration.SAFE_MODE);
             client.createIntegratedServerLoader().createAndStart(worldName, info,
                     new GeneratorOptions(0L, false, false),
                     ExtendedDepthClientProbe::createSuperflatDimensionOptions, null);
@@ -909,8 +911,8 @@ public final class ExtendedDepthClientProbe implements ClientModInitializer {
         return client != null && client.world != null && client.player != null
                 && client.interactionManager != null && client.getServer() != null;
     }
-    private static DimensionOptionsRegistryHolder createSuperflatDimensionOptions(DynamicRegistryManager registries) {
-        return registries.get(RegistryKeys.WORLD_PRESET).getOrThrow(WorldPresets.FLAT).createDimensionsRegistryHolder();
+    private static DimensionOptionsRegistryHolder createSuperflatDimensionOptions(RegistryWrapper.WrapperLookup registries) {
+        return registries.getOrThrow(RegistryKeys.WORLD_PRESET).getOrThrow(WorldPresets.FLAT).value().createDimensionsRegistryHolder();
     }
     private static ProbeCase probeCase() {
         return ROWS.get(caseIndex).spec();

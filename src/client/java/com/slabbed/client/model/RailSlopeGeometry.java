@@ -90,7 +90,7 @@ public final class RailSlopeGeometry {
             if (wrapped instanceof FabricBakedModel fabricWrapped) {
                 fabricWrapped.emitBlockQuads(view, state, pos, randomSupplier, context);
             } else {
-                context.bakedModelConsumer().accept(wrapped, state);
+                wrapped.emitBlockQuads(view, state, pos, randomSupplier, context);
             }
         } finally {
             context.popTransform();

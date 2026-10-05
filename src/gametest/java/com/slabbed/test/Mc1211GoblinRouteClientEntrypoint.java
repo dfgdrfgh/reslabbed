@@ -1,5 +1,7 @@
 package com.slabbed.test;
 
+import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.resource.featuretoggle.FeatureFlags;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.block.BlockEntityProvider;
@@ -649,7 +651,7 @@ public final class Mc1211GoblinRouteClientEntrypoint implements ClientModInitial
                 false,
                 Difficulty.PEACEFUL,
                 true,
-                new GameRules(),
+                new GameRules(FeatureFlags.DEFAULT_ENABLED_FEATURES),
                 DataConfiguration.SAFE_MODE);
         GeneratorOptions generatorOptions = new GeneratorOptions(0L, false, false);
         System.out.println("[MC1211_SLAB_THEN_BLOCK_BASELINE_WORLD_START]"
@@ -3173,7 +3175,7 @@ public final class Mc1211GoblinRouteClientEntrypoint implements ClientModInitial
                 false,
                 Difficulty.PEACEFUL,
                 true,
-                new GameRules(),
+                new GameRules(FeatureFlags.DEFAULT_ENABLED_FEATURES),
                 DataConfiguration.SAFE_MODE);
         GeneratorOptions generatorOptions = new GeneratorOptions(0L, false, false);
         client.createIntegratedServerLoader().createAndStart(
@@ -4019,7 +4021,7 @@ public final class Mc1211GoblinRouteClientEntrypoint implements ClientModInitial
                 false,
                 Difficulty.PEACEFUL,
                 true,
-                new GameRules(),
+                new GameRules(FeatureFlags.DEFAULT_ENABLED_FEATURES),
                 DataConfiguration.SAFE_MODE);
         GeneratorOptions generatorOptions = new GeneratorOptions(0L, false, false);
         client.createIntegratedServerLoader().createAndStart(
@@ -4380,7 +4382,7 @@ public final class Mc1211GoblinRouteClientEntrypoint implements ClientModInitial
                 false,
                 Difficulty.PEACEFUL,
                 true,
-                new GameRules(),
+                new GameRules(FeatureFlags.DEFAULT_ENABLED_FEATURES),
                 DataConfiguration.SAFE_MODE);
         GeneratorOptions generatorOptions = new GeneratorOptions(0L, false, false);
         client.createIntegratedServerLoader().createAndStart(
@@ -4805,7 +4807,7 @@ public final class Mc1211GoblinRouteClientEntrypoint implements ClientModInitial
                 false,
                 Difficulty.PEACEFUL,
                 true,
-                new GameRules(),
+                new GameRules(FeatureFlags.DEFAULT_ENABLED_FEATURES),
                 DataConfiguration.SAFE_MODE);
         GeneratorOptions generatorOptions = new GeneratorOptions(0L, false, false);
         client.createIntegratedServerLoader().createAndStart(
@@ -5863,7 +5865,7 @@ public final class Mc1211GoblinRouteClientEntrypoint implements ClientModInitial
             BlockState state,
             Direction direction
     ) {
-        return Block.shouldDrawSide(state, world, pos, direction, pos.offset(direction));
+        return Block.shouldDrawSide(state, world.getBlockState(pos.offset(direction)), direction);
     }
 
     private static boolean sbsTopSlabCullingFaceEmpty(
@@ -5872,7 +5874,7 @@ public final class Mc1211GoblinRouteClientEntrypoint implements ClientModInitial
             BlockState state,
             Direction direction
     ) {
-        return state.getCullingFace(world, pos, direction).isEmpty();
+        return state.getCullingFace(direction).isEmpty();
     }
 
     private static double sbsTopSlabVisibleTopY(
@@ -6455,7 +6457,7 @@ public final class Mc1211GoblinRouteClientEntrypoint implements ClientModInitial
                 false,
                 Difficulty.PEACEFUL,
                 true,
-                new GameRules(),
+                new GameRules(FeatureFlags.DEFAULT_ENABLED_FEATURES),
                 DataConfiguration.SAFE_MODE);
         GeneratorOptions generatorOptions = new GeneratorOptions(0L, false, false);
         client.createIntegratedServerLoader().createAndStart(
@@ -6789,9 +6791,9 @@ public final class Mc1211GoblinRouteClientEntrypoint implements ClientModInitial
             }
             facts.append(direction.asString())
                     .append(":draw=")
-                    .append(Block.shouldDrawSide(state, world, pos, direction, pos.offset(direction)))
+                    .append(Block.shouldDrawSide(state, world.getBlockState(pos.offset(direction)), direction))
                     .append("/empty=")
-                    .append(state.getCullingFace(world, pos, direction).isEmpty());
+                    .append(state.getCullingFace(direction).isEmpty());
         }
         return facts.toString();
     }
@@ -6990,7 +6992,7 @@ public final class Mc1211GoblinRouteClientEntrypoint implements ClientModInitial
                 false,
                 Difficulty.PEACEFUL,
                 true,
-                new GameRules(),
+                new GameRules(FeatureFlags.DEFAULT_ENABLED_FEATURES),
                 DataConfiguration.SAFE_MODE);
         GeneratorOptions generatorOptions = new GeneratorOptions(0L, false, false);
         client.createIntegratedServerLoader().createAndStart(
@@ -7316,7 +7318,7 @@ public final class Mc1211GoblinRouteClientEntrypoint implements ClientModInitial
                 false,
                 Difficulty.PEACEFUL,
                 true,
-                new GameRules(),
+                new GameRules(FeatureFlags.DEFAULT_ENABLED_FEATURES),
                 DataConfiguration.SAFE_MODE);
         GeneratorOptions generatorOptions = new GeneratorOptions(0L, false, false);
         client.createIntegratedServerLoader().createAndStart(
@@ -7769,7 +7771,7 @@ public final class Mc1211GoblinRouteClientEntrypoint implements ClientModInitial
                 false,
                 Difficulty.PEACEFUL,
                 true,
-                new GameRules(),
+                new GameRules(FeatureFlags.DEFAULT_ENABLED_FEATURES),
                 DataConfiguration.SAFE_MODE);
         GeneratorOptions generatorOptions = new GeneratorOptions(0L, false, false);
         client.createIntegratedServerLoader().createAndStart(
@@ -8440,7 +8442,7 @@ public final class Mc1211GoblinRouteClientEntrypoint implements ClientModInitial
                 false,
                 Difficulty.PEACEFUL,
                 true,
-                new GameRules(),
+                new GameRules(FeatureFlags.DEFAULT_ENABLED_FEATURES),
                 DataConfiguration.SAFE_MODE);
         GeneratorOptions generatorOptions = new GeneratorOptions(0L, false, false);
         System.out.println("[MC1211_SIDE_PLACE_STONE_PROGRAMMATIC_WORLD_START]"
@@ -8459,9 +8461,9 @@ public final class Mc1211GoblinRouteClientEntrypoint implements ClientModInitial
                 null);
     }
 
-    private static DimensionOptionsRegistryHolder createSuperflatDimensionOptions(DynamicRegistryManager registries) {
-        return registries.get(RegistryKeys.WORLD_PRESET)
-                .getOrThrow(WorldPresets.FLAT)
+    private static DimensionOptionsRegistryHolder createSuperflatDimensionOptions(RegistryWrapper.WrapperLookup registries) {
+        return registries.getOrThrow(RegistryKeys.WORLD_PRESET)
+                .getOrThrow(WorldPresets.FLAT).value()
                 .createDimensionsRegistryHolder();
     }
 

@@ -6,6 +6,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.PoweredRailBlock;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraft.world.block.WireOrientation;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -28,17 +29,19 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(AbstractBlock.AbstractBlockState.class)
 public abstract class LoweredRailSupportNeighborMixin {
 
+    // 1.21.2+: the neighbour update carries a wire orientation instead of the source position; it
+    // is forwarded as received.
     @Inject(method = "neighborUpdate(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;"
-            + "Lnet/minecraft/block/Block;Lnet/minecraft/util/math/BlockPos;Z)V",
+            + "Lnet/minecraft/block/Block;Lnet/minecraft/world/block/WireOrientation;Z)V",
             at = @At("HEAD"))
     private void slabbed$forwardToTheRailDrawnHere(World world, BlockPos pos, Block sourceBlock,
-                                                   BlockPos sourcePos, boolean notify,
+                                                   WireOrientation orientation, boolean notify,
                                                    CallbackInfo ci) {
         if (world == null || world.isClient() || sourceBlock instanceof PoweredRailBlock) {
             return;
         }
         if (RailVisualSignal.carriesADrawnPoweredRail(world, pos)) {
-            world.updateNeighbor(pos.up(), sourceBlock, sourcePos);
+            world.updateNeighbor(pos.up(), sourceBlock, orientation);
         }
     }
 }

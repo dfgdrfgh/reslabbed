@@ -829,7 +829,8 @@ public final class SlabAnchorAttachment {
             // Trigger getStateForNeighborUpdate(DOWN) on the block above so any stale floor
             // torch that was placed before this compound mark is written gets revalidated and
             // removed by TorchBlockMixin.getStateForNeighborUpdate.
-            world.replaceWithStateForNeighborUpdate(Direction.DOWN, state, pos.up(), pos, Block.NOTIFY_ALL, 512);
+            // 1.21.2+ argument order: (direction, pos reacting, neighbour pos, neighbour state, flags, depth).
+            world.replaceWithStateForNeighborUpdate(Direction.DOWN, pos.up(), pos, state, Block.NOTIFY_ALL, 512);
         }
     }
 
@@ -887,7 +888,8 @@ public final class SlabAnchorAttachment {
         boolean added = addToAttachment(world, pos, COMPOUND_VISIBLE_OWNER_TOP_SLAB_TYPE,
                 "compound_visible_owner_top_slab");
         if (added) {
-            world.replaceWithStateForNeighborUpdate(Direction.DOWN, state, pos.up(), pos, Block.NOTIFY_ALL, 512);
+            // 1.21.2+ argument order: (direction, pos reacting, neighbour pos, neighbour state, flags, depth).
+            world.replaceWithStateForNeighborUpdate(Direction.DOWN, pos.up(), pos, state, Block.NOTIFY_ALL, 512);
         }
     }
 
@@ -1357,7 +1359,7 @@ public final class SlabAnchorAttachment {
     }
 
     private static boolean isPaleMossCarpet(Block block) {
-        return block == Registries.BLOCK.get(Identifier.of("minecraft", "pale_moss_carpet"));
+        return block instanceof net.minecraft.block.PaleMossCarpetBlock;
     }
 
     public static boolean qualifiesForDirectAnchor(BlockView world, BlockPos pos, BlockState state) {

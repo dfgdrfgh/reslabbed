@@ -38,6 +38,29 @@ Keep the "do not re-add X" guard comments — they are anti-regression tripwires
   `build`; debug/dev tooling ships in every jar default-off, but the file-writing audit/recorder
   packages never ship.
 
+## Line notes (Fabric 1.21.2 and 1.21.3, one jar)
+
+- Java 21. Fabric API 0.114.1+1.21.3 keeps the 1.21.1-shaped renderer API (`ForwardingBakedModel`,
+  `RenderContext`), minus `RenderContext.bakedModelConsumer()`: a vanilla model is emitted through its own
+  `emitBlockQuads` (every `BakedModel` carries it by interface injection). The 1.21.4 line's renderer rewrite is
+  NOT on this line.
+- 1.21.3 is a two-fix hotfix of 1.21.2 and Fabric API declares both, so one jar covers both; the build version is
+  1.21.3 (`gradle.properties`); `fabric.mod.json` declares `>=1.21.2 <1.21.4`. A green here must be joined by a
+  1.21.2 server leg (same sources, `minecraft_version=1.21.2` / `yarn_mappings=1.21.2+build.1`) before any range claim.
+- 1.21.2 refactors followed here (same bridges as the 1.21.4 line): `getStateForNeighborUpdate` is (state, world view,
+  tick view, pos, direction, neighbour pos, neighbour state, random); `neighborUpdate` carries a `WireOrientation`;
+  `replaceWithStateForNeighborUpdate` takes (direction, reacting pos, neighbour pos, neighbour state); wire power lives
+  on `RedstoneController.calculateWirePowerAt`; minecart rail movement, snaps and position writes live on
+  `DefaultMinecartController` (seat shared with the entity mixin through `SlabbedRailSeatCarrier`); world events are
+  handled by `WorldEventHandler`; entity renderers work from render states (legacy render offsets travel on the state
+  through `SlabbedRenderStateDy`); `World.addParticle` with overrides takes two booleans; `BlockCollisionSpliterator`
+  builds its iterator in the shape-context constructor.
+- Pale moss carpet is its own block class (experimental on these versions): judged by type wherever carpets are, and
+  the carpet outline mixin targets both classes.
+- No Fabric client-GameTest API runs on this line: the dev-client proofs are the probe run configurations in
+  `build.gradle`. `tools/mixin-target-scan.py` against the merged Yarn jar (common + client-only) resolves every mixin
+  target string; run it after any mixin change.
+
 ## Commit hygiene
 
 `git config core.hooksPath tools/hooks` once per checkout. Gates: S-1 (any tracked doc using law

@@ -87,7 +87,7 @@ public final class HangingLoadDeferralTest {
         BlockPos attachment = wall.offset(Direction.NORTH);
         AbstractDecorationEntity original = painting
                 ? new PaintingEntity(world, attachment, Direction.NORTH,
-                    world.getRegistryManager().get(RegistryKeys.PAINTING_VARIANT).entryOf(PaintingVariants.POINTER))
+                    world.getRegistryManager().getOrThrow(RegistryKeys.PAINTING_VARIANT).getOrThrow(PaintingVariants.POINTER))
                 : new ItemFrameEntity(world, attachment, Direction.NORTH);
         ctx.assertTrue(Math.abs(((HangingSeatDyHolder) original).slabbed$hangSeatDy() + 0.5d) < EPS,
                 "premise: original decoration must be lowered");

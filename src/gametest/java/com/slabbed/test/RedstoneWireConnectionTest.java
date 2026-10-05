@@ -362,12 +362,7 @@ public final class RedstoneWireConnectionTest {
 
     private static WireConnection connectionToward(ServerWorld world, BlockPos wirePos, Direction direction) {
         BlockPos neighborPos = wirePos.offset(direction);
-        BlockState recalculated = Blocks.REDSTONE_WIRE.getDefaultState().getStateForNeighborUpdate(
-                direction,
-                world.getBlockState(neighborPos),
-                world,
-                wirePos,
-                neighborPos);
+        BlockState recalculated = Blocks.REDSTONE_WIRE.getDefaultState().getStateForNeighborUpdate(world, world, wirePos, direction, neighborPos, world.getBlockState(neighborPos), world.getRandom());
         EnumProperty<WireConnection> property =
                 RedstoneWireBlock.DIRECTION_TO_WIRE_CONNECTION_PROPERTY.get(direction);
         return recalculated.get(property);

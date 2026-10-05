@@ -1,10 +1,9 @@
 package com.slabbed.mixin;
 
-import com.llamalad7.mixinextras.injector.wrapmethod.WrapMethod;
-import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.RailSlopeProfile;
 import com.slabbed.util.SlabSupport;
+import com.slabbed.util.SlabbedRailSeatCarrier;
 import com.slabbed.util.SlabbedOffsetRaycast;
 import net.minecraft.block.AbstractRailBlock;
 import net.minecraft.block.BlockState;
@@ -19,7 +18,6 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -51,15 +49,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
  * rail's own height. A rail with no modern provenance keeps the cart at its vanilla height.
  */
 @Mixin(AbstractMinecartEntity.class)
-public abstract class MinecartPhysicalOffsetMixin extends VehicleEntity {
+public abstract class MinecartPhysicalOffsetMixin extends VehicleEntity implements SlabbedRailSeatCarrier {
     @Unique
     private static final TrackedData<Long> SLABBED_RAIL_DY = DataTracker.registerData(
             AbstractMinecartEntity.class, TrackedDataHandlerRegistry.LONG);
     @Unique
     private static final String SLABBED_RAIL_DY_KEY = "slabbed:rail_dy";
-    @Unique
-    private static final String SET_POSITION =
-            "Lnet/minecraft/entity/vehicle/AbstractMinecartEntity;setPosition(DDD)V";
     @Unique
     private int slabbed$logicalRailQueries;
 
@@ -72,10 +67,14 @@ public abstract class MinecartPhysicalOffsetMixin extends VehicleEntity {
         builder.add(SLABBED_RAIL_DY, Double.doubleToRawLongBits(0.0d));
     }
 
-    @Inject(method = "<init>(Lnet/minecraft/entity/EntityType;Lnet/minecraft/world/World;DDD)V", at = @At("TAIL"))
-    private void slabbed$placeAtRailHeight(EntityType<?> type, World world,
-                                          double x, double y, double z, CallbackInfo ci) {
-        if (world.isClient) return;
+    /**
+     * A cart placed at a position (the positioning constructor and the 1.21.2+ static factory both
+     * end in {@code initPosition}) binds the seat of the rail it lands on and sits physically on it.
+     */
+    @Inject(method = "initPosition", at = @At("TAIL"))
+    private void slabbed$placeAtRailHeight(double x, double y, double z, CallbackInfo ci) {
+        World world = getWorld();
+        if (world == null || world.isClient) return;
         // Structure generation constructs carts off-thread; rail lookup waits for the server.
         // Defer binding until the existing server-tick hook can safely read the finished chunk.
         if (world instanceof ServerWorld serverWorld && !serverWorld.getServer().isOnThread()) return;
@@ -90,8 +89,8 @@ public abstract class MinecartPhysicalOffsetMixin extends VehicleEntity {
         }
     }
 
-    @Unique
-    private double slabbed$railDy() {
+    @Override
+    public double slabbed$railDy() {
         double dy = Double.longBitsToDouble(dataTracker.get(SLABBED_RAIL_DY));
         return Double.isFinite(dy) ? dy : 0.0d;
     }
@@ -157,89 +156,40 @@ public abstract class MinecartPhysicalOffsetMixin extends VehicleEntity {
         dataTracker.set(SLABBED_RAIL_DY, Double.doubleToRawLongBits(0.0d));
     }
 
-    @Redirect(method = {"tick", "moveOnRail"}, at = @At(value = "INVOKE",
+    /**
+     * The rail cell a cart stands on is derived from its LOGICAL height: the physical cart sits lower
+     * on a lowered rail, so vanilla's rail lookup reads the entity's Y minus the bound seat. The
+     * movement itself is kept logical by {@link DefaultMinecartControllerPhysicalOffsetMixin}.
+     */
+    @Redirect(method = "getRailOrMinecartPos", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/entity/vehicle/AbstractMinecartEntity;getY()D"))
     private double slabbed$railCoordinateY(AbstractMinecartEntity entity) {
         return entity.getY() - slabbed$railDy();
     }
 
-    /** Write 0: the placement the collision sweep runs at — the top of the drawn profile. */
-    @Redirect(method = "moveOnRail", at = @At(value = "INVOKE", target = SET_POSITION, ordinal = 0))
-    private void slabbed$placeAtTheDrawnTopForCollision(AbstractMinecartEntity entity,
-                                                        double x, double y, double z) {
-        slabbed$bindAndPlace(entity, x, y, z, true);
+    @Override
+    public boolean slabbed$inLogicalRailQuery() {
+        return slabbed$logicalRailQueries > 0;
     }
 
-    /** Write 1: a ramp re-snap after the sweep, in the frame of the placement it follows. */
-    @Redirect(method = "moveOnRail", at = @At(value = "INVOKE", target = SET_POSITION, ordinal = 1))
-    private void slabbed$physicalRailPositionAfterSweep(AbstractMinecartEntity entity,
-                                                       double x, double y, double z) {
-        entity.setPosition(x, y + slabbed$railDy(), z);
+    @Override
+    public void slabbed$enterLogicalRailQuery() {
+        slabbed$logicalRailQueries++;
     }
 
-    /** Write 2: the other ramp re-snap after the sweep, same frame. */
-    @Redirect(method = "moveOnRail", at = @At(value = "INVOKE", target = SET_POSITION, ordinal = 2))
-    private void slabbed$physicalRailPositionAfterSweepOther(AbstractMinecartEntity entity,
-                                                            double x, double y, double z) {
-        entity.setPosition(x, y + slabbed$railDy(), z);
+    @Override
+    public void slabbed$exitLogicalRailQuery() {
+        slabbed$logicalRailQueries--;
     }
 
-    /** Write 3: the final snap onto the rail — the drawn slope at the cart's new place. */
-    @Redirect(method = "moveOnRail", at = @At(value = "INVOKE", target = SET_POSITION, ordinal = 3))
-    private void slabbed$snapOntoTheDrawnSlope(AbstractMinecartEntity entity, double x, double y, double z) {
-        slabbed$bindAndPlace(entity, x, y, z, false);
-    }
-
-    /**
-     * Binds the seat of the rail cell the LOGICAL position belongs to (off any rail, the bound seat
-     * stays) and writes the physical position with it.
-     */
-    @Unique
-    private void slabbed$bindAndPlace(AbstractMinecartEntity entity, double x, double logicalY, double z,
-                                      boolean top) {
+    @Override
+    public void slabbed$bindAndPlace(double x, double logicalY, double z, boolean top) {
         BlockPos rail = slabbed$railAt(x, logicalY, z);
         double seat = rail == null ? Double.NaN : slabbed$drawnSeat(rail, x, z, top);
         if (Double.isFinite(seat)) {
             dataTracker.set(SLABBED_RAIL_DY, Double.doubleToRawLongBits(seat));
         }
-        entity.setPosition(x, logicalY + slabbed$railDy(), z);
-    }
-
-    @WrapMethod(method = "moveOnRail")
-    private void slabbed$railMovement(BlockPos pos, BlockState state, Operation<Void> original) {
-        slabbed$logicalRailQueries++;
-        try {
-            original.call(pos, state);
-        } finally {
-            slabbed$logicalRailQueries--;
-        }
-    }
-
-    @WrapMethod(method = "snapPositionToRail")
-    private Vec3d slabbed$physicalRailSnap(double x, double y, double z, Operation<Vec3d> original) {
-        if (slabbed$logicalRailQueries > 0) return original.call(x, y, z);
-        double dy = slabbed$railDy();
-        slabbed$logicalRailQueries++;
-        try {
-            Vec3d snapped = original.call(x, y - dy, z);
-            return snapped == null ? null : snapped.add(0.0d, dy, 0.0d);
-        } finally {
-            slabbed$logicalRailQueries--;
-        }
-    }
-
-    @WrapMethod(method = "snapPositionToRailWithOffset")
-    private Vec3d slabbed$physicalRailOffsetSnap(double x, double y, double z, double offset,
-                                               Operation<Vec3d> original) {
-        if (slabbed$logicalRailQueries > 0) return original.call(x, y, z, offset);
-        double dy = slabbed$railDy();
-        slabbed$logicalRailQueries++;
-        try {
-            Vec3d snapped = original.call(x, y - dy, z, offset);
-            return snapped == null ? null : snapped.add(0.0d, dy, 0.0d);
-        } finally {
-            slabbed$logicalRailQueries--;
-        }
+        setPosition(x, logicalY + slabbed$railDy(), z);
     }
 
     @Inject(method = "writeCustomDataToNbt", at = @At("TAIL"))

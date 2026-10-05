@@ -8,6 +8,8 @@
     "PendingHangChunkMixin"
   ],
   "client": [
+    "EntityRenderStateEntityMixin",
+    "EntityRendererStateCaptureMixin",
     "ItemFrameRenderMatrixCaptureMixin",
     "MinecartRenderMatrixCaptureMixin",
     "BlockEntityRenderCaptureMixin",

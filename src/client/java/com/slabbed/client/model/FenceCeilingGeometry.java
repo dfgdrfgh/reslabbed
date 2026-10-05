@@ -35,7 +35,7 @@ public final class FenceCeilingGeometry {
         try {
             if (wrapped instanceof FabricBakedModel fabric) {
                 fabric.emitBlockQuads(view,state,pos,randomSupplier,context);
-            } else context.bakedModelConsumer().accept(wrapped,state);
+            } else wrapped.emitBlockQuads(view,state,pos,randomSupplier,context);
         } finally { context.popTransform(); }
         captured.build().forEach(quad -> emit(context.getEmitter(),quad,seat,extension));
         return true;

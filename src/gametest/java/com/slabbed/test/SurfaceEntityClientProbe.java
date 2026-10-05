@@ -1,5 +1,7 @@
 package com.slabbed.test;
 
+import net.minecraft.entity.vehicle.AbstractChestBoatEntity;
+import net.minecraft.entity.vehicle.AbstractBoatEntity;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -131,7 +133,7 @@ public final class SurfaceEntityClientProbe {
         server.execute(() -> {
             ServerWorld world = server.getWorld(dimension);
             for (Entity entity : world.getOtherEntities(null, new Box(support).expand(3.0d, 6.0d, 3.0d))) {
-                if (entity instanceof BoatEntity || entity instanceof ArmorStandEntity) entity.discard();
+                if (entity instanceof AbstractBoatEntity || entity instanceof ArmorStandEntity) entity.discard();
             }
             for (int x = -1; x <= 1; x++) for (int z = -1; z <= 1; z++) for (int y = -4; y <= 3; y++) {
                 BlockPos pos = support.add(x, y, z);
@@ -312,8 +314,8 @@ public final class SurfaceEntityClientProbe {
             ServerWorld world = server.getWorld(dimension);
             List<? extends Entity> entities = probe.kind() == Kind.ARMOR_STAND
                     ? world.getEntitiesByClass(ArmorStandEntity.class, new Box(support).expand(3.0d, 6.0d, 3.0d), Entity::isAlive)
-                    : world.getEntitiesByClass(BoatEntity.class, new Box(support).expand(3.0d, 6.0d, 3.0d),
-                    entity -> entity.isAlive() && (probe.kind() == Kind.CHEST_BOAT) == (entity instanceof ChestBoatEntity));
+                    : world.getEntitiesByClass(AbstractBoatEntity.class, new Box(support).expand(3.0d, 6.0d, 3.0d),
+                    entity -> entity.isAlive() && (probe.kind() == Kind.CHEST_BOAT) == (entity instanceof AbstractChestBoatEntity));
             if (entities.size() == 1) {
                 Entity entity = entities.getFirst();
                 double error = entity.getBoundingBox().minY - visibleTop(world, support);
@@ -415,7 +417,7 @@ public final class SurfaceEntityClientProbe {
         var delegate = client.getBufferBuilders().getEntityVertexConsumers();
         VertexConsumerProvider provider = layer -> new CapturingVertexConsumer(delegate.getBuffer(layer), bounds);
         client.getEntityRenderDispatcher().render(entity, 0.0d, 0.0d, 0.0d,
-                entity.getYaw(), 1.0f, new MatrixStack(), provider, 0x00F000F0);
+                1.0f, new MatrixStack(), provider, 0x00F000F0);
         delegate.draw();
         Box local = bounds.box();
         return new Capture(bounds.count, local, local.offset(entity.getPos()), entity.getBoundingBox(), Double.NaN);
@@ -435,7 +437,7 @@ public final class SurfaceEntityClientProbe {
 
     private static boolean matches(Case probe, Entity entity) {
         if (probe.kind() == Kind.ARMOR_STAND) return entity instanceof ArmorStandEntity;
-        return entity instanceof BoatEntity && ((probe.kind() == Kind.CHEST_BOAT) == (entity instanceof ChestBoatEntity));
+        return entity instanceof AbstractBoatEntity && ((probe.kind() == Kind.CHEST_BOAT) == (entity instanceof AbstractChestBoatEntity));
     }
 
     private static String contactVerdict(Case probe, double error) {

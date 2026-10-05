@@ -42,7 +42,7 @@ import net.minecraft.util.function.BooleanBiFunction;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.GameMode;
-import net.minecraft.world.ChunkSerializer;
+import net.minecraft.world.chunk.SerializedChunk;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.EmptyBlockView;
 import net.minecraft.world.chunk.WorldChunk;
@@ -396,7 +396,7 @@ public final class PlacementCaptureBoundaryGameTest {
                             + " missing=" + missingBefore + " -> " + missingAfter);
 
             WorldChunk chunk = world.getChunk(modern.getX() >> 4, modern.getZ() >> 4);
-            NbtCompound attachments = ChunkSerializer.serialize(world, chunk)
+            NbtCompound attachments = SerializedChunk.fromChunk(world, chunk).serialize()
                     .getCompound(AttachmentTarget.NBT_ATTACHMENT_KEY);
             h.assertTrue(attachments.contains("slabbed:modern_placements"),
                     "modern placement provenance was not persisted by the chunk serializer");
@@ -694,7 +694,7 @@ public final class PlacementCaptureBoundaryGameTest {
                     "slabbed.upgradeEvidenceDir", System.getProperty("java.io.tmpdir")));
             Path evidenceDir = Files.createTempDirectory(evidenceRoot, "slabbed-keep-disk-");
             Path chunkFile = evidenceDir.resolve("chunk.nbt.gz");
-            NbtCompound serialized = ChunkSerializer.serialize(world, chunk);
+            NbtCompound serialized = SerializedChunk.fromChunk(world, chunk).serialize();
             NbtCompound serializedAttachments = serialized.getCompound(AttachmentTarget.NBT_ATTACHMENT_KEY);
             h.assertTrue(serializedAttachments.contains("slabbed:slab_anchors")
                             && serializedAttachments.contains("slabbed:compound_full_block_anchors")

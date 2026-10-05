@@ -246,7 +246,7 @@ public final class ScreenshotCaptureService {
         BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                bufferedImage.setRGB(x, y, nativeImage.getColor(x, y));
+                bufferedImage.setRGB(x, y, nativeImage.getColorArgb(x, y));
             }
         }
         return bufferedImage;

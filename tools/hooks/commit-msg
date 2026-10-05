@@ -45,12 +45,12 @@ fi
 
 # ── S-5: no more than one behavior change may stack without a live pass ──────────────────────
 # The live ledger lives OUTSIDE the repo (discretion law, 2026-08-07), by default at
-#   $HOME/CascadeProjects/Slabbed-notes/parity-1.21.1/LIVE_LEDGER.md   (override: $SLABBED_NOTES)
+#   $HOME/CascadeProjects/Slabbed-notes/parity-1.21.3/LIVE_LEDGER.md   (override: $SLABBED_NOTES)
 # A behavior-touching commit is allowed only if the ledger has been updated since the previous
 # behavior-touching commit (ledger mtime vs that commit's time) — same rule as before, the
 # bookkeeping just moved out of the tracked tree.
 if [ -n "$BEHAVIOR" ]; then
-  NOTES_DIR="${SLABBED_NOTES:-$HOME/CascadeProjects/Slabbed-notes/parity-1.21.1}"
+  NOTES_DIR="${SLABBED_NOTES:-$HOME/CascadeProjects/Slabbed-notes/parity-1.21.3}"
   LEDGER_FILE="$NOTES_DIR/LIVE_LEDGER.md"
   if [ ! -f "$LEDGER_FILE" ]; then
     fail "S-5: local ledger not found at $LEDGER_FILE.

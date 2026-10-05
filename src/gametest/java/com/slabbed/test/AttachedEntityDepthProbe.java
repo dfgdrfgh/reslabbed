@@ -1,5 +1,10 @@
 package com.slabbed.test;
 
+import net.minecraft.item.ItemStack;
+import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.vehicle.AbstractMinecartEntity;
+import net.minecraft.entity.vehicle.DefaultMinecartController;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.VertexConsumer;
@@ -86,8 +91,8 @@ public final class AttachedEntityDepthProbe {
             cart.setPosition(rail.getX() + (slope ? 0.875d : 0.5d),
                     rail.getY() + (slope ? 1.0625d : 0.0625d) + currentDy, rail.getZ() + 0.5d);
         } else {
-            cart = new MinecartEntity(world, rail.getX() + (slope ? 0.875d : 0.5d),
-                    rail.getY() + (slope ? 1.0625d : 0.0625d), rail.getZ() + 0.5d);
+            cart = AbstractMinecartEntity.create(world, rail.getX() + (slope ? 0.875d : 0.5d),
+                    rail.getY() + (slope ? 1.0625d : 0.0625d), rail.getZ() + 0.5d, EntityType.MINECART, SpawnReason.TRIGGERED, ItemStack.EMPTY, null);
             if (!world.spawnEntity(cart)) throw new IllegalStateException("minecart probe spawn refused");
         }
         cart.setVelocity(Vec3d.ZERO);
@@ -111,7 +116,7 @@ public final class AttachedEntityDepthProbe {
         cart.writeNbt(saved);
         double expectedY = rail.getY() + dy + 0.0625d + (slope ? cart.getX() - rail.getX() : 0.0d);
         return saved.getDouble("slabbed:rail_dy") == dy && Math.abs(cart.getY() - expectedY) < 0.001d
-                && cart.snapPositionToRail(cart.getX(), cart.getY(), cart.getZ()) != null;
+                && ((DefaultMinecartController) cart.getController()).snapPositionToRail(cart.getX(), cart.getY(), cart.getZ()) != null;
     }
 
     /**
@@ -154,9 +159,9 @@ public final class AttachedEntityDepthProbe {
         var delegate = client.getBufferBuilders().getEntityVertexConsumers();
         VertexConsumerProvider provider = layer -> new CapturingVertexConsumer(delegate.getBuffer(layer), bounds);
         Vec3d position = cart.getPos().subtract(Vec3d.of(rail));
-        Vec3d snapped = cart.snapPositionToRail(cart.getX(), cart.getY(), cart.getZ());
+        Vec3d snapped = ((DefaultMinecartController) cart.getController()).snapPositionToRail(cart.getX(), cart.getY(), cart.getZ());
         client.getEntityRenderDispatcher().render(cart, position.x, position.y, position.z,
-                cart.getYaw(), 1.0f, new MatrixStack(), provider, 0x00F000F0);
+                1.0f, new MatrixStack(), provider, 0x00F000F0);
         delegate.draw();
         Box body = bounds.box();
         Vec3d center = body.getCenter().add(Vec3d.of(rail));
@@ -190,7 +195,7 @@ public final class AttachedEntityDepthProbe {
         VertexConsumerProvider provider = layer -> new CapturingVertexConsumer(delegate.getBuffer(layer), bounds);
         client.getEntityRenderDispatcher().render(frame,
                 frame.getX() - origin.getX(), frame.getY() - origin.getY(), frame.getZ() - origin.getZ(),
-                0.0f, 0.0f, new MatrixStack(), provider, 0x00F000F0);
+                0.0f, new MatrixStack(), provider, 0x00F000F0);
         delegate.draw();
         Box physical = frame.getBoundingBox().offset(-origin.getX(), -origin.getY(), -origin.getZ());
         Box rendered = bounds.box();
@@ -252,7 +257,7 @@ public final class AttachedEntityDepthProbe {
         MatrixStack matrices = new MatrixStack();
         VertexConsumerProvider.Immediate vertices = client.getBufferBuilders().getEntityVertexConsumers();
         client.getEntityRenderDispatcher().render(
-                entity, 0.0d, 0.0d, 0.0d, 0.0f, 0.0f, matrices, vertices, 0x00F000F0);
+                entity, 0.0d, 0.0d, 0.0d, 0.0f, matrices, vertices, 0x00F000F0);
         vertices.draw();
     }
 

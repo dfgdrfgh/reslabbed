@@ -201,7 +201,7 @@ public final class OffsetBlockStateModel extends ForwardingBakedModel {
         if (ChainCeilingGeometry.usesAlternateGeometry(view, pos, state)) {
             BakedModel alt = ChainCeilingGeometry.bakedOrNull();
             if (alt != null) {
-                context.bakedModelConsumer().accept(alt, state);
+                alt.emitBlockQuads(view, state, pos, randomSupplier, context);
                 return;
             }
         }
@@ -391,7 +391,7 @@ public final class OffsetBlockStateModel extends ForwardingBakedModel {
             return;
         }
 
-        context.bakedModelConsumer().accept(wrapped, state);
+        wrapped.emitBlockQuads(view, state, pos, randomSupplier, context);
     }
 
     private static void slabbed$logCompoundVisibleRenderTraceModelDy(
