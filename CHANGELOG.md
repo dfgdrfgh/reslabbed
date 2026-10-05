@@ -18,6 +18,8 @@ Differences on these versions:
 - Creative-mode placements record their height like survival ones (these versions skip the "use up the
   item" step for creative players; the height is recorded at the block-place event instead).
 - The decorated-pot insert particle follows the pot's stored height again (the particle exists here).
+- Bone-meal sparkles on a lowered block are not yet moved down with the block (the particle helper
+  Slabbed hooks for that does not exist on these versions).
 
 ## [0.6.2-alpha+1.20.1]
 
