@@ -1,4 +1,4 @@
-package com.slabbed.diagnostics.mixin;
+package com.slabbed.mixin;
 
 import org.objectweb.asm.tree.ClassNode;
 import org.spongepowered.asm.mixin.extensibility.IMixinConfigPlugin;
@@ -8,15 +8,13 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Picks the one full-reload hook that exists on the running game: {@code LevelRenderer.allChanged}
- * on 26.3 and newer, {@code LevelRenderer.invalidateCompiledGeometry} on 26.2. Everything else in the
- * diagnostics config always applies. The withheld twin is the justification for the mixin-target
- * scan's skip of that class on the other game version.
+ * The /slabrig drop-capture mixin is cataloged against the 26.3 painting drop signature; the rig
+ * config is registered on every build and this plugin applies the mixin only on 26.3 and newer. The
+ * withheld mixin is the justification for the mixin-target scan's skip of it on 26.2. Dev-only: the
+ * class is excluded from the release jar with the mixin it gates.
  */
-public final class SlabbedDiagnosticsMixinPlugin implements IMixinConfigPlugin {
-    static final String ALL_CHANGED_MIXIN = "com.slabbed.diagnostics.mixin.LevelRendererAllChangedMixin";
-    static final String INVALIDATE_GEOMETRY_MIXIN =
-            "com.slabbed.diagnostics.mixin.LevelRendererInvalidateCompiledGeometryMixin";
+public final class PaintingRigDropCaptureMixinPlugin implements IMixinConfigPlugin {
+    static final String RIG_MIXIN = "com.slabbed.mixin.PaintingRigDropCaptureMixin";
 
     private boolean modernMinecraft;
 
@@ -32,13 +30,7 @@ public final class SlabbedDiagnosticsMixinPlugin implements IMixinConfigPlugin {
 
     @Override
     public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
-        if (ALL_CHANGED_MIXIN.equals(mixinClassName)) {
-            return modernMinecraft;
-        }
-        if (INVALIDATE_GEOMETRY_MIXIN.equals(mixinClassName)) {
-            return !modernMinecraft;
-        }
-        return true;
+        return !RIG_MIXIN.equals(mixinClassName) || modernMinecraft;
     }
 
     @Override

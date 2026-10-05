@@ -1,6 +1,7 @@
 {
   "required": true,
   "package": "com.slabbed.mixin",
+  "plugin": "com.slabbed.mixin.PaintingRigDropCaptureMixinPlugin",
   "compatibilityLevel": "JAVA_25",
   "mixins": [
     "PaintingRigDropCaptureMixin"

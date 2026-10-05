@@ -47,7 +47,8 @@ public final class SlabbedGameTests {
 
     private static List<TestMethod> discover() {
         List<TestMethod> found = new ArrayList<>();
-        for (String className : SlabbedGameTestClasses.CLASSES) {
+        List<String> classNames = SlabbedGameTestClasses.classes();
+        for (String className : classNames) {
             Class<?> owner;
             try {
                 owner = Class.forName(className);
@@ -71,8 +72,37 @@ public final class SlabbedGameTests {
             }
         }
         LOGGER.info("[slabbed_gametest] discovered {} test methods in {} classes",
-                found.size(), SlabbedGameTestClasses.CLASSES.size());
+                found.size(), classNames.size());
         return found;
+    }
+
+    /**
+     * The full test-data constructor: 26.2 takes (environment, structure, maxTicks, setupTicks, required,
+     * rotation, manualOnly, maxAttempts, requiredSuccesses, skyAccess, padding); 26.3 inserts the level
+     * dimension after the environment. One source builds against either, so the constructor is chosen
+     * by its parameter count and the overworld is supplied where a dimension is asked for.
+     */
+    @SuppressWarnings("unchecked")
+    private static TestData<Holder<TestEnvironmentDefinition<?>>> testData(
+            Holder<TestEnvironmentDefinition<?>> environment, GameTest a) {
+        for (java.lang.reflect.Constructor<?> constructor : TestData.class.getConstructors()) {
+            int n = constructor.getParameterCount();
+            if (n != 11 && n != 12) {
+                continue;
+            }
+            List<Object> args = new ArrayList<>(List.of(environment));
+            if (n == 12) {
+                args.add(net.minecraft.world.level.Level.OVERWORLD);
+            }
+            args.addAll(List.of(Identifier.parse(a.structure()), a.maxTicks(), a.setupTicks(), a.required(),
+                    a.rotation(), a.manualOnly(), a.maxAttempts(), a.requiredSuccesses(), a.skyAccess(), 0));
+            try {
+                return (TestData<Holder<TestEnvironmentDefinition<?>>>) constructor.newInstance(args.toArray());
+            } catch (ReflectiveOperationException e) {
+                throw new IllegalStateException("TestData constructor failed", e);
+            }
+        }
+        throw new IllegalStateException("no TestData constructor with 11 or 12 parameters on this game version");
     }
 
     /** Registers one environment per distinct name and one test instance per method. */
@@ -82,19 +112,7 @@ public final class SlabbedGameTests {
             GameTest a = test.annotation();
             Holder<TestEnvironmentDefinition<?>> environment = environments.computeIfAbsent(a.environment(),
                     name -> event.registerEnvironment(environmentId(name), new TestEnvironmentDefinition.AllOf(List.of())));
-            TestData<Holder<TestEnvironmentDefinition<?>>> data = new TestData<>(
-                    environment,
-                    Identifier.parse(a.structure()),
-                    a.maxTicks(),
-                    a.setupTicks(),
-                    a.required(),
-                    a.rotation(),
-                    a.manualOnly(),
-                    a.maxAttempts(),
-                    a.requiredSuccesses(),
-                    a.skyAccess(),
-                    0);
-            event.registerTest(test.id(), new MethodTestInstance(test, data));
+            event.registerTest(test.id(), new MethodTestInstance(test, testData(environment, a)));
         }
         LOGGER.info("[slabbed_gametest] registered {} tests in {} environments", METHODS.size(), environments.size());
     }

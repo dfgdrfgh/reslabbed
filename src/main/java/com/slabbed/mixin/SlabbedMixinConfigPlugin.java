@@ -66,6 +66,8 @@ public final class SlabbedMixinConfigPlugin implements IMixinConfigPlugin {
     static final String MODERN_WIRE_MIXIN = "com.slabbed.mixin.RedstoneWireBlockMixin";
     static final String LEGACY_WIRE_MIXIN = "com.slabbed.mixin.LegacyRedStoneWireBlockMixin";
     static final String CUSHION_MIXIN = "com.slabbed.mixin.CushionRestsOnDrawnTopMixin";
+    static final String MODERN_USE_ACK_MIXIN = "com.slabbed.mixin.UseItemAckArmMixin";
+    static final String LEGACY_USE_ACK_MIXIN = "com.slabbed.mixin.LegacyUseItemAckArmMixin";
     /** Lithium's two block-collision sweepers, as resource paths — never class literals. */
     static final String LITHIUM_SWEEPER_SHAPE_CLASS =
             "net/caffeinemc/mods/lithium/common/entity/movement/ChunkAwareBlockCollisionSweeperVoxelShape";
@@ -143,10 +145,11 @@ public final class SlabbedMixinConfigPlugin implements IMixinConfigPlugin {
      */
     static boolean withheld(String mixinClassName, boolean lithiumPresent, boolean lithiumSweeperSupported,
                             boolean modernMinecraft) {
-        if (MODERN_WIRE_MIXIN.equals(mixinClassName) || CUSHION_MIXIN.equals(mixinClassName)) {
+        if (MODERN_WIRE_MIXIN.equals(mixinClassName) || CUSHION_MIXIN.equals(mixinClassName)
+                || MODERN_USE_ACK_MIXIN.equals(mixinClassName)) {
             return !modernMinecraft;
         }
-        if (LEGACY_WIRE_MIXIN.equals(mixinClassName)) {
+        if (LEGACY_WIRE_MIXIN.equals(mixinClassName) || LEGACY_USE_ACK_MIXIN.equals(mixinClassName)) {
             return modernMinecraft;
         }
         if (EXPLOSION_OCCLUSION_MIXIN.equals(mixinClassName)) {

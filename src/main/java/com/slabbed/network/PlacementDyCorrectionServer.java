@@ -82,6 +82,27 @@ public final class PlacementDyCorrectionServer {
         }
     }
 
+    /**
+     * The use packet the server is handling on this thread, set around the vanilla handler by the
+     * hit-tolerance mixin. It is not an armed correction scope: the off-thread pass clears it when
+     * vanilla reschedules by throwing. The post-ack arming mixins read it, because the ack seam sits
+     * inside the handler where the packet is no longer a parameter they can take.
+     */
+    private static final ThreadLocal<ServerboundUseItemOnPacket> CURRENT_USE_PACKET = new ThreadLocal<>();
+
+    public static void beginUsePacket(ServerboundUseItemOnPacket packet) {
+        CURRENT_USE_PACKET.set(packet);
+    }
+
+    public static void endUsePacket() {
+        CURRENT_USE_PACKET.remove();
+    }
+
+    /** Arms the author correction for the use packet being handled on this thread, if any. */
+    public static void armForCurrentUsePacket(ServerPlayer player) {
+        arm(player, CURRENT_USE_PACKET.get());
+    }
+
     public static void arm(ServerPlayer player, ServerboundUseItemOnPacket packet) {
         if (player == null || packet == null || ACTIVE_SCOPE.get() != null) {
             return;

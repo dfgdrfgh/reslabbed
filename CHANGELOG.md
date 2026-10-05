@@ -1,14 +1,16 @@
-## [0.6.2-alpha+26.2-neoforge]
+## [0.6.2-alpha+26.2-neoforge] and [0.6.2-alpha+26.3-neoforge]
 
 See LAW.md — this changelog does not redefine the law.
 
-First Slabbed build for NeoForge on Minecraft 26.2. It carries the full 0.6 feature set of the Fabric 26.2/26.3
+First Slabbed builds for NeoForge on Minecraft 26.2 and 26.3, one jar each from the same source. They carry the full
+0.6 feature set of the Fabric 26.2/26.3
 line: placement heights are recorded where you aim and kept for good, lowered slabs support the same objects, pistons
 carry stored heights, rails slope to meet their neighbours, fence posts meet a nearby slab ceiling, hung decorations
 keep their seat, the settings screen and the two height-nudge key bindings. Everything below this section is the
 inherited history of the Fabric line.
 
-Needs NeoForge 26.2.0.88 or newer, on Java 25. No Fabric API or Forgified Fabric API.
+The 26.2 jar needs NeoForge 26.2.0.88 or newer; the 26.3 jar needs NeoForge 26.3.0.48-beta or newer. Both run on
+Java 25. No Fabric API or Forgified Fabric API. Cushions (26.3 content) rest on lowered blocks on the 26.3 jar.
 
 Differences on NeoForge:
 

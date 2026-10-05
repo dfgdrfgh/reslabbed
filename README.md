@@ -1,14 +1,17 @@
 # Slabbed
 
-Slabbed is a NeoForge mod for Minecraft 26.2 (this line; the Fabric line serves 26.2 and 26.3) that makes slab-supported placement, stored height,
+Slabbed is a NeoForge mod for Minecraft 26.2 and 26.3 (this line; the Fabric line serves the same two versions) that makes slab-supported placement, stored height,
 targeting, and rendering agree. Its governing invariant is simple: a placed block keeps the height
 chosen when it was placed; a later neighbour edit must not move it. See `LAW.md` for the exact rule.
 
 ## This line
 
-- Minecraft 26.2 on NeoForge 26.2.0.88 or newer. No Fabric API or Forgified Fabric API. Java 25 builds and runs it.
-- Version: see `gradle.properties`; the current cycle is `0.6.2-alpha+26.2-neoforge`.
-- One jar per Minecraft version on NeoForge (the 26.3 jar is built from the same source). The suite runs through
+- Minecraft 26.2 on NeoForge 26.2.0.88 or newer, and Minecraft 26.3 on NeoForge 26.3.0.48-beta or newer, one jar
+  each. No Fabric API or Forgified Fabric API. Java 25 builds and runs it.
+- Version: see `gradle.properties`; the current cycle is `0.6.2-alpha+26.2-neoforge` and `0.6.2-alpha+26.3-neoforge`.
+- Both jars come from this one source: the 26.2 build uses the pins in `gradle.properties`, the 26.3 build
+  overrides them on the command line (`-Pminecraft_version=26.3 '-Pminecraft_version_range=[26.3,26.4)'
+  -Pneo_version=26.3.0.48-beta -Pmod_version=0.6.2-alpha+26.3-neoforge`). The suite runs through
   `./gradlew runGameTestServer`; the model layer uses NeoForge's block-model hooks (`com.slabbed.client.model`).
 - Other Minecraft versions and loaders live on their own branches (`port/...`) and reach the same
   features when they are ported; this branch is where 0.6 is developed first.

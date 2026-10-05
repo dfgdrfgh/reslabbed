@@ -1,6 +1,7 @@
 package com.slabbed.command;
 
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.bus.api.EventPriority;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import com.slabbed.Slabbed;
 import net.minecraft.resources.ResourceKey;
@@ -227,17 +228,19 @@ public final class SlabRigHangingDirectEntityGate {
         if (registered) {
             return;
         }
-        // One listener for both halves: the veto (Fabric ALLOW_LOAD) and the load notice
-        // (ENTITY_LOAD). NeoForge's join event is cancelable and tells disk loads apart.
-        NeoForge.EVENT_BUS.addListener((EntityJoinLevelEvent event) -> {
-            if (!(event.getLevel() instanceof ServerLevel level)) {
-                return;
-            }
-            if (!allowLoad(event.getEntity(), level, null, event.loadedFromDisk())) {
+        // Two halves of NeoForge's cancelable join event, ordered like Fabric's pair: the veto
+        // (ALLOW_LOAD) runs first at the highest priority; the load notice (ENTITY_LOAD) runs last and
+        // only when nobody cancelled, so a later listener's veto leaves the entity accepted-but-unconfirmed.
+        NeoForge.EVENT_BUS.addListener(EventPriority.HIGHEST, false, EntityJoinLevelEvent.class, event -> {
+            if (event.getLevel() instanceof ServerLevel level
+                    && !allowLoad(event.getEntity(), level, null, event.loadedFromDisk())) {
                 event.setCanceled(true);
-                return;
             }
-            onLoad(event.getEntity(), level);
+        });
+        NeoForge.EVENT_BUS.addListener(EventPriority.LOWEST, false, EntityJoinLevelEvent.class, event -> {
+            if (event.getLevel() instanceof ServerLevel level) {
+                onLoad(event.getEntity(), level);
+            }
         });
         registered = true;
     }

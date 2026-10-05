@@ -42,6 +42,8 @@
     "ScaffoldingLoweredStandMixin",
     "ServerExplosionOcclusionOffsetClipMixin",
     "ServerInteractBlockHitToleranceMixin",
+    "UseItemAckArmMixin",
+    "LegacyUseItemAckArmMixin",
     "SlabSupportBlockMixin",
     "SlabSupportStateMixin",
     "WallSlabConnectionMixin",

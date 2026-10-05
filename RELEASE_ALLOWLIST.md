@@ -125,6 +125,8 @@ anything. The split above puts the fine granularity only where a leak has actual
 | `com/slabbed/mixin/PaintingRememberedSeatMixin` | Painting remembered seat persisted in save data. |
 | `com/slabbed/mixin/ScaffoldingLoweredStandMixin` | Scaffolding standing layer gated at the lowered drawn top. |
 | `com/slabbed/mixin/ServerInteractBlockHitToleranceMixin` | Server-side hit tolerance for offset targeting. |
+| `com/slabbed/mixin/UseItemAckArmMixin` | Arms the author correction after the use packet's ack call (26.3 shape); the config plugin applies exactly one of the two ack mixins. |
+| `com/slabbed/mixin/LegacyUseItemAckArmMixin` | The 26.2 twin: NeoForge's patched handler writes the ack field instead of calling the method. |
 | `com/slabbed/mixin/SlabSupportBlockMixin` | Slab support surface. |
 | `com/slabbed/mixin/SlabSupportStateMixin` | Slab support state. |
 | `com/slabbed/mixin/AbstractArrowOffsetClipMixin` | Arrows/tridents hit a lowered block where it is drawn. |

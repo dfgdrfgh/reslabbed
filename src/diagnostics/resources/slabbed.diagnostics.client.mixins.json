@@ -1,11 +1,9 @@
 {
   "required": true,
   "package": "com.slabbed.diagnostics.mixin",
-  "plugin": "com.slabbed.diagnostics.mixin.SlabbedDiagnosticsMixinPlugin",
   "compatibilityLevel": "JAVA_25",
   "client": [
     "TargetDyHudMixin",
-    "LevelRendererAllChangedMixin",
     "LevelRendererInvalidateCompiledGeometryMixin"
   ],
   "injectors": {

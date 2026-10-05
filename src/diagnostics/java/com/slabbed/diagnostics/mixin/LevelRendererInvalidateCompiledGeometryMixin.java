@@ -10,8 +10,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 /** Diagnostics only: a full chunk-render reload (F3+A, resource reload) resets the stale-mesh sentinel. */
 @Mixin(LevelRenderer.class)
 public abstract class LevelRendererInvalidateCompiledGeometryMixin {
-    // 26.2 names the full-reload entry invalidateCompiledGeometry (F3+A and resource reload reach it
-    // through the level extractor); the plugin withholds this twin on 26.3.
+    // 26.x names the full-reload entry invalidateCompiledGeometry (F3+A and resource reload reach it
+    // through the level extractor); 1.21.x called it allChanged.
     @Inject(method = "invalidateCompiledGeometry", at = @At("HEAD"))
     private void slabbed$onFullRenderInvalidate(CallbackInfo ci) {
         SlabModelStaleSentinel.onFullRenderInvalidate();

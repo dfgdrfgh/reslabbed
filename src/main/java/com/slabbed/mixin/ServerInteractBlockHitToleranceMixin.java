@@ -27,7 +27,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.SlabType;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -44,12 +43,6 @@ public abstract class ServerInteractBlockHitToleranceMixin {
     private static final String REPEAT_SEAM_TRACE_OPT_IN = "slabbed.beta4RepeatMergeTrace";
 
     @Shadow @Final public ServerPlayer player;
-
-    /**
-     * Carries only the current handler argument to the post-reschedule ack seam. It is not an armed
-     * correction scope: the off-thread pass clears it when vanilla reschedules by throwing.
-     */
-    private static final ThreadLocal<ServerboundUseItemOnPacket> SLABBED_C3_PACKET = new ThreadLocal<>();
 
     @WrapMethod(method = "handleUseItemOn")
     private void slabbed$c3FinalizeAuthorCorrection(
@@ -72,7 +65,7 @@ public abstract class ServerInteractBlockHitToleranceMixin {
                                 player.getUUID().toString(),
                                 world.dimension().identifier().toString());
         boolean handlerReturned = false;
-        SLABBED_C3_PACKET.set(packet);
+        PlacementDyCorrectionServer.beginUsePacket(packet);
         try {
             original.call(packet);
             handlerReturned = true;
@@ -89,7 +82,7 @@ public abstract class ServerInteractBlockHitToleranceMixin {
                 }
             }
             PlacementDyCorrectionServer.clearScope();
-            SLABBED_C3_PACKET.remove();
+            PlacementDyCorrectionServer.endUsePacket();
         }
     }
 
@@ -165,22 +158,6 @@ public abstract class ServerInteractBlockHitToleranceMixin {
             double dy,
             double storedDy,
             String heldItem) {
-    }
-
-    /**
-     * Arms the C3 author correction once the use packet's sequence is recorded. NeoForge's patched
-     * handler writes the sequence straight into the {@code ackBlockChangesUpTo} field (vanilla calls
-     * the method of that name), so this hooks the field write, after it.
-     */
-    @Inject(
-            method = "handleUseItemOn",
-            at = @At(value = "FIELD",
-                    target = "Lnet/minecraft/server/network/ServerGamePacketListenerImpl;ackBlockChangesUpTo:I",
-                    opcode = Opcodes.PUTFIELD,
-                    shift = At.Shift.AFTER)
-    )
-    private void slabbed$c3ArmAuthorCorrectionAfterAck(ServerboundUseItemOnPacket packet, CallbackInfo ci) {
-        PlacementDyCorrectionServer.arm(player, SLABBED_C3_PACKET.get());
     }
 
     @Inject(

@@ -32,7 +32,11 @@ public final class SignTexts {
             Object front = Enum.valueOf(slot.asSubclass(Enum.class), "FRONT");
             SignBlockEntity.class.getMethod("updateText", UnaryOperator.class, slot).invoke(sign, edit, front);
         } catch (ClassNotFoundException legacy) {
-            sign.updateText(edit, true);
+            try {
+                SignBlockEntity.class.getMethod("updateText", UnaryOperator.class, boolean.class).invoke(sign, edit, true);
+            } catch (ReflectiveOperationException e) {
+                throw new IllegalStateException(e);
+            }
         } catch (ReflectiveOperationException e) {
             throw new IllegalStateException(e);
         }

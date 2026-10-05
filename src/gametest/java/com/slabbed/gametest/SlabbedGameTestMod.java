@@ -13,7 +13,7 @@ public final class SlabbedGameTestMod {
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public SlabbedGameTestMod(IEventBus modEventBus) {
-        for (String className : SlabbedGameTestClasses.INITIALIZERS) {
+        for (String className : SlabbedGameTestClasses.initializers()) {
             try {
                 Object initializer = Class.forName(className).getDeclaredConstructor().newInstance();
                 ((TestModInitializer) initializer).onInitialize();

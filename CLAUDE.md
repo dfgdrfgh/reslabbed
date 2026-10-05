@@ -41,13 +41,14 @@ Keep the "do not re-add X" guard comments — they are anti-regression tripwires
 - The reported count MUST match `python3 tools/expected-gametest-count.py`. A green with the
   wrong count is a false green.
 - This line ships ONE jar per Minecraft version from one source: 26.2 with the pins in
-  `gradle.properties`, 26.3 with `minecraft_version`/`neo_version` switched. A green on one is not a
-  green on the other: run the suite with each version's pins and `tools/mixin-target-scan.py` against
-  each version's game jar (merge the NeoForge universal jar's classes into the scanned jar — NeoForge
-  patches add members such as `BlockState.isScaffolding`) before any parity or release claim. The
-  scan may skip only the mixins a config plugin withholds on that version (26.2:
-  `CushionRestsOnDrawnTopMixin`, `RedstoneWireBlockMixin`, `LevelRendererAllChangedMixin`; 26.3:
-  `LegacyRedStoneWireBlockMixin`, `LevelRendererInvalidateCompiledGeometryMixin`).
+  `gradle.properties`; 26.3 by overriding them on the command line
+  (`-Pminecraft_version=26.3 '-Pminecraft_version_range=[26.3,26.4)' -Pneo_version=26.3.0.48-beta
+  -Pmod_version=0.6.2-alpha+26.3-neoforge`, with `clean`). The 26.3-only test classes
+  (`SlabbedGameTestClasses.CLASSES_26_3`) compile and count only for that build. A green on one is
+  not a green on the other: run the suite for each version, then `tools/scan-mixin-targets.sh
+  [<mc> <neo>]` (patched game jar + NeoForge universal classes — NeoForge patches add members such as
+  `BlockState.isScaffolding`; it skips only the mixins a config plugin withholds on that version), and
+  the dev-client world proof, before any parity or release claim.
 - Keep the literal `@GameTest` token out of comments in registered test classes as hygiene, but the
   count script strips comments before counting and no longer depends on it. (It once did: five
   `{@code @GameTest}` javadoc mentions inflated the expected total to 575 against a true 570, so the

@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * The registered test classes and the test-content initialisers, in registration order. This list
  * replaces the Fabric test mod's entrypoint declarations; tools/expected-gametest-count.py reads
- * CLASSES to compute the suite count the run must report.
+ * CLASSES (and CLASSES_26_3 for a 26.3 build) to compute the suite count the run must report.
  */
 public final class SlabbedGameTestClasses {
     private SlabbedGameTestClasses() {
@@ -104,6 +104,27 @@ public final class SlabbedGameTestClasses {
             "com.slabbed.test.ManualDyAdjustLawTest"
     );
 
+    /**
+     * Registered only on 26.3 and newer: the cushion entity exists from 26.3, and the /slabrig family and
+     * the kit command test are cataloged against 26.3 (route indices, SignTextSlot). The build compiles
+     * these sources only for that version, so they are listed apart and joined by {@link #classes()}.
+     */
+    public static final List<String> CLASSES_26_3 = List.of(
+            "com.slabbed.test.CushionOnLoweredBlockTest",
+            "com.slabbed.test.SlabRigCommandSmokeTest",
+            "com.slabbed.test.SlabRigCaseCatalogTest",
+            "com.slabbed.test.SlabRigHangingCatalogTest",
+            "com.slabbed.test.SlabRigHangingPaintingPlanTest",
+            "com.slabbed.test.SlabRigHangingKernelArtifactsTest",
+            "com.slabbed.test.SlabRigHangingPaintingKernelTest",
+            "com.slabbed.test.SlabRigHangingDirectEntityGateTest",
+            "com.slabbed.test.SlabRigHangingDirectFixtureTest",
+            "com.slabbed.test.SlabRigHangingDirectActionsTest",
+            "com.slabbed.test.SlabRigHangingDirectStateStoreTest",
+            "com.slabbed.test.SlabRigHangingDirectExecutorTest",
+            "com.slabbed.test.SlabTestKitCommandsTest"
+    );
+
     public static final List<String> INITIALIZERS = List.of(
             "com.slabbed.test.RedstoneGateOnTerrainSlabsPlacementTest$TerrainSlabsRedstoneGateTestEntrypoint",
             "com.slabbed.test.SlabVerticalSupportTerrainSlabsGuardTest$TerrainSlabsVerticalSupportGuardTestEntrypoint",
@@ -119,4 +140,28 @@ public final class SlabbedGameTestClasses {
             "com.slabbed.test.BottomSlabSpawnProofTest$TerrainSlabsSpawnProofTestEntrypoint",
             "com.slabbed.test.CompatEligibilityPredicateTest$CompatEligibilityFixtureEntrypoint"
     );
+
+    /** Initialisers that belong to the 26.3-only classes above. */
+    public static final List<String> INITIALIZERS_26_3 = List.of(
+            "com.slabbed.test.SlabRigHangingDirectExecutorTest$StoreBootstrap"
+    );
+
+    /** The classes to register on the running game version. */
+    public static List<String> classes() {
+        return join(CLASSES, CLASSES_26_3);
+    }
+
+    /** The initialisers to run on the running game version. */
+    public static List<String> initializers() {
+        return join(INITIALIZERS, INITIALIZERS_26_3);
+    }
+
+    private static List<String> join(List<String> always, List<String> modern) {
+        if (!com.slabbed.compat.MinecraftVersions.AT_LEAST_26_3) {
+            return always;
+        }
+        java.util.ArrayList<String> all = new java.util.ArrayList<>(always);
+        all.addAll(modern);
+        return List.copyOf(all);
+    }
 }

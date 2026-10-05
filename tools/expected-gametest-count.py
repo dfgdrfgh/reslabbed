@@ -29,7 +29,9 @@ on its success path, and the run is proof only when the log carries one such
 line per entry below.
 
 Usage (from the repo root):
-    python3 tools/expected-gametest-count.py
+    python3 tools/expected-gametest-count.py [--mc <minecraft version>]
+--mc defaults to minecraft_version in gradle.properties; a 26.3 (or newer) build also counts the
+classes in CLASSES_26_3, which the build compiles only for that version.
 
 If the live run reports fewer:  rm -rf build/run/gameTest  and re-run.
 """
@@ -69,9 +71,32 @@ def strip_comments(text: str) -> str:
     return "\n".join(out)
 
 
+def minecraft_version(argv) -> str:
+    if "--mc" in argv:
+        return argv[argv.index("--mc") + 1]
+    for line in (ROOT / "gradle.properties").read_text().splitlines():
+        if line.startswith("minecraft_version="):
+            return line.split("=", 1)[1].strip()
+    raise SystemExit("minecraft_version not found in gradle.properties; pass --mc")
+
+
+def at_least(version: str, floor: str) -> bool:
+    def parts(v):
+        return tuple(int(p) for p in re.findall(r"\d+", v))
+    return parts(version) >= parts(floor)
+
+
+def registered_block(src: str, name: str) -> str:
+    start = src.index(name + " = List.of(")
+    return src[start:src.index(");", start)]
+
+
 def main() -> int:
+    mc = minecraft_version(sys.argv[1:])
     src = REGISTRAR.read_text()
-    block = src[src.index("CLASSES = List.of("):src.index(");", src.index("CLASSES = List.of("))]
+    block = registered_block(src, "CLASSES")
+    if at_least(mc, "26.3"):
+        block += registered_block(src, "CLASSES_26_3")
     entrypoints = re.findall(r'"([\w.$]+)"', block)
     total = 0
     for cls in entrypoints:
@@ -79,7 +104,7 @@ def main() -> int:
         count = strip_comments(src.read_text()).count("@GameTest")
         total += count
     expected = total + HARNESS_TESTS
-    print(f"{total} @GameTest occurrences in {len(entrypoints)} registered classes "
+    print(f"{total} @GameTest occurrences in {len(entrypoints)} registered classes (Minecraft {mc}) "
           f"+ {HARNESS_TESTS} harness test = expected suite count {expected}")
 
     # Advisory only — never folded into the gated number above, because these do not run in the

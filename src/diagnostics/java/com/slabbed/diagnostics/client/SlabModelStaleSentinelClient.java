@@ -52,7 +52,7 @@ public final class SlabModelStaleSentinelClient {
             long packed = chunk.getPos().pack();
             SlabModelStaleSentinel.onChunkUnload(ChunkPos.getX(packed), ChunkPos.getZ(packed));
         });
-        // Full render invalidation is observed by LevelRendererAllChangedMixin (diagnostics mixin config).
+        // Full render invalidation is observed by LevelRendererInvalidateCompiledGeometryMixin (diagnostics mixin config).
     }
 
     private static void onEndClientTick(Minecraft client) {

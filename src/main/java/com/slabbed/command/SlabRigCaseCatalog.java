@@ -405,9 +405,23 @@ public final class SlabRigCaseCatalog {
         if (item instanceof ScaffoldingBlockItem) {
             return EffectPolicy.DEFERRED_UNBOUNDED_STACK;
         }
-        return KNOWN_LOCAL_BLOCK_ITEM_CLASSES.contains(item.getClass())
+        return KNOWN_LOCAL_BLOCK_ITEM_CLASSES.contains(effectClass(item))
                 ? EffectPolicy.LOCAL_TARGET_AND_NEIGHBORS
                 : EffectPolicy.DEFERRED_UNKNOWN_EFFECT;
+    }
+
+    /**
+     * The class whose placement effects an item has. NeoForge registers the multi-block vanilla items
+     * (cauldron) through an anonymous {@code BlockItem} subclass declared inside {@code Items} that
+     * only widens block registration; its effects are the superclass's, so that is the class judged.
+     * Only the game's own anonymous subclasses unwrap: a named mod subclass stays unknown.
+     */
+    private static Class<?> effectClass(Item item) {
+        Class<?> type = item.getClass();
+        if (type.isAnonymousClass() && type.getEnclosingClass() == net.minecraft.world.item.Items.class) {
+            return type.getSuperclass();
+        }
+        return type;
     }
 
     private static String excludedRoute(Item item) {

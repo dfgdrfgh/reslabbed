@@ -161,7 +161,6 @@ sourceSets {
             include("com/slabbed/test/EnsemblePlacementCoherenceTest.java")
             include("com/slabbed/test/StateChangeAnchorTest.java")
             include("com/slabbed/test/DepartedOccupantFactClearTest.java")
-            // CushionOnLoweredBlockTest: the cushion entity exists from 26.3; re-included on the 26.3 jar.
             include("com/slabbed/test/HauntedCarrierCellTest.java")
             include("com/slabbed/test/ConnectingStructuralFreezeTest.java")
             include("com/slabbed/test/AnchoredDepthReadbackTest.java")
@@ -189,7 +188,25 @@ sourceSets {
             include("com/slabbed/test/HangingUndersideHitRescueTest.java")
             include("com/slabbed/test/PlacementCaptureBoundaryGameTest.java")
             // The /slabrig family and the kit command test are cataloged against 26.3 (route indices,
-            // SignTextSlot); they return on the 26.3 jar, as on the Fabric 26.2 harness.
+            // SignTextSlot) and the cushion entity exists from 26.3: compiled and registered only when the
+            // build targets 26.3 or newer (SlabbedGameTestClasses.CLASSES_26_3 is the runtime twin).
+            if (project.minecraft_version != "26.2") {
+                [
+                        "CushionOnLoweredBlockTest",
+                        "SlabRigCommandSmokeTest",
+                        "SlabRigCaseCatalogTest",
+                        "SlabRigHangingCatalogTest",
+                        "SlabRigHangingPaintingPlanTest",
+                        "SlabRigHangingKernelArtifactsTest",
+                        "SlabRigHangingPaintingKernelTest",
+                        "SlabRigHangingDirectEntityGateTest",
+                        "SlabRigHangingDirectFixtureTest",
+                        "SlabRigHangingDirectActionsTest",
+                        "SlabRigHangingDirectStateStoreTest",
+                        "SlabRigHangingDirectExecutorTest",
+                        "SlabTestKitCommandsTest"
+                ].each { include("com/slabbed/test/${it}.java") }
+            }
             include("com/slabbed/test/RegistrySweepTest.java")
             include("com/slabbed/test/RegistrySweepArtifacts.java")
             include("com/slabbed/test/FrozenDySceneFixture.java")
@@ -324,7 +341,7 @@ jar {
 def slabbedReportedGameTestCount = new java.util.concurrent.atomic.AtomicInteger(-1)
 
 def slabbedExpectedGameTestCount = { File repoRoot ->
-    def process = new ProcessBuilder("python3", "tools/expected-gametest-count.py")
+    def process = new ProcessBuilder("python3", "tools/expected-gametest-count.py", "--mc", project.minecraft_version.toString())
             .directory(repoRoot)
             .redirectErrorStream(true)
             .start()

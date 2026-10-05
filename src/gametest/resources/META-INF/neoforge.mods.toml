@@ -13,7 +13,9 @@ Slabbed's automated test suite. Development only; never published.
 [[mixins]]
 config="slabbed-test31.mixins.json"
 
-# slabbed.rig.mixins.json (PaintingRigDropCaptureMixin) targets a 26.3 signature; off on the 26.2 jar.
+# PaintingRigDropCaptureMixin targets a 26.3 signature; its plugin withholds it on 26.2.
+[[mixins]]
+config="slabbed.rig.mixins.json"
 
 [[dependencies.slabbed_gametest]]
 modId="slabbed"
