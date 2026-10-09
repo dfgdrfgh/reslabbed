@@ -296,15 +296,22 @@ public final class PlacementCaptureBoundaryGameTest {
 
             currentThread.setName(previousThreadName);
             int normalBefore = modernLookups.get();
-            Blocks.GRINDSTONE.getDefaultState().getCollisionShape(view, pos, ShapeContext.absent());
+            BlockView renderView = ChunkAccessSafetyTest.renderView();
+            Blocks.GRINDSTONE.getDefaultState().getCollisionShape(renderView, pos, ShapeContext.absent());
             int normalEligibleLookups = modernLookups.get() - normalBefore;
+
+            currentThread.setName("Worker-Main-slabbed-render");
+            int meshBefore = modernLookups.get();
+            Blocks.GRINDSTONE.getDefaultState().getCollisionShape(renderView, pos, ShapeContext.absent());
+            int meshEligibleLookups = modernLookups.get() - meshBefore;
 
             h.assertTrue(unsafeIneligibleLookups == 0
                             && unsafeEligibleLookups == 0
-                            && normalEligibleLookups > 0,
+                            && normalEligibleLookups > 0 && meshEligibleLookups > 0,
                     "collision guard routing regressed: unsafeIneligible=" + unsafeIneligibleLookups
                             + " unsafeEligible=" + unsafeEligibleLookups
-                            + " normalEligible=" + normalEligibleLookups);
+                            + " normalEligible=" + normalEligibleLookups
+                            + " meshEligible=" + meshEligibleLookups);
         } finally {
             currentThread.setName(previousThreadName);
             SlabAnchorAttachment.FROZEN_DY_ENABLED = previousFrozen;

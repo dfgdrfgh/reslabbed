@@ -161,6 +161,10 @@ public final class ChunkAccessSafetyTest {
                     if (method.getName().equals("isClient")) {
                         return false;
                     }
+                    if (type == BlockRenderView.class
+                            && method.getDeclaringClass().isInstance(EmptyBlockView.INSTANCE)) {
+                        return method.invoke(EmptyBlockView.INSTANCE, args);
+                    }
                     throw new AssertionError("unexpected world access: " + method.getName());
                 }));
     }
