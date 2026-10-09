@@ -4,6 +4,7 @@ import com.slabbed.Slabbed;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.SlabSupport;
 import it.unimi.dsi.fastutil.longs.Long2ByteOpenHashMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -16,8 +17,7 @@ import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.WorldChunk;
 
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
 
 /**
@@ -36,13 +36,11 @@ import java.util.Map;
  */
 @Environment(EnvType.CLIENT)
 public final class SlabAnchorClientSync {
-    private static final Map<Long, WorldChunk> TRACKED_CHUNKS = new HashMap<>();
-    private static final Map<AttachmentSnapshotKey, LongOpenHashSet> ATTACHMENT_SNAPSHOTS = new HashMap<>();
-    private static final Map<Long, Long2ByteOpenHashMap> DY_SNAPSHOTS = new HashMap<>();
+    private static final Long2ObjectOpenHashMap<WorldChunk> TRACKED_CHUNKS = new Long2ObjectOpenHashMap<>();
+    private static final Long2ObjectOpenHashMap<Map<AttachmentType<LongOpenHashSet>, LongOpenHashSet>>
+            ATTACHMENT_SNAPSHOTS = new Long2ObjectOpenHashMap<>();
+    private static final Long2ObjectOpenHashMap<Long2ByteOpenHashMap> DY_SNAPSHOTS = new Long2ObjectOpenHashMap<>();
     private static boolean initialized;
-
-    private record AttachmentSnapshotKey(long chunkPos, AttachmentType<LongOpenHashSet> attachmentType) {
-    }
 
     private SlabAnchorClientSync() {
     }
@@ -197,7 +195,7 @@ public final class SlabAnchorClientSync {
     private static void onChunkUnload(ClientWorld world, WorldChunk chunk) {
         long chunkPos = chunk.getPos().toLong();
         TRACKED_CHUNKS.remove(chunkPos);
-        ATTACHMENT_SNAPSHOTS.keySet().removeIf(key -> key.chunkPos() == chunkPos);
+        ATTACHMENT_SNAPSHOTS.remove(chunkPos);
         DY_SNAPSHOTS.remove(chunkPos);
     }
 
@@ -224,27 +222,31 @@ public final class SlabAnchorClientSync {
             return;
         }
 
-        for (WorldChunk chunk : new ArrayList<>(TRACKED_CHUNKS.values())) {
+        // Chunk events and this poll run on the client thread. Scheduling a redraw cannot
+        // mutate this inventory, so there is no per-tick copy or per-attachment key allocation.
+        for (WorldChunk chunk : TRACKED_CHUNKS.values()) {
+            Map<AttachmentType<LongOpenHashSet>, LongOpenHashSet> snapshots =
+                    ATTACHMENT_SNAPSHOTS.get(chunk.getPos().toLong());
             pollPlacementDyChange(mc, chunk);
-            pollAttachmentChange(mc, chunk, SlabAnchorAttachment.ANCHOR_TYPE);
-            pollAttachmentChange(mc, chunk, SlabAnchorAttachment.FROZEN_FLAT_TYPE);
-            pollAttachmentChange(mc, chunk, SlabAnchorAttachment.LOWERED_SLAB_CARRIER_TYPE);
-            pollAttachmentChange(mc, chunk, SlabAnchorAttachment.COMPOUND_FULL_BLOCK_ANCHOR_TYPE);
-            pollAttachmentChange(mc, chunk, SlabAnchorAttachment.COMPOUND_VISIBLE_SIDE_LOWER_SLAB_TYPE);
-            pollAttachmentChange(mc, chunk, SlabAnchorAttachment.COMPOUND_VISIBLE_SIDE_UPPER_SLAB_TYPE);
-            pollAttachmentChange(mc, chunk, SlabAnchorAttachment.COMPOUND_VISIBLE_SIDE_DOUBLE_SLAB_TYPE);
-            pollAttachmentChange(mc, chunk, SlabAnchorAttachment.COMPOUND_VISIBLE_OWNER_TOP_SLAB_TYPE);
-            pollAttachmentChange(mc, chunk, SlabAnchorAttachment.MODERN_PLACEMENT_TYPE);
+            pollAttachmentChange(mc, chunk, snapshots, SlabAnchorAttachment.ANCHOR_TYPE);
+            pollAttachmentChange(mc, chunk, snapshots, SlabAnchorAttachment.FROZEN_FLAT_TYPE);
+            pollAttachmentChange(mc, chunk, snapshots, SlabAnchorAttachment.LOWERED_SLAB_CARRIER_TYPE);
+            pollAttachmentChange(mc, chunk, snapshots, SlabAnchorAttachment.COMPOUND_FULL_BLOCK_ANCHOR_TYPE);
+            pollAttachmentChange(mc, chunk, snapshots, SlabAnchorAttachment.COMPOUND_VISIBLE_SIDE_LOWER_SLAB_TYPE);
+            pollAttachmentChange(mc, chunk, snapshots, SlabAnchorAttachment.COMPOUND_VISIBLE_SIDE_UPPER_SLAB_TYPE);
+            pollAttachmentChange(mc, chunk, snapshots, SlabAnchorAttachment.COMPOUND_VISIBLE_SIDE_DOUBLE_SLAB_TYPE);
+            pollAttachmentChange(mc, chunk, snapshots, SlabAnchorAttachment.COMPOUND_VISIBLE_OWNER_TOP_SLAB_TYPE);
+            pollAttachmentChange(mc, chunk, snapshots, SlabAnchorAttachment.MODERN_PLACEMENT_TYPE);
         }
     }
 
     private static void pollAttachmentChange(
             MinecraftClient mc,
             WorldChunk chunk,
+            Map<AttachmentType<LongOpenHashSet>, LongOpenHashSet> snapshots,
             AttachmentType<LongOpenHashSet> attachmentType
     ) {
-        AttachmentSnapshotKey key = new AttachmentSnapshotKey(chunk.getPos().toLong(), attachmentType);
-        LongOpenHashSet oldSet = ATTACHMENT_SNAPSHOTS.get(key);
+        LongOpenHashSet oldSet = snapshots.get(attachmentType);
         // Attachment writers publish a fresh value, never mutate a published one. Keeping that
         // immutable snapshot makes unchanged chunks a reference check instead of a copy per tick.
         LongOpenHashSet newSet = chunk.getAttached(attachmentType);
@@ -252,14 +254,14 @@ public final class SlabAnchorClientSync {
             return;
         }
         if (attachmentSetsEqual(oldSet, newSet)) {
-            ATTACHMENT_SNAPSHOTS.put(key, newSet);
+            snapshots.put(attachmentType, newSet);
             return;
         }
 
         logReloadJumpSync("attachedSetPoll", chunk, attachmentType, oldSet, newSet);
         scheduleRerendersForSet(mc, oldSet, attachmentType);
         scheduleRerendersForSet(mc, newSet, attachmentType);
-        ATTACHMENT_SNAPSHOTS.put(key, newSet);
+        snapshots.put(attachmentType, newSet);
     }
 
     /** FROZEN-DY analog of {@link #pollAttachmentChange}: rerender the union of old/new stored cells. */
@@ -307,8 +309,8 @@ public final class SlabAnchorClientSync {
             WorldChunk chunk,
             AttachmentType<LongOpenHashSet> attachmentType
     ) {
-        AttachmentSnapshotKey key = new AttachmentSnapshotKey(chunk.getPos().toLong(), attachmentType);
-        ATTACHMENT_SNAPSHOTS.put(key, chunk.getAttached(attachmentType));
+        ATTACHMENT_SNAPSHOTS.computeIfAbsent(chunk.getPos().toLong(), ignored -> new IdentityHashMap<>())
+                .put(attachmentType, chunk.getAttached(attachmentType));
     }
 
     private static boolean attachmentSetsEqual(LongOpenHashSet left, LongOpenHashSet right) {

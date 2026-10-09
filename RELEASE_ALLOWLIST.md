@@ -144,6 +144,7 @@ before this line's behaviour work closes — see the note beneath the table.
 | `com/slabbed/mixin/ServerInteractBlockHitToleranceMixin` | Server-side hit tolerance for offset targeting. |
 | `com/slabbed/mixin/SlabSupportBlockMixin` | Slab support surface. |
 | `com/slabbed/mixin/SlabSupportStateMixin` | Slab support state. |
+| `com/slabbed/mixin/TerrainSlabsVegetationOffsetMixin` | Prevents Terrain Slabs and Slabbed from translating vegetation vertically twice while retaining horizontal model jitter. |
 | `com/slabbed/mixin/BlockCollisionDepthWindowMixin` | Discovers stored collision owners through the supported depth. |
 | `com/slabbed/mixin/BoatItemOffsetRaycastMixin` | Lets boat item use target stored visible block surfaces while preserving nearer vanilla block and fluid hits. |
 | `com/slabbed/mixin/ItemFramePhysicalOffsetMixin` | Saves and synchronizes frame height so the physical body and rendered position agree. |

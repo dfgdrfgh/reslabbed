@@ -12,6 +12,7 @@
     "torch.TorchBlockMixin",
     "SlabSupportBlockMixin",
     "SlabSupportStateMixin",
+    "TerrainSlabsVegetationOffsetMixin",
     "BlockCollisionDepthWindowMixin",
     "BoatItemOffsetRaycastMixin",
     "ItemFramePhysicalOffsetMixin",

@@ -311,7 +311,8 @@ public final class OffsetBlockStateModel extends ForwardingBakedModel {
         final double selfStepDy = (state.getBlock() instanceof CarpetBlock)
                 ? SlabSupport.getYOffset(view, pos, state)
                 : sourceDy;
-        final boolean clearStepCullFaces = slabbed$hasLoweredStepFace(view, pos, state, selfStepDy);
+        final int stepCullMask = SlabSupport.slabHeightStepFaceMask(view, pos, state, selfStepDy);
+        final boolean clearStepCullFaces = stepCullMask != 0;
 
         boolean captureZeroHeightMesh = slabbed$fullMeshBoundsTracePos != null
                 && slabbed$fullMeshBoundsTracePos.equals(pos);
@@ -325,41 +326,52 @@ public final class OffsetBlockStateModel extends ForwardingBakedModel {
 
         final float yOffset = dy;
         final BakedModel traceModel = wrapped;
-        final int[] totalQuadsSeen = {0};
-        final int[] verticesVisited = {0};
-        final double[] meshBounds = {
+        final boolean captureMeshBounds = captureZeroHeightMesh || MC1211_FULL_MESH_BOUNDS_TRACE;
+        final int[] totalQuadsSeen = captureMeshBounds ? new int[1] : null;
+        final int[] verticesVisited = captureMeshBounds ? new int[1] : null;
+        final double[] meshBounds = captureMeshBounds ? new double[]{
                 Double.POSITIVE_INFINITY,
                 Double.NEGATIVE_INFINITY,
                 Double.POSITIVE_INFINITY,
-                Double.NEGATIVE_INFINITY};
+                Double.NEGATIVE_INFINITY} : null;
         context.pushTransform(quad -> {
-            totalQuadsSeen[0]++;
+            if (captureMeshBounds) {
+                totalQuadsSeen[0]++;
+            }
             // Un-cull lowered-step seam faces so the strip exposed by the offset is drawn,
             // not culled into a see-through window. Preserve nominalFace so lighting/orientation
             // are unchanged. Only flips cull->draw, so it cannot remove geometry or z-fight
             // (the opposite-facing coplanar seam face is GPU back-face-culled).
             if (clearStepCullFaces) {
                 Direction cullFace = quad.cullFace();
-                if (cullFace != null && SlabSupport.isSlabHeightStepFace(view, pos, state, cullFace)) {
+                if (cullFace != null && (stepCullMask & (1 << cullFace.ordinal())) != 0) {
                     quad.cullFace(null);
                     quad.nominalFace(cullFace);
                 }
             }
+            if (yOffset == 0.0f && !captureMeshBounds) {
+                return true;
+            }
             for (int i = 0; i < 4; i++) {
-                verticesVisited[0]++;
                 float beforeY = quad.y(i);
                 float afterY = beforeY + yOffset;
-                meshBounds[0] = Math.min(meshBounds[0], beforeY);
-                meshBounds[1] = Math.max(meshBounds[1], beforeY);
-                meshBounds[2] = Math.min(meshBounds[2], afterY);
-                meshBounds[3] = Math.max(meshBounds[3], afterY);
-                quad.pos(i, quad.x(i), afterY, quad.z(i));
+                if (captureMeshBounds) {
+                    verticesVisited[0]++;
+                    meshBounds[0] = Math.min(meshBounds[0], beforeY);
+                    meshBounds[1] = Math.max(meshBounds[1], beforeY);
+                    meshBounds[2] = Math.min(meshBounds[2], afterY);
+                    meshBounds[3] = Math.max(meshBounds[3], afterY);
+                }
+                if (yOffset != 0.0f) {
+                    quad.pos(i, quad.x(i), afterY, quad.z(i));
+                }
             }
             return true;
         });
         try {
             emitWrappedBlockQuads(view, state, pos, randomSupplier, context);
-            slabbed$recordMc1211FullMeshBoundsSample(view, pos, state, traceModel, dy,
+            if (captureMeshBounds) {
+                slabbed$recordMc1211FullMeshBoundsSample(view, pos, state, traceModel, dy,
                     totalQuadsSeen[0],
                     verticesVisited[0],
                     meshBounds[0],
@@ -367,21 +379,10 @@ public final class OffsetBlockStateModel extends ForwardingBakedModel {
                     meshBounds[2],
                     meshBounds[3],
                     "quad_transform_aggregate");
+            }
         } finally {
             context.popTransform();
         }
-    }
-
-    /** True if any horizontal side face of {@code pos} sits at a slab-height step (see
-     * {@link SlabSupport#isSlabHeightStepFace}). Drives the cull relaxation for BOTH the
-     * lowered block and its flat neighbour, so neither side leaves a see-through seam. */
-    private static boolean slabbed$hasLoweredStepFace(BlockRenderView view, BlockPos pos, BlockState state, double selfDy) {
-        for (Direction direction : Direction.Type.HORIZONTAL) {
-            if (SlabSupport.isSlabHeightStepFace(view, pos, state, direction, selfDy)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private void emitWrappedBlockQuads(BlockRenderView view, BlockState state, BlockPos pos,

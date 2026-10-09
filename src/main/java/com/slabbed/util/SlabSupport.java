@@ -1360,6 +1360,20 @@ public final class SlabSupport {
         return slabHeightStepFaceAgainst(world, pos, state, direction, selfDy);
     }
 
+    /** Resolves the horizontal cull faces once per emitted model, using its existing total seat. */
+    public static int slabHeightStepFaceMask(BlockView world, BlockPos pos, BlockState state, double selfDy) {
+        if (STEP_CULL_DISABLED || world == null || pos == null || state == null) {
+            return 0;
+        }
+        int mask = 0;
+        for (Direction direction : Direction.Type.HORIZONTAL) {
+            if (slabHeightStepFaceAgainst(world, pos, state, direction, selfDy)) {
+                mask |= 1 << direction.ordinal();
+            }
+        }
+        return mask;
+    }
+
     private static boolean slabHeightStepFaceAgainst(BlockView world, BlockPos pos, BlockState state, Direction direction, double selfDy) {
         BlockPos neighborPos = pos.offset(direction);
         BlockState neighbor = world.getBlockState(neighborPos);
