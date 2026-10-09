@@ -54,6 +54,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
+import net.minecraft.world.EmptyBlockView;
 import net.minecraft.world.WorldView;
 
 import java.util.ArrayDeque;
@@ -67,6 +68,17 @@ public final class SlabSupport {
     private static final String BOTTOM_PERSISTENT_TRACE_OPT_IN = "slabbed.bottomPersistentTrace";
 
     private SlabSupport() {
+    }
+
+    /**
+     * Empty shape-cache views and server generation regions have no live placement geometry.
+     * Server worlds may be queried only by their owning thread; client render regions remain
+     * valid on mesh workers. Stored placement facts are never changed by this read guard (LAW.md).
+     */
+    public static boolean isUnsafeGeometryView(BlockView view) {
+        return view == null || view instanceof EmptyBlockView
+                || view instanceof WorldView worldView && !worldView.isClient()
+                && !(view instanceof ServerWorld serverWorld && serverWorld.getServer().isOnThread());
     }
 
     /**
@@ -1187,8 +1199,7 @@ public final class SlabSupport {
 
         // Background server queries must not touch chunk attachments or walk support geometry.
         // The authoritative server thread resolves and synchronizes the visible value.
-        if (world instanceof ServerWorld serverWorld
-                && !serverWorld.getServer().isOnThread()) {
+        if (isUnsafeGeometryView(world)) {
             return 0.0;
         }
         // A player-placed Terrain Slabs slab carries provenance and reads its stored height like any
@@ -1278,6 +1289,9 @@ public final class SlabSupport {
         }
         if (state == null || state.isAir()) {
             return 0.0;
+        }
+        if (isUnsafeGeometryView(world)) {
+            return 0.0d;
         }
         if (CompatHooks.shouldSkipOffset(state)) {
             return 0.0;

@@ -61,7 +61,7 @@ public final class SlabAnchorClientSync {
             if (mc == null || mc.world == null) {
                 return false;
             }
-            WorldChunk chunk = mc.world.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
+            WorldChunk chunk = SlabAnchorAttachment.loadedAttachmentChunk(mc.world, pos);
             if (chunk == null) {
                 return false;
             }
@@ -77,7 +77,7 @@ public final class SlabAnchorClientSync {
             if (mc == null || mc.world == null) {
                 return false;
             }
-            WorldChunk chunk = mc.world.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
+            WorldChunk chunk = SlabAnchorAttachment.loadedAttachmentChunk(mc.world, pos);
             if (chunk == null) {
                 return false;
             }
@@ -122,7 +122,7 @@ public final class SlabAnchorClientSync {
             if (mc == null || mc.world == null || pos == null) {
                 return null;
             }
-            WorldChunk chunk = mc.world.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
+            WorldChunk chunk = SlabAnchorAttachment.loadedAttachmentChunk(mc.world, pos);
             if (chunk == null) {
                 return null;
             }
@@ -191,7 +191,7 @@ public final class SlabAnchorClientSync {
                 scheduleDyRerenders(mc, initialDy.keySet());
             }
         }
-        DY_SNAPSHOTS.put(chunk.getPos().toLong(), copyDyMap(initialDy));
+        DY_SNAPSHOTS.put(chunk.getPos().toLong(), initialDy);
     }
 
     private static void onChunkUnload(ClientWorld world, WorldChunk chunk) {
@@ -209,7 +209,7 @@ public final class SlabAnchorClientSync {
         if (mc == null || mc.world == null || pos == null) {
             return null;
         }
-        WorldChunk chunk = mc.world.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
+        WorldChunk chunk = SlabAnchorAttachment.loadedAttachmentChunk(mc.world, pos);
         return chunk == null ? null : chunk.getAttached(attachmentType);
     }
 
@@ -217,6 +217,7 @@ public final class SlabAnchorClientSync {
         if (mc.world == null) {
             TRACKED_CHUNKS.clear();
             ATTACHMENT_SNAPSHOTS.clear();
+            DY_SNAPSHOTS.clear();
             return;
         }
         if (mc.worldRenderer == null) {
@@ -244,8 +245,14 @@ public final class SlabAnchorClientSync {
     ) {
         AttachmentSnapshotKey key = new AttachmentSnapshotKey(chunk.getPos().toLong(), attachmentType);
         LongOpenHashSet oldSet = ATTACHMENT_SNAPSHOTS.get(key);
-        LongOpenHashSet newSet = copyAttachmentSet(chunk.getAttached(attachmentType));
+        // Attachment writers publish a fresh value, never mutate a published one. Keeping that
+        // immutable snapshot makes unchanged chunks a reference check instead of a copy per tick.
+        LongOpenHashSet newSet = chunk.getAttached(attachmentType);
+        if (oldSet == newSet) {
+            return;
+        }
         if (attachmentSetsEqual(oldSet, newSet)) {
+            ATTACHMENT_SNAPSHOTS.put(key, newSet);
             return;
         }
 
@@ -259,10 +266,14 @@ public final class SlabAnchorClientSync {
     private static void pollPlacementDyChange(MinecraftClient mc, WorldChunk chunk) {
         long chunkPos = chunk.getPos().toLong();
         Long2ByteOpenHashMap oldMap = DY_SNAPSHOTS.get(chunkPos);
-        Long2ByteOpenHashMap newMap = copyDyMap(chunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE));
+        Long2ByteOpenHashMap newMap = chunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE);
+        if (oldMap == newMap) {
+            return;
+        }
         boolean oldEmpty = oldMap == null || oldMap.isEmpty();
         boolean newEmpty = newMap == null || newMap.isEmpty();
         if ((oldEmpty && newEmpty) || (!oldEmpty && !newEmpty && oldMap.equals(newMap))) {
+            DY_SNAPSHOTS.put(chunkPos, newMap);
             return;
         }
         if (!oldEmpty) {
@@ -272,10 +283,6 @@ public final class SlabAnchorClientSync {
             scheduleDyRerenders(mc, newMap.keySet());
         }
         DY_SNAPSHOTS.put(chunkPos, newMap);
-    }
-
-    private static Long2ByteOpenHashMap copyDyMap(Long2ByteOpenHashMap map) {
-        return map == null ? null : new Long2ByteOpenHashMap(map);
     }
 
     private static void scheduleDyRerenders(MinecraftClient mc, it.unimi.dsi.fastutil.longs.LongSet keys) {
@@ -301,11 +308,7 @@ public final class SlabAnchorClientSync {
             AttachmentType<LongOpenHashSet> attachmentType
     ) {
         AttachmentSnapshotKey key = new AttachmentSnapshotKey(chunk.getPos().toLong(), attachmentType);
-        ATTACHMENT_SNAPSHOTS.put(key, copyAttachmentSet(chunk.getAttached(attachmentType)));
-    }
-
-    private static LongOpenHashSet copyAttachmentSet(LongOpenHashSet set) {
-        return set == null ? null : new LongOpenHashSet(set);
+        ATTACHMENT_SNAPSHOTS.put(key, chunk.getAttached(attachmentType));
     }
 
     private static boolean attachmentSetsEqual(LongOpenHashSet left, LongOpenHashSet right) {

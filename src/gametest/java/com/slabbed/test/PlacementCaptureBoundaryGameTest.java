@@ -406,9 +406,10 @@ public final class PlacementCaptureBoundaryGameTest {
             SlabAnchorAttachment.clientEffectivePlacementDyLookup = pos -> pos.equals(predicted)
                     ? new SlabAnchorAttachment.PlacementDyFact(true, Double.doubleToRawLongBits(-0.5d))
                     : null;
-            h.assertTrue(SlabAnchorAttachment.usesFrozenPlacementHeight(null, modern)
-                            && SlabAnchorAttachment.usesFrozenPlacementHeight(null, predicted)
-                            && !SlabAnchorAttachment.usesFrozenPlacementHeight(null, legacy)
+            BlockView renderView = ChunkAccessSafetyTest.renderView();
+            h.assertTrue(SlabAnchorAttachment.usesFrozenPlacementHeight(renderView, modern)
+                            && SlabAnchorAttachment.usesFrozenPlacementHeight(renderView, predicted)
+                            && !SlabAnchorAttachment.usesFrozenPlacementHeight(renderView, legacy)
                             && !SlabAnchorAttachment.usesFrozenPlacementHeight(world, predicted),
                     "client bridge or server/client prediction separation selected the wrong route");
         } finally {

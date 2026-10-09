@@ -55,8 +55,8 @@ jobs:
       - name: Build and run server GameTests
         run: ./gradlew --no-daemon --stacktrace --console=plain build runGameTest
 
-      - name: Upload gametest logs on failure
-        if: failure()
+      - name: Upload gametest logs
+        if: always()
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: gametest-logs
@@ -64,3 +64,14 @@ jobs:
             build/run/gameTest/logs/
           if-no-files-found: ignore
           retention-days: 7
+
+      - name: Upload Fabric release jar
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+        with:
+          name: slabbed-mc1.21.1-fabric
+          path: |
+            build/libs/*.jar
+            !build/libs/*-sources.jar
+            !build/libs/*-dev.jar
+          if-no-files-found: error
+          retention-days: 30

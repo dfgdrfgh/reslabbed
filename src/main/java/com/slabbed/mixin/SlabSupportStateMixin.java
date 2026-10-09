@@ -75,7 +75,7 @@ public abstract class SlabSupportStateMixin {
 
     private VoxelShape slabbed$translateCollision(BlockView world, BlockPos pos,
                                                    java.util.function.Supplier<VoxelShape> original) {
-        if (slabbed$readingBaseCollision.get() || slabbed$isUnsafeAsyncShapeContext()
+        if (slabbed$readingBaseCollision.get() || slabbed$isUnsafeAsyncShapeContext(world)
                 || !SlabAnchorAttachment.usesFrozenPlacementHeight(world, pos)) {
             return original.get();
         }
@@ -348,6 +348,9 @@ public abstract class SlabSupportStateMixin {
             at = @At("RETURN"), cancellable = true)
     private void slabbed$offsetRaycast(BlockView world, BlockPos pos,
                                        CallbackInfoReturnable<VoxelShape> cir) {
+        if (slabbed$isUnsafeAsyncShapeContext(world)) {
+            return;
+        }
         BlockState self = (BlockState) (Object) this;
         VoxelShape shape = cir.getReturnValue();
         if (slabbed$isTopHalfTrapdoor(self) && (shape == null || shape.isEmpty())) {
@@ -417,7 +420,7 @@ public abstract class SlabSupportStateMixin {
             at = @At("RETURN"), cancellable = true)
     private void slabbed$offsetOakFenceAndGrindstoneCollision(BlockView world, BlockPos pos, ShapeContext ctx,
                                                               CallbackInfoReturnable<VoxelShape> cir) {
-        if (slabbed$isUnsafeAsyncShapeContext()) {
+        if (slabbed$isUnsafeAsyncShapeContext(world)) {
             return;
         }
         BlockState self = (BlockState) (Object) this;
@@ -444,10 +447,9 @@ public abstract class SlabSupportStateMixin {
         if (slabbed$readingBaseCollision.get()) {
             return;
         }
-        // In 1.21.1, getOutlineShape is called by light/opacity workers (Worker-Main, ForkJoinPool)
-        // during spawn-prep. SlabSupport.getYOffset accesses chunk/anchor state and can block via
-        // CompletableFuture.join, deadlocking the server. Return vanilla shape on those threads.
-        if (slabbed$isUnsafeAsyncShapeContext()) {
+        // Generation and lighting must retain base shapes without crossing into a live world.
+        // Check the supplied view and server ownership, independent of worker thread names.
+        if (slabbed$isUnsafeAsyncShapeContext(world)) {
             return;
         }
 
@@ -497,9 +499,8 @@ public abstract class SlabSupportStateMixin {
         }
     }
 
-    private static boolean slabbed$isUnsafeAsyncShapeContext() {
-        String name = Thread.currentThread().getName();
-        return name.startsWith("Worker-Main") || name.contains("ForkJoinPool");
+    private static boolean slabbed$isUnsafeAsyncShapeContext(BlockView world) {
+        return SlabSupport.isUnsafeGeometryView(world);
     }
 
     private static boolean isPaleMossCarpet(Block block) {

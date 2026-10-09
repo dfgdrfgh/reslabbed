@@ -1,13 +1,13 @@
 package com.slabbed.mixin;
 
 import com.slabbed.util.RailSlopeProfile;
+import com.slabbed.util.SlabSupport;
 import net.minecraft.block.AbstractRailBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.world.BlockView;
-import net.minecraft.world.EmptyBlockView;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -38,17 +38,9 @@ public abstract class AbstractRailBlockSlopeShapeMixin {
     private void slabbed$boxFollowsTheDrawnSlope(BlockState state, BlockView world, BlockPos pos,
                                                  ShapeContext context,
                                                  CallbackInfoReturnable<VoxelShape> cir) {
-        // The state cache is initialised at bootstrap against an empty view: no neighbour can exist
-        // there, so the answer is vanilla's by construction and the reads are skipped.
-        if (world instanceof EmptyBlockView) {
-            return;
-        }
-        // Light, opacity and world-generation workers reach shape queries off the server thread,
-        // where a neighbour read can wait on a chunk that is still loading. The seat mixin leaves
-        // those threads on vanilla geometry (SlabSupportStateMixin); the slope does the same, so the
-        // two never disagree.
-        String thread = Thread.currentThread().getName();
-        if (thread.startsWith("Worker-Main") || thread.contains("ForkJoinPool")) {
+        // Shape-cache and generation views retain vanilla geometry; live server geometry is
+        // read only by its owning thread. Mesh workers are identified by their view, not name.
+        if (SlabSupport.isUnsafeGeometryView(world)) {
             return;
         }
         RailSlopeProfile.Profile profile;

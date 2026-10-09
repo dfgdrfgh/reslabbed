@@ -23,6 +23,7 @@ import net.minecraft.block.CarpetBlock;
 import net.minecraft.block.SlabBlock;
 import net.minecraft.block.enums.SlabType;
 import net.minecraft.registry.Registries;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.Direction;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
@@ -31,7 +32,9 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
+import net.minecraft.world.BlockRenderView;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldView;
 import net.minecraft.world.chunk.WorldChunk;
 import net.minecraft.util.shape.VoxelShape;
 
@@ -400,6 +403,28 @@ public final class SlabAnchorAttachment {
             Boolean.parseBoolean(System.getProperty("slabbed.frozenDy", "false"));
 
     /**
+     * Attachment reads and removal callbacks must never request chunk generation or wait on a
+     * chunk future. Only the owning server thread may inspect its loaded chunk map; client mesh
+     * workers may read the client's already-published chunks and immutable attachment values.
+     */
+    public static WorldChunk loadedAttachmentChunk(World world, BlockPos pos) {
+        if (world == null || pos == null
+                || world instanceof ServerWorld serverWorld && !serverWorld.getServer().isOnThread()) {
+            return null;
+        }
+        return world.getChunkManager().getWorldChunk(pos.getX() >> 4, pos.getZ() >> 4);
+    }
+
+    private static boolean isClientAttachmentView(BlockView view) {
+        if (view instanceof WorldView worldView) {
+            return worldView.isClient();
+        }
+        // Generation regions and empty shape-cache views must not read the integrated client's
+        // world. Only render regions without a World handle need the client bridge.
+        return view instanceof BlockRenderView;
+    }
+
+    /**
      * Writes a server-authoritative C3 batch with at most one attachment publication per chunk.
      *
      * @param rawBitsByPos raw {@code Double.doubleToRawLongBits} height per cell
@@ -510,7 +535,7 @@ public final class SlabAnchorAttachment {
         if (pos == null) {
             return Double.NaN;
         }
-        boolean clientView = !(world instanceof World w) || w.isClient();
+        boolean clientView = isClientAttachmentView(world);
         if (clientView) {
             ClientPlacementDyFactLookup overlay = clientEffectivePlacementDyLookup;
             if (overlay != null) {
@@ -529,9 +554,10 @@ public final class SlabAnchorAttachment {
             return false;
         }
         if (!(world instanceof World w)) {
-            return clientModernPlacementLookup != null && clientModernPlacementLookup.test(pos);
+            return isClientAttachmentView(world)
+                    && clientModernPlacementLookup != null && clientModernPlacementLookup.test(pos);
         }
-        WorldChunk chunk = w.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
+        WorldChunk chunk = loadedAttachmentChunk(w, pos);
         LongOpenHashSet set = chunk == null ? null : chunk.getAttached(MODERN_PLACEMENT_TYPE);
         return set != null && set.contains(pos.asLong());
     }
@@ -549,7 +575,7 @@ public final class SlabAnchorAttachment {
         }
         // A server never consults the integrated client's prediction overlay. Only the client World
         // or its render-region bridge may select the modern path before provenance sync arrives.
-        if (world instanceof World w && !w.isClient()) {
+        if (!isClientAttachmentView(world)) {
             return false;
         }
         return clientPostPolicyPredictionLookup != null && clientPostPolicyPredictionLookup.test(pos)
@@ -597,6 +623,9 @@ public final class SlabAnchorAttachment {
             return PlacementDyFact.absent();
         }
         if (!(world instanceof World w)) {
+            if (!isClientAttachmentView(world)) {
+                return PlacementDyFact.absent();
+            }
             ClientPlacementDyFactLookup lookup = clientPlacementDyLookup;
             if (lookup != null) {
                 PlacementDyFact fact = lookup.lookup(pos);
@@ -606,7 +635,7 @@ public final class SlabAnchorAttachment {
             }
             return PlacementDyFact.absent();
         }
-        WorldChunk chunk = w.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
+        WorldChunk chunk = loadedAttachmentChunk(w, pos);
         if (chunk == null) {
             return PlacementDyFact.absent();
         }
@@ -778,9 +807,9 @@ public final class SlabAnchorAttachment {
             return false;
         }
         if (!(world instanceof World w)) {
-            return clientFrozenFlatLookup != null && clientFrozenFlatLookup.test(pos);
+            return isClientAttachmentView(world) && clientFrozenFlatLookup != null && clientFrozenFlatLookup.test(pos);
         }
-        WorldChunk chunk = w.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
+        WorldChunk chunk = loadedAttachmentChunk(w, pos);
         if (chunk == null) {
             return false;
         }
@@ -922,6 +951,9 @@ public final class SlabAnchorAttachment {
             return false;
         }
         LongOpenHashSet existing = chunk.getAttached(type);
+        if (existing != null && existing.contains(pos.asLong())) {
+            return false;
+        }
         LongOpenHashSet set = existing == null ? new LongOpenHashSet() : new LongOpenHashSet(existing);
         BlockState stateBefore = RuntimeDiagnostics.beta35SlabJumpSourceTruthEnabled()
                 ? world.getBlockState(pos) : null;
@@ -970,7 +1002,7 @@ public final class SlabAnchorAttachment {
         // FROZEN-DY: the stored placement height dies with the block, so a fresh placement in the same
         // cell captures its own aim from scratch. Copy-on-write, exactly like the writer.
         if (world != null && !world.isClient()) {
-            WorldChunk dyChunk = world.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
+            WorldChunk dyChunk = loadedAttachmentChunk(world, pos);
             if (dyChunk != null) {
                 Long2ByteOpenHashMap dyMap = dyChunk.getAttached(PLACEMENT_DY_TYPE);
                 if (dyMap != null && dyMap.containsKey(pos.asLong())) {
@@ -995,12 +1027,12 @@ public final class SlabAnchorAttachment {
         if (world == null || world.isClient()) {
             return false;
         }
-        WorldChunk chunk = world.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
+        WorldChunk chunk = loadedAttachmentChunk(world, pos);
         if (chunk == null) {
             return false;
         }
         LongOpenHashSet existing = chunk.getAttached(type);
-        if (existing == null || existing.isEmpty()) {
+        if (existing == null || !existing.contains(pos.asLong())) {
             if (TRACE) {
                 Slabbed.LOGGER.info("[ANCHOR] {} remove pos={} existed=false", label, pos.toShortString());
             }
@@ -1119,9 +1151,9 @@ public final class SlabAnchorAttachment {
             // Chunk render paths (e.g. ChunkRendererRegion) are not World instances and
             // cannot access chunk attachments directly.  Delegate to the client fallback
             // hook so the model render path sees the same anchor state as outline/raycast.
-            return clientAnchorLookup != null && clientAnchorLookup.test(pos);
+            return isClientAttachmentView(world) && clientAnchorLookup != null && clientAnchorLookup.test(pos);
         }
-        WorldChunk chunk = w.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
+        WorldChunk chunk = loadedAttachmentChunk(w, pos);
         if (chunk == null) {
             return false;
         }
@@ -1149,10 +1181,10 @@ public final class SlabAnchorAttachment {
             return false;
         }
         if (!(world instanceof World w)) {
-            return clientCompoundFullBlockAnchorLookup != null
+            return isClientAttachmentView(world) && clientCompoundFullBlockAnchorLookup != null
                     && clientCompoundFullBlockAnchorLookup.test(pos);
         }
-        WorldChunk chunk = w.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
+        WorldChunk chunk = loadedAttachmentChunk(w, pos);
         if (chunk == null) {
             return false;
         }
@@ -1170,10 +1202,10 @@ public final class SlabAnchorAttachment {
             return false;
         }
         if (!(world instanceof World w)) {
-            return clientCompoundVisibleSideLowerSlabLookup != null
+            return isClientAttachmentView(world) && clientCompoundVisibleSideLowerSlabLookup != null
                     && clientCompoundVisibleSideLowerSlabLookup.test(pos);
         }
-        WorldChunk chunk = w.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
+        WorldChunk chunk = loadedAttachmentChunk(w, pos);
         if (chunk == null) {
             return false;
         }
@@ -1191,10 +1223,10 @@ public final class SlabAnchorAttachment {
             return false;
         }
         if (!(world instanceof World w)) {
-            return clientCompoundVisibleSideUpperSlabLookup != null
+            return isClientAttachmentView(world) && clientCompoundVisibleSideUpperSlabLookup != null
                     && clientCompoundVisibleSideUpperSlabLookup.test(pos);
         }
-        WorldChunk chunk = w.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
+        WorldChunk chunk = loadedAttachmentChunk(w, pos);
         if (chunk == null) {
             return false;
         }
@@ -1212,10 +1244,10 @@ public final class SlabAnchorAttachment {
             return false;
         }
         if (!(world instanceof World w)) {
-            return clientCompoundVisibleSideDoubleSlabLookup != null
+            return isClientAttachmentView(world) && clientCompoundVisibleSideDoubleSlabLookup != null
                     && clientCompoundVisibleSideDoubleSlabLookup.test(pos);
         }
-        WorldChunk chunk = w.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
+        WorldChunk chunk = loadedAttachmentChunk(w, pos);
         if (chunk == null) {
             return false;
         }
@@ -1233,10 +1265,10 @@ public final class SlabAnchorAttachment {
             return false;
         }
         if (!(world instanceof World w)) {
-            return clientCompoundVisibleOwnerTopSlabLookup != null
+            return isClientAttachmentView(world) && clientCompoundVisibleOwnerTopSlabLookup != null
                     && clientCompoundVisibleOwnerTopSlabLookup.test(pos);
         }
-        WorldChunk chunk = w.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
+        WorldChunk chunk = loadedAttachmentChunk(w, pos);
         if (chunk == null) {
             return false;
         }
@@ -1250,18 +1282,19 @@ public final class SlabAnchorAttachment {
     }
 
     public static boolean isPersistentLoweredSlabCarrier(BlockView world, BlockPos pos, BlockState state) {
-        if (!isPersistentLoweredSlabCarrierState(state) || pos == null) {
+        if (SlabSupport.isUnsafeGeometryView(world)
+                || !isPersistentLoweredSlabCarrierState(state) || pos == null) {
             return false;
         }
         if (isCompoundVisibleOwnerTopSlab(world, pos, state)) {
             return false;
         }
         if (!(world instanceof World w)) {
-            return clientLoweredSlabCarrierLookup != null && clientLoweredSlabCarrierLookup.test(pos);
+            return isClientAttachmentView(world) && clientLoweredSlabCarrierLookup != null && clientLoweredSlabCarrierLookup.test(pos);
         }
-        WorldChunk chunk = w.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
+        WorldChunk chunk = loadedAttachmentChunk(w, pos);
         if (chunk == null) {
-            return isPersistentLoweredBottomSlabCarrierNonRecursive(world, pos, state);
+            return false;
         }
         LongOpenHashSet set = chunk.getAttached(LOWERED_SLAB_CARRIER_TYPE);
         boolean carrier = set != null && set.contains(pos.asLong());
@@ -1280,21 +1313,24 @@ public final class SlabAnchorAttachment {
             BlockPos pos,
             BlockState state
     ) {
-        if (!isBottomPersistentLoweredSlabCarrierState(state) || world == null || pos == null) {
+        if (SlabSupport.isUnsafeGeometryView(world)
+                || !isBottomPersistentLoweredSlabCarrierState(state) || world == null || pos == null) {
             return false;
         }
         if (isCompoundVisibleOwnerTopSlab(world, pos, state)) {
             return false;
         }
         if (world instanceof World w) {
-            WorldChunk chunk = w.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
-            if (chunk != null) {
-                LongOpenHashSet set = chunk.getAttached(LOWERED_SLAB_CARRIER_TYPE);
-                if (set != null && set.contains(pos.asLong())) {
-                    return true;
-                }
+            WorldChunk chunk = loadedAttachmentChunk(w, pos);
+            if (chunk == null) {
+                return false;
             }
-        } else if (clientLoweredSlabCarrierLookup != null && clientLoweredSlabCarrierLookup.test(pos)) {
+            LongOpenHashSet set = chunk.getAttached(LOWERED_SLAB_CARRIER_TYPE);
+            if (set != null && set.contains(pos.asLong())) {
+                return true;
+            }
+        } else if (isClientAttachmentView(world) && clientLoweredSlabCarrierLookup != null
+                && clientLoweredSlabCarrierLookup.test(pos)) {
             return true;
         }
         return qualifiesForPersistentLoweredBottomSlabOnLoweredFullBlockNonRecursive(world, pos, state)
