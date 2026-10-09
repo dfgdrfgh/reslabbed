@@ -82,7 +82,7 @@ exclusion can leave a manifest advertising a class the archive no longer has. Th
 | `fabric.mod.json` | Mod descriptor. Required by the loader. |
 | `slabbed.mixins.json` | Required main mixin configuration referenced from `fabric.mod.json`. |
 | `slabbed.client.mixins.json` | Required client mixin configuration referenced from `fabric.mod.json`. |
-| `assets/slabbed/**` | The mod's own lang file and the chain-ceiling-support model. Recursive by policy — asset subdirectories are content, not behaviour. |
+| `assets/slabbed/**` | The mod's own icon, lang file and the chain-ceiling-support model. Recursive by policy — asset subdirectories are content, not behaviour. |
 
 ### Entrypoints
 

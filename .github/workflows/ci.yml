@@ -53,7 +53,26 @@ jobs:
       # reported test count differs from tools/expected-gametest-count.py — the stale-run-dir
       # false-green class is machine-gated, not a manual step.
       - name: Build and run server GameTests
-        run: ./gradlew --no-daemon --stacktrace --console=plain build runGameTest
+        run: |
+          rm -rf build/run/gameTest
+          ./gradlew --no-daemon --stacktrace --console=plain build runGameTest
+
+      - name: Verify packaged mod icon
+        run: |
+          python3 - <<'PYCODE'
+          import json, pathlib, struct, zipfile
+          jars = [p for p in pathlib.Path('build/libs').glob('*.jar')
+                  if not p.name.endswith(('-sources.jar', '-dev.jar'))]
+          assert len(jars) == 1, f'Expected one release jar, found {len(jars)}'
+          with zipfile.ZipFile(jars[0]) as jar:
+              metadata = json.loads(jar.read('fabric.mod.json'))
+              icon_path = metadata['icon']
+              icon = jar.read(icon_path)
+              assert icon[:8] == b'\x89PNG\r\n\x1a\n', 'Mod icon is not a PNG'
+              width, height = struct.unpack('>II', icon[16:24])
+              assert width > 0 and height > 0, 'Mod icon has invalid dimensions'
+              print(f'{jars[0].name}: {icon_path} packaged ({width}x{height})')
+          PYCODE
 
       - name: Upload gametest logs
         if: always()
