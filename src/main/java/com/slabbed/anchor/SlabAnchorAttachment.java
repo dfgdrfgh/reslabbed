@@ -54,6 +54,8 @@ import net.minecraft.util.shape.VoxelShape;
  * lane states only. No retroactive anchoring and no torch interaction.
  */
 public final class SlabAnchorAttachment {
+    private static final Identifier PALE_MOSS_CARPET_ID = Identifier.of("minecraft", "pale_moss_carpet");
+
     private SlabAnchorAttachment() {
     }
 
@@ -1393,7 +1395,7 @@ public final class SlabAnchorAttachment {
     }
 
     private static boolean isPaleMossCarpet(Block block) {
-        return block == Registries.BLOCK.get(Identifier.of("minecraft", "pale_moss_carpet"));
+        return block == Registries.BLOCK.get(PALE_MOSS_CARPET_ID);
     }
 
     public static boolean qualifiesForDirectAnchor(BlockView world, BlockPos pos, BlockState state) {

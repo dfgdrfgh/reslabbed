@@ -35,6 +35,7 @@ import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.WorldView;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -57,6 +58,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
  */
 @Mixin(AbstractBlock.AbstractBlockState.class)
 public abstract class SlabSupportStateMixin {
+    @Unique
+    private static final Identifier slabbed$PALE_MOSS_CARPET_ID = Identifier.of("minecraft", "pale_moss_carpet");
 
     private static final ThreadLocal<Boolean> slabbed$readingBaseCollision =
             ThreadLocal.withInitial(() -> false);
@@ -504,6 +507,6 @@ public abstract class SlabSupportStateMixin {
     }
 
     private static boolean isPaleMossCarpet(Block block) {
-        return block == Registries.BLOCK.get(Identifier.of("minecraft", "pale_moss_carpet"));
+        return block == Registries.BLOCK.get(slabbed$PALE_MOSS_CARPET_ID);
     }
 }

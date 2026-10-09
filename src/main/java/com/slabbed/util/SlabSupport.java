@@ -66,6 +66,7 @@ import java.util.Set;
  */
 public final class SlabSupport {
     private static final String BOTTOM_PERSISTENT_TRACE_OPT_IN = "slabbed.bottomPersistentTrace";
+    private static final Identifier PALE_MOSS_CARPET_ID = Identifier.of("minecraft", "pale_moss_carpet");
 
     private SlabSupport() {
     }
@@ -94,7 +95,7 @@ public final class SlabSupport {
     }
 
     private static boolean isPaleMossCarpet(Block block) {
-        return block == Registries.BLOCK.get(Identifier.of("minecraft", "pale_moss_carpet"));
+        return block == Registries.BLOCK.get(PALE_MOSS_CARPET_ID);
     }
 
     /**
