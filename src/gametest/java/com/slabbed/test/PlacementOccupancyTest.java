@@ -140,4 +140,61 @@ public final class PlacementOccupancyTest {
         h.assertTrue(height(world, upper) == before, "Rejected deep placement moved the upper block");
         h.complete();
     }
+
+    @GameTest(templateName = "slabbed:empty_16")
+    public void loweredSidePlacementCannotEnterUnshiftedNaturalTerrain(TestContext h) {
+        naturalTerrainPlacement(h, false);
+    }
+
+    @GameTest(templateName = "slabbed:empty_16")
+    public void replacingGeneratedSlabCannotEnterUnshiftedTerrainBelow(TestContext h) {
+        naturalTerrainPlacement(h, true);
+    }
+
+    private static void naturalTerrainPlacement(TestContext h, boolean replaceGenerated) {
+        ServerWorld world = h.getWorld();
+        BlockPos ground = h.getAbsolutePos(new BlockPos(3, 1, 3));
+        PlayerEntity player = player(h, ground);
+        setup(h, world, player, ground, Items.STONE_SLAB);
+        BlockPos owner = ground.up(2);
+        BlockPos target = owner.east();
+        BlockPos terrain = target.down();
+        long ownerHeight = height(world, owner);
+        BlockState generated = TerrainSlabsTestShim.TEST_TS_SLAB.getDefaultState()
+                .with(SlabBlock.TYPE, SlabType.BOTTOM).with(TerrainSlabsTestShim.GENERATED, true);
+        BlockState[] blockers = {Blocks.STONE.getDefaultState(), Blocks.DIRT.getDefaultState(),
+                Blocks.GLASS.getDefaultState(), generated.with(SlabBlock.TYPE, SlabType.TOP)};
+        Item[] items = {Items.STONE, Items.GLASS, Items.STONE_SLAB,
+                TerrainSlabsTestShim.TEST_TS_SLAB.asItem()};
+        for (BlockState blocker : blockers) {
+            world.setBlockState(terrain, blocker, Block.NOTIFY_ALL);
+            h.assertTrue(height(world, terrain) == Double.doubleToRawLongBits(0.0),
+                    "Natural blocker must exercise the unshifted lane");
+            h.assertTrue(!SlabAnchorAttachment.isModernPlacement(world, terrain),
+                    "Natural blocker must have no player placement marker");
+            for (Item item : items) {
+                if (replaceGenerated) {
+                    world.setBlockState(target, generated, Block.NOTIFY_ALL);
+                    h.assertTrue(world.breakBlock(target, false), "Generated slab did not break");
+                }
+                ItemStack stack = new ItemStack(item, 2);
+                ActionResult result = PlacementCaptureBoundaryGameTest.useOn(player, stack, owner, Direction.EAST);
+                h.assertTrue(!result.isAccepted() && world.getBlockState(target).isAir() && stack.getCount() == 2,
+                        "Lowered placement entered natural terrain: " + blocker + " item=" + item);
+                h.assertTrue(world.getBlockState(terrain).equals(blocker)
+                        && height(world, terrain) == Double.doubleToRawLongBits(0.0)
+                        && height(world, owner) == ownerHeight,
+                        "Rejected placement changed terrain or the placed owner's height");
+            }
+        }
+        // A real half-height opening remains usable; contact is not an intersection.
+        world.setBlockState(terrain, generated, Block.NOTIFY_ALL);
+        h.assertTrue(PlacementCaptureBoundaryGameTest.useOn(player, new ItemStack(Items.STONE_SLAB),
+                        owner, Direction.EAST).isAccepted(), "Touching natural half slab must leave room");
+        h.assertTrue(world.getBlockState(target).isOf(Blocks.STONE_SLAB)
+                        && height(world, target) == Double.doubleToRawLongBits(-0.5),
+                "Fitting slab must retain its aimed height");
+        h.assertTrue(height(world, owner) == ownerHeight, "Fitting slab moved the placed owner");
+        h.complete();
+    }
 }
