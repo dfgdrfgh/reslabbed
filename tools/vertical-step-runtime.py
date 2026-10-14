@@ -3,6 +3,7 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import shutil
 import zipfile
 
 project = Path.cwd()
@@ -27,7 +28,6 @@ assert intermediary, 'Production intermediary mappings are missing'
 add(intermediary[-1])
 api = module_jars('net.fabricmc.fabric-api', 'fabric-api', metadata['fabricVersion'])
 assert api, 'Original Fabric API bundle is missing'
-add(api[0])
 for artifact in metadata['artifacts']:
     if artifact['group'] == 'net.minecraft':
         continue
@@ -70,10 +70,11 @@ for root in (modules / 'org.lwjgl').iterdir():
 release = [p for p in (project / 'build/libs').glob('*.jar')
            if not p.name.endswith(('-sources.jar', '-dev.jar'))]
 assert len(release) == 1, 'Expected one release mod'
-add(release[0])
-add(project / 'build/vertical-step-runtime/vertical-step-probe.jar')
 game = project / 'build/run/vertical-step-client'
-game.mkdir(parents=True, exist_ok=True)
+mods = game / 'mods'
+mods.mkdir(parents=True, exist_ok=True)
+for path in [api[0], release[0], project / 'build/vertical-step-runtime/vertical-step-probe.jar']:
+    shutil.copy2(path, mods / path.name)
 (game / 'options.txt').write_text('renderClouds:false\nrenderDistance:8\nmaxFps:60\n')
 indexes = sorted((home / 'caches/fabric-loom').rglob('indexes/*17*.json'))
 assert len(indexes) == 1, 'Expected one downloaded 1.21.1 asset index: ' + str(indexes)
@@ -85,7 +86,10 @@ command = [java, '-Xmx2G', '-Dfabric.development=false', '-Dslabbed.verticalStep
            '--gameDir', str(game), '--assetsDir', str(assets), '--assetIndex', asset_index.stem,
            '--username', 'FaceProbe', '--version', '1.21.1', '--accessToken', '0']
 with (game / 'production-launch.log').open('w') as log:
-    result = subprocess.run(command, cwd=game, stdout=log, stderr=subprocess.STDOUT, timeout=300)
+    try:
+        result = subprocess.run(command, cwd=game, stdout=log, stderr=subprocess.STDOUT, timeout=300)
+    except subprocess.TimeoutExpired:
+        raise AssertionError('Production client timed out; see production-launch.log') from None
 assert result.returncode == 0, 'Production client failed; see production-launch.log'
 assert (game / 'vertical-step-pass.txt').exists(), 'Production client did not complete the face checks'
 print((game / 'vertical-step-pass.txt').read_text().strip())
