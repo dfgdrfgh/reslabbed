@@ -64,9 +64,9 @@ public final class TerrainSlabsCompat {
      *
      * <p>Consulted ONLY to lower an OBJECT resting on a Terrain Slabs slab — never to
      * offset the TS slab itself (that stays subtractive via {@link #shouldSkipOffset}).
-     * A named TS slab with {@code type=BOTTOM}, or a {@code type=DOUBLE} with
-     * {@code generated=true}, presents a flush half-height/full top surface that an
-     * object sits on, so it reports {@link CompatSlabSurfaceKind#BOTTOM_LIKE}.
+     * Only {@code type=BOTTOM} supplies a half-height plane. Terrain Slabs' DOUBLE
+     * variants use full-block models and shapes even when {@code generated=true};
+     * provenance must not lower a placement into that occupied upper half (LAW.md).
      */
     public static CompatSlabSurfaceKind customSlabSurfaceKind(BlockState state) {
         if (!LOADED || state == null || !state.contains(SlabBlock.TYPE)) {
@@ -83,9 +83,6 @@ public final class TerrainSlabsCompat {
 
         SlabType type = state.get(SlabBlock.TYPE);
         if (type == SlabType.BOTTOM) {
-            return CompatSlabSurfaceKind.BOTTOM_LIKE;
-        }
-        if (type == SlabType.DOUBLE && propertyEquals(state, "generated", "true")) {
             return CompatSlabSurfaceKind.BOTTOM_LIKE;
         }
         return CompatSlabSurfaceKind.NONE;
