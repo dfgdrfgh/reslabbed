@@ -10,6 +10,7 @@ import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.compat.CompatHooks;
 import com.slabbed.placement.ConnectorPlacementSettle;
 import com.slabbed.placement.LandingResolver;
+import com.slabbed.placement.PlacementOccupancy;
 import com.slabbed.util.SlabSupport;
 import com.slabbed.util.RuntimeDiagnostics;
 import com.slabbed.upgrade.WorldUpgradeRuntimePolicy;
@@ -907,6 +908,12 @@ public abstract class BlockItemPlacementIntentMixin {
             BlockState state,
             CallbackInfoReturnable<Boolean> cir
     ) {
+        PlacementFrame frame = slabbed$c3Frame();
+        LandingResolver.PlacementAim aim = frame == null ? C3_ROOT_AIM.get() : frame.rootAim;
+        if (PlacementOccupancy.intersectsDisplacedBody(context.getWorld(), context.getBlockPos(), state, aim)) {
+            cir.setReturnValue(false);
+            return;
+        }
         if (!slabbed$isLoweredSlabFacePlacement(context, state)) {
             return;
         }
@@ -1668,3 +1675,4 @@ public abstract class BlockItemPlacementIntentMixin {
                 "side_adjacent_lowered_full_anchor_attempt");
     }
 }
+

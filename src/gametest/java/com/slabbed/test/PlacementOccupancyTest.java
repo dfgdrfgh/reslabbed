@@ -122,10 +122,13 @@ public final class PlacementOccupancyTest {
         BlockPos owner = h.getAbsolutePos(new BlockPos(2, 6, 2));
         world.setBlockState(owner, Blocks.STONE.getDefaultState(), Block.NOTIFY_ALL);
         SlabAnchorAttachment.writePlacementDyBatch(world, Map.of(owner, Double.doubleToRawLongBits(-3.0)));
+        SlabAnchorAttachment.markPostPolicyPlacements(world, java.util.List.of(owner));
         PlayerEntity player = player(h, owner);
         h.assertTrue(place(player, new ItemStack(Items.DIRT), owner).isAccepted(), "Deep upper block did not place");
         BlockPos upper = owner.up();
         h.assertTrue(height(world, upper) == Double.doubleToRawLongBits(-3.0), "Deep placement must retain its native landing");
+        world.breakBlock(owner, false);
+        h.assertTrue(height(world, upper) == Double.doubleToRawLongBits(-3.0), "Removing the deep support moved the upper block");
         // The existing owner's body is three cells below its grid cell. A new item must find it.
         BlockPos ground = upper.down(4);
         world.setBlockState(ground, Blocks.STONE.getDefaultState(), Block.NOTIFY_ALL);
