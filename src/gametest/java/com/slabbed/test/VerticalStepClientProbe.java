@@ -75,7 +75,12 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
         if (exposed) require(actual.visible && actual.cull == null, "Actual section mesh hid exposed face: " + actual);
     }
     private static final BlockPos EDGE = new BlockPos(15, 205, 8);
-    private static final BlockPos NATURAL_BASE = new BlockPos(12, 191, 12);
+    private static final BlockPos NATURAL_TOP = new BlockPos(12, 208, 12);
+    // Sodium supplies one-cell section borders; its legacy control must fit that snapshot.
+    // Indigo also exercises a support sixteen cells below the watched natural block.
+    private static BlockPos naturalBase() {
+        return new BlockPos(12, net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("sodium") ? 206 : 191, 12);
+    }
     private it.unimi.dsi.fastutil.longs.LongOpenHashSet terrainMarkers;
     private Long2ByteOpenHashMap edgeFacts;
     private int ticks, phase, started, reloads;
@@ -170,11 +175,11 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
                     place(world, player, Items.STONE_SLAB, carpet);
                     place(world, player, Items.OAK_LOG, carpet.up());
                     world.setBlockState(carpet.up(3), Blocks.RED_CARPET.getDefaultState(), Block.NOTIFY_ALL);
-                    world.setBlockState(NATURAL_BASE, Blocks.STONE.getDefaultState(), Block.NOTIFY_ALL);
+                    world.setBlockState(naturalBase(), Blocks.STONE.getDefaultState(), Block.NOTIFY_ALL);
                     player.setPosition(15.5, 191, 12.5);
-                    place(world, player, terrainSlab().asItem(), NATURAL_BASE);
-                    for (int y = 2; y <= SlabSupport.SUPPORT_COLUMN_DEPTH + 1; y++)
-                        world.setBlockState(NATURAL_BASE.up(y), Blocks.OAK_LOG.getDefaultState(), Block.NOTIFY_ALL);
+                    place(world, player, terrainSlab().asItem(), naturalBase());
+                    for (int y = 2; y <= NATURAL_TOP.getY() - naturalBase().getY(); y++)
+                        world.setBlockState(naturalBase().up(y), Blocks.OAK_LOG.getDefaultState(), Block.NOTIFY_ALL);
                     player.setStackInHand(Hand.MAIN_HAND, ItemStack.EMPTY);
                     prepared = true;
                 } catch (Throwable error) { failure = error; }
@@ -243,24 +248,24 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
         }
         if (phase == 6) {
             System.out.println("WEIGHTED_TERRAIN_SLAB_MODEL_OUTLINE_RELOAD_PASS");
-            checkMeshedFace(NATURAL_BASE.up(17), Direction.DOWN, 0, false);
-            var chunk = client.world.getWorldChunk(NATURAL_BASE.up());
+            checkMeshedFace(NATURAL_TOP, Direction.DOWN, 0, false);
+            var chunk = client.world.getWorldChunk(naturalBase().up());
             terrainMarkers = new it.unimi.dsi.fastutil.longs.LongOpenHashSet(
                     chunk.getAttached(SlabAnchorAttachment.MODERN_PLACEMENT_TYPE));
             var delayed = new it.unimi.dsi.fastutil.longs.LongOpenHashSet(terrainMarkers);
-            delayed.remove(NATURAL_BASE.up().asLong());
+            delayed.remove(naturalBase().up().asLong());
             chunk.setAttached(SlabAnchorAttachment.MODERN_PLACEMENT_TYPE, delayed);
             MESH_FACES.clear(); client.worldRenderer.reload();
             phase = 7; started = ticks; return;
         }
         if (phase == 7) {
-            checkMeshedFace(NATURAL_BASE.up(17), Direction.DOWN, -.5, false);
-            MESH_FACES.remove(NATURAL_BASE.up(17).asLong() + ":" + Direction.DOWN);
-            client.world.getWorldChunk(NATURAL_BASE.up()).setAttached(
+            checkMeshedFace(NATURAL_TOP, Direction.DOWN, -.5, false);
+            MESH_FACES.remove(NATURAL_TOP.asLong() + ":" + Direction.DOWN);
+            client.world.getWorldChunk(naturalBase().up()).setAttached(
                     SlabAnchorAttachment.MODERN_PLACEMENT_TYPE, terrainMarkers);
             phase = 8; started = ticks; return;
         }
-        checkMeshedFace(NATURAL_BASE.up(17), Direction.DOWN, 0, false);
+        checkMeshedFace(NATURAL_TOP, Direction.DOWN, 0, false);
         System.out.println("NATURAL_COLUMN_PROVENANCE_REFRESH_PASS");
 
         Renderer renderer = RendererAccess.INSTANCE.getRenderer();
