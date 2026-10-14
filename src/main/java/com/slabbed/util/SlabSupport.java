@@ -89,9 +89,7 @@ public final class SlabSupport {
      */
     public static boolean isThinTopLayer(BlockState state) {
         Block block = state.getBlock();
-        return block instanceof SnowBlock
-                || block instanceof CarpetBlock
-                || isPaleMossCarpet(block);
+        return block instanceof SnowBlock || isCarpetLike(state);
     }
 
     private static boolean isPaleMossCarpet(Block block) {
