@@ -85,6 +85,13 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
 
     @Override public void onInitializeClient() {
         if (!Boolean.getBoolean("slabbed.verticalStepProbe")) return;
+        if (Boolean.getBoolean("slabbed.realTerrainProbe")) {
+            var mod = net.fabricmc.loader.api.FabricLoader.getInstance().getModContainer("terrain_slabs").orElseThrow();
+            require(mod.getMetadata().getId().equals("terrain_slabs") && terrainSlab() != TerrainSlabsTestShim.TEST_TS_SLAB,
+                    "Real Terrain Slabs must be loaded; a provided test alias is not the integration fixture");
+            System.out.println("REAL_TERRAIN_SLABS_LOADED version=" + mod.getMetadata().getVersion()
+                    + " block=" + terrainSlab().getClass().getName());
+        }
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             try { tick(client); }
             catch (Throwable error) { error.printStackTrace(); System.exit(1); }

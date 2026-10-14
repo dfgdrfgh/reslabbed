@@ -77,6 +77,18 @@ mods = game / 'mods'
 mods.mkdir(parents=True, exist_ok=True)
 for path in [api[0], gametest_api[-1], release[0], project / 'build/vertical-step-runtime/vertical-step-probe.jar']:
     shutil.copy2(path, mods / path.name)
+real_terrain = os.environ.get('SLABBED_REAL_TERRAIN') == '1'
+if real_terrain:
+    # The headless shim's alias otherwise satisfies the real mod ID during resolution.
+    probe = mods / 'vertical-step-probe.jar'
+    with zipfile.ZipFile(probe) as archive:
+        contents = {entry.filename: archive.read(entry.filename) for entry in archive.infolist()}
+    config = json.loads(contents['fabric.mod.json'])
+    config.pop('provides', None)
+    contents['fabric.mod.json'] = json.dumps(config).encode()
+    with zipfile.ZipFile(probe, 'w', zipfile.ZIP_DEFLATED) as archive:
+        for name, data in contents.items():
+            archive.writestr(name, data)
 (game / 'options.txt').write_text('renderClouds:false\nrenderDistance:8\nmaxFps:60\n')
 indexes = sorted((home / 'caches/fabric-loom').rglob('indexes/*17*.json'))
 assert len(indexes) == 1, 'Expected one downloaded 1.21.1 asset index: ' + str(indexes)
@@ -84,6 +96,7 @@ asset_index = indexes[0]
 assets = asset_index.parent.parent
 java = str(Path(os.environ['JAVA_HOME']) / 'bin/java')
 command = [java, '-Xmx2G', '-Dfabric.development=false', '-Dslabbed.verticalStepProbe=true',
+           '-Dslabbed.realTerrainProbe=' + str(real_terrain).lower(),
            '-cp', os.pathsep.join(map(str, classpath)), 'net.fabricmc.loader.impl.launch.knot.KnotClient',
            '--gameDir', str(game), '--assetsDir', str(assets), '--assetIndex', asset_index.stem,
            '--username', 'FaceProbe', '--version', '1.21.1', '--accessToken', '0']

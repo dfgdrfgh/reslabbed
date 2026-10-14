@@ -98,6 +98,7 @@ jobs:
       - name: Check real Terrain Slabs compatibility in Sodium
         env:
           LIBGL_ALWAYS_SOFTWARE: '1'
+          SLABBED_REAL_TERRAIN: '1'
         run: |
           mv build/run/vertical-step-client build/vertical-step-sodium
           mkdir -p build/run/vertical-step-client/mods
