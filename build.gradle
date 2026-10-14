@@ -39,6 +39,7 @@ tasks.register("remapVerticalStepProbeJar", net.fabricmc.loom.task.RemapJarTask)
 }
 tasks.register("writeVerticalStepRuntime") {
     dependsOn tasks.named("remapVerticalStepProbeJar")
+    dependsOn tasks.named("downloadAssets")
     doLast {
         def artifacts = configurations.gametestRuntimeClasspath.resolvedConfiguration.resolvedArtifacts.collect {
             [group: it.moduleVersion.id.group, name: it.moduleVersion.id.name,
