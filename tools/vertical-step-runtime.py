@@ -28,6 +28,8 @@ assert intermediary, 'Production intermediary mappings are missing'
 add(intermediary[-1])
 api = module_jars('net.fabricmc.fabric-api', 'fabric-api', metadata['fabricVersion'])
 assert api, 'Original Fabric API bundle is missing'
+gametest_api = module_jars('net.fabricmc.fabric-api', 'fabric-gametest-api-v1')
+assert gametest_api, 'Original Fabric GameTest API is missing'
 for artifact in metadata['artifacts']:
     if artifact['group'] == 'net.minecraft':
         continue
@@ -73,7 +75,7 @@ assert len(release) == 1, 'Expected one release mod'
 game = project / 'build/run/vertical-step-client'
 mods = game / 'mods'
 mods.mkdir(parents=True, exist_ok=True)
-for path in [api[0], release[0], project / 'build/vertical-step-runtime/vertical-step-probe.jar']:
+for path in [api[0], gametest_api[-1], release[0], project / 'build/vertical-step-runtime/vertical-step-probe.jar']:
     shutil.copy2(path, mods / path.name)
 (game / 'options.txt').write_text('renderClouds:false\nrenderDistance:8\nmaxFps:60\n')
 indexes = sorted((home / 'caches/fabric-loom').rglob('indexes/*17*.json'))
