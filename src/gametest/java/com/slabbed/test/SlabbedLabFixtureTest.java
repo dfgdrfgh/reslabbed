@@ -497,20 +497,7 @@ public final class SlabbedLabFixtureTest {
         ctx.complete();
     }
 
-    /**
-     * Regression guard: proves that carpet outline offset is applied exactly once
-     * (not doubled) for a carpet placed above a bottom-slab lane on the SERVER.
-     *
-     * <p>After dedupe: {@code CarpetBlockMixin.slabbed$offsetShape} is removed.
-     * Server-side {@code getOutlineShape} for carpet returns the unmodified shape
-     * (minY == 0.0). Client-side, {@code CarpetDyShapeMixin.slabbed$offsetCarpetOutline}
-     * (client-only mixin) provides the single -0.5 offset.
-     *
-     * <p>Before the dedupe, {@code CarpetBlockMixin.slabbed$offsetShape} (both-env)
-     * was the sole effective handler on the server (due to cancellation short-circuit).
-     * This test fails against double-offset state (minY == -1.0) and trivially
-     * confirms the server path produces 0.0 post-dedupe.
-     */
+    /** Carpet outlines share the visible support seat on both sides, once (LAW.md). */
     @GameTest(templateName = "fabric-gametest-api-v1:empty")
     public void carpetOutlineNotDoubled(TestContext ctx) {
         ServerWorld world = ctx.getWorld();
@@ -532,11 +519,10 @@ public final class SlabbedLabFixtureTest {
         VoxelShape outline = carpetState.getOutlineShape(world, carpetPos, ShapeContext.absent());
         double minY = outline.getBoundingBox().minY;
 
-        // Server: CarpetDyShapeMixin is client-only; CarpetBlockMixin.slabbed$offsetShape
-        // is removed. No server-side offset → minY must be 0.0 (unmodified carpet shape).
-        ctx.assertTrue(minY == 0.0,
-                "server carpet outline should be unmodified (minY=0.0), got " + minY
-                + ". If -0.5: server-side offset still active. If -1.0: double-offset.");
+        ctx.assertTrue(minY == -0.5,
+                "carpet outline must use one support offset (-0.5), got " + minY);
+        ctx.assertTrue(SlabSupport.getYOffset(world, carpetPos, carpetState) == minY,
+                "carpet outline and shared height reader must agree");
 
         ctx.complete();
     }
