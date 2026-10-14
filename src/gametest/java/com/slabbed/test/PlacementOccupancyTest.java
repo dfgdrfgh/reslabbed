@@ -92,7 +92,7 @@ public final class PlacementOccupancyTest {
     }
 
     @GameTest(templateName = "fabric-gametest-api-v1:empty")
-    public void replacementOfGeneratedTerrainSlabCannotGrowIntoTerrainAbove(TestContext h) {
+    public void replacementOfGeneratedTerrainSlabKeepsNaturalBlockAtGridHeight(TestContext h) {
         ServerWorld world = h.getWorld();
         BlockPos ground = h.getAbsolutePos(new BlockPos(2, 1, 2));
         BlockPos slab = ground.up();
@@ -107,12 +107,12 @@ public final class PlacementOccupancyTest {
         h.assertTrue(place(player, new ItemStack(item), ground).isAccepted(), "Replacement bottom slab did not fit");
         h.assertTrue(!world.getBlockState(slab).get(TerrainSlabsTestShim.GENERATED), "Replacement must be player placed");
         long before = height(world, terrain);
-        h.assertTrue(before == Double.doubleToRawLongBits(-0.5), "Legacy terrain must exercise the lowered support lane");
+        h.assertTrue(before == Double.doubleToRawLongBits(0.0), "Replacing terrain support must not lower the natural block");
         ItemStack stack = new ItemStack(item, 2);
-        h.assertTrue(!place(player, stack, slab).isAccepted() && stack.getCount() == 2
-                && world.getBlockState(slab).get(SlabBlock.TYPE) == SlabType.BOTTOM,
-                "Replacement slab grew into the natural block above it");
-        h.assertTrue(height(world, terrain) == before, "Rejected replacement changed the terrain height");
+        h.assertTrue(place(player, stack, slab).isAccepted() && stack.getCount() == 1
+                && world.getBlockState(slab).get(SlabBlock.TYPE) == SlabType.DOUBLE,
+                "The unshifted double slab must fit below unshifted natural terrain");
+        h.assertTrue(height(world, terrain) == before, "Slab upgrade changed the terrain height");
         h.complete();
     }
 

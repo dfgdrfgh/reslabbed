@@ -1219,7 +1219,7 @@ public final class SlabSupport {
         // A player-placed Terrain Slabs slab carries provenance and reads its stored height like any
         // slab (maintainer ruling, 2026-09-07). Legacy and natural Terrain Slabs cells carry none and
         // keep the compat skip below, so nothing existing moves and natural terrain never lowers.
-        if (CompatHooks.shouldSkipOffset(state) && !SlabAnchorAttachment.isModernPlacement(world, pos)) {
+        if (CompatHooks.shouldSkipOffset(state) && !SlabAnchorAttachment.usesFrozenPlacementHeight(world, pos)) {
             return 0.0;
         }
 
@@ -1232,6 +1232,16 @@ public final class SlabSupport {
         if (SlabAnchorAttachment.usesFrozenPlacementHeight(world, pos)) {
             double frozen = SlabAnchorAttachment.storedPlacementDy(world, pos);
             return Double.isFinite(frozen) ? frozen : 0.0d;
+        }
+
+        // Structural terrain has no authored seat. Adding or replacing a support must not
+        // opt that terrain into the legacy stack-lowering rules. Older player placements
+        // retain their anchor/flat markers; modern placements already returned above (LAW.md).
+        if (isOpaqueFullCubeViewIndependent(state)
+                && !isSlabSitCandidate(world, pos, state)
+                && !SlabAnchorAttachment.isAnchored(world, pos)
+                && !SlabAnchorAttachment.isFrozenFlat(world, pos)) {
+            return 0.0d;
         }
 
         // Powder snow is a FULL CUBE, so unlike snow layers it matches the "full block on a slab"

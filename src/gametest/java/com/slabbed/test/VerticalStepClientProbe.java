@@ -176,6 +176,7 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
             double lowerDy = SlabSupport.getYOffset(client.world, natural.up(2), client.world.getBlockState(natural.up(2)));
             double upperDy = SlabSupport.getYOffset(client.world, natural.up(3), client.world.getBlockState(natural.up(3)));
             System.out.println("NATURAL_LOG_HEIGHTS lower=" + lowerDy + " upper=" + upperDy);
+            require(upperDy == 0, "Natural trunk must retain its original grid seat");
             checkMeshedFace(natural.up(2), Direction.UP, 1 + lowerDy, lowerDy < upperDy);
             checkMeshedFace(natural.up(3), Direction.DOWN, upperDy, lowerDy < upperDy);
             checkMeshedFace(GROUND.south(4).up(3), Direction.UP, -0.5 + 1.0 / 16, false);
@@ -202,7 +203,7 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
             checkMeshedFace(EDGE.up(3), Direction.DOWN, 0, true);
             System.out.println("CROSS_SECTION_HEIGHT_SYNC_PASS");
             BlockPos owner = GROUND.north(2).up(2);
-            ItemStack slab = new ItemStack(Items.STONE_SLAB, 16);
+            ItemStack slab = new ItemStack(TerrainSlabsTestShim.TEST_TS_SLAB.asItem(), 16);
             client.player.setStackInHand(Hand.MAIN_HAND, slab);
             client.interactionManager.clickCreativeStack(slab.copy(), 36 + client.player.getInventory().selectedSlot);
             var hit = new BlockHitResult(new Vec3d(owner.getX() + .5, owner.getY() + .5, owner.getZ() + .5),
@@ -215,6 +216,12 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
         }
         requirePredictedSlab(client, GROUND.north(2).up(3));
         System.out.println("CONFIRMED_SLAB_PREDICTION_PASS");
+        BlockPos predicted = GROUND.north(2).up(3);
+        var outline = client.world.getBlockState(predicted).getOutlineShape(client.world, predicted);
+        require(outline.getMin(Direction.Axis.Y) == -.5 && outline.getMax(Direction.Axis.Y) == 0,
+                "Terrain slab outline contains geometry outside its visible half slab");
+        checkMeshedFace(predicted, Direction.DOWN, -.5, false);
+        System.out.println("WEIGHTED_TERRAIN_SLAB_MODEL_OUTLINE_PASS");
 
         Renderer renderer = RendererAccess.INSTANCE.getRenderer();
         require(renderer != null, "No active native renderer");
@@ -236,7 +243,7 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
 
     private static void requirePredictedSlab(MinecraftClient client, BlockPos pos) {
         BlockState state = client.world.getBlockState(pos);
-        require(state.isOf(Blocks.STONE_SLAB) && state.get(SlabBlock.TYPE) == SlabType.BOTTOM,
+        require(state.isOf(TerrainSlabsTestShim.TEST_TS_SLAB) && state.get(SlabBlock.TYPE) == SlabType.BOTTOM,
                 "Upward placement must remain a bottom slab: " + state);
         require(SlabSupport.getYOffset(client.world, pos, state) == -0.5,
                 "Slab height must be correct before and after the server reply");

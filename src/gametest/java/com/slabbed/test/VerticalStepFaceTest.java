@@ -119,4 +119,41 @@ public final class VerticalStepFaceTest {
                 "An UP-face slab must start on the lowered top plane as a bottom slab");
         h.complete();
     }
+    @GameTest(templateName = "slabbed:empty_16")
+    public void supportReplacementDoesNotAdoptNaturalStructureIntoPlacedStack(TestContext h) {
+        ServerWorld world = h.getWorld();
+        net.minecraft.item.Item[] slabs = {Items.OAK_SLAB, Items.STONE_SLAB,
+                TerrainSlabsTestShim.TEST_TS_SLAB.asItem()};
+        for (int i = 0; i < slabs.length; i++) {
+            BlockPos ground = h.getAbsolutePos(new BlockPos(2 + 4 * i, 1, 3));
+            world.setBlockState(ground, Blocks.STONE.getDefaultState(), Block.NOTIFY_ALL);
+            for (int y = 1; y <= 4; y++) for (int x = -1; x <= 1; x++)
+                world.setBlockState(ground.add(x, y, 0), Blocks.OAK_LOG.getDefaultState(), Block.NOTIFY_ALL);
+            world.breakBlock(ground.up(), false);
+            world.breakBlock(ground.up(2), false);
+            PlayerEntity player = h.createMockPlayer(GameMode.SURVIVAL);
+            player.setPosition(ground.getX() + 3.5, ground.getY(), ground.getZ() + .5);
+            place(h, player, slabs[i], ground);
+            place(h, player, Items.COBBLED_DEEPSLATE, ground.up());
+            BlockPos placed = ground.up(2), natural = ground.up(3);
+            long seat = SlabAnchorAttachment.rawPlacementDyFact(world, placed).rawBits();
+            for (int attempt = 0; attempt < 3; attempt++) {
+                h.assertTrue(!SlabAnchorAttachment.isModernPlacement(world, natural)
+                                && SlabSupport.getYOffset(world, natural, world.getBlockState(natural)) == 0,
+                        "Natural trunk was pulled into the player's lowered stack");
+                var naturalShape = world.getBlockState(natural).getOutlineShape(world, natural);
+                var placedShape = world.getBlockState(placed).getOutlineShape(world, placed);
+                h.assertTrue(naturalShape.getMin(Direction.Axis.Y) == 0
+                                && placedShape.getMin(Direction.Axis.Y) == -.5
+                                && placedShape.getMax(Direction.Axis.Y) == .5,
+                        "Model seats and outline bodies must preserve the half-block opening");
+                world.setBlockState(natural.east(), attempt % 2 == 0
+                        ? Blocks.AIR.getDefaultState() : Blocks.OAK_LOG.getDefaultState(), Block.NOTIFY_ALL);
+                h.assertTrue(SlabAnchorAttachment.rawPlacementDyFact(world, placed).rawBits() == seat,
+                        "Natural neighbor edits changed the placed block's stored seat");
+            }
+        }
+        h.complete();
+    }
+
 }
