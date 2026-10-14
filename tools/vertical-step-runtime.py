@@ -75,12 +75,14 @@ add(project / 'build/vertical-step-runtime/vertical-step-probe.jar')
 game = project / 'build/run/vertical-step-client'
 game.mkdir(parents=True, exist_ok=True)
 (game / 'options.txt').write_text('renderClouds:false\nrenderDistance:8\nmaxFps:60\n')
-assets = home / 'caches/fabric-loom/assets'
-assert (assets / 'indexes/17.json').exists(), 'Minecraft 1.21.1 assets are missing'
+indexes = sorted((home / 'caches/fabric-loom').rglob('indexes/*17*.json'))
+assert len(indexes) == 1, 'Expected one downloaded 1.21.1 asset index: ' + str(indexes)
+asset_index = indexes[0]
+assets = asset_index.parent.parent
 java = str(Path(os.environ['JAVA_HOME']) / 'bin/java')
 command = [java, '-Xmx2G', '-Dfabric.development=false', '-Dslabbed.verticalStepProbe=true',
            '-cp', os.pathsep.join(map(str, classpath)), 'net.fabricmc.loader.impl.launch.knot.KnotClient',
-           '--gameDir', str(game), '--assetsDir', str(assets), '--assetIndex', '17',
+           '--gameDir', str(game), '--assetsDir', str(assets), '--assetIndex', asset_index.stem,
            '--username', 'FaceProbe', '--version', '1.21.1', '--accessToken', '0']
 with (game / 'production-launch.log').open('w') as log:
     result = subprocess.run(command, cwd=game, stdout=log, stderr=subprocess.STDOUT, timeout=300)
