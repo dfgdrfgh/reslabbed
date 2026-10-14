@@ -21,6 +21,8 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.model.BakedModel;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.client.util.ScreenshotRecorder;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -147,9 +149,15 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
         require(SlabSupport.getYOffset(client.world, pos, state) == dy, "Client height not synchronized");
         BakedModel model = client.getBlockRenderManager().getModel(state);
         require(model instanceof OffsetBlockStateModel, "Installed offset model missing: " + model.getClass());
-        Capture capture = new Capture(client, renderer, pos, state);
-        ((FabricBakedModel)model).emitBlockQuads(client.world, state, pos, () -> Random.create(42), capture);
-        List<Face> faces = capture.faces.stream().filter(q -> q.normal == face).toList();
+        List<Face> emitted;
+        if (net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("sodium")) {
+            emitted = sodiumFaces(client, model, pos, state);
+        } else {
+            Capture capture = new Capture(client, renderer, pos, state);
+            ((FabricBakedModel)model).emitBlockQuads(client.world, state, pos, () -> Random.create(42), capture);
+            emitted = capture.faces;
+        }
+        List<Face> faces = emitted.stream().filter(q -> q.normal == face).toList();
         require(faces.size() == 1, "Expected one real cube face: " + face + " got " + faces.size());
         Face quad = faces.getFirst();
         require(quad.visible == exposed, "Face visibility mismatch: " + face + " cull=" + quad.cull);
@@ -159,6 +167,39 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
                 "Face moved away from its stored surface");
         require(!Block.shouldDrawSide(state, client.world, pos, face, pos.offset(face)),
                 "Grid-culling control did not reproduce the hidden face");
+    }
+
+    /** Observe Sodium's own transform and occlusion pipeline without replacing its context. */
+    private static List<Face> sodiumFaces(MinecraftClient client, BakedModel model,
+                                           BlockPos pos, BlockState state) {
+        try {
+            Class<?> type = Class.forName("net.caffeinemc.mods.sodium.client.render.frapi.render.NonTerrainBlockRenderContext");
+            RenderContext context = (RenderContext)type.getConstructors()[0].newInstance(client.getBlockColors());
+            var culling = type.getMethod("isFaceCulled", Direction.class);
+            List<Face> faces = new ArrayList<>();
+            context.pushTransform(quad -> {
+                float minY = Float.POSITIVE_INFINITY, maxY = Float.NEGATIVE_INFINITY;
+                for (int i = 0; i < 4; i++) { minY = Math.min(minY, quad.y(i)); maxY = Math.max(maxY, quad.y(i)); }
+                try {
+                    boolean visible = !(boolean)culling.invoke(context, quad.cullFace());
+                    faces.add(new Face(quad.nominalFace(), quad.cullFace(), visible, minY, maxY));
+                } catch (ReflectiveOperationException error) { throw new AssertionError(error); }
+                return true;
+            });
+            VertexConsumer sink = (VertexConsumer)Proxy.newProxyInstance(VertexConsumer.class.getClassLoader(),
+                    new Class<?>[]{VertexConsumer.class}, (proxy, method, args) ->
+                            method.getReturnType() == VertexConsumer.class ? proxy : null);
+            try {
+                var render = java.util.Arrays.stream(type.getMethods())
+                        .filter(method -> method.getName().equals("renderModel") && method.getParameterCount() == 10)
+                        .findFirst().orElseThrow();
+                render.invoke(context, client.world, model, state, pos, new MatrixStack(), sink,
+                        true, Random.create(42), 42L, 0);
+            } finally { context.popTransform(); }
+            return faces;
+        } catch (ReflectiveOperationException error) {
+            throw new AssertionError("Native Sodium pipeline check failed", error);
+        }
     }
 
     private record Face(Direction normal, Direction cull, boolean visible, float minY, float maxY) {}
