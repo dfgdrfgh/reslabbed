@@ -1234,13 +1234,14 @@ public final class SlabSupport {
             return Double.isFinite(frozen) ? frozen : 0.0d;
         }
 
-        // Structural terrain has no authored seat. Adding or replacing a support must not
-        // opt that terrain into the legacy stack-lowering rules. Older player placements
-        // retain their anchor/flat markers; modern placements already returned above (LAW.md).
+        // A modern support must not adopt untouched structural terrain into its new stack.
+        // Retain the live lane for wholly legacy columns, and retain authored legacy markers.
+        // Modern placements already returned their permanent seat above (LAW.md).
         if (isOpaqueFullCubeViewIndependent(state)
                 && !isSlabSitCandidate(world, pos, state)
                 && !SlabAnchorAttachment.isAnchored(world, pos)
-                && !SlabAnchorAttachment.isFrozenFlat(world, pos)) {
+                && !SlabAnchorAttachment.isFrozenFlat(world, pos)
+                && hasModernColumnSupport(world, pos)) {
             return 0.0d;
         }
 
@@ -1293,6 +1294,18 @@ public final class SlabSupport {
         } finally {
             IN_GET_Y_OFFSET.set(Boolean.FALSE);
         }
+    }
+
+    /** Read-only provenance boundary for existing terrain above a new player support (LAW.md). */
+    private static boolean hasModernColumnSupport(BlockView world, BlockPos pos) {
+        BlockPos cursor = pos.down();
+        for (int i = 0; i < MAX_CHAIN_DEPTH; i++, cursor = cursor.down()) {
+            BlockState support = world.getBlockState(cursor);
+            if (support.isAir()) return false;
+            if (SlabAnchorAttachment.usesFrozenPlacementHeight(world, cursor)) return true;
+            if (support.contains(SlabBlock.TYPE) || isThinTopLayer(support)) return false;
+        }
+        return false;
     }
 
     /**
