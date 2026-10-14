@@ -1,0 +1,30 @@
+name: Build client probe artifact
+on:
+  push:
+    branches: ["test/full-modpack-probe-1.21.1"]
+    paths: [".github/workflows/client-probe-artifact.yml"]
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+      - uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95
+        with:
+          distribution: temurin
+          java-version: "21"
+      - uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92
+        with:
+          cache-provider: basic
+      - name: Build and verify probe
+        run: |
+          rm -rf build/run/gameTest
+          ./gradlew --no-daemon --console=plain build runGameTest remapVerticalStepProbeJar
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: client-test-probe
+          path: build/vertical-step-runtime/vertical-step-probe.jar
+          if-no-files-found: error
+          retention-days: 7
