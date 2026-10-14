@@ -16,7 +16,7 @@ import net.minecraft.world.EmptyBlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
 
-/** A free grid cell can contain another block's displaced body. Seats remain unchanged (LAW.md). */
+/** Shifted placements must fit both displaced bodies and ordinary terrain (LAW.md). */
 public final class PlacementOccupancy {
     private PlacementOccupancy() {}
 
@@ -51,9 +51,9 @@ public final class PlacementOccupancy {
                     BlockState existing = chunk.getBlockState(owner);
                     if (existing.isAir()) continue;
                     double dy = SlabSupport.getYOffset(world, owner, existing);
-                    // Vanilla owns flush-cell replaceability and ordinary attachment geometry.
-                    // This guard adds the bodies that have left their cells, which vanilla misses.
-                    if (!Double.isFinite(dy) || dy == 0.0d) continue;
+                    // Vanilla covers ordinary grid-aligned placement. Once either body is shifted,
+                    // the other body's volume matters even when it is untouched, unshifted terrain.
+                    if (!Double.isFinite(dy) || (dy == 0.0d && candidateDy == 0.0d)) continue;
                     VoxelShape occupied = baseBody(existing).offset(x, y + dy, z);
                     if (VoxelShapes.matchesAnywhere(body, occupied, BooleanBiFunction.AND)) return true;
                 }
