@@ -3,6 +3,7 @@ plugins {
     id 'maven-publish'
 }
 
+
 loom {
     splitEnvironmentSourceSets()
     runs {
@@ -18,6 +19,33 @@ loom {
 fabricApi {
     configureTests {
         createSourceSet = true
+    }
+}
+
+// Production-namespace client checks avoid third-party utility getters colliding with Yarn names.
+tasks.register("verticalStepProbeJar", Jar) {
+    dependsOn tasks.named("gametestClasses")
+    from sourceSets.gametest.output
+    archiveFileName = "vertical-step-probe-named.jar"
+    destinationDirectory = file("build/vertical-step-runtime")
+}
+tasks.register("remapVerticalStepProbeJar", net.fabricmc.loom.task.RemapJarTask) {
+    dependsOn tasks.named("verticalStepProbeJar")
+    inputFile = tasks.named("verticalStepProbeJar").flatMap { it.archiveFile }
+    archiveFileName = "vertical-step-probe.jar"
+    destinationDirectory = file("build/vertical-step-runtime")
+    addNestedDependencies = false
+    classpath.from(sourceSets.gametest.compileClasspath)
+}
+tasks.register("writeVerticalStepRuntime") {
+    dependsOn tasks.named("remapVerticalStepProbeJar")
+    doLast {
+        def artifacts = configurations.gametestRuntimeClasspath.resolvedConfiguration.resolvedArtifacts.collect {
+            [group: it.moduleVersion.id.group, name: it.moduleVersion.id.name,
+             version: it.moduleVersion.id.version, classifier: it.classifier, path: it.file.absolutePath]
+        }
+        file("build/vertical-step-runtime/dependencies.json").text = groovy.json.JsonOutput.toJson([
+            gradleHome: gradle.gradleUserHomeDir.absolutePath, artifacts: artifacts])
     }
 }
 
