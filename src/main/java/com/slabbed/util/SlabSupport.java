@@ -106,9 +106,9 @@ public final class SlabSupport {
         BlockState below = world.getBlockState(belowPos);
         if (below.isAir() || isThinTopLayer(below)) return 0.0d;
         double supportDy = getYOffset(world, belowPos, below);
-        double top = below.getBlock() instanceof SlabBlock && below.get(SlabBlock.TYPE) == SlabType.BOTTOM
-                ? 0.5d : 1.0d;
-        return supportDy + top - 1.0d;
+        VoxelShape base = below.getOutlineShape(EmptyBlockView.INSTANCE, BlockPos.ORIGIN);
+        if (base.isEmpty()) return 0.0d;
+        return supportDy + base.getMax(Direction.Axis.Y) - 1.0d;
     }
 
     /**
