@@ -95,6 +95,31 @@ jobs:
           timeout 10m xvfb-run -a python3 tools/vertical-step-runtime.py
           test -f build/run/vertical-step-client/vertical-step-pass.txt
 
+      - name: Check real Terrain Slabs compatibility in Sodium
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mv build/run/vertical-step-client build/vertical-step-sodium
+          mkdir -p build/run/vertical-step-client/mods
+          cp build/vertical-step-sodium/mods/sodium.jar build/run/vertical-step-client/mods/
+          gh api repos/dfgdrfgh/terrain_slabs_fork/actions/artifacts/11730260747/zip > build/terrain-slabs-fixture.zip
+          python3 - <<'PYCODE'
+          import hashlib, io, pathlib, urllib.request, zipfile
+          data = pathlib.Path('build/terrain-slabs-fixture.zip').read_bytes()
+          assert hashlib.sha256(data).hexdigest() == '7ee547759b235f1e7977dd41b37dea3298bd96217ddb931d8b76d9a36c4e4852'
+          mods = pathlib.Path('build/run/vertical-step-client/mods')
+          with zipfile.ZipFile(io.BytesIO(data)) as archive:
+              jars = [n for n in archive.namelist() if n.endswith('.jar') and not n.endswith(('-sources.jar', '-dev.jar'))]
+              assert len(jars) == 1, jars
+              (mods / 'terrain-slabs.jar').write_bytes(archive.read(jars[0]))
+          data = urllib.request.urlopen('https://cdn.modrinth.com/data/lhGA9TYQ/versions/Pzc2FP5K/architectury-13.0.11-fabric.jar').read()
+          assert hashlib.sha512(data).hexdigest() == '53314eb34890b11ad3c06c6f3ba2d01ae1ca756235ce4f0574e4b0544952a2ab3c628c81b521653d6487d62c5dc3055e06fed6367a3a499bafad909512f0c716'
+          (mods / 'architectury.jar').write_bytes(data)
+          PYCODE
+          timeout 10m xvfb-run -a python3 tools/vertical-step-runtime.py
+          test -f build/run/vertical-step-client/vertical-step-pass.txt
+
       - name: Upload vertical face checks
         if: always()
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
@@ -105,6 +130,10 @@ jobs:
             build/vertical-step-indigo/logs/
             build/vertical-step-indigo/vertical-step*.png
             build/vertical-step-indigo/vertical-step-pass.txt
+            build/vertical-step-sodium/production-launch.log
+            build/vertical-step-sodium/logs/
+            build/vertical-step-sodium/vertical-step*.png
+            build/vertical-step-sodium/vertical-step-pass.txt
             build/run/vertical-step-client/production-launch.log
             build/run/vertical-step-client/logs/
             build/run/vertical-step-client/vertical-step*.png
