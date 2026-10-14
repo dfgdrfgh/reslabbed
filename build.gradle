@@ -46,7 +46,8 @@ tasks.register("writeVerticalStepRuntime") {
              version: it.moduleVersion.id.version, classifier: it.classifier, path: it.file.absolutePath]
         }
         file("build/vertical-step-runtime/dependencies.json").text = groovy.json.JsonOutput.toJson([
-            gradleHome: gradle.gradleUserHomeDir.absolutePath, artifacts: artifacts])
+            gradleHome: gradle.gradleUserHomeDir.absolutePath,
+            fabricVersion: project.fabric_version, artifacts: artifacts])
     }
 }
 

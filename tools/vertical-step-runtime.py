@@ -25,8 +25,15 @@ def module_jars(group, name, version=None):
 intermediary = module_jars('net.fabricmc', 'intermediary', '1.21.1')
 assert intermediary, 'Production intermediary mappings are missing'
 add(intermediary[-1])
+api = module_jars('net.fabricmc.fabric-api', 'fabric-api', metadata['fabricVersion'])
+assert api, 'Original Fabric API bundle is missing'
+add(api[0])
 for artifact in metadata['artifacts']:
     if artifact['group'] == 'net.minecraft':
+        continue
+    # Fabric discovers the original API's nested modules itself. Loom's generated named
+    # module coordinates are not production artifacts and must never enter this classpath.
+    if 'remapped_mods' in artifact['path']:
         continue
     originals = module_jars(artifact['group'], artifact['name'], artifact['version'])
     classifier = artifact.get('classifier')
@@ -38,7 +45,6 @@ for artifact in metadata['artifacts']:
         add(originals[0])
     else:
         candidate = Path(artifact['path'])
-        assert 'remapped_mods' not in str(candidate), 'Original dependency is missing'
         if candidate.suffix == '.jar':
             add(candidate)
 
