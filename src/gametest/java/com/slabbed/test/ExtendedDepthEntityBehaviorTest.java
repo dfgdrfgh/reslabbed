@@ -360,7 +360,7 @@ public final class ExtendedDepthEntityBehaviorTest {
         context.complete();
     }
 
-    @GameTest(templateName = "fabric-gametest-api-v1:empty", batchId = ARMOR_STAND_BATCH)
+    @GameTest(templateName = "slabbed:empty_16", batchId = ARMOR_STAND_BATCH)
     public void armorStandsPlaceAndRemainSupportedAtRenderedDepth(TestContext context) {
         ServerWorld world = context.getWorld();
         PlayerEntity player = context.createMockPlayer(GameMode.SURVIVAL);
