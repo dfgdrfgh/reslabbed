@@ -63,8 +63,10 @@ public final class PlacementOccupancy {
     }
 
     private static VoxelShape baseBody(BlockState state) {
-        VoxelShape collision = state.getCollisionShape(EmptyBlockView.INSTANCE, BlockPos.ORIGIN);
-        return collision.isEmpty()
-                ? state.getOutlineShape(EmptyBlockView.INSTANCE, BlockPos.ORIGIN) : collision;
+        // Placement excludes visible block volume. Fence collision includes extra movement
+        // clearance above the post; that clearance does not occupy the opening for another block.
+        VoxelShape outline = state.getOutlineShape(EmptyBlockView.INSTANCE, BlockPos.ORIGIN);
+        return outline.isEmpty()
+                ? state.getCollisionShape(EmptyBlockView.INSTANCE, BlockPos.ORIGIN) : outline;
     }
 }
