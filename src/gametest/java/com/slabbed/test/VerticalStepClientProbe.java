@@ -9,6 +9,10 @@ import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.Map;
+import net.fabricmc.fabric.api.renderer.v1.mesh.MutableQuadView;
+import net.minecraft.world.BlockRenderView;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.renderer.v1.Renderer;
@@ -48,7 +52,26 @@ import net.minecraft.world.level.LevelInfo;
 /** Uses real item placement, synced heights and client-baked renderer quads (LAW.md). */
 public final class VerticalStepClientProbe implements ClientModInitializer {
     private static final BlockPos GROUND = new BlockPos(8, 198, 8);
-    private int ticks, phase, started;
+    private static final Map<String, MeshFace> MESH_FACES = new ConcurrentHashMap<>();
+    private record MeshFace(float minY, float maxY, Direction cull, boolean visible, String view) {}
+    public static void recordMeshedQuad(BlockRenderView view, BlockPos pos, MutableQuadView quad, RenderContext context) {
+        if (Math.abs(pos.getX() - GROUND.getX()) > 12 || Math.abs(pos.getZ() - GROUND.getZ()) > 12
+                || pos.getY() < 198 || pos.getY() > 204) return;
+        float minY = Float.POSITIVE_INFINITY, maxY = Float.NEGATIVE_INFINITY;
+        for (int i = 0; i < 4; i++) { minY = Math.min(minY, quad.y(i)); maxY = Math.max(maxY, quad.y(i)); }
+        MESH_FACES.put(pos.asLong() + ":" + quad.nominalFace(), new MeshFace(minY, maxY,
+                quad.cullFace(), !context.isFaceCulled(quad.cullFace()), view.getClass().getName()));
+    }
+    private static void checkMeshedFace(BlockPos pos, Direction face, double plane, boolean exposed) {
+        MeshFace actual = MESH_FACES.get(pos.asLong() + ":" + face);
+        System.out.println("SECTION_MESH_FACE pos=" + pos + " face=" + face + " actual=" + actual);
+        require(actual != null, "Actual section mesh omitted watched face " + pos + " " + face);
+        require(!actual.view.contains("ClientWorld"), "Expected a real section render view");
+        require(Math.abs(actual.minY - plane) < 1.0e-6 && Math.abs(actual.maxY - plane) < 1.0e-6,
+                "Section mesh used stale height: " + actual);
+        if (exposed) require(actual.visible && actual.cull == null, "Actual section mesh hid exposed face: " + actual);
+    }
+    private int ticks, phase, started, reloads;
     private boolean requested;
     private volatile boolean prepared;
     private volatile Throwable failure;
@@ -106,6 +129,20 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
                     place(world, player, Items.STONE_SLAB, control);
                     place(world, player, Items.GRAY_CONCRETE, control.up());
                     place(world, player, Items.GRAY_CONCRETE, control.up(2));
+                    BlockPos natural = GROUND.west(4);
+                    world.setBlockState(natural, Blocks.STONE.getDefaultState(), Block.NOTIFY_ALL);
+                    for (int i = 1; i <= 3; i++) world.setBlockState(natural.up(i), Blocks.OAK_LOG.getDefaultState(), Block.NOTIFY_ALL);
+                    world.breakBlock(natural.up(), false);
+                    world.breakBlock(natural.up(2), false);
+                    player.setPosition(natural.getX() + 3.5, 198, natural.getZ() + 0.5);
+                    place(world, player, Items.STONE_SLAB, natural);
+                    place(world, player, Items.OAK_LOG, natural.up());
+                    BlockPos carpet = GROUND.south(4);
+                    world.setBlockState(carpet, Blocks.STONE.getDefaultState(), Block.NOTIFY_ALL);
+                    player.setPosition(carpet.getX() + 3.5, 198, carpet.getZ() + 0.5);
+                    place(world, player, Items.STONE_SLAB, carpet);
+                    place(world, player, Items.OAK_LOG, carpet.up());
+                    world.setBlockState(carpet.up(3), Blocks.RED_CARPET.getDefaultState(), Block.NOTIFY_ALL);
                     player.setStackInHand(Hand.MAIN_HAND, ItemStack.EMPTY);
                     prepared = true;
                 } catch (Throwable error) { failure = error; }
@@ -113,8 +150,19 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
             return;
         }
         if (!prepared || ticks - started < 100) return;
-        if (phase == 1) { client.worldRenderer.reload(); phase = 2; started = ticks; return; }
+        if (phase == 1) { phase = 2; started = ticks; return; }
         if (ticks - started < 80) return;
+        checkMeshedFace(GROUND.up(2), Direction.UP, 0.5, true);
+        BlockPos natural = GROUND.west(4);
+        double lowerDy = SlabSupport.getYOffset(client.world, natural.up(2), client.world.getBlockState(natural.up(2)));
+        double upperDy = SlabSupport.getYOffset(client.world, natural.up(3), client.world.getBlockState(natural.up(3)));
+        System.out.println("NATURAL_LOG_HEIGHTS lower=" + lowerDy + " upper=" + upperDy);
+        checkMeshedFace(natural.up(2), Direction.UP, 1 + lowerDy, lowerDy < upperDy);
+        checkMeshedFace(natural.up(3), Direction.DOWN, upperDy, lowerDy < upperDy);
+        checkMeshedFace(GROUND.south(4).up(3), Direction.UP, -0.5 + 1.0 / 16, false);
+        if (reloads++ < 2) {
+            MESH_FACES.clear(); client.worldRenderer.reload(); started = ticks; return;
+        }
 
         Renderer renderer = RendererAccess.INSTANCE.getRenderer();
         require(renderer != null, "No active native renderer");
