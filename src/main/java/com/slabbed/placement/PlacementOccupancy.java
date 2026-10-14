@@ -50,7 +50,7 @@ public final class PlacementOccupancy {
                     if (chunk == null) continue;
                     BlockState existing = chunk.getBlockState(owner);
                     if (existing.isAir()) continue;
-                    double dy = SlabSupport.getVisualYOffset(world, owner, existing);
+                    double dy = SlabSupport.getYOffset(world, owner, existing);
                     // Vanilla owns flush-cell replaceability and ordinary attachment geometry.
                     // This guard adds the bodies that have left their cells, which vanilla misses.
                     if (!Double.isFinite(dy) || dy == 0.0d) continue;
