@@ -182,6 +182,7 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
             if (reloads++ < 2) {
                 MESH_FACES.clear(); client.worldRenderer.reload(); started = ticks; return;
             }
+            System.out.println("REPEATED_SECTION_RELOAD_PASS count=2");
             checkMeshedFace(EDGE.up(3), Direction.DOWN, 0, true);
             var chunk = client.world.getWorldChunk(EDGE.up(2));
             edgeFacts = new Long2ByteOpenHashMap(chunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE));
