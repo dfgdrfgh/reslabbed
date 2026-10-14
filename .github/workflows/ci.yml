@@ -74,6 +74,41 @@ jobs:
               print(f'{jars[0].name}: {icon_path} packaged ({width}x{height})')
           PYCODE
 
+      - name: Check vertical faces in Indigo and Sodium clients
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: |
+          rm -rf build/run/vertical-step-client
+          timeout 10m xvfb-run -a ./gradlew --no-daemon --console=plain runVerticalStepClientProbe
+          test -f build/run/vertical-step-client/vertical-step-pass.txt
+          mv build/run/vertical-step-client build/vertical-step-indigo
+          mkdir -p build/run/vertical-step-client/mods
+          python3 - <<'PYCODE'
+          import hashlib, pathlib, urllib.request
+          url = 'https://cdn.modrinth.com/data/AANobbMI/versions/SMxNOGZ6/sodium-fabric-0.8.13%2Bmc1.21.1.jar'
+          data = urllib.request.urlopen(url).read()
+          expected = '8614a374593698069a80ac74de8cd9c28f3928d16819a0e0d6320b538e823f7e54e8be06d5ea5a9c268beb0e02073209d1f831a02dede851588b972367680853'
+          assert hashlib.sha512(data).hexdigest() == expected, 'Sodium test dependency hash mismatch'
+          pathlib.Path('build/run/vertical-step-client/mods/sodium.jar').write_bytes(data)
+          PYCODE
+          timeout 10m xvfb-run -a ./gradlew --no-daemon --console=plain runVerticalStepClientProbe
+          test -f build/run/vertical-step-client/vertical-step-pass.txt
+
+      - name: Upload vertical face checks
+        if: always()
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        with:
+          name: vertical-step-client-checks
+          path: |
+            build/vertical-step-indigo/logs/
+            build/vertical-step-indigo/vertical-step*.png
+            build/vertical-step-indigo/vertical-step-pass.txt
+            build/run/vertical-step-client/logs/
+            build/run/vertical-step-client/vertical-step*.png
+            build/run/vertical-step-client/vertical-step-pass.txt
+          if-no-files-found: ignore
+          retention-days: 7
+
       - name: Upload gametest logs
         if: always()
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
@@ -94,3 +129,4 @@ jobs:
             !build/libs/*-dev.jar
           if-no-files-found: error
           retention-days: 30
+

@@ -1,0 +1,212 @@
+package com.slabbed.test;
+
+import com.slabbed.anchor.SlabAnchorAttachment;
+import com.slabbed.client.model.OffsetBlockStateModel;
+import com.slabbed.util.SlabSupport;
+import java.lang.reflect.Proxy;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
+import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.renderer.v1.Renderer;
+import net.fabricmc.fabric.api.renderer.v1.RendererAccess;
+import net.fabricmc.fabric.api.renderer.v1.mesh.QuadEmitter;
+import net.fabricmc.fabric.api.renderer.v1.model.FabricBakedModel;
+import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.model.BakedModel;
+import net.minecraft.client.util.ScreenshotRecorder;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUsageContext;
+import net.minecraft.item.Items;
+import net.minecraft.registry.RegistryKeys;
+import net.minecraft.resource.DataConfiguration;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
+import net.minecraft.world.Difficulty;
+import net.minecraft.world.GameMode;
+import net.minecraft.world.GameRules;
+import net.minecraft.world.gen.GeneratorOptions;
+import net.minecraft.world.gen.WorldPresets;
+import net.minecraft.world.level.LevelInfo;
+
+/** Uses real item placement, synced heights and client-baked renderer quads (LAW.md). */
+public final class VerticalStepClientProbe implements ClientModInitializer {
+    private static final BlockPos GROUND = new BlockPos(8, 198, 8);
+    private int ticks, phase, started;
+    private boolean requested;
+    private volatile boolean prepared;
+    private volatile Throwable failure;
+
+    @Override public void onInitializeClient() {
+        if (!Boolean.getBoolean("slabbed.verticalStepProbe")) return;
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            try { tick(client); }
+            catch (Throwable error) { error.printStackTrace(); System.exit(1); }
+        });
+    }
+
+    private void tick(MinecraftClient client) throws Exception {
+        if (phase == 99) return;
+        require(++ticks < 2400, "Client face proof timed out");
+        if (failure != null) throw new AssertionError("Server scene failed", failure);
+        if (!requested && client.isFinishedLoading()) {
+            require(client.world == null, "Client probe requires an unopened world");
+            requested = true;
+            client.createIntegratedServerLoader().createAndStart("vertical-step-proof",
+                    new LevelInfo("Vertical Step Proof", GameMode.CREATIVE, false,
+                            Difficulty.PEACEFUL, true, new GameRules(), DataConfiguration.SAFE_MODE),
+                    new GeneratorOptions(0L, false, false),
+                    registries -> registries.get(RegistryKeys.WORLD_PRESET).getOrThrow(WorldPresets.FLAT)
+                            .createDimensionsRegistryHolder(), null);
+            return;
+        }
+        if (client.world == null || client.player == null || client.getServer() == null) return;
+        client.options.pauseOnLostFocus = false;
+        client.options.hudHidden = true;
+        if (client.currentScreen != null) client.setScreen(null);
+        client.player.getAbilities().flying = true;
+        client.player.setVelocity(Vec3d.ZERO);
+        client.player.refreshPositionAndAngles(8.5, 201.2 - client.player.getStandingEyeHeight(), 3.0, 0, 8);
+        client.player.setStackInHand(Hand.MAIN_HAND, ItemStack.EMPTY);
+        if (phase == 0) {
+            phase = 1; started = ticks;
+            client.getServer().execute(() -> {
+                try {
+                    ServerWorld world = client.getServer().getOverworld();
+                    ServerPlayerEntity player = world.getPlayers().getFirst();
+                    player.setPosition(12.5, 198, 8.5);
+                    world.setBlockState(GROUND, Blocks.STONE.getDefaultState(), Block.NOTIFY_ALL);
+                    for (int i = 0; i < 3; i++) place(world, player, Items.RED_CONCRETE, GROUND.up(i));
+                    long original = SlabAnchorAttachment.rawPlacementDyFact(world, GROUND.up(3)).rawBits();
+                    world.breakBlock(GROUND.up(), false);
+                    world.breakBlock(GROUND.up(2), false);
+                    place(world, player, Items.STONE_SLAB, GROUND);
+                    place(world, player, Items.RED_CONCRETE, GROUND.up());
+                    require(original == SlabAnchorAttachment.rawPlacementDyFact(world, GROUND.up(3)).rawBits(),
+                            "Rebuilding moved the floating block");
+                    BlockPos control = GROUND.east(4);
+                    world.setBlockState(control, Blocks.STONE.getDefaultState(), Block.NOTIFY_ALL);
+                    player.setPosition(16.5, 198, 8.5);
+                    place(world, player, Items.STONE_SLAB, control);
+                    place(world, player, Items.GRAY_CONCRETE, control.up());
+                    place(world, player, Items.GRAY_CONCRETE, control.up(2));
+                    player.setStackInHand(Hand.MAIN_HAND, ItemStack.EMPTY);
+                    prepared = true;
+                } catch (Throwable error) { failure = error; }
+            });
+            return;
+        }
+        if (!prepared || ticks - started < 100) return;
+        if (phase == 1) { client.worldRenderer.reload(); phase = 2; started = ticks; return; }
+        if (ticks - started < 80) return;
+
+        Renderer renderer = RendererAccess.INSTANCE.getRenderer();
+        require(renderer != null, "No active native renderer");
+        String name = renderer.getClass().getName();
+        boolean sodium = net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("sodium");
+        require(name.toLowerCase().contains(sodium ? "sodium" : "indigo"), "Wrong active renderer: " + name);
+        check(client, renderer, GROUND.up(2), Direction.UP, true, -0.5);
+        check(client, renderer, GROUND.up(3), Direction.DOWN, true, 0.0);
+        check(client, renderer, GROUND.east(4).up(2), Direction.UP, false, -0.5);
+        check(client, renderer, GROUND.east(4).up(3), Direction.DOWN, false, -0.5);
+        try (var screenshot = ScreenshotRecorder.takeScreenshot(client.getFramebuffer())) {
+            screenshot.writeTo(client.runDirectory.toPath().resolve("vertical-step.png"));
+        }
+        Files.writeString(Path.of("vertical-step-pass.txt"), "Native vertical faces and shared-face controls passed: " + name + "\n");
+        System.out.println("VERTICAL_STEP_CLIENT_PASS renderer=" + name);
+        phase = 99;
+        client.scheduleStop();
+    }
+
+    private static void place(ServerWorld world, ServerPlayerEntity player, Item item, BlockPos owner) {
+        ItemStack stack = new ItemStack(item);
+        player.setStackInHand(Hand.MAIN_HAND, stack);
+        var hit = new BlockHitResult(new Vec3d(owner.getX() + 0.5,
+                owner.getY() + 1.0, owner.getZ() + 0.5), Direction.UP, owner, false);
+        require(stack.useOnBlock(new ItemUsageContext(player, Hand.MAIN_HAND, hit)).isAccepted(),
+                "Native placement failed: " + item);
+    }
+
+    private static void check(MinecraftClient client, Renderer renderer, BlockPos pos,
+                              Direction face, boolean exposed, double dy) {
+        BlockState state = client.world.getBlockState(pos);
+        require(SlabSupport.getYOffset(client.world, pos, state) == dy, "Client height not synchronized");
+        BakedModel model = client.getBlockRenderManager().getModel(state);
+        require(model instanceof OffsetBlockStateModel, "Installed offset model missing: " + model.getClass());
+        Capture capture = new Capture(client, renderer, pos, state);
+        ((FabricBakedModel)model).emitBlockQuads(client.world, state, pos, () -> Random.create(42), capture);
+        List<Face> faces = capture.faces.stream().filter(q -> q.normal == face).toList();
+        require(faces.size() == 1, "Expected one real cube face: " + face + " got " + faces.size());
+        Face quad = faces.getFirst();
+        require(quad.visible == exposed, "Face visibility mismatch: " + face + " cull=" + quad.cull);
+        require((quad.cull == null) == exposed, "Exposed face must bypass grid culling");
+        double plane = (face == Direction.UP ? 1.0 : 0.0) + dy;
+        require(Math.abs(quad.minY - plane) < 1.0e-6 && Math.abs(quad.maxY - plane) < 1.0e-6,
+                "Face moved away from its stored surface");
+        require(!Block.shouldDrawSide(state, client.world, pos, face, pos.offset(face)),
+                "Grid-culling control did not reproduce the hidden face");
+    }
+
+    private record Face(Direction normal, Direction cull, boolean visible, float minY, float maxY) {}
+
+    private static final class Capture implements RenderContext {
+        private final ArrayDeque<QuadTransform> transforms = new ArrayDeque<>();
+        private final List<Face> faces = new ArrayList<>();
+        private final QuadEmitter emitter;
+        private final Renderer renderer;
+        private final BlockState state;
+
+        Capture(MinecraftClient client, Renderer renderer, BlockPos pos, BlockState state) {
+            this.renderer = renderer;
+            this.state = state;
+            QuadEmitter nativeEmitter = renderer.meshBuilder().getEmitter();
+            emitter = (QuadEmitter)Proxy.newProxyInstance(QuadEmitter.class.getClassLoader(),
+                    new Class<?>[]{QuadEmitter.class}, (proxy, method, args) -> {
+                        if (method.getName().equals("emit")) {
+                            for (QuadTransform transform : transforms) if (!transform.transform(nativeEmitter)) return proxy;
+                            Direction cull = nativeEmitter.cullFace();
+                            float minY = Float.POSITIVE_INFINITY, maxY = Float.NEGATIVE_INFINITY;
+                            for (int i = 0; i < 4; i++) { minY = Math.min(minY, nativeEmitter.y(i)); maxY = Math.max(maxY, nativeEmitter.y(i)); }
+                            boolean visible = cull == null || Block.shouldDrawSide(state, client.world, pos, cull, pos.offset(cull));
+                            faces.add(new Face(nativeEmitter.nominalFace(), cull, visible, minY, maxY));
+                        }
+                        Object value = method.invoke(nativeEmitter, args);
+                        return value == nativeEmitter ? proxy : value;
+                    });
+        }
+        @Override public QuadEmitter getEmitter() { return emitter; }
+        @Override public void pushTransform(QuadTransform transform) { transforms.addFirst(transform); }
+        @Override public void popTransform() { transforms.removeFirst(); }
+        @Override public BakedModelConsumer bakedModelConsumer() {
+            return new BakedModelConsumer() {
+                @Override public void accept(BakedModel model) { accept(model, state); }
+                @Override public void accept(BakedModel model, BlockState blockState) {
+                    for (int i = 0; i <= 6; i++) {
+                        Direction face = i == 6 ? null : Direction.values()[i];
+                        for (var quad : model.getQuads(blockState, face, Random.create(42))) {
+                            emitter.fromVanilla(quad, renderer.materialFinder().find(), face).emit();
+                        }
+                    }
+                }
+            };
+        }
+    }
+
+    private static void require(boolean value, String message) {
+        if (!value) throw new AssertionError(message);
+    }
+}

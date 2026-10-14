@@ -88,6 +88,13 @@ loom {
             runDir "build/run/attachment-client-probe"
             property "slabbed.attachmentRemeshProbe", "true"
         }
+        verticalStepClientProbe {
+            client()
+            name = "Slabbed Vertical Face Client Probe"
+            source sourceSets.gametest
+            runDir "build/run/vertical-step-client"
+            property "slabbed.verticalStepProbe", "true"
+        }
     }
 }
 
@@ -744,3 +751,4 @@ tasks.named("runFenceClientProbe").configure {
         }
     }
 }
+

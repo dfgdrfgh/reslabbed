@@ -1318,30 +1318,15 @@ public final class SlabSupport {
     }
 
     /**
-     * Render cull-relaxation predicate: returns true when {@code direction}'s HORIZONTAL side
-     * face of the block at {@code pos} sits at a SLAB-HEIGHT STEP against its neighbour — i.e.
-     * the two blocks render at different heights ({@code |getYOffset(self) − getYOffset(neighbour)|
-     * > ε}). Vanilla / Indigo / Sodium all cull that shared side face (both are full cubes in
-     * their voxel cells), but the model offset drops one of them, exposing a strip that was never
-     * meshed → a see-through "ghost window". A client cull mixin is expected to force-draw the
-     * face when this returns true.
-     *
-     * <p><b>Contract:</b> only ever used to flip cull→draw (never draw→cull), so it cannot create
-     * new culling/z-fight artifacts: the two coplanar seam faces face opposite ways (GPU
-     * back-face-culls the far one) and the still-occluded portion hides behind the opaque
-     * neighbour body. Uses the SAME {@link #getYOffset} signal the offset model renders with
-     * (via {@code ClientDy.dyFor}), so the un-culled face matches the shifted geometry exactly.
-     *
-     * <p>Horizontal faces only (the common terrace/canopy window). Vertical steps (a frozen-flat
-     * block directly above a lowered one) are a documented follow-up; see
-     * {@code docs/CULL-WINDOW-FIX-DESIGN.md}. Disabled by {@code -Dslabbed.disableStepCull}.
-     *
-     * <p>No render wiring calls this yet — it is pure, recursion-guarded ({@link #getYOffset})
-     * logic, safe to call from the chunk-mesh BlockView context.
+     * Exposed faces between blocks with different stored seats must remain in the mesh.
+     * Horizontal differences expose a side strip. An UP face opens when its neighbor is
+     * higher; a DOWN face opens when its neighbor is lower. Touching vertical faces retain
+     * ordinary culling. This affects emitted faces only and never writes a seat (LAW.md).
      */
+    private static final Direction[] STEP_CULL_DIRECTIONS = Direction.values();
+
     public static boolean isSlabHeightStepFace(BlockView world, BlockPos pos, BlockState state, Direction direction) {
-        if (STEP_CULL_DISABLED || world == null || pos == null || state == null || direction == null
-                || !direction.getAxis().isHorizontal()) {
+        if (STEP_CULL_DISABLED || world == null || pos == null || state == null || direction == null) {
             return false;
         }
         return slabHeightStepFaceAgainst(world, pos, state, direction, getYOffset(world, pos, state));
@@ -1349,25 +1334,24 @@ public final class SlabSupport {
 
     /**
      * Variant that reuses an already-computed self dy (== {@code getYOffset(world,pos,state)}) so the
-     * per-block render path does not recompute the block's own offset once per horizontal direction
-     * (4x per block). The caller must pass exactly {@code getYOffset(world,pos,state)}; behaviour is
+     * per-block render path does not repeat the block's own offset calculation for each face.
+     * The caller must pass exactly {@code getYOffset(world,pos,state)}; behaviour is
      * otherwise identical to the 4-arg overload.
      */
     public static boolean isSlabHeightStepFace(BlockView world, BlockPos pos, BlockState state, Direction direction, double selfDy) {
-        if (STEP_CULL_DISABLED || world == null || pos == null || state == null || direction == null
-                || !direction.getAxis().isHorizontal()) {
+        if (STEP_CULL_DISABLED || world == null || pos == null || state == null || direction == null) {
             return false;
         }
         return slabHeightStepFaceAgainst(world, pos, state, direction, selfDy);
     }
 
-    /** Resolves the horizontal cull faces once per emitted model, using its existing total seat. */
+    /** Resolves exposed cull faces once per emitted model, using its existing total seat. */
     public static int slabHeightStepFaceMask(BlockView world, BlockPos pos, BlockState state, double selfDy) {
         if (STEP_CULL_DISABLED || world == null || pos == null || state == null) {
             return 0;
         }
         int mask = 0;
-        for (Direction direction : Direction.Type.HORIZONTAL) {
+        for (Direction direction : STEP_CULL_DIRECTIONS) {
             if (slabHeightStepFaceAgainst(world, pos, state, direction, selfDy)) {
                 mask |= 1 << direction.ordinal();
             }
@@ -1382,7 +1366,10 @@ public final class SlabSupport {
             return false;
         }
         double neighborDy = getYOffset(world, neighborPos, neighbor);
-        return Math.abs(selfDy - neighborDy) > 1.0e-6;
+        double difference = selfDy - neighborDy;
+        if (direction == Direction.UP) return difference < -1.0e-6;
+        if (direction == Direction.DOWN) return difference > 1.0e-6;
+        return Math.abs(difference) > 1.0e-6;
     }
 
     /**
@@ -2931,3 +2918,4 @@ public final class SlabSupport {
         return 0.0;
     }
 }
+

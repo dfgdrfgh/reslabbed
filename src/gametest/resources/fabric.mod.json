@@ -19,7 +19,8 @@
       "com.slabbed.test.AttachmentRemeshProbe",
       "com.slabbed.test.ExtendedDepthClientProbe",
       "com.slabbed.test.Mc1211GoblinRouteClientEntrypoint",
-      "com.slabbed.test.KeepOnlyReopenProbe"
+      "com.slabbed.test.KeepOnlyReopenProbe",
+      "com.slabbed.test.VerticalStepClientProbe"
     ],
     "fabric-gametest": [
       "com.slabbed.test.PlacementOccupancyTest",
