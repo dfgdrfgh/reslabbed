@@ -54,7 +54,8 @@
       "com.slabbed.test.RailVisualSignalTest",
       "com.slabbed.test.RedstoneWireVisualStepTest",
       "com.slabbed.test.ChunkAccessSafetyTest",
-      "com.slabbed.test.TerrainSlabsVegetationTest"
+      "com.slabbed.test.TerrainSlabsVegetationTest",
+      "com.slabbed.test.VerticalStepFaceTest"
     ]
   },
   "depends": {
@@ -63,4 +64,3 @@
     "slabbed": "*"
   }
 }
-
