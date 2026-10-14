@@ -163,7 +163,7 @@ public final class PlacementOccupancyTest {
         BlockState generated = TerrainSlabsTestShim.TEST_TS_SLAB.getDefaultState()
                 .with(SlabBlock.TYPE, SlabType.BOTTOM).with(TerrainSlabsTestShim.GENERATED, true);
         BlockState[] blockers = {Blocks.STONE.getDefaultState(), Blocks.DIRT.getDefaultState(),
-                Blocks.GLASS.getDefaultState(), generated.with(SlabBlock.TYPE, SlabType.TOP)};
+                Blocks.GLASS.getDefaultState(), generated.with(SlabBlock.TYPE, SlabType.TOP), generated.with(SlabBlock.TYPE, SlabType.DOUBLE)};
         Item[] items = {Items.STONE, Items.GLASS, Items.STONE_SLAB,
                 TerrainSlabsTestShim.TEST_TS_SLAB.asItem()};
         for (BlockState blocker : blockers) {

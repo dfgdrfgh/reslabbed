@@ -128,8 +128,8 @@ public final class SlabSupport {
     /**
      * GH #39 parity: bottom(-like) slab surfaces whose Slabbed placement-support widening must
      * NOT make them valid ON_GROUND mob-spawn floors. Vanilla bottom slabs plus custom
-     * BOTTOM_LIKE surfaces (Terrain Slabs bottom, generated double). Top-like and ordinary
-     * double surfaces are deliberately excluded — they are legitimately spawnable.
+     * BOTTOM_LIKE surfaces (Terrain Slabs bottom). Top-like and double surfaces, including
+     * generated doubles, are deliberately excluded — they are legitimately spawnable.
      */
     public static boolean isSpawnProofBottomLikeSurface(BlockState state) {
         return isBottomSlab(state)

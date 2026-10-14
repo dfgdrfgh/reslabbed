@@ -388,9 +388,9 @@ public final class LandingResolver {
 
     /**
      * The owner's visible top plane, asking the compat classifier first: a Terrain Slabs surface the
-     * classifier reports as bottom-like (a placed bottom slab, or a generated double, which that mod
-     * presents as a half-height terrain surface) seats a placement at 0.5, exactly as the live support
-     * lane does; any other Terrain Slabs state seats at 1.0. Vanilla owners use the slab-type plane.
+     * classifier reports as bottom-like seats a placement at 0.5, exactly as the live support
+     * lane does; TOP and DOUBLE terrain use their full-height plane regardless of provenance.
+     * Vanilla owners use the slab-type plane.
      */
     private static double ownerTopPlaneOffset(boolean ownerModern, BlockState ownerState) {
         if (CompatHooks.shouldSkipOffset(ownerState) && !ownerModern) {

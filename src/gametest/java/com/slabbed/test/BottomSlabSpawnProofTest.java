@@ -25,9 +25,8 @@ import net.minecraft.util.math.Direction;
  * reports full-square/RIGID support. Spawn eligibility is a separate policy and must keep
  * vanilla's bottom-slab mob-proofing.
  *
- * <p>Adds the 26.2 donor's generated-double control: a Terrain Slabs {@code DOUBLE} with
- * {@code generated=true} classifies {@code BOTTOM_LIKE} on this line and must be
- * spawn-proof, while an ordinary TS {@code DOUBLE} stays spawnable.
+ * <p>Generated and player-made doubles both have full-height geometry. Provenance
+ * must not turn a full support into a half-height surface.
  */
 public final class BottomSlabSpawnProofTest {
 
@@ -124,12 +123,9 @@ public final class BottomSlabSpawnProofTest {
         ctx.complete();
     }
 
-    /**
-     * 26.2 donor control: worldgen terrain doubles ({@code generated=true}) classify
-     * {@code BOTTOM_LIKE} and must be spawn-proof, unlike the ordinary DOUBLE above.
-     */
+    /** A worldgen marker does not alter DOUBLE slab geometry or support eligibility. */
     @GameTest(templateName = "fabric-gametest-api-v1:empty")
-    public void terrainSlabGeneratedDoubleStaysMobProof(TestContext ctx) {
+    public void terrainSlabGeneratedDoubleRetainsFullBlockSupport(TestContext ctx) {
         BlockPos generatedDouble = new BlockPos(3, 2, 15);
         setSupport(ctx, generatedDouble,
                 terrainSlab(SlabType.DOUBLE).with(TerrainSlabsTestShim.GENERATED, true));
@@ -137,9 +133,9 @@ public final class BottomSlabSpawnProofTest {
         ctx.assertTrue(
                 CompatHooks.customSlabSurfaceKind(
                         ctx.getWorld().getBlockState(ctx.getAbsolutePos(generatedDouble)))
-                        == CompatSlabSurfaceKind.BOTTOM_LIKE,
-                "setup: terrain_slabs generated double fixture must classify BOTTOM_LIKE");
-        assertSpawnSurface(ctx, generatedDouble, EntityType.ZOMBIE, false,
+                        == CompatSlabSurfaceKind.NONE,
+                "setup: terrain_slabs generated double must retain its full-height surface");
+        assertSpawnSurface(ctx, generatedDouble, EntityType.ZOMBIE, true,
                 "terrain_slabs generated double");
         ctx.complete();
     }
