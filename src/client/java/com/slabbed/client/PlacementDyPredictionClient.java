@@ -87,8 +87,8 @@ public final class PlacementDyPredictionClient {
     }
 
     /**
-     * Rebuilds exactly the section holding {@code pos}. Skipped when the chunk is gone, so a
-     * retirement that races a chunk unload cannot poke the renderer at an unloaded position.
+     * Rebuilds the changed body and its dependent faces, including section borders. Unloaded
+     * chunks remain untouched; prediction and authoritative sync share the redraw window.
      */
     private static void scheduleExactPlacementDyRerender(BlockPos pos) {
         MinecraftClient mc = MinecraftClient.getInstance();
@@ -99,8 +99,7 @@ public final class PlacementDyPredictionClient {
         var state = mc.world.getBlockState(pos);
         if (state != null) {
             // Retiring a prediction changes geometry even when the block state is identical.
-            mc.worldRenderer.scheduleBlockRenders(pos.getX(), pos.getY(), pos.getZ(),
-                    pos.getX(), pos.getY(), pos.getZ());
+            SlabAnchorClientSync.scheduleHeightRefresh(mc, pos);
         }
     }
 }

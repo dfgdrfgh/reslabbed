@@ -98,6 +98,21 @@ public final class SlabSupport {
         return block == Registries.BLOCK.get(PALE_MOSS_CARPET_ID);
     }
 
+    /** Carpet layers share the support's visible plane when they have no stored seat (LAW.md). */
+    public static boolean isCarpetLike(BlockState state) {
+        return state != null && (state.getBlock() instanceof CarpetBlock || isPaleMossCarpet(state.getBlock()));
+    }
+
+    private static double legacyCarpetSupportDy(BlockView world, BlockPos pos) {
+        BlockPos belowPos = pos.down();
+        BlockState below = world.getBlockState(belowPos);
+        if (below.isAir() || isThinTopLayer(below)) return 0.0d;
+        double supportDy = getYOffset(world, belowPos, below);
+        double top = below.getBlock() instanceof SlabBlock && below.get(SlabBlock.TYPE) == SlabType.BOTTOM
+                ? 0.5d : 1.0d;
+        return supportDy + top - 1.0d;
+    }
+
     /**
      * Returns true if the block at {@code pos} is a slab whose top face can provide support.
      */
@@ -1253,6 +1268,7 @@ public final class SlabSupport {
             }
             return 0.0;
         }
+        if (isCarpetLike(state)) return legacyCarpetSupportDy(world, pos);
         IN_GET_Y_OFFSET.set(Boolean.TRUE);
         try {
             // Terrain Slabs WYSIWYG (build-only): a PLACED opaque full cube resting directly on a
@@ -1305,6 +1321,7 @@ public final class SlabSupport {
         if (IN_GET_Y_OFFSET.get()) {
             return 0.0;
         }
+        if (isCarpetLike(state)) return legacyCarpetSupportDy(world, pos);
         IN_GET_Y_OFFSET.set(Boolean.TRUE);
         try {
             double tsBottomFullCubeDy = placedTerrainSlabBottomFullCubeDy(world, pos, state);

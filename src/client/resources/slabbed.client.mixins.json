@@ -6,7 +6,6 @@
     "BlockEntityOffsetMixin",
     "BlockDisplayParticleMixin",
     "BlockModelDyTranslateMixin",
-    "CarpetDyShapeMixin",
     "ClientPlayerInteractionManagerPredictionSequenceMixin",
     "ClientWorldPlacementDyAckMixin",
     "GameRendererPickOffsetRaycastMixin",
@@ -15,5 +14,7 @@
     "PistonBlockEntityRenderScopeMixin",
     "RedstoneBurnoutParticleMixin"
   ],
-  "injectors": { "defaultRequire": 1 }
+  "injectors": {
+    "defaultRequire": 1
+  }
 }

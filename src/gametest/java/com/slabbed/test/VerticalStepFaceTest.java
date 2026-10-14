@@ -71,4 +71,52 @@ public final class VerticalStepFaceTest {
                 "Touching shifted blocks must retain their shared-face culling");
         h.complete();
     }
+
+    @GameTest(templateName = "fabric-gametest-api-v1:empty")
+    public void naturalCarpetMatchesLoweredSupportAndPlacedCarpetKeepsItsSeat(TestContext h) {
+        ServerWorld world = h.getWorld();
+        BlockPos ground = h.getAbsolutePos(new BlockPos(2, 1, 2));
+        world.setBlockState(ground, Blocks.STONE.getDefaultState(), Block.NOTIFY_ALL);
+        PlayerEntity player = h.createMockPlayer(GameMode.SURVIVAL);
+        player.setPosition(ground.getX() + 3.5, ground.getY(), ground.getZ() + .5);
+        place(h, player, Items.STONE_SLAB, ground);
+        place(h, player, Items.OAK_LOG, ground.up());
+        BlockPos carpet = ground.up(3);
+        world.setBlockState(carpet, Blocks.RED_CARPET.getDefaultState(), Block.NOTIFY_ALL);
+        h.assertTrue(!SlabAnchorAttachment.isModernPlacement(world, carpet), "Natural carpet must have no placement fact");
+        h.assertTrue(SlabSupport.getYOffset(world, carpet, world.getBlockState(carpet)) == -0.5,
+                "Natural carpet floated above its lowered full-block support");
+        var shape = world.getBlockState(carpet).getOutlineShape(world, carpet);
+        h.assertTrue(Math.abs(shape.getMin(Direction.Axis.Y) + .5) < 1.0e-6
+                        && Math.abs(shape.getMax(Direction.Axis.Y) + .4375) < 1.0e-6,
+                "Natural carpet outline must use the same support plane");
+        world.breakBlock(carpet, false);
+        place(h, player, Items.RED_CARPET, ground.up(2));
+        long before = SlabAnchorAttachment.rawPlacementDyFact(world, carpet).rawBits();
+        world.breakBlock(ground.up(), false);
+        h.assertTrue(world.getBlockState(carpet).isOf(Blocks.RED_CARPET)
+                        && SlabAnchorAttachment.rawPlacementDyFact(world, carpet).rawBits() == before
+                        && SlabSupport.getYOffset(world, carpet, world.getBlockState(carpet)) == -0.5,
+                "A player carpet must retain its exact stored height after support edits");
+        h.complete();
+    }
+
+    @GameTest(templateName = "fabric-gametest-api-v1:empty")
+    public void upwardSlabFullBlockSlabStackUsesBottomSlabAtStoredHeight(TestContext h) {
+        ServerWorld world = h.getWorld();
+        BlockPos ground = h.getAbsolutePos(new BlockPos(2, 1, 2));
+        world.setBlockState(ground, Blocks.STONE.getDefaultState(), Block.NOTIFY_ALL);
+        PlayerEntity player = h.createMockPlayer(GameMode.SURVIVAL);
+        player.setPosition(ground.getX() + 3.5, ground.getY(), ground.getZ() + .5);
+        place(h, player, Items.STONE_SLAB, ground);
+        place(h, player, Items.OAK_LOG, ground.up());
+        place(h, player, Items.STONE_SLAB, ground.up(2));
+        BlockPos slab = ground.up(3);
+        var state = world.getBlockState(slab);
+        h.assertTrue(state.isOf(Blocks.STONE_SLAB)
+                        && state.get(net.minecraft.block.SlabBlock.TYPE) == net.minecraft.block.enums.SlabType.BOTTOM
+                        && SlabSupport.getYOffset(world, slab, state) == -0.5,
+                "An UP-face slab must start on the lowered top plane as a bottom slab");
+        h.complete();
+    }
 }

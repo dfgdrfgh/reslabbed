@@ -458,12 +458,8 @@ public abstract class SlabSupportStateMixin {
 
         BlockState self = (BlockState) (Object) this;
 
-        // Avoid carpet recursion: carpets have their own outline mixin and should not be offset here.
+        // Carpet and pale-moss outlines use the same support seat as their model (LAW.md).
         Block block = self.getBlock();
-        if (!SlabAnchorAttachment.usesFrozenPlacementHeight(world, pos)
-                && (block instanceof net.minecraft.block.CarpetBlock || isPaleMossCarpet(block))) {
-            return;
-        }
 
         // Fence/wall/pane render un-lowered; keep their outline un-offset to match
         // (else the authoritative nearest-hit raycast targets a phantom shape below).
@@ -510,3 +506,4 @@ public abstract class SlabSupportStateMixin {
         return block == Registries.BLOCK.get(slabbed$PALE_MOSS_CARPET_ID);
     }
 }
+

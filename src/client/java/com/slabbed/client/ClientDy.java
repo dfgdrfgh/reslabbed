@@ -1,35 +1,15 @@
 package com.slabbed.client;
 
 import com.slabbed.util.SlabSupport;
-import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.CarpetBlock;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
 
-/**
- * Client-only dy policy for visual alignment of thin carpet layers on bottom slabs.
- */
+/** Model, outline and carpet support share one height authority (LAW.md). */
 public final class ClientDy {
-    private ClientDy() {
-    }
+    private ClientDy() {}
 
     public static double dyFor(BlockView world, BlockPos pos, BlockState state) {
-        if (world == null || pos == null || state == null) {
-            return 0.0;
-        }
-
-        if (com.slabbed.anchor.SlabAnchorAttachment.usesFrozenPlacementHeight(world, pos)) {
-            return SlabSupport.getYOffset(world, pos, state);
-        }
-
-        Block block = state.getBlock();
-        if (block instanceof CarpetBlock) {
-            // Carpet special case: simple geometric check without anchor logic
-            return SlabSupport.hasBottomSlabBelow(world, pos) ? -0.5 : 0.0;
-        }
-
-        // For all other blocks, use the full SlabSupport policy including persistent anchors
         return SlabSupport.getYOffset(world, pos, state);
     }
 }

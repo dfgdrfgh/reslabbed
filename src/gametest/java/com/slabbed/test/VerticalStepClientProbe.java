@@ -11,6 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
+import it.unimi.dsi.fastutil.longs.Long2ByteOpenHashMap;
+import net.minecraft.block.SlabBlock;
+import net.minecraft.block.enums.SlabType;
 import net.fabricmc.fabric.api.renderer.v1.mesh.MutableQuadView;
 import net.minecraft.world.BlockRenderView;
 import net.fabricmc.api.ClientModInitializer;
@@ -56,7 +59,7 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
     private record MeshFace(float minY, float maxY, Direction cull, boolean visible, String view) {}
     public static void recordMeshedQuad(BlockRenderView view, BlockPos pos, MutableQuadView quad, RenderContext context) {
         if (Math.abs(pos.getX() - GROUND.getX()) > 12 || Math.abs(pos.getZ() - GROUND.getZ()) > 12
-                || pos.getY() < 198 || pos.getY() > 204) return;
+                || pos.getY() < 198 || pos.getY() > 212) return;
         float minY = Float.POSITIVE_INFINITY, maxY = Float.NEGATIVE_INFINITY;
         for (int i = 0; i < 4; i++) { minY = Math.min(minY, quad.y(i)); maxY = Math.max(maxY, quad.y(i)); }
         MESH_FACES.put(pos.asLong() + ":" + quad.nominalFace(), new MeshFace(minY, maxY,
@@ -71,6 +74,8 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
                 "Section mesh used stale height: " + actual);
         if (exposed) require(actual.visible && actual.cull == null, "Actual section mesh hid exposed face: " + actual);
     }
+    private static final BlockPos EDGE = new BlockPos(15, 205, 8);
+    private Long2ByteOpenHashMap edgeFacts;
     private int ticks, phase, started, reloads;
     private boolean requested;
     private volatile boolean prepared;
@@ -129,8 +134,21 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
                     place(world, player, Items.STONE_SLAB, control);
                     place(world, player, Items.GRAY_CONCRETE, control.up());
                     place(world, player, Items.GRAY_CONCRETE, control.up(2));
+                    world.setBlockState(EDGE, Blocks.STONE.getDefaultState(), Block.NOTIFY_ALL);
+                    player.setPosition(18.5, 205, 8.5);
+                    for (int i = 0; i < 3; i++) place(world, player, Items.OAK_LOG, EDGE.up(i));
+                    world.breakBlock(EDGE.up(), false); world.breakBlock(EDGE.up(2), false);
+                    place(world, player, Items.STONE_SLAB, EDGE);
+                    place(world, player, Items.OAK_LOG, EDGE.up());
+                    BlockPos predict = GROUND.north(2);
+                    world.setBlockState(predict, Blocks.STONE.getDefaultState(), Block.NOTIFY_ALL);
+                    player.setPosition(11.5, 198, 6.5);
+                    place(world, player, Items.STONE_SLAB, predict);
+                    place(world, player, Items.OAK_LOG, predict.up());
                     BlockPos natural = GROUND.west(4);
                     world.setBlockState(natural, Blocks.STONE.getDefaultState(), Block.NOTIFY_ALL);
+                    for (int x : new int[]{-1, 1}) for (int y = 1; y <= 4; y++)
+                        world.setBlockState(natural.add(x, y, 0), Blocks.OAK_LOG.getDefaultState(), Block.NOTIFY_ALL);
                     for (int i = 1; i <= 3; i++) world.setBlockState(natural.up(i), Blocks.OAK_LOG.getDefaultState(), Block.NOTIFY_ALL);
                     world.breakBlock(natural.up(), false);
                     world.breakBlock(natural.up(2), false);
@@ -152,17 +170,50 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
         if (!prepared || ticks - started < 100) return;
         if (phase == 1) { phase = 2; started = ticks; return; }
         if (ticks - started < 80) return;
-        checkMeshedFace(GROUND.up(2), Direction.UP, 0.5, true);
-        BlockPos natural = GROUND.west(4);
-        double lowerDy = SlabSupport.getYOffset(client.world, natural.up(2), client.world.getBlockState(natural.up(2)));
-        double upperDy = SlabSupport.getYOffset(client.world, natural.up(3), client.world.getBlockState(natural.up(3)));
-        System.out.println("NATURAL_LOG_HEIGHTS lower=" + lowerDy + " upper=" + upperDy);
-        checkMeshedFace(natural.up(2), Direction.UP, 1 + lowerDy, lowerDy < upperDy);
-        checkMeshedFace(natural.up(3), Direction.DOWN, upperDy, lowerDy < upperDy);
-        checkMeshedFace(GROUND.south(4).up(3), Direction.UP, -0.5 + 1.0 / 16, false);
-        if (reloads++ < 2) {
-            MESH_FACES.clear(); client.worldRenderer.reload(); started = ticks; return;
+        if (phase == 2) {
+            checkMeshedFace(GROUND.up(2), Direction.UP, 0.5, true);
+            BlockPos natural = GROUND.west(4);
+            double lowerDy = SlabSupport.getYOffset(client.world, natural.up(2), client.world.getBlockState(natural.up(2)));
+            double upperDy = SlabSupport.getYOffset(client.world, natural.up(3), client.world.getBlockState(natural.up(3)));
+            System.out.println("NATURAL_LOG_HEIGHTS lower=" + lowerDy + " upper=" + upperDy);
+            checkMeshedFace(natural.up(2), Direction.UP, 1 + lowerDy, lowerDy < upperDy);
+            checkMeshedFace(natural.up(3), Direction.DOWN, upperDy, lowerDy < upperDy);
+            checkMeshedFace(GROUND.south(4).up(3), Direction.UP, -0.5 + 1.0 / 16, false);
+            if (reloads++ < 2) {
+                MESH_FACES.clear(); client.worldRenderer.reload(); started = ticks; return;
+            }
+            checkMeshedFace(EDGE.up(3), Direction.DOWN, 0, true);
+            var chunk = client.world.getWorldChunk(EDGE.up(2));
+            edgeFacts = new Long2ByteOpenHashMap(chunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE));
+            var delayed = new Long2ByteOpenHashMap(edgeFacts); delayed.put(EDGE.up(2).asLong(), (byte)0);
+            chunk.setAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE, delayed);
+            MESH_FACES.clear(); client.worldRenderer.reload(); phase = 3; started = ticks; return;
         }
+        if (phase == 3) {
+            MeshFace hidden = MESH_FACES.get(EDGE.up(3).asLong() + ":" + Direction.DOWN);
+            require(hidden != null && hidden.cull != null && !hidden.visible,
+                    "Delayed-height control must hide the ceiling face");
+            MESH_FACES.remove(EDGE.up(3).asLong() + ":" + Direction.DOWN);
+            client.world.getWorldChunk(EDGE.up(2)).setAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE, edgeFacts);
+            phase = 4; started = ticks; return;
+        }
+        if (phase == 4) {
+            checkMeshedFace(EDGE.up(3), Direction.DOWN, 0, true);
+            System.out.println("CROSS_SECTION_HEIGHT_SYNC_PASS");
+            BlockPos owner = GROUND.north(2).up(2);
+            ItemStack slab = new ItemStack(Items.STONE_SLAB, 16);
+            client.player.setStackInHand(Hand.MAIN_HAND, slab);
+            client.interactionManager.clickCreativeStack(slab.copy(), 36 + client.player.getInventory().selectedSlot);
+            var hit = new BlockHitResult(new Vec3d(owner.getX() + .5, owner.getY() + .5, owner.getZ() + .5),
+                    Direction.UP, owner, false);
+            require(client.interactionManager.interactBlock(client.player, Hand.MAIN_HAND, hit).isAccepted(),
+                    "Client slab prediction failed");
+            requirePredictedSlab(client, owner.up());
+            System.out.println("IMMEDIATE_SLAB_PREDICTION_PASS");
+            phase = 5; started = ticks; return;
+        }
+        requirePredictedSlab(client, GROUND.north(2).up(3));
+        System.out.println("CONFIRMED_SLAB_PREDICTION_PASS");
 
         Renderer renderer = RendererAccess.INSTANCE.getRenderer();
         require(renderer != null, "No active native renderer");
@@ -180,6 +231,14 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
         System.out.println("VERTICAL_STEP_CLIENT_PASS renderer=" + name);
         phase = 99;
         client.scheduleStop();
+    }
+
+    private static void requirePredictedSlab(MinecraftClient client, BlockPos pos) {
+        BlockState state = client.world.getBlockState(pos);
+        require(state.isOf(Blocks.STONE_SLAB) && state.get(SlabBlock.TYPE) == SlabType.BOTTOM,
+                "Upward placement must remain a bottom slab: " + state);
+        require(SlabSupport.getYOffset(client.world, pos, state) == -0.5,
+                "Slab height must be correct before and after the server reply");
     }
 
     private static void place(ServerWorld world, ServerPlayerEntity player, Item item, BlockPos owner) {

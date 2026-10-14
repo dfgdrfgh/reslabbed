@@ -299,10 +299,19 @@ public final class SlabAnchorClientSync {
             if (current != null) {
                 // Height attachments can change without changing the vanilla block state.
                 // The model-equality shortcut would discard this redraw.
-                mc.worldRenderer.scheduleBlockRenders(pos.getX(), pos.getY(), pos.getZ(),
-                        pos.getX(), pos.getY(), pos.getZ());
+                scheduleHeightRefresh(mc, pos);
             }
         }
+    }
+
+    /** Height-only updates also invalidate neighboring faces and the support's carpet (LAW.md). */
+    public static void scheduleHeightRefresh(MinecraftClient mc, BlockPos pos) {
+        if (mc == null || mc.world == null || mc.worldRenderer == null || pos == null
+                || !mc.world.getChunkManager().isChunkLoaded(pos.getX() >> 4, pos.getZ() >> 4)) return;
+        // Include displaced bodies at the supported depth and both sides of section borders.
+        int depth = (int)Math.ceil(-com.slabbed.util.SlabbedOffsetRaycast.DEEPEST_TARGETABLE_DY);
+        mc.worldRenderer.scheduleBlockRenders(pos.getX() - 1, pos.getY() - depth - 1, pos.getZ() - 1,
+                pos.getX() + 1, pos.getY() + 2, pos.getZ() + 1);
     }
 
     private static void snapshotAttachment(
@@ -360,9 +369,7 @@ public final class SlabAnchorClientSync {
                 if (SlabAnchorAttachment.isCompoundVisibleAttachmentType(attachmentType)) {
                     scheduleCompoundVisibleRenderRefresh(mc, rerenderPos, current, attachmentType);
                 } else {
-                    mc.worldRenderer.scheduleBlockRenders(
-                            rerenderPos.getX(), rerenderPos.getY(), rerenderPos.getZ(),
-                            rerenderPos.getX(), rerenderPos.getY(), rerenderPos.getZ());
+                    scheduleHeightRefresh(mc, rerenderPos);
                 }
             }
         }
