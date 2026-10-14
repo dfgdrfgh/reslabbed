@@ -107,7 +107,7 @@ jobs:
           git -C build/terrain-slabs-fixture remote add origin https://github.com/dfgdrfgh/terrain_slabs_fork.git
           git -C build/terrain-slabs-fixture fetch --depth=1 origin f3728280f3e09ec9927899bb4e489aea6b7ce832
           git -C build/terrain-slabs-fixture checkout --detach FETCH_HEAD
-          build/terrain-slabs-fixture/gradlew -p build/terrain-slabs-fixture --no-daemon --console=plain :fabric:remapJar
+          bash build/terrain-slabs-fixture/gradlew -p build/terrain-slabs-fixture --no-daemon --console=plain :fabric:remapJar
           python3 - <<'PYCODE'
           import hashlib, pathlib, shutil, urllib.request
           mods = pathlib.Path('build/run/vertical-step-client/mods')
