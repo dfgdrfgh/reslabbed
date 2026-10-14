@@ -952,8 +952,9 @@ public final class SlabSupport {
         return pos.getY() + getSupportYOffset(state);
     }
 
-    /** Max blocks to walk down when checking chain offset. */
-    private static final int MAX_CHAIN_DEPTH = 16;
+    /** Shared dependency window for legacy support reads and client mesh refreshes (LAW.md). */
+    public static final int SUPPORT_COLUMN_DEPTH = 16;
+    private static final int MAX_CHAIN_DEPTH = SUPPORT_COLUMN_DEPTH;
 
     /** Recursion guard: prevents StackOverflow when isSolidBlock triggers getOutlineShape → getYOffset. */
     private static final ThreadLocal<Boolean> IN_GET_Y_OFFSET = ThreadLocal.withInitial(() -> Boolean.FALSE);

@@ -308,10 +308,11 @@ public final class SlabAnchorClientSync {
     public static void scheduleHeightRefresh(MinecraftClient mc, BlockPos pos) {
         if (mc == null || mc.world == null || mc.worldRenderer == null || pos == null
                 || !mc.world.getChunkManager().isChunkLoaded(pos.getX() >> 4, pos.getZ() >> 4)) return;
-        // Include displaced bodies at the supported depth and both sides of section borders.
+        // Cover displaced owners below and the full natural support column above, including
+        // its carpet. Provenance-only changes can affect that column across section borders.
         int depth = (int)Math.ceil(-com.slabbed.util.SlabbedOffsetRaycast.DEEPEST_TARGETABLE_DY);
         mc.worldRenderer.scheduleBlockRenders(pos.getX() - 1, pos.getY() - depth - 1, pos.getZ() - 1,
-                pos.getX() + 1, pos.getY() + 2, pos.getZ() + 1);
+                pos.getX() + 1, pos.getY() + SlabSupport.SUPPORT_COLUMN_DEPTH + 1, pos.getZ() + 1);
     }
 
     private static void snapshotAttachment(

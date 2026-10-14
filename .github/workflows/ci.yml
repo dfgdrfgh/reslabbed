@@ -98,21 +98,22 @@ jobs:
       - name: Check real Terrain Slabs compatibility in Sodium
         env:
           LIBGL_ALWAYS_SOFTWARE: '1'
-          GH_TOKEN: ${{ github.token }}
         run: |
           mv build/run/vertical-step-client build/vertical-step-sodium
           mkdir -p build/run/vertical-step-client/mods
           cp build/vertical-step-sodium/mods/sodium.jar build/run/vertical-step-client/mods/
-          gh api repos/dfgdrfgh/terrain_slabs_fork/actions/artifacts/11730260747/zip > build/terrain-slabs-fixture.zip
+          git init build/terrain-slabs-fixture
+          git -C build/terrain-slabs-fixture remote add origin https://github.com/dfgdrfgh/terrain_slabs_fork.git
+          git -C build/terrain-slabs-fixture fetch --depth=1 origin f3728280f3e09ec9927899bb4e489aea6b7ce832
+          git -C build/terrain-slabs-fixture checkout --detach FETCH_HEAD
+          build/terrain-slabs-fixture/gradlew -p build/terrain-slabs-fixture --no-daemon --console=plain :fabric:remapJar
           python3 - <<'PYCODE'
-          import hashlib, io, pathlib, urllib.request, zipfile
-          data = pathlib.Path('build/terrain-slabs-fixture.zip').read_bytes()
-          assert hashlib.sha256(data).hexdigest() == '7ee547759b235f1e7977dd41b37dea3298bd96217ddb931d8b76d9a36c4e4852'
+          import hashlib, pathlib, shutil, urllib.request
           mods = pathlib.Path('build/run/vertical-step-client/mods')
-          with zipfile.ZipFile(io.BytesIO(data)) as archive:
-              jars = [n for n in archive.namelist() if n.endswith('.jar') and not n.endswith(('-sources.jar', '-dev.jar'))]
-              assert len(jars) == 1, jars
-              (mods / 'terrain-slabs.jar').write_bytes(archive.read(jars[0]))
+          jars = [p for p in pathlib.Path('build/terrain-slabs-fixture/fabric/build/libs').glob('*.jar')
+                  if not any(label in p.name for label in ('-sources', '-dev', '-shadow'))]
+          assert len(jars) == 1, jars
+          shutil.copy2(jars[0], mods / 'terrain-slabs.jar')
           data = urllib.request.urlopen('https://cdn.modrinth.com/data/lhGA9TYQ/versions/Pzc2FP5K/architectury-13.0.11-fabric.jar').read()
           assert hashlib.sha512(data).hexdigest() == '53314eb34890b11ad3c06c6f3ba2d01ae1ca756235ce4f0574e4b0544952a2ab3c628c81b521653d6487d62c5dc3055e06fed6367a3a499bafad909512f0c716'
           (mods / 'architectury.jar').write_bytes(data)
