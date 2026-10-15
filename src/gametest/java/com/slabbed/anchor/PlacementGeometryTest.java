@@ -40,7 +40,7 @@ public final class PlacementGeometryTest {
                 "premise: an independently saved fact must not require a second marker");
         var before = world.getWorldChunk(pos).getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE);
         for (int i = 0; i < 100; i++) {
-            double actual = SlabSupport.getYOffset(world, pos, state);
+            double actual = PlacementGeometry.offsetY(world, pos, state);
             ctx.assertTrue(Double.doubleToRawLongBits(actual) == Double.doubleToRawLongBits(expected),
                     "SAVED_POSITION_IGNORED: stored=" + expected + " read=" + actual);
         }

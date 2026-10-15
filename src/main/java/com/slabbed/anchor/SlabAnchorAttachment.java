@@ -548,8 +548,13 @@ public final class SlabAnchorAttachment {
      * every server view, reads the backing store unchanged.
      */
     public static double storedPlacementDy(BlockView world, BlockPos pos) {
+        return effectivePlacementDyFact(world, pos).valueOrNaN();
+    }
+
+    /** Effective authored fact, without changing the stored snapshot or consulting neighbors. */
+    public static PlacementDyFact effectivePlacementDyFact(BlockView world, BlockPos pos) {
         if (pos == null) {
-            return Double.NaN;
+            return PlacementDyFact.absent();
         }
         boolean clientView = isClientAttachmentView(world);
         if (clientView) {
@@ -557,11 +562,11 @@ public final class SlabAnchorAttachment {
             if (overlay != null) {
                 PlacementDyFact effective = overlay.lookup(pos);
                 if (effective != null) {
-                    return effective.valueOrNaN();
+                    return effective;
                 }
             }
         }
-        return rawPlacementDyFact(world, pos).valueOrNaN();
+        return rawPlacementDyFact(world, pos);
     }
 
     /** True only for a cell placed by an item under the placement policy (modern provenance). */
