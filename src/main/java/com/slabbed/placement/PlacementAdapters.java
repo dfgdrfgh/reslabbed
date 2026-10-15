@@ -19,6 +19,8 @@ public final class PlacementAdapters {
     public static PlacementPlan plan(World world, LandingResolver.PlacementAim aim,
                                      ItemPlacementContext context, BlockState state) {
         if (state == null || state.isAir()) return null;
+        var component = context.getStack().get(net.minecraft.component.DataComponentTypes.BLOCK_STATE);
+        if (component != null) state = component.applyToState(state);
         if (LandingResolver.compatOwnsFinalState(state)) return new PlacementPlan(List.of());
         BlockPos target = context.getBlockPos().toImmutable();
         var resolution = LandingResolver.resolve(world, aim, target, state, LandingResolver.classify(state));

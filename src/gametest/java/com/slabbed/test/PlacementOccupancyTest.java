@@ -178,7 +178,7 @@ public final class PlacementOccupancyTest {
                     h.assertTrue(world.breakBlock(target, false), "Generated slab did not break");
                 }
                 ItemStack stack = new ItemStack(item, 2);
-                ActionResult result = PlacementCaptureBoundaryGameTest.useOn(player, stack, owner, Direction.EAST);
+                ActionResult result = physicalSide(player, stack, owner, ownerHeight);
                 h.assertTrue(!result.isAccepted() && world.getBlockState(target).isAir() && stack.getCount() == 2,
                         "Lowered placement entered natural terrain: " + blocker + " item=" + item);
                 h.assertTrue(world.getBlockState(terrain).equals(blocker)
@@ -189,13 +189,21 @@ public final class PlacementOccupancyTest {
         }
         // A real half-height opening remains usable; contact is not an intersection.
         world.setBlockState(terrain, generated, Block.NOTIFY_ALL);
-        h.assertTrue(PlacementCaptureBoundaryGameTest.useOn(player, new ItemStack(Items.STONE_SLAB),
-                        owner, Direction.EAST).isAccepted(), "Touching natural half slab must leave room");
+        h.assertTrue(physicalSide(player, new ItemStack(Items.STONE_SLAB),
+                        owner, ownerHeight).isAccepted(), "Touching natural half slab must leave room");
         h.assertTrue(world.getBlockState(target).isOf(Blocks.STONE_SLAB)
                         && height(world, target) == Double.doubleToRawLongBits(-0.5),
                 "Fitting slab must retain its aimed height");
         h.assertTrue(height(world, owner) == ownerHeight, "Fitting slab moved the placed owner");
         h.complete();
+    }
+
+    private static ActionResult physicalSide(PlayerEntity player, ItemStack stack, BlockPos owner, long height) {
+        var hit = new net.minecraft.util.hit.BlockHitResult(
+                new net.minecraft.util.math.Vec3d(owner.getX() + 1.0,
+                        owner.getY() + Double.longBitsToDouble(height) + 0.25, owner.getZ() + 0.5),
+                Direction.EAST, owner, false);
+        return PlacementCaptureBoundaryGameTest.useOn(player, stack, hit);
     }
 
     @GameTest(templateName = "slabbed:empty_16")

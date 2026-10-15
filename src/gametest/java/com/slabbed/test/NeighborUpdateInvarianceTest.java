@@ -443,7 +443,7 @@ public final class NeighborUpdateInvarianceTest {
         }
     }
 
-    @GameTest(templateName = "fabric-gametest-api-v1:empty", required = false)
+    @GameTest(templateName = "fabric-gametest-api-v1:empty")
     public void torchOnMarkedSlabSurvivesNeighborEdits(TestContext h) {
         runSubject(h, SUBJECTS.get(0));
     }
@@ -458,32 +458,32 @@ public final class NeighborUpdateInvarianceTest {
         runSubjectWithFrozenStore(h, SUBJECTS.get(1));
     }
 
-    @GameTest(templateName = "fabric-gametest-api-v1:empty", required = false)
+    @GameTest(templateName = "fabric-gametest-api-v1:empty")
     public void fullBlockOnLoweredStackSurvivesNeighborEdits(TestContext h) {
         runSubject(h, SUBJECTS.get(2));
     }
 
-    @GameTest(templateName = "fabric-gametest-api-v1:empty", required = false)
+    @GameTest(templateName = "fabric-gametest-api-v1:empty")
     public void flatFullBlockControlSurvivesNeighborEdits(TestContext h) {
         runSubject(h, SUBJECTS.get(3));
     }
 
-    @GameTest(templateName = "fabric-gametest-api-v1:empty", required = false)
+    @GameTest(templateName = "fabric-gametest-api-v1:empty")
     public void flatSlabControlSurvivesNeighborEdits(TestContext h) {
         runSubject(h, SUBJECTS.get(4));
     }
 
-    @GameTest(templateName = "fabric-gametest-api-v1:empty", required = false)
+    @GameTest(templateName = "fabric-gametest-api-v1:empty")
     public void cantileverSlabSurvivesNeighborEdits(TestContext h) {
         runSubject(h, SUBJECTS.get(5));
     }
 
-    @GameTest(templateName = "fabric-gametest-api-v1:empty", required = false)
+    @GameTest(templateName = "fabric-gametest-api-v1:empty")
     public void slabOnLoweredFullBlockSurvivesNeighborEdits(TestContext h) {
         runSubject(h, SUBJECTS.get(6));
     }
 
-    @GameTest(templateName = "fabric-gametest-api-v1:empty", required = false)
+    @GameTest(templateName = "fabric-gametest-api-v1:empty")
     public void candlePlacedFlatSurvivesNeighborEdits(TestContext h) {
         runSubject(h, SUBJECTS.get(7));
     }
@@ -651,7 +651,7 @@ public final class NeighborUpdateInvarianceTest {
      * door pair's {@link SlabSupport#getYOffset} height is byte-identical after an open/powered
      * toggle plus non-support neighbor edits.
      */
-    @GameTest(templateName = "fabric-gametest-api-v1:empty", required = false)
+    @GameTest(templateName = "fabric-gametest-api-v1:empty")
     public void c3_pair_door_toggle_and_neighbor_invariance(TestContext h) {
         ServerWorld world = h.getWorld();
         clearArena(h, world);
@@ -691,7 +691,7 @@ public final class NeighborUpdateInvarianceTest {
      * same way as the door row: real-placed bed pair's getYOffset height must be byte-identical
      * after non-support neighbor edits, and the pair must stay a FOOT/HEAD pair.
      */
-    @GameTest(templateName = "fabric-gametest-api-v1:empty", required = false)
+    @GameTest(templateName = "fabric-gametest-api-v1:empty")
     public void c3_pair_bed_neighbor_invariance(TestContext h) {
         ServerWorld world = h.getWorld();
         clearArena(h, world);
