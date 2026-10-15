@@ -553,6 +553,10 @@ public final class ExtendedDepthEntityBehaviorTest {
         for (BlockPos position : positions) {
             ChunkPos chunk = new ChunkPos(position);
             if (added.stream().anyMatch(ticket -> ticket.chunk().equals(chunk))) continue;
+            // Entity-ticking promotion needs the neighboring FULL chunks, including at arena edges.
+            // This is fixture setup on the owning server thread, never a production geometry read.
+            for (int dx=-1;dx<=1;dx++) for (int dz=-1;dz<=1;dz++)
+                world.getChunk(chunk.x+dx,chunk.z+dz);
             long id = ENTITY_TICKET_IDS.incrementAndGet();
             world.getChunkManager().addTicket(ENTITY_TEST_TICKET, chunk, 2, id);
             added.add(new EntityTickingTicket(chunk, id));

@@ -17,6 +17,46 @@ import java.util.Map;
 
 /** Refused storage must refuse the real placement before block or item mutation (LAW.md). */
 public final class PlacementTransactionTest {
+    @GameTest(templateName="fabric-gametest-api-v1:empty",batchId="slabbed_piston_capacity_isolated")
+    public void pistonRefusesAnUnsavableDestinationBeforeMovingTheBody(TestContext h) {
+        var world=h.getWorld();BlockPos base=h.getAbsolutePos(new BlockPos(3,30,3));
+        BlockPos piston=new BlockPos((base.getX() & ~15)+14,base.getY(),base.getZ());
+        BlockPos source=piston.east(),destination=source.east();
+        world.setBlockState(piston,Blocks.PISTON.getDefaultState().with(
+                net.minecraft.block.PistonBlock.FACING,Direction.EAST),Block.NOTIFY_ALL);
+        world.setBlockState(source,Blocks.STONE.getDefaultState(),Block.NOTIFY_ALL);
+        world.setBlockState(destination,Blocks.AIR.getDefaultState(),Block.NOTIFY_ALL);
+        SlabAnchorAttachment.writePlacementDyBatch(world,Map.of(source,Double.doubleToRawLongBits(-.5)));
+        var chunk=world.getWorldChunk(destination);
+        var before=chunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE);
+        chunk.removeAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE);
+        BlockPos section=new BlockPos(chunk.getPos().x<<4,((destination.getY()>>4)<<4)+48,chunk.getPos().z<<4);
+        int low=0,high=4096;
+        while(low<high) {
+            int middle=(low+high+1)>>>1;
+            if(SlabAnchorAttachment.preparePlacementDyBatch(world,rawHeights(distinct(section,middle)))!=null) low=middle;
+            else high=middle-1;
+        }
+        var full=distinct(section,low);chunk.setAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE,full);
+        h.assertTrue(SlabAnchorAttachment.preparePlacementDyBatch(world,
+                Map.of(destination,Double.doubleToRawLongBits(-.5)))==null,"Destination budget must be exhausted");
+        world.setBlockState(piston.west(),Blocks.REDSTONE_BLOCK.getDefaultState(),Block.NOTIFY_ALL);
+        h.runAtTick(10,()->{
+            try {
+                h.assertTrue(world.getBlockState(piston).isOf(Blocks.PISTON)
+                                && !world.getBlockState(piston).get(net.minecraft.block.PistonBlock.EXTENDED)
+                                && world.getBlockState(source).isOf(Blocks.STONE)
+                                && world.getBlockState(destination).isAir()
+                                && SlabAnchorAttachment.rawPlacementDyFact(world,source).valueOrNaN()==-.5,
+                        "PISTON_MOVED_WITHOUT_SAVED_HEIGHT: a full destination must refuse movement before body mutation");
+                h.complete();
+            } finally {
+                if(before==null)chunk.removeAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE);
+                else chunk.setAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE,before);
+            }
+        });
+    }
+
     @GameTest(templateName = "fabric-gametest-api-v1:empty")
     public void componentFacingBedCannotOverwriteAnOccupiedPartner(TestContext h) {
         var world=h.getWorld();
