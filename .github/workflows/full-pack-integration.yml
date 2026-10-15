@@ -44,13 +44,10 @@ jobs:
         env:
           LIBGL_ALWAYS_SOFTWARE: '1'
         run: timeout 8m xvfb-run -a python3 tools/full-pack-client.py
-      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
-        if: always()
+      - name: Upload the tested Slabbed JAR
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         with:
-          name: full-pack-client-checks
-          path: |
-            build/full-pack-control/production-launch.log
-            build/full-pack-fixed/production-launch.log
-            build/full-pack-fixed/vertical-step-pass.txt
-            build/full-pack-fixed/vertical-step.png
-          retention-days: 7
+          name: slabbed-mc1.21.1-fabric
+          path: build/libs/slabbed-0.6.8-alpha+1.21.1-fabric.jar
+          if-no-files-found: error
+          retention-days: 30
