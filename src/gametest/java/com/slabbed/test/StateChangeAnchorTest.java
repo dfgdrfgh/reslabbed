@@ -25,6 +25,18 @@ import java.util.Map;
  */
 public final class StateChangeAnchorTest {
 
+    @GameTest(templateName="fabric-gametest-api-v1:empty")
+    public void unrelatedSameShapeReplacementCannotInheritTheOldSeat(TestContext ctx) {
+        var world=ctx.getWorld();var pos=ctx.getAbsolutePos(new BlockPos(3,4,3));
+        world.setBlockState(pos,Blocks.STONE.getDefaultState(),Block.NOTIFY_ALL);
+        SlabAnchorAttachment.writePlacementDyBatch(world,Map.of(pos,Double.doubleToRawLongBits(-.5)));
+        world.setBlockState(pos,Blocks.GOLD_BLOCK.getDefaultState(),Block.NOTIFY_ALL);
+        ctx.assertTrue(!SlabAnchorAttachment.rawPlacementDyFact(world,pos).present()
+                        && SlabSupport.getYOffset(world,pos,world.getBlockState(pos))==0,
+                "REPLACEMENT_INHERITED_OLD_SEAT: equal shapes do not make unrelated blocks the same placement");
+        ctx.complete();
+    }
+
     private static final double EPS = 1.0e-6d;
 
     @GameTest(templateName = "fabric-gametest-api-v1:empty")

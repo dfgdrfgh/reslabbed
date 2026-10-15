@@ -13,6 +13,24 @@ import java.util.Map;
 
 /** The presence of a saved height is its authority, including zero (LAW.md). */
 public final class PlacementGeometryTest {
+    @GameTest(templateName="fabric-gametest-api-v1:empty")
+    public void hitValidationUsesTheObjectsOwnSavedSeat(TestContext ctx) {
+        var world=ctx.getWorld();var pos=ctx.getAbsolutePos(new BlockPos(3,4,3));
+        var state=Blocks.OAK_TRAPDOOR.getDefaultState();
+        world.setBlockState(pos.down(),Blocks.STONE.getDefaultState(),Block.NOTIFY_LISTENERS);
+        world.setBlockState(pos,state,Block.NOTIFY_LISTENERS);
+        var chunk=world.getWorldChunk(pos);
+        var anchors=chunk.getAttached(SlabAnchorAttachment.ANCHOR_TYPE);
+        var copy=anchors==null ? new it.unimi.dsi.fastutil.longs.LongOpenHashSet()
+                : new it.unimi.dsi.fastutil.longs.LongOpenHashSet(anchors);
+        copy.add(pos.down().asLong());chunk.setAttached(SlabAnchorAttachment.ANCHOR_TYPE,copy);
+        SlabAnchorAttachment.writePlacementDyBatch(world,Map.of(
+                pos,Double.doubleToRawLongBits(-.4375),pos.down(),Double.doubleToRawLongBits(-.5)));
+        ctx.assertTrue(SlabSupport.getBeta35ShiftedServerValidationYOffset(world,pos,state)==-.4375,
+                "VALIDATION_REINFERRED_SEAT: hit validation must agree with the object's exact saved geometry");
+        ctx.complete();
+    }
+
     @GameTest(templateName = "fabric-gametest-api-v1:empty")
     public void explicitDeepSeatNeedsNoSecondMarker(TestContext ctx) {
         verifyExactSeat(ctx, -8.5d);

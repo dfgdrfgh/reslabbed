@@ -36,6 +36,28 @@ import java.util.Map;
  */
 public final class PlacementDyOverlayTest {
 
+    @GameTest(templateName="fabric-gametest-api-v1:empty")
+    public void breakBeforeAcknowledgmentRetiresTheWholePairAndRejectsReplay(TestContext h) {
+        Object level=new Object();BlockPos first=new BlockPos(15,70,3),second=first.east();
+        try {
+            arm(new FakeBacking(),null);
+            Map<BlockPos,Long> pair=new LinkedHashMap<>();pair.put(first,raw(-.5));pair.put(second,raw(-.5));
+            PlacementDyOverlay.installPredictedPlacement(level,first.down(),Direction.UP,11,pair);
+            PlacementDyOverlay.onBlockRemoved(level,first);
+            h.assertTrue(PlacementDyOverlay.liveGroupCount()==0
+                            && PlacementDyOverlay.overlayFact(level,second.asLong())==null,
+                    "BROKEN_PREDICTION_SURVIVED: removing one member must retire the complete cross-chunk pair");
+            PlacementDyOverlay.onVanillaAcknowledgement(level,11);
+            PlacementDyOverlay.installPredictedPlacement(level,first.down(),Direction.UP,11,pair);
+            h.assertTrue(PlacementDyOverlay.liveGroupCount()==0,
+                    "REPLAY_REVIVED_BROKEN_BODY: an old sequence must not reinstall a removed body");
+            PlacementDyOverlay.installPredictedPlacement(level,first.down(),Direction.UP,12,bits(first,-1));
+            h.assertTrue(dy(level,first)==-1 && PlacementDyOverlay.highWaterSequence(first.asLong())==12,
+                    "A new action must remain able to place at the cleared cell");
+        } finally { PlacementDyOverlay.resetForTests(); }
+        pass(h,"break_before_acknowledgment");
+    }
+
     private static final String PREFIX = "slabbed_gametest:placement_dy_overlay_test_";
 
     private static final double PREDICTED_DEEP = -1.0d;

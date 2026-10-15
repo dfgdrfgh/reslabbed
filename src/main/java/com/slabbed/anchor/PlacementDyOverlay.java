@@ -334,6 +334,10 @@ public final class PlacementDyOverlay {
 
     // ── retirement ───────────────────────────────────────────────────────────────────────────
 
+    /** A removed predicted body must not be revived by a delayed acknowledgment (LAW.md). */
+    public static void onBlockRemoved(Object level, BlockPos pos) {
+    }
+
     /**
      * Vanilla acknowledged everything through {@code sequence}. Called from the RETURN of
      * {@code ClientWorld.handlePlayerActionResponse}, after vanilla's own state sync work.

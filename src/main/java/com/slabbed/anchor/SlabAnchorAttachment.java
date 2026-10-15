@@ -367,6 +367,16 @@ public final class SlabAnchorAttachment {
         return DY_MAP_CODEC;
     }
 
+    private static Long2IntOpenHashMap dyMapFromStreams(
+            java.util.stream.LongStream positions, java.util.stream.IntStream heights) {
+        long[] p = positions.toArray();
+        int[] h = heights.toArray();
+        Long2IntOpenHashMap map = newDyMap();
+        int n = Math.min(p.length, h.length);
+        for (int i = 0; i < n; i++) map.put(p[i], h[i]);
+        return map;
+    }
+
     /**
      * Wire form: {@link ChunkPositionDyMapPacketCodec}, which groups by 16-cubed section, stores
      * occupancy as a non-empty-word mask, and stores heights as a per-section palette. The height
