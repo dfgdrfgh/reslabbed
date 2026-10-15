@@ -226,8 +226,9 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
             return;
         }
         if (phase == 2) {
-            checkAuthorityWithoutProvenance(client);
             checkOverheadControls(client);
+            checkAuthorityWithoutProvenance(client);
+            checkBrokenPrediction(client);
             checkRepeatedStack(client, false);
             checkMeshedFace(GROUND.up(2), Direction.UP, 0.5, true);
             BlockPos natural = GROUND.west(4);
@@ -345,6 +346,27 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
             else chunk.setAttached(SlabAnchorAttachment.MODERN_PLACEMENT_TYPE,markers);
         }
         System.out.println("AUTHORITATIVE_HEIGHT_WITHOUT_PROVENANCE_PASS");
+    }
+
+    private static void checkBrokenPrediction(MinecraftClient client) {
+        BlockPos first=GROUND.west(6).up(10), second=first.east();
+        var oldFirst=client.world.getBlockState(first);var oldSecond=client.world.getBlockState(second);
+        try {
+            client.world.setBlockState(first,Blocks.STONE.getDefaultState(),Block.NOTIFY_LISTENERS);
+            client.world.setBlockState(second,Blocks.STONE.getDefaultState(),Block.NOTIFY_LISTENERS);
+            com.slabbed.anchor.PlacementDyOverlay.installPredictedPlacement(client.world,first.down(),Direction.UP,
+                    1_000_000,Map.of(first,Double.doubleToRawLongBits(-.5),second,Double.doubleToRawLongBits(-.5)));
+            require(com.slabbed.anchor.PlacementDyOverlay.overlayFact(client.world,first.asLong())!=null,
+                    "Client removal fixture did not install a prediction");
+            client.world.getWorldChunk(first).setBlockState(first,Blocks.AIR.getDefaultState(),false);
+            require(com.slabbed.anchor.PlacementDyOverlay.overlayFact(client.world,first.asLong())==null
+                            && com.slabbed.anchor.PlacementDyOverlay.overlayFact(client.world,second.asLong())==null,
+                    "Actual client chunk removal left a predicted ghost body");
+        } finally {
+            client.world.setBlockState(first,oldFirst,Block.NOTIFY_LISTENERS);
+            client.world.setBlockState(second,oldSecond,Block.NOTIFY_LISTENERS);
+        }
+        System.out.println("CLIENT_BREAK_BEFORE_ACK_PASS");
     }
 
     private static final BlockPos TOWER_BASE = new BlockPos(18, 198, 12);

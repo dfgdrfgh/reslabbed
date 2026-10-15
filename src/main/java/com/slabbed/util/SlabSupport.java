@@ -400,15 +400,6 @@ public final class SlabSupport {
     }
 
     public static double getBeta35ShiftedServerValidationYOffset(BlockView world, BlockPos pos, BlockState state) {
-        if (world == null || pos == null || state == null) {
-            return Double.NaN;
-        }
-        if (isBeta35BottomTrapdoorVisibleOwnerObject(state)) {
-            double visibleOwnerDy = beta35BottomTrapdoorVisibleOwnerDy(world, pos, state);
-            if (Double.isFinite(visibleOwnerDy) && visibleOwnerDy < -1.0e-6d) {
-                return visibleOwnerDy;
-            }
-        }
         return getYOffset(world, pos, state);
     }
 

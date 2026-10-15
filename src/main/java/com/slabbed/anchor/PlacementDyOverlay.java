@@ -293,7 +293,7 @@ public final class PlacementDyOverlay {
             return List.of();
         }
         for (long cell : cells) {
-            if (HIGH_WATER.get(cell) > sequence) {
+            if (HIGH_WATER.get(cell) >= sequence) {
                 Slabbed.LOGGER.warn("[C3] out-of-order prediction sequence {}; overlay not installed", sequence);
                 return List.of();
             }
@@ -336,6 +336,17 @@ public final class PlacementDyOverlay {
 
     /** A removed predicted body must not be revived by a delayed acknowledgment (LAW.md). */
     public static void onBlockRemoved(Object level, BlockPos pos) {
+        dispatchRerenders(removeBodyLocked(level, pos));
+    }
+
+    private static synchronized List<BlockPos> removeBodyLocked(Object level, BlockPos pos) {
+        if (level == null || level != currentLevel || pos == null) return List.of();
+        GroupKey owner = OVERLAY_OWNER.get(pos.asLong());
+        if (owner == null) return List.of();
+        var rerenders = new ArrayList<BlockPos>();
+        retireLocked(owner, rerenders);
+        publishOverlayCellsLocked();
+        return List.copyOf(rerenders);
     }
 
     /**

@@ -19,8 +19,7 @@ public final class FenceCeilingConnectionTest {
     private static final BlockPos OWNER = new BlockPos(2, 3, 2);
     private static final double EPS = 1.0e-6d;
 
-    private static void withFrozen(Runnable body) {
-    }
+    private static void withFrozen(Runnable body) { body.run(); }
     private static void store(ServerWorld w, BlockPos p, double dy) {
         SlabAnchorAttachment.writePlacementDyBatch(w,java.util.Map.of(p,Double.doubleToRawLongBits(dy)));
     }

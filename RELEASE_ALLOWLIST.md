@@ -134,7 +134,7 @@ Every row below is declared in `slabbed.mixins.json`. Inactive, unregistered mix
 | `com/slabbed/mixin/LoweredRailSupportNeighborMixin` | A neighbour change delivered to the cell a lowered powered rail is drawn in is forwarded to the rail, so a lever or repeater beside the slab reaches it (maintainer ruling, 2026-09-28). |
 | `com/slabbed/mixin/ArmorStandItemOffsetPlacementMixin` | Places armor stands against the stored visible support plane while retaining vanilla item collision and entity-data handling. |
 | `com/slabbed/mixin/BlockItemPlacementIntentMixin` | Captures placement intent for the placement law. |
-| `com/slabbed/mixin/BlockOnStateReplacedAnchorMixin` | Clears the dy anchor on state replacement; a same-shape kind change keeps it. |
+| `com/slabbed/mixin/BlockOnStateReplacedAnchorMixin` | Clears departed placement facts; explicit recognized transformations keep their seat. |
 | `com/slabbed/mixin/CarpetBlockMixin` | Carpet support and shape over a lowered slab. |
 | `com/slabbed/mixin/FencePaneSlabConnectionMixin` | Fence and pane connection against a lowered slab. |
 | `com/slabbed/mixin/HangingSignAttachedMixin` | Hanging-sign attachment from above. |
@@ -144,6 +144,7 @@ Every row below is declared in `slabbed.mixins.json`. Inactive, unregistered mix
 | `com/slabbed/mixin/SlabSupportBlockMixin` | Slab support surface. |
 | `com/slabbed/mixin/SlabSupportStateMixin` | Slab support state. |
 | `com/slabbed/mixin/TerrainSlabsVegetationOffsetMixin` | Prevents Terrain Slabs and Slabbed from translating vegetation vertically twice while retaining horizontal model jitter. |
+| `com/slabbed/mixin/WorldChunkPredictionLifecycleMixin` | Retires a departed client prediction group without changing authoritative heights. |
 | `com/slabbed/mixin/BlockCollisionDepthWindowMixin` | Discovers stored collision owners through the supported depth. |
 | `com/slabbed/mixin/LithiumStoredCollisionMixin` | Optional Lithium collision adapter. Uses the offset-aware native collision iterator in loaded chunk columns with displaced stored bodies; keeps the ordinary optimized path elsewhere. It reads existing heights without authoring them (LAW.md). |
 | `com/slabbed/mixin/BoatItemOffsetRaycastMixin` | Lets boat item use target stored visible block surfaces while preserving nearer vanilla block and fluid hits. |

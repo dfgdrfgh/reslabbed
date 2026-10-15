@@ -14,15 +14,7 @@ import net.minecraft.util.math.BlockPos;
 import java.util.List;
 import java.util.Map;
 
-/**
- * A block that changes KIND in place but keeps its SHAPE keeps its height (LAW.md corollary,
- * maintainer ruling 2026-09-13). Live on this line with Terrain Slabs: a grass slab on a lowered
- * stack converted to a dirt slab when covered and popped up to grid height, sinking into the block
- * above. Vanilla stands in here: a lowered stone slab becomes an oak slab of the same half.
- *
- * <p>MUTATION that must redden this row alone: drop the same-shape early return from
- * {@code BlockOnStateReplacedAnchorMixin}.
- */
+/** Recognized terrain transformations keep their seat; unrelated replacements clear it (LAW.md). */
 public final class StateChangeAnchorTest {
 
     @GameTest(templateName="fabric-gametest-api-v1:empty")
@@ -40,12 +32,12 @@ public final class StateChangeAnchorTest {
     private static final double EPS = 1.0e-6d;
 
     @GameTest(templateName = "fabric-gametest-api-v1:empty")
-    public void inPlaceSlabKindChangeWithTheSameShapeKeepsItsSeat(TestContext ctx) {
+    public void terrainGrassDirtConversionKeepsItsSeat(TestContext ctx) {
         ServerWorld world = ctx.getWorld();
         BlockPos support = ctx.getAbsolutePos(new BlockPos(3, 16, 3));
         BlockPos slab = support.up();
         world.setBlockState(support, Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM), Block.NOTIFY_ALL);
-        world.setBlockState(slab, Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM), Block.NOTIFY_ALL);
+        world.setBlockState(slab, TerrainSlabsTestShim.LEGACY_TS_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM), Block.NOTIFY_ALL);
         // The slab's recorded seat and modern provenance, the two facts a real placement leaves.
         int writes = SlabAnchorAttachment.writePlacementDyBatch(world, Map.of(slab.toImmutable(), Double.doubleToRawLongBits(-0.5d)));
         int marks = SlabAnchorAttachment.markPostPolicyPlacements(world, List.of(slab.toImmutable()));
@@ -53,8 +45,8 @@ public final class StateChangeAnchorTest {
         if (writes != 1 || marks != 1 || Math.abs(before + 0.5d) > EPS) {
             ctx.throwGameTestException("precondition: the lowered slab must carry its seat; writes=" + writes + " marks=" + marks + " dy=" + before);
         }
-        // Stone slab -> oak slab: a block-KIND change at the SAME position with the SAME shape.
-        world.setBlockState(slab, Blocks.OAK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM), Block.NOTIFY_ALL);
+        // Actual recognized grass-to-dirt identity conversion, retaining half and generated state.
+        world.setBlockState(slab, TerrainSlabsTestShim.DIRT_TS_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM), Block.NOTIFY_ALL);
         double stored = SlabAnchorAttachment.storedPlacementDy(world, slab);
         double after = SlabSupport.getYOffset(world, slab, world.getBlockState(slab));
         if (!Double.isFinite(stored) || Math.abs(after - before) > EPS) {

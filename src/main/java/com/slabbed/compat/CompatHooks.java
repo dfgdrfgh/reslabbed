@@ -93,6 +93,19 @@ public final class CompatHooks {
         return (override != null && override.test(state)) || isNaturalTerrainSlab(state);
     }
 
+    /** Recognized in-place grass/dirt transformations retain their saved seat (LAW.md). */
+    public static boolean keepsPlacementHeight(BlockState before, BlockState after) {
+        if (before.isOf(after.getBlock())) return true;
+        if (before.isOf(net.minecraft.block.Blocks.GRASS_BLOCK) && after.isOf(net.minecraft.block.Blocks.DIRT)) return true;
+        var from = net.minecraft.registry.Registries.BLOCK.getId(before.getBlock());
+        var to = net.minecraft.registry.Registries.BLOCK.getId(after.getBlock());
+        if (!TerrainSlabsCompat.isLoaded() || !from.getNamespace().equals(to.getNamespace())
+                || !(from.getNamespace().equals("terrain_slabs") || from.getNamespace().equals("terrainslabs"))
+                || !((from.getPath().equals("grass_slab") && to.getPath().equals("dirt_slab"))
+                || (from.getPath().equals("dirt_slab") && to.getPath().equals("grass_slab")))) return false;
+        return before.getEntries().equals(after.getEntries());
+    }
+
     /** Cheap precomputed gate so per-block hot paths can skip all compat work when TS is absent. */
     public static boolean isTerrainSlabsLoaded() {
         return TerrainSlabsCompat.isLoaded();

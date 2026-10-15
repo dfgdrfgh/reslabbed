@@ -36,6 +36,7 @@
     "BlockItemPlacementIntentMixin",
     "ServerInteractBlockHitToleranceMixin",
     "BlockOnStateReplacedAnchorMixin",
+    "WorldChunkPredictionLifecycleMixin",
     "FencePaneSlabConnectionMixin",
     "WallSlabConnectionMixin",
     "ScaffoldingLoweredStandMixin",

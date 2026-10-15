@@ -42,35 +42,8 @@ public abstract class BlockOnStateReplacedAnchorMixin {
     @Inject(method = "onStateReplaced", at = @At("HEAD"))
     private void slabbed$clearSlabAnchor(BlockState oldState, World world, BlockPos pos,
                                          BlockState newState, boolean moved, CallbackInfo ci) {
-        // Same block, new state: the block stayed, so its placed height and markers stay with it.
-        if (oldState.isOf(newState.getBlock())) {
-            return;
-        }
-        // Different block, SAME shape: the placed thing is still there, transformed in place — a
-        // compat grass slab becoming its dirt slab when covered. Its height stays (LAW.md corollary,
-        // maintainer ruling 2026-09-13; live, the converted slab popped to grid height). A change of
-        // shape (slab to carpet, block to slab) is a different thing and still clears.
-        if (slabbed$sameShape(oldState, newState)) {
-            return;
-        }
+        if (com.slabbed.compat.CompatHooks.keepsPlacementHeight(oldState, newState)) return;
         SlabAnchorAttachment.removeAnchor(world, pos);
     }
 
-    /** Context-free shapes, so the lowered-shape mixins cannot feed shifted geometry back in. */
-    @Unique
-    private static boolean slabbed$sameShape(BlockState oldState, BlockState newState) {
-        if (oldState.isAir() || newState.isAir() || !newState.getFluidState().isEmpty()) {
-            return false;
-        }
-        VoxelShape before = oldState.getCollisionShape(EmptyBlockView.INSTANCE, BlockPos.ORIGIN);
-        VoxelShape after = newState.getCollisionShape(EmptyBlockView.INSTANCE, BlockPos.ORIGIN);
-        if (before.isEmpty() || after.isEmpty()) {
-            before = oldState.getOutlineShape(EmptyBlockView.INSTANCE, BlockPos.ORIGIN);
-            after = newState.getOutlineShape(EmptyBlockView.INSTANCE, BlockPos.ORIGIN);
-            if (before.isEmpty() || after.isEmpty()) {
-                return false;
-            }
-        }
-        return !VoxelShapes.matchesAnywhere(before, after, BooleanBiFunction.NOT_SAME);
-    }
 }
