@@ -386,9 +386,11 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
             require(SlabSupport.getYOffset(world, placed, world.getBlockState(placed)) == -(step / 2) * .5,
                     "Repeated native stack lost its server height at " + step);
             double drawnTop = placed.getY() + world.getBlockState(placed).getOutlineShape(world, placed).getMax(Direction.Axis.Y);
-            player.setPosition(placed.getX() + .5, drawnTop + .4, placed.getZ() + .5);
+            double expectedTop=TOWER_BASE.getY()+1+(step/2)*1.5+((step&1)==1 ? .5 : 0);
+            require(Math.abs(drawnTop-expectedTop)<1.0e-6,"Stack top differs from independent body-height sum at "+step);
+            player.setPosition(placed.getX() + .5, expectedTop + .4, placed.getZ() + .5);
             player.move(net.minecraft.entity.MovementType.SELF, new Vec3d(0, -.8, 0));
-            require(Math.abs(player.getY() - drawnTop) < 1.0e-6,
+            require(Math.abs(player.getY() - expectedTop) < 1.0e-6,
                     "Full-pack player stood on a ghost surface at stack step " + step);
         }
     }
@@ -435,7 +437,13 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
             world.setBlockState(ground, Blocks.STONE.getDefaultState(), Block.NOTIFY_ALL);
             world.setBlockState(ground.up(), Blocks.STONE.getDefaultState(), Block.NOTIFY_ALL);
             world.setBlockState(upper, state, Block.NOTIFY_ALL);
-            if (old) com.slabbed.dev.LegacyPlacementFixtures.freezeLoweredOnPlace(world, upper, state);
+            if (old) {
+                var chunk=world.getWorldChunk(upper);
+                var markers=chunk.getAttached(SlabAnchorAttachment.FROZEN_FLAT_TYPE);
+                var copy=markers==null ? new it.unimi.dsi.fastutil.longs.LongOpenHashSet()
+                        : new it.unimi.dsi.fastutil.longs.LongOpenHashSet(markers);
+                copy.add(upper.asLong());chunk.setAttached(SlabAnchorAttachment.FROZEN_FLAT_TYPE,copy);
+            }
             world.breakBlock(ground.up(), false);
             player.setPosition(ground.getX() + 3.5, 198, ground.getZ() + .5);
             place(world, player, terrainSlab().asItem(), ground);
@@ -456,6 +464,9 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
             checkMeshedFace(upper, Direction.DOWN, 0, false);
             var face = MESH_FACES.get(upper.asLong() + ":" + Direction.DOWN);
             require(face.visible, "Overhead block lost its exposed underside");
+            checkMeshedFace(upper,Direction.UP,1.0,false);
+            var top=MESH_FACES.get(upper.asLong()+":"+Direction.UP);
+            require(top.visible,"replacementKeepsOverheadTopFace: unchanged overhead block lost its native top face");
             Vec3d start = new Vec3d(upper.getX() + .5, upper.getY() - .25, upper.getZ() - 1);
             var hit = com.slabbed.util.SlabbedOffsetRaycast.raycast(client.world, start,
                     start.add(0, 0, 1.75), net.minecraft.block.ShapeContext.of(client.player));

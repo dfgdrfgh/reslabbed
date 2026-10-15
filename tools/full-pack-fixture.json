@@ -683,5 +683,11 @@
     "config/asyncparticles/asyncparticles-mixin.properties": "create$contraptionNoParticleCollision=rbasamoyai.createbigcannons.cannon_control.contraption.PitchOrientedContraptionEntity,rbasamoyai.createbigcannons.cannon_control.contraption.AbstractMountedCannonContraption\nparticle$lockProvider=yesman.epicfight.client.particle.TrailParticle,yesman.epicfight.client.particle.AbstractTrailParticle,com.lowdragmc.photon.client.gameobject.FXObject\nparticle$lockRequired=yesman.epicfight.client.particle.TrailParticle,yesman.epicfight.client.particle.AbstractTrailParticle,com.lowdragmc.photon.client.gameobject.FXObject\nparticle$noCulling=com.lowdragmc.photon.client.gameobject.FXObject,net.bettercombat.client.particle.SlashParticle\nparticle$noLightCache=dev.shadowsoffire.gateways.client.GatewayParticle,com.chailotl.particular.particles.FireflyParticle,com.lowdragmc.photon.client.gameobject.FXObject,net.diebuddies.minecraft.weather.WeatherParticle\nreplaceRandom=appeng.client.render.effects.LightningArcFX,appeng.client.render.effects.LightningFX,de.cheaterpaul.fallingleaves.util.LeafUtil\nsafeBlockEntityMap=false\nsafeClassInstanceMultiMap=false\nsafeLegacyRandomSource=true\nversion=3\n",
     "config/lithostitched.json": "{\n  \n  \"breaks_seed_parity\": true,\n  \"enable_debug_suite\": false,\n  \"log_debug_messages\": false\n}\n",
     "config/fabric/indigo-renderer.properties": "always-tesselate-blocks=auto\nambient-occlusion-mode=hybrid\ndebug-compare-lighting=auto\nfix-exterior-vertex-lighting=auto\nfix-luminous-block-ambient-occlusion=auto\nfix-mean-light-calculation=auto\nfix-smooth-lighting-offset=auto\n"
+  },
+  "storedCoreBaseline": {
+    "repo": "dfgdrfgh/reslabbed",
+    "artifact": 11996859131,
+    "file": "slabbed-0.7.0-alpha+1.21.1-fabric.jar",
+    "sha256": "74b52986d6f208d6a79f717279fa3322ee6bf067d49cb891541f72946abef7f0"
   }
 }

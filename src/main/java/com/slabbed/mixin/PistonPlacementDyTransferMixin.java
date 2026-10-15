@@ -92,7 +92,10 @@ public abstract class PistonPlacementDyTransferMixin {
                     destinations,
                     modernDestinations);
         }
-        return true;
+        var projected = new LinkedHashMap<>(destinations);
+        var baseFact = SLABBED$BASE_FACTS.get().peek();
+        if (baseFact != null && baseFact.present()) projected.put(pistonPos.toImmutable(), baseFact.rawBits());
+        return SlabAnchorAttachment.canStorePlacementDyMove(world, projected, handler.getMovedBlocks());
     }
 
     @Inject(method = "move", at = @At("RETURN"))

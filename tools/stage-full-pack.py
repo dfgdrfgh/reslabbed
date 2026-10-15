@@ -40,6 +40,16 @@ for entry in fixture['forks']:
     destination.write_bytes(data)
     print('PACK_FORK_SHA256_MATCH',entry['id'],entry['version'],flush=True)
 
+baseline_entry=fixture.get('storedCoreBaseline')
+if baseline_entry:
+    archive_path=public_artifact(baseline_entry['repo'],baseline_entry['artifact'])
+    with zipfile.ZipFile(archive_path) as archive:
+        matches=[archive.read(name) for name in archive.namelist() if name.endswith('.jar')
+                 and hashlib.sha256(archive.read(name)).hexdigest()==baseline_entry['sha256']]
+    assert len(matches)==1,'Stored-core baseline artifact hash mismatch'
+    (forks/baseline_entry['file']).write_bytes(matches[0])
+    print('STORED_CORE_BASELINE_SHA256_MATCH',baseline_entry['file'],flush=True)
+
 def download(entry):
     target=out/entry['path'];target.parent.mkdir(parents=True,exist_ok=True)
     error=None

@@ -467,6 +467,36 @@ public final class SlabAnchorAttachment {
         return new PreparedHeightWrite(world, originals, copies, writes);
     }
 
+    /** Pure capacity check for a move, including the slots its departing bodies free (LAW.md). */
+    public static boolean canStorePlacementDyMove(World world, Map<BlockPos, Long> destinations,
+                                                 Iterable<BlockPos> departing) {
+        if (world == null || world.isClient() || destinations == null || departing == null) return false;
+        IdentityHashMap<WorldChunk, Long2IntOpenHashMap> projected = new IdentityHashMap<>();
+        for (BlockPos pos : departing) {
+            if (pos == null) return false;
+            WorldChunk chunk = loadedAttachmentChunk(world, pos);
+            if (chunk == null) return false;
+            projected.computeIfAbsent(chunk, key -> {
+                var before = key.getAttached(PLACEMENT_DY_TYPE);
+                return before == null ? newDyMap() : new PlacementHeightMap(before);
+            }).remove(pos.asLong());
+        }
+        for (var entry : destinations.entrySet()) {
+            if (entry.getKey() == null || entry.getValue() == null) return false;
+            int dy = quantiseDy(Double.longBitsToDouble(entry.getValue()));
+            if (dy == UNREPRESENTABLE) return false;
+            WorldChunk chunk = loadedAttachmentChunk(world, entry.getKey());
+            if (chunk == null) return false;
+            projected.computeIfAbsent(chunk, key -> {
+                var before = key.getAttached(PLACEMENT_DY_TYPE);
+                return before == null ? newDyMap() : new PlacementHeightMap(before);
+            }).put(entry.getKey().asLong(), dy);
+        }
+        for (var map : projected.values())
+            if (ChunkPositionDyMapPacketCodec.encodedByteLength(map) > SYNC_SAFE_ENCODED_BYTES) return false;
+        return true;
+    }
+
     /** One-use publication plan; stale snapshots refuse the entire group before any write. */
     public static final class PreparedHeightWrite {
         private final World world;

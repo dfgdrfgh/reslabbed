@@ -74,7 +74,8 @@ public final class KeepOnlyReopenProbe implements ClientModInitializer {
     private record Control(String name, BlockPos pos, double expected) {
     }
 
-    private record ServerObservation(String state, double dy, boolean fact, double factValue, boolean modern) {
+    private record ServerObservation(String state, double dy, boolean fact, double factValue, boolean modern,
+                                     boolean anchor, boolean compound, double collisionMin) {
     }
 
     private enum Phase { BOOTSTRAP, AUTHOR, SETTLE, OBSERVE, PLACE, OBSERVE_PLACED, SAVE, FINISH }
@@ -83,6 +84,8 @@ public final class KeepOnlyReopenProbe implements ClientModInitializer {
     private static Phase phase = Phase.BOOTSTRAP;
     private static int ticks, phaseTick, controlIndex, greenRows, redRows;
     private static String mode = "";
+    private static String corePhase = "";
+    private static boolean packChecked;
     private static Path evidenceDir, observations, controlsFile;
     private static String worldName;
     private static final List<Control> CONTROLS = new ArrayList<>();
@@ -98,6 +101,9 @@ public final class KeepOnlyReopenProbe implements ClientModInitializer {
         if (initialized) return;
         initialized = true;
         mode = System.getProperty(MODE_PROPERTY, "").trim();
+        corePhase = System.getProperty("slabbed.coreProbePhase", "").trim();
+        if (corePhase.equals("baseline-save")) mode = "author";
+        if (corePhase.equals("candidate-reopen")) mode = "reopen";
         ClientTickEvents.END_CLIENT_TICK.register(KeepOnlyReopenProbe::tick);
     }
 
@@ -168,12 +174,34 @@ public final class KeepOnlyReopenProbe implements ClientModInitializer {
             return;
         }
         if (ready(client)) {
+            if (!corePhase.isEmpty() && !packChecked) {
+                try {
+                    var manifest=com.google.gson.JsonParser.parseString(Files.readString(Path.of(
+                            System.getProperty("slabbed.packManifest")))).getAsJsonArray();
+                    for (var row:manifest) {
+                        var item=row.getAsJsonObject();
+                        var mod=net.fabricmc.loader.api.FabricLoader.getInstance().getModContainer(item.get("id").getAsString()).orElseThrow();
+                        if (!mod.getMetadata().getVersion().getFriendlyString().equals(item.get("version").getAsString()))
+                            throw new IllegalStateException("Saved-world pack version mismatch: "+item.get("id"));
+                    }
+                    System.out.println("CORE_SAVED_WORLD_FULL_PACK_VERIFIED count="+manifest.size());
+                    packChecked=true;
+                } catch (IOException error) { throw new IllegalStateException(error); }
+            }
             client.options.pauseOnLostFocus = false;
             if (client.currentScreen != null) client.setScreen(null);
             if ("author".equals(mode)) {
                 phase = Phase.AUTHOR;
             } else {
                 loadControls();
+                if (corePhase.equals("candidate-reopen")) {
+                    client.getServer().execute(() -> {
+                        ServerWorld world=client.getServer().getWorld(client.world.getRegistryKey());
+                        for (Control control:CONTROLS) if (control.name().startsWith("natural_"))
+                            world.setBlockState(control.pos().down(),Blocks.STONE_SLAB.getDefaultState()
+                                    .with(SlabBlock.TYPE,SlabType.BOTTOM),Block.NOTIFY_ALL);
+                    });
+                }
                 phase = Phase.SETTLE;
                 teleport(client);
             }
@@ -201,13 +229,21 @@ public final class KeepOnlyReopenProbe implements ClientModInitializer {
             teleport(client);
             return;
         }
-        BlockPos origin = client.player.getBlockPos().add(8, 2, 8).toImmutable();
+        BlockPos origin = corePhase.isEmpty() ? client.player.getBlockPos().add(8, 2, 8).toImmutable()
+                : new BlockPos(8,220,8);
         CONTROLS.clear();
         CONTROLS.add(new Control("legacy_half", origin, -0.5d));
         CONTROLS.add(new Control("legacy_compound", origin.add(3, 0, 0), -1.0d));
         CONTROLS.add(new Control("latent_fact", origin.add(6, 0, 0), 0.0d));
         CONTROLS.add(new Control("flat", origin.add(9, 0, 0), 0.0d));
         CONTROLS.add(new Control("modern_half", origin.add(12, 0, 0), -0.5d));
+        if (!corePhase.isEmpty()) {
+            CONTROLS.add(new Control("explicit_zero",origin.add(0,0,4),0.0d));
+            CONTROLS.add(new Control("explicit_sixteenth",origin.add(3,0,4),-0.4375d));
+            CONTROLS.add(new Control("explicit_deep",origin.add(6,0,4),-8.5d));
+            CONTROLS.add(new Control("natural_glass",origin.add(9,0,4),0.0d));
+            CONTROLS.add(new Control("natural_stone",origin.add(12,0,4),0.0d));
+        }
         viewFeet = origin.add(6, 1, -6);
         viewYaw = 0.0f;
         viewPitch = 25.0f;
@@ -257,7 +293,17 @@ public final class KeepOnlyReopenProbe implements ClientModInitializer {
             // The modern cell carries exactly what an accepted item placement writes: fact + provenance.
             SlabAnchorAttachment.writePlacementDyBatch(world, Map.of(modern, Double.doubleToRawLongBits(-0.5d)));
             SlabAnchorAttachment.markPostPolicyPlacements(world, List.of(modern));
-            for (Control control : CONTROLS) world.getChunkManager().markForUpdate(control.pos());
+            for (Control control : CONTROLS) {
+                if (control.name().startsWith("explicit_")) {
+                    world.setBlockState(control.pos(),Blocks.STONE.getDefaultState(),Block.NOTIFY_LISTENERS);
+                    SlabAnchorAttachment.writePlacementDyBatch(world,Map.of(control.pos(),Double.doubleToRawLongBits(control.expected())));
+                    SlabAnchorAttachment.markPostPolicyPlacements(world,List.of(control.pos()));
+                } else if (control.name().startsWith("natural_")) {
+                    world.setBlockState(control.pos(),control.name().equals("natural_glass")
+                            ? Blocks.GLASS.getDefaultState():Blocks.STONE.getDefaultState(),Block.NOTIFY_LISTENERS);
+                }
+                world.getChunkManager().markForUpdate(control.pos());
+            }
             authored = true;
         });
         try {
@@ -288,7 +334,15 @@ public final class KeepOnlyReopenProbe implements ClientModInitializer {
                     viewYaw = Float.parseFloat(angles[0]);
                     viewPitch = Float.parseFloat(angles[1]);
                 } else {
-                    CONTROLS.add(new Control(parts[0], pos, Double.parseDouble(parts[4])));
+                    double expected=Double.parseDouble(parts[4]);
+                    if (corePhase.equals("candidate-reopen") && (parts[0].startsWith("legacy_") || parts[0].equals("latent_fact"))) {
+                        double changed=parts[0].equals("latent_fact") ? -2.0d : 0.0d;
+                        System.out.println("CORE_SAVED_WORLD_CONTRACT_CHANGE name="+parts[0]+" baseline="+expected+" candidate="+changed);
+                        Files.writeString(controlsFile.resolveSibling("stored-core-legacy-unresolved.txt"),
+                                "Marker-only geometry and previously inactive facts require explicit migration; universal drop-in compatibility is not proven.\n");
+                        expected=changed;
+                    }
+                    CONTROLS.add(new Control(parts[0], pos, expected));
                 }
             }
         } catch (IOException exception) {
@@ -341,7 +395,9 @@ public final class KeepOnlyReopenProbe implements ClientModInitializer {
                 var fact = SlabAnchorAttachment.rawPlacementDyFact(world, pos);
                 SERVER.put(name, new ServerObservation(state.getBlock().toString(),
                         SlabSupport.getYOffset(world, pos, state), fact.present(), fact.valueOrNaN(),
-                        SlabAnchorAttachment.isModernPlacement(world, pos)));
+                        SlabAnchorAttachment.isModernPlacement(world, pos),
+                        SlabAnchorAttachment.isAnchored(world,pos),SlabAnchorAttachment.isCompoundFullBlockAnchor(world,pos),
+                        state.getCollisionShape(world,pos).getMin(Direction.Axis.Y)));
             }
             serverPending = false;
         });
@@ -380,7 +436,24 @@ public final class KeepOnlyReopenProbe implements ClientModInitializer {
         boolean serverOk = same(server.dy(), expected);
         boolean clientOk = same(clientDy, expected);
         boolean meshOk = !mesh.seen() || same(mesh.dy(), expected);
-        boolean green = serverOk && clientOk && meshOk && mesh.seen();
+        boolean savedDataOk=true;
+        if (!corePhase.isEmpty()) {
+            if (name.startsWith("explicit_") || name.equals("modern_half"))
+                savedDataOk=server.fact() && same(server.factValue(),expected)
+                        && clientFact.present() && same(clientFact.valueOrNaN(),expected);
+            if (name.equals("legacy_half")) savedDataOk=server.anchor() && !server.fact()
+                    && SlabAnchorAttachment.isAnchored(client.world,pos);
+            if (name.equals("legacy_compound")) savedDataOk=server.anchor() && server.compound() && !server.fact()
+                    && SlabAnchorAttachment.isCompoundFullBlockAnchor(client.world,pos);
+            if (name.equals("latent_fact")) savedDataOk=server.fact() && same(server.factValue(),-2.0d);
+            if (name.startsWith("natural_")) savedDataOk=!server.fact() && !clientFact.present();
+            if (!(corePhase.equals("baseline-save") && name.startsWith("legacy_")))
+                savedDataOk &= same(server.collisionMin(),expected)
+                        && same(clientState.getCollisionShape(client.world,pos).getMin(Direction.Axis.Y),expected);
+            savedDataOk &= mesh.seen() && same(mesh.minAfterY()-mesh.minBeforeY(),expected);
+            System.out.println("CORE_SAVED_WORLD_ROW name="+name+" phase="+corePhase+" dy="+server.dy()+" dataAndGeometry="+savedDataOk);
+        }
+        boolean green = serverOk && clientOk && meshOk && mesh.seen() && savedDataOk;
         if (green) greenRows++; else redRows++;
         append(kind + "\t" + mode + "\t" + name + "\t" + pos.toShortString() + "\t" + expected
                 + "\t" + server.state() + "\t" + server.dy()
@@ -498,7 +571,7 @@ public final class KeepOnlyReopenProbe implements ClientModInitializer {
             server.execute(() -> {
                 server.saveAll(true, true, true);
                 append("SAVE\t" + mode + "\t" + worldName + "\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-\tsaveAll_done");
-                SERVER.put("saved", new ServerObservation("saved", 0.0d, false, Double.NaN, false));
+                SERVER.put("saved", new ServerObservation("saved", 0.0d, false, Double.NaN, false,false,false,0.0d));
             });
             phaseTick = ticks;
             return;
@@ -536,6 +609,8 @@ public final class KeepOnlyReopenProbe implements ClientModInitializer {
                 + " rows=" + (greenRows + redRows) + " green=" + greenRows + " red=" + redRows
                 + " placement=" + placementResult + " world=" + worldName + " evidenceDir=" + evidenceDir;
         System.out.println(summary);
+        if (!corePhase.isEmpty()) System.out.println("CORE_SAVED_WORLD_SUMMARY phase="+corePhase+" verdict="+verdict
+                +" universalDropIn="+!corePhase.equals("candidate-reopen"));
         append("SUMMARY\t" + mode + "\t" + verdict + "\t-\t-\t-\t-\t-\t-\t-\t-\t-\t-\tgreen=" + greenRows + " red=" + redRows);
         if (client != null) client.scheduleStop();
     }

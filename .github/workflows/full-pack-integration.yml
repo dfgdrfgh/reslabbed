@@ -2,7 +2,7 @@ name: Full pack slab integration
 
 on:
   push:
-    branches: ["port/fabric-1.21.1-core-overhaul"]
+    branches: ["port/fabric-1.21.1-core-overhaul", "port/fabric-1.21.1-stored-core-cleanup"]
   workflow_dispatch:
 
 permissions:
@@ -13,7 +13,7 @@ jobs:
   verify:
     name: Updated pack control and fixed clients
     runs-on: ubuntu-22.04
-    timeout-minutes: 30
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
         with:
@@ -44,10 +44,18 @@ jobs:
         env:
           LIBGL_ALWAYS_SOFTWARE: '1'
         run: timeout 8m xvfb-run -a python3 tools/full-pack-client.py
+      - name: Save a world under the previous 0.7 build
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: timeout 8m xvfb-run -a python3 tools/full-pack-client.py --phase baseline-save --world-dir build/stored-core-world
+      - name: Reopen a copy under the stored-core candidate
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: timeout 8m xvfb-run -a python3 tools/full-pack-client.py --phase candidate-reopen --world-dir build/stored-core-world
       - name: Upload the tested Slabbed JAR
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         with:
-          name: slabbed-mc1.21.1-fabric
-          path: build/libs/slabbed-0.7.0-alpha+1.21.1-fabric.jar
+          name: slabbed-mc1.21.1-fabric-stored-core-candidate
+          path: build/libs/slabbed-0.8.0-alpha+1.21.1-fabric.jar
           if-no-files-found: error
           retention-days: 30
