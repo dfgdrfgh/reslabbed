@@ -146,6 +146,7 @@ before this line's behaviour work closes — see the note beneath the table.
 | `com/slabbed/mixin/SlabSupportStateMixin` | Slab support state. |
 | `com/slabbed/mixin/TerrainSlabsVegetationOffsetMixin` | Prevents Terrain Slabs and Slabbed from translating vegetation vertically twice while retaining horizontal model jitter. |
 | `com/slabbed/mixin/BlockCollisionDepthWindowMixin` | Discovers stored collision owners through the supported depth. |
+| `com/slabbed/mixin/LithiumStoredCollisionMixin` | Optional Lithium collision adapter. Uses the offset-aware native collision iterator in loaded chunk columns with displaced stored bodies; keeps the ordinary optimized path elsewhere. It reads existing heights without authoring them (LAW.md). |
 | `com/slabbed/mixin/BoatItemOffsetRaycastMixin` | Lets boat item use target stored visible block surfaces while preserving nearer vanilla block and fluid hits. |
 | `com/slabbed/mixin/ItemFramePhysicalOffsetMixin` | Saves and synchronizes frame height so the physical body and rendered position agree. |
 | `com/slabbed/mixin/PaintingRememberedSeatMixin` | A painting remembers the drawn face it was hung on: seat minted once, synced, saved, physical (maintainer ruling, 2026-09-13). |

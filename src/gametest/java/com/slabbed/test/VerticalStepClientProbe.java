@@ -143,7 +143,11 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
         if (client.currentScreen != null) client.setScreen(null);
         client.player.getAbilities().flying = true;
         client.player.setVelocity(Vec3d.ZERO);
-        client.player.refreshPositionAndAngles(8.5, 201.2 - client.player.getStandingEyeHeight(), 3.0, 0, 8);
+        if (phase == 9) {
+            client.player.refreshPositionAndAngles(18.5, 236.0 - client.player.getStandingEyeHeight(), 6.0, 0, 20);
+        } else {
+            client.player.refreshPositionAndAngles(8.5, 201.2 - client.player.getStandingEyeHeight(), 3.0, 0, 8);
+        }
         client.player.setStackInHand(Hand.MAIN_HAND, ItemStack.EMPTY);
         if (phase == 0) {
             phase = 1; started = ticks;
@@ -210,9 +214,20 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
         if (!prepared || ticks - started < 100) return;
         if (phase == 1) { phase = 2; started = ticks; return; }
         if (ticks - started < 80) return;
+        if (phase == 9) {
+            checkRepeatedStack(client, true);
+            try (var screenshot = ScreenshotRecorder.takeScreenshot(client.getFramebuffer())) {
+                screenshot.writeTo(client.runDirectory.toPath().resolve("vertical-step.png"));
+            }
+            Files.writeString(Path.of("vertical-step-pass.txt"), "Native geometry and repeated stacking passed\n");
+            System.out.println("VERTICAL_STEP_CLIENT_PASS renderer=" + RendererAccess.INSTANCE.getRenderer().getClass().getName());
+            phase = 99;
+            client.scheduleStop();
+            return;
+        }
         if (phase == 2) {
             checkOverheadControls(client);
-            checkRepeatedStack(client);
+            checkRepeatedStack(client, false);
             checkMeshedFace(GROUND.up(2), Direction.UP, 0.5, true);
             BlockPos natural = GROUND.west(4);
             double lowerDy = SlabSupport.getYOffset(client.world, natural.up(2), client.world.getBlockState(natural.up(2)));
@@ -303,13 +318,10 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
         check(client, renderer, GROUND.up(3), Direction.DOWN, true, 0.0);
         check(client, renderer, GROUND.east(4).up(2), Direction.UP, false, -0.5);
         check(client, renderer, GROUND.east(4).up(3), Direction.DOWN, false, -0.5);
-        try (var screenshot = ScreenshotRecorder.takeScreenshot(client.getFramebuffer())) {
-            screenshot.writeTo(client.runDirectory.toPath().resolve("vertical-step.png"));
-        }
-        Files.writeString(Path.of("vertical-step-pass.txt"), "Native vertical faces and shared-face controls passed: " + name + "\n");
-        System.out.println("VERTICAL_STEP_CLIENT_PASS renderer=" + name);
-        phase = 99;
-        client.scheduleStop();
+        phase = 9;
+        started = ticks;
+        MESH_FACES.clear();
+        client.worldRenderer.reload();
     }
 
     private static final BlockPos TOWER_BASE = new BlockPos(18, 198, 12);
@@ -328,10 +340,15 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
             BlockPos placed = TOWER_BASE.up(step);
             require(SlabSupport.getYOffset(world, placed, world.getBlockState(placed)) == -(step / 2) * .5,
                     "Repeated native stack lost its server height at " + step);
+            double drawnTop = placed.getY() + world.getBlockState(placed).getOutlineShape(world, placed).getMax(Direction.Axis.Y);
+            player.setPosition(placed.getX() + .5, drawnTop + .4, placed.getZ() + .5);
+            player.move(net.minecraft.entity.MovementType.SELF, new Vec3d(0, -.8, 0));
+            require(Math.abs(player.getY() - drawnTop) < 1.0e-6,
+                    "Full-pack player stood on a ghost surface at stack step " + step);
         }
     }
 
-    private static void checkRepeatedStack(MinecraftClient client) {
+    private static void checkRepeatedStack(MinecraftClient client, boolean mesh) {
         for (int step = 1; step <= 48; step++) {
             BlockPos owner = TOWER_BASE.up(step);
             BlockState state = client.world.getBlockState(owner);
@@ -349,9 +366,11 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
                     "Repeated stack ray selected a ghost cell at " + step);
         }
         BlockPos top = TOWER_BASE.up(48);
+        if (mesh) {
         checkMeshedFace(top, Direction.UP, -11.0d, false);
         require(MESH_FACES.get(top.asLong() + ":" + Direction.UP).visible,
                 "Repeated stack top disappeared from the real mesh");
+        }
         require(client.world.isSpaceEmpty(null, new net.minecraft.util.math.Box(top).contract(.2)),
                 "Repeated stack left a ghost collision in its old logical cell");
         System.out.println("REPEATED_STACK_CLIENT_COLLISION_TARGET_MESH_PASS pieces=48");

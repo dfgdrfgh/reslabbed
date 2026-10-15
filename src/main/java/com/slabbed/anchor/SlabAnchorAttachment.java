@@ -368,6 +368,25 @@ public final class SlabAnchorAttachment {
         return radius;
     }
 
+    /** The optimized collision path is valid only where no stored body has left its cell. */
+    public static boolean hasStoredDisplacement(World world, Box bounds) {
+        int minX = ((int) Math.floor(bounds.minX) - 1) >> 4;
+        int minZ = ((int) Math.floor(bounds.minZ) - 1) >> 4;
+        int maxX = ((int) Math.ceil(bounds.maxX)) >> 4;
+        int maxZ = ((int) Math.ceil(bounds.maxZ)) >> 4;
+        for (int x = minX; x <= maxX; x++) {
+            for (int z = minZ; z <= maxZ; z++) {
+                WorldChunk chunk = loadedAttachmentChunk(world, new BlockPos(x << 4, world.getBottomY(), z << 4));
+                Long2IntOpenHashMap map = chunk == null ? null : chunk.getAttached(PLACEMENT_DY_TYPE);
+                if (map != null && !map.isEmpty()
+                        && (map instanceof PlacementDyMap indexed ? indexed.ownerRadius() : radiusOf(map)) > 1) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     /**
      * Disk form: packed positions beside their quantised heights, both in ascending position order
      * so a save is stable.

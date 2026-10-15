@@ -37,7 +37,6 @@ public final class PlacementOccupancy {
         if (body.isEmpty()) return false;
 
         Box bounds = body.getBoundingBox();
-        int depth = (int)Math.ceil(-SlabbedOffsetRaycast.DEEPEST_TARGETABLE_DY);
         // The window follows the proposed body, not its grid cell. Tall shapes and lowered owners
         // can originate outside that cell; every read is restricted to already loaded chunks.
         BlockPos.Mutable owner = new BlockPos.Mutable();

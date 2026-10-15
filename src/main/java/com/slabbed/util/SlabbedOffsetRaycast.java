@@ -33,7 +33,7 @@ import net.minecraft.world.BlockView;
  * marched cell it tests every vertical owner within the supported depth window
  * that carries a non-zero visual offset.
  *
- * <p>The owner window includes all sixteenth-grid depths through {@code -3.0}.
+ * <p>The owner window derives from the saved heights in each loaded chunk.
  * It searches symmetrically to preserve raised and cross-cell attachment shapes.
  * The window controls owner discovery only; it never clamps a stored height (LAW.md).
  *
@@ -48,7 +48,6 @@ import net.minecraft.world.BlockView;
 public final class SlabbedOffsetRaycast {
 
     public static final double DEEPEST_TARGETABLE_DY = -3.0d;
-    private static final int WINDOW_RADIUS = (int) Math.ceil(-DEEPEST_TARGETABLE_DY);
 
     private SlabbedOffsetRaycast() {
     }

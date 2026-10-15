@@ -39,7 +39,8 @@
     "BlockOnStateReplacedAnchorMixin",
     "FencePaneSlabConnectionMixin",
     "WallSlabConnectionMixin",
-    "ScaffoldingLoweredStandMixin"
+    "ScaffoldingLoweredStandMixin",
+    "LithiumStoredCollisionMixin"
   ],
   "client": [],
   "injectors": {
