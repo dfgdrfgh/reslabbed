@@ -424,7 +424,16 @@ public final class ExtendedDepthPlacementTest {
         if (placementCase.item() == Items.WHEAT_SEEDS) {
             // Crop placement has a vanilla light-or-sky requirement in addition to farmland.
             // Keep a deterministic light source outside the target, support, ray, and mutation cells.
-            world.setBlockState(owner.add(2, 1, 0), Blocks.GLOWSTONE.getDefaultState(), Block.NOTIFY_ALL);
+            BlockPos lamp = owner.add(2, 1, 0);
+            world.setBlockState(lamp, Blocks.GLOWSTONE.getDefaultState(), Block.NOTIFY_ALL);
+            var lighting = world.getChunkManager().getLightingProvider();
+            var ready = java.util.concurrent.CompletableFuture.allOf(
+                    lighting.enqueue(owner.getX() >> 4, owner.getZ() >> 4),
+                    lighting.enqueue(lamp.getX() >> 4, lamp.getZ() >> 4));
+            lighting.tick();
+            ready.orTimeout(10, java.util.concurrent.TimeUnit.SECONDS).join();
+            require(world.getLightLevel(owner.up()) >= 8 || world.isSkyVisible(owner.up()),
+                    "Crop fixture lighting was not ready");
         }
     }
 

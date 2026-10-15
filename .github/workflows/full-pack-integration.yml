@@ -28,14 +28,14 @@ jobs:
       - uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92
         with:
           cache-provider: basic
-      - name: Build and verify the fixed mod and client probe
-        run: |
-          rm -rf build/run/gameTest
-          bash gradlew --no-daemon --console=plain build runGameTest writeVerticalStepRuntime
       - name: Stage the updated pack
         env:
           GH_TOKEN: ${{ github.token }}
         run: python3 tools/stage-full-pack.py
+      - name: Build and verify the fixed mod and client probe
+        run: |
+          rm -rf build/run/gameTest
+          bash gradlew --no-daemon --console=plain build runGameTest writeVerticalStepRuntime
       - name: Reproduce the old overhead-block behavior
         env:
           LIBGL_ALWAYS_SOFTWARE: '1'
