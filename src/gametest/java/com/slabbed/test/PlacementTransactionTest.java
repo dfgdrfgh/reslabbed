@@ -1,6 +1,5 @@
 package com.slabbed.test;
 
-import com.slabbed.anchor.ChunkPositionDyMapPacketCodec;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
 import net.minecraft.block.Block;
@@ -19,6 +18,29 @@ import java.util.Map;
 /** Refused storage must refuse the real placement before block or item mutation (LAW.md). */
 public final class PlacementTransactionTest {
     @GameTest(templateName = "fabric-gametest-api-v1:empty")
+    public void directAimlessPlacementNeverInfersNearbySlabHeight(TestContext h) {
+        var world = h.getWorld();
+        BlockPos support = h.getAbsolutePos(new BlockPos(3, 3, 3));
+        BlockPos target = support.up();
+        world.setBlockState(support, Blocks.STONE_SLAB.getDefaultState()
+                .with(SlabBlock.TYPE, SlabType.BOTTOM), Block.NOTIFY_ALL);
+        world.setBlockState(target, Blocks.AIR.getDefaultState(), Block.NOTIFY_ALL);
+        var stack = new ItemStack(Items.STONE);
+        var hit = new net.minecraft.util.hit.BlockHitResult(
+                new net.minecraft.util.math.Vec3d(support.getX() + .5d, support.getY() + .5d,
+                        support.getZ() + .5d), Direction.UP, support, false);
+        var usage = new net.minecraft.item.ItemUsageContext(world, null, net.minecraft.util.Hand.MAIN_HAND,
+                stack, hit) {};
+        var result = ((net.minecraft.item.BlockItem) Items.STONE).place(
+                new net.minecraft.item.ItemPlacementContext(usage));
+        var fact = SlabAnchorAttachment.rawPlacementDyFact(world, target);
+        h.assertTrue(result.isAccepted() && fact.present() && fact.valueOrNaN() == 0.0d,
+                "AIMLESS_INFERRED_NEIGHBOR: a native creation without captured aim inferred height "
+                        + fact.valueOrNaN());
+        h.complete();
+    }
+
+    @GameTest(templateName = "fabric-gametest-api-v1:empty")
     public void saturatedChunkRefusesRealPlacementWithoutLosingTheItem(TestContext h) {
         var world = h.getWorld();
         BlockPos support = h.getAbsolutePos(new BlockPos(3, 3, 3));
@@ -29,12 +51,14 @@ public final class PlacementTransactionTest {
             world.setBlockState(support, Blocks.STONE_SLAB.getDefaultState()
                     .with(SlabBlock.TYPE, SlabType.BOTTOM), Block.NOTIFY_ALL);
             world.setBlockState(target, Blocks.AIR.getDefaultState(), Block.NOTIFY_ALL);
+            chunk.removeAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE);
             BlockPos section = new BlockPos(chunk.getPos().x << 4,
                     ((target.getY() >> 4) << 4) + 32, chunk.getPos().z << 4);
             int low = 0, high = 4096;
             while (low < high) {
                 int middle = (low + high + 1) >>> 1;
-                if (ChunkPositionDyMapPacketCodec.encodedByteLength(distinct(section, middle)) <= 16_383) low = middle;
+                if (SlabAnchorAttachment.preparePlacementDyBatch(world,
+                        rawHeights(distinct(section, middle))) != null) low = middle;
                 else high = middle - 1;
             }
             var full = distinct(section, low);
@@ -64,5 +88,14 @@ public final class PlacementTransactionTest {
             map.put(section.add(i & 15, i >> 8, (i >> 4) & 15).asLong(), -1024 - i);
         }
         return map;
+    }
+
+    private static Map<BlockPos, Long> rawHeights(Long2IntOpenHashMap heights) {
+        var result = new java.util.LinkedHashMap<BlockPos, Long>();
+        for (var entry : heights.long2IntEntrySet()) {
+            result.put(BlockPos.fromLong(entry.getLongKey()),
+                    Double.doubleToRawLongBits(entry.getIntValue() / 16.0d));
+        }
+        return result;
     }
 }
