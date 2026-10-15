@@ -58,22 +58,6 @@ public final class ExtendedDepthEntityBehaviorTest {
             ChunkTicketType.create("slabbed_gametest_entity_ticking", Long::compareTo);
     private static final AtomicLong ENTITY_TICKET_IDS = new AtomicLong();
 
-
-
-
-
-
-
-    @BeforeBatch(batchId = RAIL_BATCH)
-    public static void enableRailCoordinates(ServerWorld world) {
-        enableFrozenDyForBatch(world);
-    }
-
-    @AfterBatch(batchId = RAIL_BATCH)
-    public static void restoreRailCoordinates(ServerWorld world) {
-        restoreFrozenDyAfterBatch(world);
-    }
-
     @GameTest(templateName = "fabric-gametest-api-v1:empty", batchId = BATCH)
     public void itemFramesPlaceTargetAndSurviveAtRenderedDepth(TestContext context) {
         ServerWorld world = context.getWorld();
