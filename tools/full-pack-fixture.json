@@ -1,463 +1,17 @@
 {
+  "dependencies": {
+    "fabric-loader": "0.19.5",
+    "minecraft": "1.21.1"
+  },
   "downloads": [
-    {
-      "path": "mods/better-end-sky-0.3.0+1.21.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/SgJ1iW80/versions/Zxum0zx8/better-end-sky-0.3.0%2B1.21.jar"
-      ],
-      "hashes": {
-        "sha512": "ad644691a516a168155d2ae5fcae28db6c7e4e21a8c1f28aa6c904d895fc5e50cfe0e3c3ed5aad93f4c8be1d4bc95d62652433acac1fe72dcd591576bfe7e546",
-        "sha1": "c53743d3ffabf65a26ef9f0b9a1d48277bf039c4"
-      }
-    },
-    {
-      "path": "mods/architectury-13.0.11-fabric.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/lhGA9TYQ/versions/Pzc2FP5K/architectury-13.0.11-fabric.jar"
-      ],
-      "hashes": {
-        "sha512": "53314eb34890b11ad3c06c6f3ba2d01ae1ca756235ce4f0574e4b0544952a2ab3c628c81b521653d6487d62c5dc3055e06fed6367a3a499bafad909512f0c716",
-        "sha1": "18200609d4c3571c4237b50884966f6fd82431ea"
-      }
-    },
-    {
-      "path": "mods/geckolib-fabric-1.21.1-4.9.3.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/8BmcQJ2H/versions/tmxM7U4W/geckolib-fabric-1.21.1-4.9.3.jar"
-      ],
-      "hashes": {
-        "sha512": "e26a1c15d10cf5c1234309dbb82fb23d4783b2594b2454b16a9c964fab9e9912be66904b03eb01ebb94dada298d98de18d66f5e3f4173f771579b56e13f7da16",
-        "sha1": "b3a6aff6ffff34d20ffde1faa640bcf17ff4b646"
-      }
-    },
-    {
-      "path": "mods/Ixeris-4.6.8+1.21.1-fabric.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/p8RJPJIC/versions/MySe2ICq/Ixeris-4.6.8%2B1.21.1-fabric.jar"
-      ],
-      "hashes": {
-        "sha1": "c83c96b48e8885dda6e5c3f1a6d7d244740b3b6f",
-        "sha512": "5b284351f91e60741d392be55a704d31d81b387df3f905fd5b62effde136f0c5e2a545b89d0ed4e2367c5c04a743240884930797e16d75068da3dde4a7d978e3"
-      }
-    },
-    {
-      "path": "mods/screenshot-to-clipboard-fabric-1.0.10.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/1KiJRrTg/versions/DHUI24N7/screenshot-to-clipboard-fabric-1.0.10.jar"
-      ],
-      "hashes": {
-        "sha512": "54f3c0fe55145f396a824c780bdaaf59026f855037ffa67c3c4228781685350d308feec5ed5527a7e4eaa1d4f71f6d106d5ac9d1bf7aa79cb74cad0953c60e8f",
-        "sha1": "d8a8af1844ae38ac4f39e4bf5756915e08081375"
-      }
-    },
-    {
-      "path": "resourcepacks/Tweaked Pale Garden.zip",
-      "downloads": [
-        "https://cdn.modrinth.com/data/Rcd8VycJ/versions/mj6ItjFV/Tweaked%20Pale%20Garden.zip"
-      ],
-      "hashes": {
-        "sha512": "8d192a94ee1759656d60ea0e64fc76716c9dfba3cc3e9389abe0693d71dfb7cd21572908562a95d7f0e37649c1a2a448f5969ecd64806a895d9c94d8e66fabb4",
-        "sha1": "9de0d2d11dd8fbe3aaeb95c4aedab8ce8aaa2c7e"
-      }
-    },
-    {
-      "path": "resourcepacks/PixelatedSky_BetterEnd_1.0-1.20.1.zip",
-      "downloads": [
-        "https://cdn.modrinth.com/data/nadYBTPe/versions/lgqeiru5/PixelatedSky_BetterEnd_1.0-1.20.1.zip"
-      ],
-      "hashes": {
-        "sha1": "ed14bd902101954109dc327cc5b57af6cce76885",
-        "sha512": "e6542b4b15f4ddc20e7e448551e9516dea19490104731e38dba877b0de7d829d1e11767c4f274ed7257e36d97ef799a9419ccdcaa4bee8be38e26b9e73ac3897"
-      }
-    },
-    {
-      "path": "mods/quick-pack-fabric-1.5.1+1.21.1.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/pSISfJ4O/versions/QOqEPNtJ/quick-pack-fabric-1.5.1%2B1.21.1.jar"
-      ],
-      "hashes": {
-        "sha512": "8b81ba1160012e82bfa01527d781506011efef62c120085bd4a29604e8263e396d8a967f003ba2c383345562774693a10083fb5d961f690925fadb5f2d6e37d0",
-        "sha1": "df66cd08a0fe90e541b9c05beb9c49c76fd8a4bb"
-      }
-    },
-    {
-      "path": "mods/seamlesssleep-fabric-1.21-2.5.3.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/IyHq05yB/versions/Yl66HsGP/seamlesssleep-fabric-1.21-2.5.3.jar"
-      ],
-      "hashes": {
-        "sha1": "1a36821eb4ea96e30e52edbe095f147fddbe7c28",
-        "sha512": "a1e49ed9e2e9d34565938ca1efa212a49e8384c1fdb592b4801fd2b8387edb6fb53023be58f62b8ff3c9b11483b02e769d59bd0b9f403c4a24c9d6a2314c31a2"
-      }
-    },
-    {
-      "path": "mods/fabric-api-0.116.17+1.21.1.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/P7dR8mSH/versions/Mys3P7lK/fabric-api-0.116.17%2B1.21.1.jar"
-      ],
-      "hashes": {
-        "sha512": "98c478217da19181f0e4df3ea6c2da6bdbda271c7544a4aea048513a49b444f1ff5b71dc0df6303017c48e8ff69b7bb6af6179bdf0d0e09ab3c1ee08411857a8",
-        "sha1": "810b2b0195371a012906241d8b85a32a1d6de53c"
-      }
-    },
     {
       "path": "mods/guiscaler-1.21.1-1.1.3-fabric.jar",
       "downloads": [
         "https://cdn.modrinth.com/data/fM4mOw7u/versions/rmiJoUQl/guiscaler-1.21.1-1.1.3-fabric.jar"
       ],
       "hashes": {
-        "sha1": "d2ee22217ec5227ddc7877af1a5f326464188f5f",
-        "sha512": "454d1fc26b83cbf32450e9aa922b4bde98f290c1c6e595fed8de6b4210184f0053a390dd46dd14cab85b498f1bb80aa544c40092eadeb740c23ba69cb528e136"
-      }
-    },
-    {
-      "path": "mods/centered-crosshair+1.21-1.0.8.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/xUTHly0N/versions/Orfi1Sh5/centered-crosshair%2B1.21-1.0.8.jar"
-      ],
-      "hashes": {
-        "sha1": "09b6464435cd8db59d17da6351329ee30cbb56aa",
-        "sha512": "106f39b42c00b957199450cdf8b176cba70c6e945cd6356e53c27dfa26ab174ae29fc38a7f846de7ad1e30f6267fefd37c351f16f566155070dc2bee96c3e9ca"
-      }
-    },
-    {
-      "path": "mods/hideexperimentalwarning-1.21.1-1.3.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/Rm4OOdHd/versions/tJbfSalt/hideexperimentalwarning-1.21.1-1.3.jar"
-      ],
-      "hashes": {
-        "sha1": "0c18b1e2534fd1dd633ae438a51206651fe46d6d",
-        "sha512": "a45d6aa619670a64594c04ea59efb031aec92a84952106b2375e1667a9b445da4e4a6ed81557c99f9017e338f30b208812b0a0983907c9d094fab1ee661b73fb"
-      }
-    },
-    {
-      "path": "mods/ScalableLux-fabric-0.3.0-alpha.0.7-all.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/Ps1zyz6x/versions/AodeMVa6/ScalableLux-fabric-0.3.0-alpha.0.7-all.jar"
-      ],
-      "hashes": {
-        "sha1": "ff6baa9ab1f2aecf0eba5b72595085551adddc7a",
-        "sha512": "e3c098b5136101575fe852d7d967f1be1c29a26ec687118e01a3efcea9ea1b8367d3b3be63ab7fa5029c12b478dcd764ad362980317e998674ddad4e0573349f"
-      }
-    },
-    {
-      "path": "mods/collective-1.21.1-8.51.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/e0M1UDsY/versions/v7u7yoDu/collective-1.21.1-8.51.jar"
-      ],
-      "hashes": {
-        "sha1": "0e26d4c171737bbc7dbdde350aeda56542b9644d",
-        "sha512": "aef17b6e995a03622167e0d317423fa5c91b87b82cc9d548c994dd3b2df4e6ae648fa39a4cf883aa1ea5280f986c3abd3fd44a43619a1088ac8383c4990b1185"
-      }
-    },
-    {
-      "path": "mods/resourcefulconfig-fabric-1.21-3.0.11.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/M1953qlQ/versions/dQh99ERC/resourcefulconfig-fabric-1.21-3.0.11.jar"
-      ],
-      "hashes": {
-        "sha512": "11189c68626404bef5021bae51bcec1840dba0c3356ca275e9b3439e20ba474fb9ba6f6bf4b4f08b3e9a43c58ac553e2e0d182429bd606948d8211bd49c1d0e7",
-        "sha1": "f6a0df7cf464d1c94458ef075bead82033add9c9"
-      }
-    },
-    {
-      "path": "mods/Controlling-fabric-1.21.1-19.0.5.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/xv94TkTM/versions/hGJDoW2W/Controlling-fabric-1.21.1-19.0.5.jar"
-      ],
-      "hashes": {
-        "sha1": "22d2407311298d0185b606aa1dd03ae33b98dff3",
-        "sha512": "2b172371037bdac4d37332f1fcfbd09c6e083524ba02ea62d980aab937c79cef4eeeea4e05353cbb0428dcb1d31f04ce0f6f148619d15db74587b983c6d04bc8"
-      }
-    },
-    {
-      "path": "mods/BorderlessFullscreen-v2.4.1-mc1.21.1.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/UIexcMP1/versions/a7RyAE2L/BorderlessFullscreen-v2.4.1-mc1.21.1.jar"
-      ],
-      "hashes": {
-        "sha1": "5adf7fa41c4b0e17ea705aae2fa9ab965f982c9a",
-        "sha512": "e0e41bbc246e8ff35165ab29e73fcd48245cd625da9f64a36a1871c412bc3a963ba6320ed427b8170c16a3ec8a9cc1ae6d5f1527d26ce17922ccd2833fa22643"
-      }
-    },
-    {
-      "path": "mods/ferritecore-7.0.3-fabric.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/uXXizFIs/versions/sOzRw3CG/ferritecore-7.0.3-fabric.jar"
-      ],
-      "hashes": {
-        "sha512": "3ad31620fac4ff44327dc7dedbe162b2d978f3f246dc16255a6e400ce9592a0d326fe36a626f3c1bf30a11f813093cbb4dcc107af039cff724d0cdf648541fdf",
-        "sha1": "a8a6a34fcda177da2828cedef44e0e538cf78aad"
-      }
-    },
-    {
-      "path": "mods/fabric-language-kotlin-1.14.2+kotlin.2.4.21.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/Ha28R6CL/versions/SKW1BTL3/fabric-language-kotlin-1.14.2%2Bkotlin.2.4.21.jar"
-      ],
-      "hashes": {
-        "sha1": "f1d4ab6ecd54d9782521333a87eb50724ecb03e0",
-        "sha512": "7fb475c4a7e7bdf8d0aca4b5798a58a354c51443d5b1fbde3e8cf34dfbf7191ef4238b5f07d08ec9490ec180b371624523326c3ad45d4ed2b2be541de9407e5d"
-      }
-    },
-    {
-      "path": "mods/modernfix-fabric-5.25.1+mc1.21.1.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/nmDcB62a/versions/NnNX8LBn/modernfix-fabric-5.25.1%2Bmc1.21.1.jar"
-      ],
-      "hashes": {
-        "sha1": "4ab39e9c736e7204146792c545ec5b29fc0a3872",
-        "sha512": "dc67d6e023e1fcdeaf7837917c477cba212c611dfc2463c6ea021319c644087c79b477e0ea8194e113ddd7332fd5c6d82baa47c291eaac7f4a86252507b4e19f"
-      }
-    },
-    {
-      "path": "mods/CleanF3-0.4.10.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/5lvjfaRs/versions/sONVk6J8/CleanF3-0.4.10.jar"
-      ],
-      "hashes": {
-        "sha512": "a96b2c88c0d630512bd101cb51e850637dfff5d5875da68de7729bbab519217661a37d21e6b77f727a0d950dff90a16ef43b898fc47fcfbb9a19a2fc15c0c06f",
-        "sha1": "e4b2e232713bfceacb7c2c6a3745fe42a40be368"
-      }
-    },
-    {
-      "path": "mods/smooth_steps-fabric-1.1.0.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/5VSZqDK0/versions/YcwNX8B8/smooth_steps-fabric-1.1.0.jar"
-      ],
-      "hashes": {
-        "sha1": "2d1093fded2a0ec7bd79a838a72f9b02e7ec186f",
-        "sha512": "b25061ed7fcb3825aad3e1e82ac319b77709bd8b3417d20d61a73e6c416916e51096cf694a2f8be0bfd3a9fe260b1df5b239b132eb44d48a7e6f90fe112e645a"
-      }
-    },
-    {
-      "path": "mods/cristellib-fabric-1.21.1-3.1.7.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/cl223EMc/versions/K1dyr5gj/cristellib-fabric-1.21.1-3.1.7.jar"
-      ],
-      "hashes": {
-        "sha512": "7a71a8f409d14268461bebb8d7c45a1e15e82f379d92c6f6938eb20cc480cc6bbb763affc1ac582c3733eac2c403788f1cf43edcb4abe345054b0acc5c4c045d",
-        "sha1": "4f966c3efd6ecfe679aac64ba7c6f4d4a648ad5b"
-      }
-    },
-    {
-      "path": "mods/c2me-fabric-mc1.21.1-0.4.0-alpha.0.30.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/VSNURh3q/versions/KxcgERSN/c2me-fabric-mc1.21.1-0.4.0-alpha.0.30.jar"
-      ],
-      "hashes": {
-        "sha512": "6fa50f7d626c0d0f9b877c76a2b176d8d22db17bf0530aa07ddd2a7d2f65a6328eb5326376aa28ae474d6c08610842c975548db4efc253f8386fdaefc60e08db",
-        "sha1": "7ce266eb1d7ff617751ed1f0ebb203662ed641b3"
-      }
-    },
-    {
-      "path": "mods/betterbiomeblend-fabric-1.21.1-1.4.1.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/Rs6c7WyL/versions/eDX2L0GQ/betterbiomeblend-fabric-1.21.1-1.4.1.jar"
-      ],
-      "hashes": {
-        "sha512": "77bea694a5f641f4ecac16b69f5abe86768df02f73381c4f3cdf9793b3b1532bb097d9d280e708d3a22d12a416bb9de5bea094c0f84dc185b2d14bac0bf0c585",
-        "sha1": "c48f566c3b342c7426089a2f29377dafd9335439"
-      }
-    },
-    {
-      "path": "mods/screenshot_viewer-1.3.3-fabric-mc1.21.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/laNoi025/versions/OPtoNGCV/screenshot_viewer-1.3.3-fabric-mc1.21.jar"
-      ],
-      "hashes": {
-        "sha1": "1f986d3f9e15e6962c13d7f9c3c511e11df250c1",
-        "sha512": "4fe76b8c21a3c769c043445cc3bb160ad8f73d1e3364b074c6c3088dcbe388fa74b51da70cfce344536b7e9869892021b40f45f9b364e4954c32f27039a69926"
-      }
-    },
-    {
-      "path": "mods/libjf-3.17.5.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/WKwQAwke/versions/WRFFw4eh/libjf-3.17.5.jar"
-      ],
-      "hashes": {
-        "sha1": "67c0111a22b4b058e6f08c1e607d8e9605612716",
-        "sha512": "8e209148c313ecab6ac68d7980a2748efd415f956978076cd353c9daef39b005a19e342fa0c5a937be494c4921964c287ff22567e2417c1c83fc5f91101443fc"
-      }
-    },
-    {
-      "path": "mods/structure_layout_optimizer-fabric-1.0.12.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/ayPU0OHc/versions/522Wudew/structure_layout_optimizer-fabric-1.0.12.jar"
-      ],
-      "hashes": {
-        "sha512": "658db517456e7b9ce1b92b34cf8e7e411ca2d8004cccbb2608e3cd278f79846eafa176c40d1e6666d23a7dff6e1f2bc4ad97a8bfc168976168effce42979333b",
-        "sha1": "2ca2f8650794b271d439fc8cb703ed85f1fde068"
-      }
-    },
-    {
-      "path": "mods/sodium-extra-fabric-0.9.4+mc1.21.1.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/PtjYWJkn/versions/YEWu6red/sodium-extra-fabric-0.9.4%2Bmc1.21.1.jar"
-      ],
-      "hashes": {
-        "sha512": "824b06ddaa7ab697ff252ee47c6278725fc2ed6eeaaa027c32c0ee8bbb9ab416c23dfdd3c89a2ca7f4618cb106ef55694a6163cd09abc248219d14e9eca3d7d3",
-        "sha1": "628487b330c9589d26cada5c4a51ac457af80a1f"
-      }
-    },
-    {
-      "path": "mods/placeholder-api-2.4.2+1.21.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/eXts2L7r/versions/U5bhVym2/placeholder-api-2.4.2%2B1.21.jar"
-      ],
-      "hashes": {
-        "sha1": "aa1b9a49f9f190dfe4825c502b150817dd2998c3",
-        "sha512": "fc13d3a5c048dbaab86318edaf8b6c6b46ef9f1d367e8f063d19f5a9b0da66c5ae419d92c8c4608edc89a01eb44d91ffcf017fea73f39b222cbd85e82f70a233"
-      }
-    },
-    {
-      "path": "mods/sodium-fabric-0.8.13+mc1.21.1.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/AANobbMI/versions/SMxNOGZ6/sodium-fabric-0.8.13%2Bmc1.21.1.jar"
-      ],
-      "hashes": {
-        "sha512": "8614a374593698069a80ac74de8cd9c28f3928d16819a0e0d6320b538e823f7e54e8be06d5ea5a9c268beb0e02073209d1f831a02dede851588b972367680853",
-        "sha1": "003c114c85ca88ef3362e018deb6aca0c682d6a1"
-      }
-    },
-    {
-      "path": "mods/zconfig-1.0.0+1.21.x.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/4qmvXRB9/versions/yD19P1nG/zconfig-1.0.0%2B1.21.x.jar"
-      ],
-      "hashes": {
-        "sha1": "cb9fe03e6f64b900317d7edf305c1d7d43412a60",
-        "sha512": "706819e56672a79a814a6b04a96cf5be585679c093a3027f5a2652ca60678c9bd24d5596fa7e373447e582a1360ab4c8540b023ca744ebabca1be426166d0b84"
-      }
-    },
-    {
-      "path": "mods/zoomify-2.15.2+1.21.1.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/w7ThoJFB/versions/6jrMC48Z/zoomify-2.15.2%2B1.21.1.jar"
-      ],
-      "hashes": {
-        "sha1": "9ec9c47e1d3465ea0cbd595b6d9d12227239c9a6",
-        "sha512": "ce8db36e77f089f091986b6e8bea1c33433bbcffc7a47fa18d04dea5ecd4910286943600a85b4773fdf4ed5405f52f3c0dc08fea8b1551d7725a26e1f6ef2879"
-      }
-    },
-    {
-      "path": "mods/lithostitched-1.8.0-fabric-21.1.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/XaDC71GB/versions/eN30OQaU/lithostitched-1.8.0-fabric-21.1.jar"
-      ],
-      "hashes": {
-        "sha512": "5cb6a9af715a6463257546feef0ceae5d0caf10119656ac4e8ef7c334978659c5d54d2ba276db331e17f65b55971256d61c2200eb5ab9447fc87dab7f23dcc2f",
-        "sha1": "634f580a0ee75a558ce6560101cd838c4d35471d"
-      }
-    },
-    {
-      "path": "mods/moreculling-fabric-1.21.1-1.0.10.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/51shyZVL/versions/wUYbHzXF/moreculling-fabric-1.21.1-1.0.10.jar"
-      ],
-      "hashes": {
-        "sha512": "7f8f33e09a7b1952c4ae77843a28a5220fe9dd6436fda4b14edeb261a5ceb5468630c54ab3b8ec2c64a5c91f5b02f0246d17db57fa7fe11eb16ec9c745b9ae40",
-        "sha1": "d425f77706d8f6499aae64eb804b3802dad111d4"
-      }
-    },
-    {
-      "path": "mods/tectonic-3.0.28-fabric-21.1.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/lWDHr9jE/versions/WdDiEKMn/tectonic-3.0.28-fabric-21.1.jar"
-      ],
-      "hashes": {
-        "sha1": "41e58bae9c22e5999bfa56ae92f45ecdee07f1cf",
-        "sha512": "a15a85fb5c6d134d0967fa3ccd6797fa28348b69937b65b2a3bcd6173609e84ae97bd8400eb01013167ceca3434bf97216e879d4b0277c007f6deda7aa076afd"
-      }
-    },
-    {
-      "path": "mods/yet_another_config_lib_v3-3.8.2+1.21.1-fabric.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/1eAoo2KR/versions/o3cDn8Vp/yet_another_config_lib_v3-3.8.2%2B1.21.1-fabric.jar"
-      ],
-      "hashes": {
-        "sha512": "353169f85fa63e73ce9bdd0d4ddce54e3cbc4d71153a93c982f74c68fd93325986663f94fc2f2b10f4427e8b15a0485c608c5587b3840d933204b50ea4cb6d4c",
-        "sha1": "e075503382f70715ab9fc6f66d603397a86eb3e0"
-      }
-    },
-    {
-      "path": "mods/zfastnoise-1.0.14+1.21.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/OnlVIpq5/versions/73DMCY3S/zfastnoise-1.0.14%2B1.21.jar"
-      ],
-      "hashes": {
-        "sha1": "7e9ce65d3e1e92940449fcab815563cb1e7ca1a8",
-        "sha512": "e19081e664d4fd731d985642279ae2f0e0774eb2da7d92f144a4e34b098d2a5c990cb92ed1f94793129798d75f17fe19450ca277c00d002dbf6734a6bda906b0"
-      }
-    },
-    {
-      "path": "mods/cloth-config-15.0.140-fabric.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/9s6osm5g/versions/HpMb5wGb/cloth-config-15.0.140-fabric.jar"
-      ],
-      "hashes": {
-        "sha512": "1b3f5db4fc1d481704053db9837d530919374bf7518d7cede607360f0348c04fc6347a3a72ccfef355559e1f4aef0b650cd58e5ee79c73b12ff0fc2746797a00",
-        "sha1": "5d82342a2df53fd6df712bfdd583a811572918a4"
-      }
-    },
-    {
-      "path": "mods/Platform-fabric-1.21.1-1.3.3.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/i6fiqm5y/versions/BbIdNbF1/Platform-fabric-1.21.1-1.3.3.jar"
-      ],
-      "hashes": {
-        "sha1": "b3302ad9158171874d01e863d69c8bf4db8faef9",
-        "sha512": "ba5d968f08531d3cd1eac53bb6a02a0870a79e4b3a265c80aaf73b0f1836706b8a5fa099b43c7f1c81b2ebc9d223db5c74aa004e579dbbdfaa44a80d701d4dbe"
-      }
-    },
-    {
-      "path": "mods/lithium-fabric-0.15.4+mc1.21.1.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/gvQqBUqZ/versions/N08Z8wog/lithium-fabric-0.15.4%2Bmc1.21.1.jar"
-      ],
-      "hashes": {
-        "sha512": "182064b00e6315e2255b857eaab8eb759e6b042ebd4cc8b855ff0d93f875a5a7188fac49f878d7b29d4ef7e6b6341190ad7f6f6f39f4a6d2c62003468b08e4c6",
-        "sha1": "7d82a004403b7780d4443d8e40361a55cfd0ae63"
-      }
-    },
-    {
-      "path": "mods/continuity-3.0.0+1.21.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/1IjD5062/versions/kSPJ4hQv/continuity-3.0.0%2B1.21.jar"
-      ],
-      "hashes": {
-        "sha1": "c7f09b53512604c2ba6803b1247bc70e4d0f8f8c",
-        "sha512": "3601ddb50f19142c087d32525bc0afcfb5f49a2e7477b6645a98ec191218739fdf3c6ac95cd298e826eb34fc533af43bb0e78c64e51292866ecabade4d14b13a"
-      }
-    },
-    {
-      "path": "mods/obe+1.21.1-1.1.52.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/AtOSAunf/versions/xM58y6hq/obe%2B1.21.1-1.1.52.jar"
-      ],
-      "hashes": {
-        "sha1": "01cd35904b464ef0363480f6bdf0fbc9a030fe8c",
-        "sha512": "e1139b4ce45eae6bf43bc920bb46ffdb23abeed300f15eb13188a705f23a1bc80fb71269d6d2c43fe7abd1167e86b51caeb459924ec34b03a1e95801c5ad7187"
-      }
-    },
-    {
-      "path": "mods/Searchables-fabric-1.21.1-1.0.2.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/fuuu3xnx/versions/tRdr8Bg3/Searchables-fabric-1.21.1-1.0.2.jar"
-      ],
-      "hashes": {
-        "sha1": "2777db0b967e80e0659053154f32f14a0e99a7a7",
-        "sha512": "1d57bd196a1122953a4f80d18af660be7ad791b9264e46666b273172c448df4de9acf2630fae7d196a4da8168c829fad18756c86b2cd3dd1068a0b453d8ec222"
-      }
-    },
-    {
-      "path": "resourcepacks/Vintage Panorama 1.1.1.zip",
-      "downloads": [
-        "https://cdn.modrinth.com/data/1kx02Ah7/versions/qxs0J0lL/Vintage%20Panorama%201.1.1.zip"
-      ],
-      "hashes": {
-        "sha1": "2e18ef9303f6661bf46f86c5f83c8ef6fb84b157",
-        "sha512": "e154ac4d449f90d04124f914f2d268b51b3928a876a34354a3ed5a1ca1de01704a02ca1f4fce09028592594d6f3054a621cdbdd5d6d178105e303ac57361377a"
+        "sha512": "454d1fc26b83cbf32450e9aa922b4bde98f290c1c6e595fed8de6b4210184f0053a390dd46dd14cab85b498f1bb80aa544c40092eadeb740c23ba69cb528e136",
+        "sha1": "d2ee22217ec5227ddc7877af1a5f326464188f5f"
       }
     },
     {
@@ -471,63 +25,43 @@
       }
     },
     {
-      "path": "mods/globalnarrationtoggle-1.21.1-1.5.jar",
+      "path": "mods/collective-1.21.1-8.53.jar",
       "downloads": [
-        "https://cdn.modrinth.com/data/UxJVewrJ/versions/7FdDgPtT/globalnarrationtoggle-1.21.1-1.5.jar"
+        "https://cdn.modrinth.com/data/e0M1UDsY/versions/nCzFhSap/collective-1.21.1-8.53.jar"
       ],
       "hashes": {
-        "sha512": "05c7e3f7d641d5a64f893fdc49ba76c56978b5484a8e895547c49f2c270ccea5e05c4ae91c9ba2b6295fe64d630ec2b2542bb3fdf6d0d6d73007a7be05672f2b",
-        "sha1": "effebdbc23c691d7fa99e3878efc3de7e4992b2a"
+        "sha1": "47ab7fc6da808660c1ded374eb21b61219c9b845",
+        "sha512": "f5d9f8db4f59adef62a1dd542eb22f9842153200320f3593dc591f9c6eda1f327d9fd98eb866decdc77aaf6d2a043ee2ee2a8bebab5ac89ae4611fe93e195b92"
       }
     },
     {
-      "path": "mods/ImmediatelyFast-Fabric-1.6.15+1.21.1.jar",
+      "path": "mods/centered-crosshair+1.21-1.0.8.jar",
       "downloads": [
-        "https://cdn.modrinth.com/data/5ZwdcRci/versions/aLnBqxFW/ImmediatelyFast-Fabric-1.6.15%2B1.21.1.jar"
+        "https://cdn.modrinth.com/data/xUTHly0N/versions/Orfi1Sh5/centered-crosshair%2B1.21-1.0.8.jar"
       ],
       "hashes": {
-        "sha512": "d4ac2d574d80000cd59b0b362706a6f86778bfc717748dca854f05ee8d09ce158738488e58c6b8ee05d5e54017f05b6c66c3bcaa3fa357d38cbfd75893dda9f4",
-        "sha1": "5067bdff1d5cc6d2dd89986f98bd8bd7ae62fb98"
+        "sha1": "09b6464435cd8db59d17da6351329ee30cbb56aa",
+        "sha512": "106f39b42c00b957199450cdf8b176cba70c6e945cd6356e53c27dfa26ab174ae29fc38a7f846de7ad1e30f6267fefd37c351f16f566155070dc2bee96c3e9ca"
       }
     },
     {
-      "path": "mods/Ksyxis-1.4.6.jar",
+      "path": "mods/lithium-fabric-0.15.4+mc1.21.1.jar",
       "downloads": [
-        "https://cdn.modrinth.com/data/2ecVyZ49/versions/kzLBJQLn/Ksyxis-1.4.6.jar"
+        "https://cdn.modrinth.com/data/gvQqBUqZ/versions/N08Z8wog/lithium-fabric-0.15.4%2Bmc1.21.1.jar"
       ],
       "hashes": {
-        "sha512": "1571cd9b15b6733002dd164beab4ad1022fab2c904414b39db6fb609a41c48cca394f1751e5634ebc555795d9bd9dba48c2c280c152d9e0f570795d47a91c1d5",
-        "sha1": "6de6271329e0c83e3ccc0512a0d3cfcc3e790d3f"
+        "sha512": "182064b00e6315e2255b857eaab8eb759e6b042ebd4cc8b855ff0d93f875a5a7188fac49f878d7b29d4ef7e6b6341190ad7f6f6f39f4a6d2c62003468b08e4c6",
+        "sha1": "7d82a004403b7780d4443d8e40361a55cfd0ae63"
       }
     },
     {
-      "path": "mods/midnightlib-fabric-1.9.3+1.21.1.jar",
+      "path": "mods/seamlesssleep-fabric-1.21-2.5.3.jar",
       "downloads": [
-        "https://cdn.modrinth.com/data/codAaoxh/versions/as2ZKoB1/midnightlib-fabric-1.9.3%2B1.21.1.jar"
+        "https://cdn.modrinth.com/data/IyHq05yB/versions/Yl66HsGP/seamlesssleep-fabric-1.21-2.5.3.jar"
       ],
       "hashes": {
-        "sha512": "bfab6bec9dfe4800237861df4d1749cc42770a81599d7a4f2c3dd83efca91347faa113240c63e20c1135593cce6dbcde517512083c4dfd5efab12df0f4f95e69",
-        "sha1": "6595a90351e827b99b36fa2c6ef1dde1a4c8fdf1"
-      }
-    },
-    {
-      "path": "mods/reeses-sodium-options-fabric-2.2.4+mc1.21.1.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/Bh37bMuy/versions/XtuPOKUN/reeses-sodium-options-fabric-2.2.4%2Bmc1.21.1.jar"
-      ],
-      "hashes": {
-        "sha512": "7784880c4dedae15e3e03c6de4cfa67a9ed242006f90b764c0fa6fda8679e219ca6c9987aae76ec9b0fff6f8cc38fff86b16e2836aaa0200998c9de938617d3e",
-        "sha1": "552c80c3113ad346c3abcdf7c5c6cc3a02a5fb62"
-      }
-    },
-    {
-      "path": "mods/Clumps-fabric-1.21.1-19.0.0.1.jar",
-      "downloads": [
-        "https://cdn.modrinth.com/data/Wnxd13zP/versions/3ene3W1l/Clumps-fabric-1.21.1-19.0.0.1.jar"
-      ],
-      "hashes": {
-        "sha1": "14628ba309d876cfefc4cef864a66ef12812066c",
-        "sha512": "0aa8e3508d0a40ef814d4064c0b6cadba6326128dd878fe69f30677c889cec4ccb8f639c22bdd7083a73ae8fa76e1c115b5e4b1885904dc1244b02ab2f728e78"
+        "sha512": "a1e49ed9e2e9d34565938ca1efa212a49e8384c1fdb592b4801fd2b8387edb6fb53023be58f62b8ff3c9b11483b02e769d59bd0b9f403c4a24c9d6a2314c31a2",
+        "sha1": "1a36821eb4ea96e30e52edbe095f147fddbe7c28"
       }
     },
     {
@@ -541,23 +75,183 @@
       }
     },
     {
-      "path": "mods/cirrus-fabric-1.21.1-1.4.1.jar",
+      "path": "mods/screenshot-to-clipboard-fabric-1.0.10.jar",
       "downloads": [
-        "https://cdn.modrinth.com/data/SJDzFJH7/versions/lxmciEpD/cirrus-fabric-1.21.1-1.4.1.jar"
+        "https://cdn.modrinth.com/data/1KiJRrTg/versions/DHUI24N7/screenshot-to-clipboard-fabric-1.0.10.jar"
       ],
       "hashes": {
-        "sha1": "000bcc548b7af1a0bf3dea826d5995e8faaa1ef3",
-        "sha512": "948c6ae6298fee3a6cdf75dd99373e4b552efc3d2715610769483dbbd8183bc4f56158fc810ccea22032e91f522b32be20b01bcc8a57f4c496e24e66f9070df5"
+        "sha1": "d8a8af1844ae38ac4f39e4bf5756915e08081375",
+        "sha512": "54f3c0fe55145f396a824c780bdaaf59026f855037ffa67c3c4228781685350d308feec5ed5527a7e4eaa1d4f71f6d106d5ac9d1bf7aa79cb74cad0953c60e8f"
       }
     },
     {
-      "path": "mods/NoChatReports-FABRIC-1.21.1-v2.9.1.jar",
+      "path": "mods/better-end-sky-0.3.0+1.21.jar",
       "downloads": [
-        "https://cdn.modrinth.com/data/qQyHxfxd/versions/D8K0KJXM/NoChatReports-FABRIC-1.21.1-v2.9.1.jar"
+        "https://cdn.modrinth.com/data/SgJ1iW80/versions/Zxum0zx8/better-end-sky-0.3.0%2B1.21.jar"
       ],
       "hashes": {
-        "sha1": "789cabd9b1fed079af87f675d1d6c1c95b603e19",
-        "sha512": "23bb4a8a6a3f7071281cf97560e12f37e1f5f638a156e3fcb92a50ff0091f1fcfa3e090e7745e4b1175e7c2c784e38d73536a1044db1bf225a182fab758a5a29"
+        "sha1": "c53743d3ffabf65a26ef9f0b9a1d48277bf039c4",
+        "sha512": "ad644691a516a168155d2ae5fcae28db6c7e4e21a8c1f28aa6c904d895fc5e50cfe0e3c3ed5aad93f4c8be1d4bc95d62652433acac1fe72dcd591576bfe7e546"
+      }
+    },
+    {
+      "path": "mods/Controlling-fabric-1.21.1-19.0.5.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/xv94TkTM/versions/hGJDoW2W/Controlling-fabric-1.21.1-19.0.5.jar"
+      ],
+      "hashes": {
+        "sha1": "22d2407311298d0185b606aa1dd03ae33b98dff3",
+        "sha512": "2b172371037bdac4d37332f1fcfbd09c6e083524ba02ea62d980aab937c79cef4eeeea4e05353cbb0428dcb1d31f04ce0f6f148619d15db74587b983c6d04bc8"
+      }
+    },
+    {
+      "path": "mods/sodium-fabric-0.8.13+mc1.21.1.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/AANobbMI/versions/SMxNOGZ6/sodium-fabric-0.8.13%2Bmc1.21.1.jar"
+      ],
+      "hashes": {
+        "sha512": "8614a374593698069a80ac74de8cd9c28f3928d16819a0e0d6320b538e823f7e54e8be06d5ea5a9c268beb0e02073209d1f831a02dede851588b972367680853",
+        "sha1": "003c114c85ca88ef3362e018deb6aca0c682d6a1"
+      }
+    },
+    {
+      "path": "mods/tectonic-3.0.28-fabric-21.1.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/lWDHr9jE/versions/WdDiEKMn/tectonic-3.0.28-fabric-21.1.jar"
+      ],
+      "hashes": {
+        "sha512": "a15a85fb5c6d134d0967fa3ccd6797fa28348b69937b65b2a3bcd6173609e84ae97bd8400eb01013167ceca3434bf97216e879d4b0277c007f6deda7aa076afd",
+        "sha1": "41e58bae9c22e5999bfa56ae92f45ecdee07f1cf"
+      }
+    },
+    {
+      "path": "mods/cloth-config-15.0.140-fabric.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/9s6osm5g/versions/HpMb5wGb/cloth-config-15.0.140-fabric.jar"
+      ],
+      "hashes": {
+        "sha1": "5d82342a2df53fd6df712bfdd583a811572918a4",
+        "sha512": "1b3f5db4fc1d481704053db9837d530919374bf7518d7cede607360f0348c04fc6347a3a72ccfef355559e1f4aef0b650cd58e5ee79c73b12ff0fc2746797a00"
+      }
+    },
+    {
+      "path": "mods/zoomify-2.15.2+1.21.1.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/w7ThoJFB/versions/6jrMC48Z/zoomify-2.15.2%2B1.21.1.jar"
+      ],
+      "hashes": {
+        "sha512": "ce8db36e77f089f091986b6e8bea1c33433bbcffc7a47fa18d04dea5ecd4910286943600a85b4773fdf4ed5405f52f3c0dc08fea8b1551d7725a26e1f6ef2879",
+        "sha1": "9ec9c47e1d3465ea0cbd595b6d9d12227239c9a6"
+      }
+    },
+    {
+      "path": "resourcepacks/Vintage Panorama 1.1.1.zip",
+      "downloads": [
+        "https://cdn.modrinth.com/data/1kx02Ah7/versions/qxs0J0lL/Vintage%20Panorama%201.1.1.zip"
+      ],
+      "hashes": {
+        "sha512": "e154ac4d449f90d04124f914f2d268b51b3928a876a34354a3ed5a1ca1de01704a02ca1f4fce09028592594d6f3054a621cdbdd5d6d178105e303ac57361377a",
+        "sha1": "2e18ef9303f6661bf46f86c5f83c8ef6fb84b157"
+      }
+    },
+    {
+      "path": "mods/Searchables-fabric-1.21.1-1.0.2.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/fuuu3xnx/versions/tRdr8Bg3/Searchables-fabric-1.21.1-1.0.2.jar"
+      ],
+      "hashes": {
+        "sha1": "2777db0b967e80e0659053154f32f14a0e99a7a7",
+        "sha512": "1d57bd196a1122953a4f80d18af660be7ad791b9264e46666b273172c448df4de9acf2630fae7d196a4da8168c829fad18756c86b2cd3dd1068a0b453d8ec222"
+      }
+    },
+    {
+      "path": "mods/obe+1.21.1-1.1.52.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/AtOSAunf/versions/xM58y6hq/obe%2B1.21.1-1.1.52.jar"
+      ],
+      "hashes": {
+        "sha1": "01cd35904b464ef0363480f6bdf0fbc9a030fe8c",
+        "sha512": "e1139b4ce45eae6bf43bc920bb46ffdb23abeed300f15eb13188a705f23a1bc80fb71269d6d2c43fe7abd1167e86b51caeb459924ec34b03a1e95801c5ad7187"
+      }
+    },
+    {
+      "path": "mods/structure_layout_optimizer-fabric-1.0.12.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/ayPU0OHc/versions/522Wudew/structure_layout_optimizer-fabric-1.0.12.jar"
+      ],
+      "hashes": {
+        "sha512": "658db517456e7b9ce1b92b34cf8e7e411ca2d8004cccbb2608e3cd278f79846eafa176c40d1e6666d23a7dff6e1f2bc4ad97a8bfc168976168effce42979333b",
+        "sha1": "2ca2f8650794b271d439fc8cb703ed85f1fde068"
+      }
+    },
+    {
+      "path": "mods/biomecleaner-mc1.21.1-1.1.8-fabric.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/mzuh1rlR/versions/d0gtrv25/biomecleaner-mc1.21.1-1.1.8-fabric.jar"
+      ],
+      "hashes": {
+        "sha512": "ab7ac850d7043080fd6fa15e22790b208884f7b1e20ad0fc9033f61e786b19fdb366465b43f484119ac9dd1168781c480508cb30b878e030e8347431a370e327",
+        "sha1": "2cd5691a6f82d702eb4f295797682292ddd059f7"
+      }
+    },
+    {
+      "path": "mods/cristellib-fabric-1.21.1-3.1.7.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/cl223EMc/versions/K1dyr5gj/cristellib-fabric-1.21.1-3.1.7.jar"
+      ],
+      "hashes": {
+        "sha512": "7a71a8f409d14268461bebb8d7c45a1e15e82f379d92c6f6938eb20cc480cc6bbb763affc1ac582c3733eac2c403788f1cf43edcb4abe345054b0acc5c4c045d",
+        "sha1": "4f966c3efd6ecfe679aac64ba7c6f4d4a648ad5b"
+      }
+    },
+    {
+      "path": "mods/screenshot_viewer-1.3.3-fabric-mc1.21.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/laNoi025/versions/OPtoNGCV/screenshot_viewer-1.3.3-fabric-mc1.21.jar"
+      ],
+      "hashes": {
+        "sha1": "1f986d3f9e15e6962c13d7f9c3c511e11df250c1",
+        "sha512": "4fe76b8c21a3c769c043445cc3bb160ad8f73d1e3364b074c6c3088dcbe388fa74b51da70cfce344536b7e9869892021b40f45f9b364e4954c32f27039a69926"
+      }
+    },
+    {
+      "path": "mods/betterbiomeblend-fabric-1.21.1-1.4.1.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/Rs6c7WyL/versions/eDX2L0GQ/betterbiomeblend-fabric-1.21.1-1.4.1.jar"
+      ],
+      "hashes": {
+        "sha1": "c48f566c3b342c7426089a2f29377dafd9335439",
+        "sha512": "77bea694a5f641f4ecac16b69f5abe86768df02f73381c4f3cdf9793b3b1532bb097d9d280e708d3a22d12a416bb9de5bea094c0f84dc185b2d14bac0bf0c585"
+      }
+    },
+    {
+      "path": "mods/architectury-13.0.11-fabric.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/lhGA9TYQ/versions/Pzc2FP5K/architectury-13.0.11-fabric.jar"
+      ],
+      "hashes": {
+        "sha512": "53314eb34890b11ad3c06c6f3ba2d01ae1ca756235ce4f0574e4b0544952a2ab3c628c81b521653d6487d62c5dc3055e06fed6367a3a499bafad909512f0c716",
+        "sha1": "18200609d4c3571c4237b50884966f6fd82431ea"
+      }
+    },
+    {
+      "path": "mods/midnightlib-fabric-1.10.0+1.21.1.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/codAaoxh/versions/jQ0KXdpD/midnightlib-fabric-1.10.0%2B1.21.1.jar"
+      ],
+      "hashes": {
+        "sha512": "5c1d174ec58bc90e2295a2e97f930bb2a97a5a1f6ee1e956f628237223386c9e40c50655b1238a2368735399472d9a1950d9f1c6ca472d279a57ee04dcf6d11e",
+        "sha1": "3120b1329ab0d01b4af4e659495259bffee2ddae"
+      }
+    },
+    {
+      "path": "mods/ferritecore-7.0.3-fabric.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/uXXizFIs/versions/sOzRw3CG/ferritecore-7.0.3-fabric.jar"
+      ],
+      "hashes": {
+        "sha512": "3ad31620fac4ff44327dc7dedbe162b2d978f3f246dc16255a6e400ce9592a0d326fe36a626f3c1bf30a11f813093cbb4dcc107af039cff724d0cdf648541fdf",
+        "sha1": "a8a6a34fcda177da2828cedef44e0e538cf78aad"
       }
     },
     {
@@ -581,73 +275,408 @@
       }
     },
     {
+      "path": "mods/ScalableLux-fabric-0.3.0-alpha.0.7-all.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/Ps1zyz6x/versions/AodeMVa6/ScalableLux-fabric-0.3.0-alpha.0.7-all.jar"
+      ],
+      "hashes": {
+        "sha512": "e3c098b5136101575fe852d7d967f1be1c29a26ec687118e01a3efcea9ea1b8367d3b3be63ab7fa5029c12b478dcd764ad362980317e998674ddad4e0573349f",
+        "sha1": "ff6baa9ab1f2aecf0eba5b72595085551adddc7a"
+      }
+    },
+    {
+      "path": "mods/CleanF3-0.4.10.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/5lvjfaRs/versions/sONVk6J8/CleanF3-0.4.10.jar"
+      ],
+      "hashes": {
+        "sha512": "a96b2c88c0d630512bd101cb51e850637dfff5d5875da68de7729bbab519217661a37d21e6b77f727a0d950dff90a16ef43b898fc47fcfbb9a19a2fc15c0c06f",
+        "sha1": "e4b2e232713bfceacb7c2c6a3745fe42a40be368"
+      }
+    },
+    {
+      "path": "mods/Ixeris-4.6.8+1.21.1-fabric.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/p8RJPJIC/versions/MySe2ICq/Ixeris-4.6.8%2B1.21.1-fabric.jar"
+      ],
+      "hashes": {
+        "sha512": "5b284351f91e60741d392be55a704d31d81b387df3f905fd5b62effde136f0c5e2a545b89d0ed4e2367c5c04a743240884930797e16d75068da3dde4a7d978e3",
+        "sha1": "c83c96b48e8885dda6e5c3f1a6d7d244740b3b6f"
+      }
+    },
+    {
+      "path": "mods/zfastnoise-1.0.14+1.21.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/OnlVIpq5/versions/73DMCY3S/zfastnoise-1.0.14%2B1.21.jar"
+      ],
+      "hashes": {
+        "sha512": "e19081e664d4fd731d985642279ae2f0e0774eb2da7d92f144a4e34b098d2a5c990cb92ed1f94793129798d75f17fe19450ca277c00d002dbf6734a6bda906b0",
+        "sha1": "7e9ce65d3e1e92940449fcab815563cb1e7ca1a8"
+      }
+    },
+    {
+      "path": "mods/Ksyxis-1.4.6.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/2ecVyZ49/versions/kzLBJQLn/Ksyxis-1.4.6.jar"
+      ],
+      "hashes": {
+        "sha1": "6de6271329e0c83e3ccc0512a0d3cfcc3e790d3f",
+        "sha512": "1571cd9b15b6733002dd164beab4ad1022fab2c904414b39db6fb609a41c48cca394f1751e5634ebc555795d9bd9dba48c2c280c152d9e0f570795d47a91c1d5"
+      }
+    },
+    {
+      "path": "mods/resourcefulconfig-fabric-1.21-3.0.11.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/M1953qlQ/versions/dQh99ERC/resourcefulconfig-fabric-1.21-3.0.11.jar"
+      ],
+      "hashes": {
+        "sha1": "f6a0df7cf464d1c94458ef075bead82033add9c9",
+        "sha512": "11189c68626404bef5021bae51bcec1840dba0c3356ca275e9b3439e20ba474fb9ba6f6bf4b4f08b3e9a43c58ac553e2e0d182429bd606948d8211bd49c1d0e7"
+      }
+    },
+    {
+      "path": "mods/yet_another_config_lib_v3-3.8.2+1.21.1-fabric.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/1eAoo2KR/versions/o3cDn8Vp/yet_another_config_lib_v3-3.8.2%2B1.21.1-fabric.jar"
+      ],
+      "hashes": {
+        "sha512": "353169f85fa63e73ce9bdd0d4ddce54e3cbc4d71153a93c982f74c68fd93325986663f94fc2f2b10f4427e8b15a0485c608c5587b3840d933204b50ea4cb6d4c",
+        "sha1": "e075503382f70715ab9fc6f66d603397a86eb3e0"
+      }
+    },
+    {
+      "path": "mods/fabric-api-0.116.17+1.21.1.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/P7dR8mSH/versions/Mys3P7lK/fabric-api-0.116.17%2B1.21.1.jar"
+      ],
+      "hashes": {
+        "sha1": "810b2b0195371a012906241d8b85a32a1d6de53c",
+        "sha512": "98c478217da19181f0e4df3ea6c2da6bdbda271c7544a4aea048513a49b444f1ff5b71dc0df6303017c48e8ff69b7bb6af6179bdf0d0e09ab3c1ee08411857a8"
+      }
+    },
+    {
+      "path": "mods/lithostitched-1.8.1-fabric-21.1.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/XaDC71GB/versions/GZFp8lnS/lithostitched-1.8.1-fabric-21.1.jar"
+      ],
+      "hashes": {
+        "sha1": "f295e89ad7f18a2ba20da2deb33efabfbe63ed43",
+        "sha512": "4854c2bccc969c0a84d9600825d899b391353917e26eb5ce8dc190d666c10b59bdbe1c8a63e900c7473d7f774e71e63a2c0e6f9efa7f5577ed90710295bd2cd7"
+      }
+    },
+    {
+      "path": "resourcepacks/PixelatedSky_BetterEnd_1.0-1.20.1.zip",
+      "downloads": [
+        "https://cdn.modrinth.com/data/nadYBTPe/versions/lgqeiru5/PixelatedSky_BetterEnd_1.0-1.20.1.zip"
+      ],
+      "hashes": {
+        "sha512": "e6542b4b15f4ddc20e7e448551e9516dea19490104731e38dba877b0de7d829d1e11767c4f274ed7257e36d97ef799a9419ccdcaa4bee8be38e26b9e73ac3897",
+        "sha1": "ed14bd902101954109dc327cc5b57af6cce76885"
+      }
+    },
+    {
+      "path": "mods/quick-pack-fabric-1.5.1+1.21.1.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/pSISfJ4O/versions/QOqEPNtJ/quick-pack-fabric-1.5.1%2B1.21.1.jar"
+      ],
+      "hashes": {
+        "sha512": "8b81ba1160012e82bfa01527d781506011efef62c120085bd4a29604e8263e396d8a967f003ba2c383345562774693a10083fb5d961f690925fadb5f2d6e37d0",
+        "sha1": "df66cd08a0fe90e541b9c05beb9c49c76fd8a4bb"
+      }
+    },
+    {
+      "path": "mods/fabric-language-kotlin-1.14.2+kotlin.2.4.21.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/Ha28R6CL/versions/SKW1BTL3/fabric-language-kotlin-1.14.2%2Bkotlin.2.4.21.jar"
+      ],
+      "hashes": {
+        "sha512": "7fb475c4a7e7bdf8d0aca4b5798a58a354c51443d5b1fbde3e8cf34dfbf7191ef4238b5f07d08ec9490ec180b371624523326c3ad45d4ed2b2be541de9407e5d",
+        "sha1": "f1d4ab6ecd54d9782521333a87eb50724ecb03e0"
+      }
+    },
+    {
+      "path": "mods/placeholder-api-2.4.2+1.21.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/eXts2L7r/versions/U5bhVym2/placeholder-api-2.4.2%2B1.21.jar"
+      ],
+      "hashes": {
+        "sha512": "fc13d3a5c048dbaab86318edaf8b6c6b46ef9f1d367e8f063d19f5a9b0da66c5ae419d92c8c4608edc89a01eb44d91ffcf017fea73f39b222cbd85e82f70a233",
+        "sha1": "aa1b9a49f9f190dfe4825c502b150817dd2998c3"
+      }
+    },
+    {
+      "path": "resourcepacks/Tweaked Pale Garden.zip",
+      "downloads": [
+        "https://cdn.modrinth.com/data/Rcd8VycJ/versions/mj6ItjFV/Tweaked%20Pale%20Garden.zip"
+      ],
+      "hashes": {
+        "sha512": "8d192a94ee1759656d60ea0e64fc76716c9dfba3cc3e9389abe0693d71dfb7cd21572908562a95d7f0e37649c1a2a448f5969ecd64806a895d9c94d8e66fabb4",
+        "sha1": "9de0d2d11dd8fbe3aaeb95c4aedab8ce8aaa2c7e"
+      }
+    },
+    {
+      "path": "mods/modernfix-fabric-5.25.1+mc1.21.1.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/nmDcB62a/versions/NnNX8LBn/modernfix-fabric-5.25.1%2Bmc1.21.1.jar"
+      ],
+      "hashes": {
+        "sha512": "dc67d6e023e1fcdeaf7837917c477cba212c611dfc2463c6ea021319c644087c79b477e0ea8194e113ddd7332fd5c6d82baa47c291eaac7f4a86252507b4e19f",
+        "sha1": "4ab39e9c736e7204146792c545ec5b29fc0a3872"
+      }
+    },
+    {
+      "path": "mods/libjf-3.17.5.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/WKwQAwke/versions/WRFFw4eh/libjf-3.17.5.jar"
+      ],
+      "hashes": {
+        "sha512": "8e209148c313ecab6ac68d7980a2748efd415f956978076cd353c9daef39b005a19e342fa0c5a937be494c4921964c287ff22567e2417c1c83fc5f91101443fc",
+        "sha1": "67c0111a22b4b058e6f08c1e607d8e9605612716"
+      }
+    },
+    {
+      "path": "mods/sodium-extra-fabric-0.9.4+mc1.21.1.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/PtjYWJkn/versions/YEWu6red/sodium-extra-fabric-0.9.4%2Bmc1.21.1.jar"
+      ],
+      "hashes": {
+        "sha1": "628487b330c9589d26cada5c4a51ac457af80a1f",
+        "sha512": "824b06ddaa7ab697ff252ee47c6278725fc2ed6eeaaa027c32c0ee8bbb9ab416c23dfdd3c89a2ca7f4618cb106ef55694a6163cd09abc248219d14e9eca3d7d3"
+      }
+    },
+    {
+      "path": "mods/ImmediatelyFast-Fabric-1.6.15+1.21.1.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/5ZwdcRci/versions/aLnBqxFW/ImmediatelyFast-Fabric-1.6.15%2B1.21.1.jar"
+      ],
+      "hashes": {
+        "sha512": "d4ac2d574d80000cd59b0b362706a6f86778bfc717748dca854f05ee8d09ce158738488e58c6b8ee05d5e54017f05b6c66c3bcaa3fa357d38cbfd75893dda9f4",
+        "sha1": "5067bdff1d5cc6d2dd89986f98bd8bd7ae62fb98"
+      }
+    },
+    {
+      "path": "mods/zconfig-1.0.0+1.21.x.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/4qmvXRB9/versions/yD19P1nG/zconfig-1.0.0%2B1.21.x.jar"
+      ],
+      "hashes": {
+        "sha512": "706819e56672a79a814a6b04a96cf5be585679c093a3027f5a2652ca60678c9bd24d5596fa7e373447e582a1360ab4c8540b023ca744ebabca1be426166d0b84",
+        "sha1": "cb9fe03e6f64b900317d7edf305c1d7d43412a60"
+      }
+    },
+    {
+      "path": "mods/globalnarrationtoggle-1.21.1-1.5.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/UxJVewrJ/versions/7FdDgPtT/globalnarrationtoggle-1.21.1-1.5.jar"
+      ],
+      "hashes": {
+        "sha512": "05c7e3f7d641d5a64f893fdc49ba76c56978b5484a8e895547c49f2c270ccea5e05c4ae91c9ba2b6295fe64d630ec2b2542bb3fdf6d0d6d73007a7be05672f2b",
+        "sha1": "effebdbc23c691d7fa99e3878efc3de7e4992b2a"
+      }
+    },
+    {
+      "path": "mods/Clumps-fabric-1.21.1-19.0.0.1.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/Wnxd13zP/versions/3ene3W1l/Clumps-fabric-1.21.1-19.0.0.1.jar"
+      ],
+      "hashes": {
+        "sha512": "0aa8e3508d0a40ef814d4064c0b6cadba6326128dd878fe69f30677c889cec4ccb8f639c22bdd7083a73ae8fa76e1c115b5e4b1885904dc1244b02ab2f728e78",
+        "sha1": "14628ba309d876cfefc4cef864a66ef12812066c"
+      }
+    },
+    {
+      "path": "mods/Platform-fabric-1.21.1-1.3.3.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/i6fiqm5y/versions/BbIdNbF1/Platform-fabric-1.21.1-1.3.3.jar"
+      ],
+      "hashes": {
+        "sha512": "ba5d968f08531d3cd1eac53bb6a02a0870a79e4b3a265c80aaf73b0f1836706b8a5fa099b43c7f1c81b2ebc9d223db5c74aa004e579dbbdfaa44a80d701d4dbe",
+        "sha1": "b3302ad9158171874d01e863d69c8bf4db8faef9"
+      }
+    },
+    {
+      "path": "mods/BorderlessFullscreen-v2.4.1-mc1.21.1.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/UIexcMP1/versions/a7RyAE2L/BorderlessFullscreen-v2.4.1-mc1.21.1.jar"
+      ],
+      "hashes": {
+        "sha512": "e0e41bbc246e8ff35165ab29e73fcd48245cd625da9f64a36a1871c412bc3a963ba6320ed427b8170c16a3ec8a9cc1ae6d5f1527d26ce17922ccd2833fa22643",
+        "sha1": "5adf7fa41c4b0e17ea705aae2fa9ab965f982c9a"
+      }
+    },
+    {
+      "path": "mods/c2me-fabric-mc1.21.1-0.4.0-alpha.0.30.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/VSNURh3q/versions/KxcgERSN/c2me-fabric-mc1.21.1-0.4.0-alpha.0.30.jar"
+      ],
+      "hashes": {
+        "sha1": "7ce266eb1d7ff617751ed1f0ebb203662ed641b3",
+        "sha512": "6fa50f7d626c0d0f9b877c76a2b176d8d22db17bf0530aa07ddd2a7d2f65a6328eb5326376aa28ae474d6c08610842c975548db4efc253f8386fdaefc60e08db"
+      }
+    },
+    {
+      "path": "mods/reeses-sodium-options-fabric-2.2.4+mc1.21.1.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/Bh37bMuy/versions/XtuPOKUN/reeses-sodium-options-fabric-2.2.4%2Bmc1.21.1.jar"
+      ],
+      "hashes": {
+        "sha1": "552c80c3113ad346c3abcdf7c5c6cc3a02a5fb62",
+        "sha512": "7784880c4dedae15e3e03c6de4cfa67a9ed242006f90b764c0fa6fda8679e219ca6c9987aae76ec9b0fff6f8cc38fff86b16e2836aaa0200998c9de938617d3e"
+      }
+    },
+    {
+      "path": "mods/smooth_steps-fabric-1.1.0.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/5VSZqDK0/versions/YcwNX8B8/smooth_steps-fabric-1.1.0.jar"
+      ],
+      "hashes": {
+        "sha512": "b25061ed7fcb3825aad3e1e82ac319b77709bd8b3417d20d61a73e6c416916e51096cf694a2f8be0bfd3a9fe260b1df5b239b132eb44d48a7e6f90fe112e645a",
+        "sha1": "2d1093fded2a0ec7bd79a838a72f9b02e7ec186f"
+      }
+    },
+    {
+      "path": "mods/hideexperimentalwarning-1.21.1-1.3.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/Rm4OOdHd/versions/tJbfSalt/hideexperimentalwarning-1.21.1-1.3.jar"
+      ],
+      "hashes": {
+        "sha512": "a45d6aa619670a64594c04ea59efb031aec92a84952106b2375e1667a9b445da4e4a6ed81557c99f9017e338f30b208812b0a0983907c9d094fab1ee661b73fb",
+        "sha1": "0c18b1e2534fd1dd633ae438a51206651fe46d6d"
+      }
+    },
+    {
+      "path": "mods/moreculling-fabric-1.21.1-1.0.10.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/51shyZVL/versions/wUYbHzXF/moreculling-fabric-1.21.1-1.0.10.jar"
+      ],
+      "hashes": {
+        "sha512": "7f8f33e09a7b1952c4ae77843a28a5220fe9dd6436fda4b14edeb261a5ceb5468630c54ab3b8ec2c64a5c91f5b02f0246d17db57fa7fe11eb16ec9c745b9ae40",
+        "sha1": "d425f77706d8f6499aae64eb804b3802dad111d4"
+      }
+    },
+    {
+      "path": "mods/cirrus-fabric-1.21.1-1.4.1.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/SJDzFJH7/versions/lxmciEpD/cirrus-fabric-1.21.1-1.4.1.jar"
+      ],
+      "hashes": {
+        "sha1": "000bcc548b7af1a0bf3dea826d5995e8faaa1ef3",
+        "sha512": "948c6ae6298fee3a6cdf75dd99373e4b552efc3d2715610769483dbbd8183bc4f56158fc810ccea22032e91f522b32be20b01bcc8a57f4c496e24e66f9070df5"
+      }
+    },
+    {
       "path": "mods/modmenu-11.0.5.jar",
       "downloads": [
         "https://cdn.modrinth.com/data/mOgUt4GM/versions/6lgOkclV/modmenu-11.0.5.jar"
       ],
       "hashes": {
-        "sha1": "2321d890a25b5985eba576d7cd8fe9a9c136e33d",
-        "sha512": "92e8e96267ff18d320903090f2ad9b32408a218919f5a0d578e232ad774c89d49a34a8271806652be7d6283f24e98432bc4af7f95855e78b843f9100d68696c7"
+        "sha512": "92e8e96267ff18d320903090f2ad9b32408a218919f5a0d578e232ad774c89d49a34a8271806652be7d6283f24e98432bc4af7f95855e78b843f9100d68696c7",
+        "sha1": "2321d890a25b5985eba576d7cd8fe9a9c136e33d"
+      }
+    },
+    {
+      "path": "mods/NoChatReports-FABRIC-1.21.1-v2.9.1.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/qQyHxfxd/versions/D8K0KJXM/NoChatReports-FABRIC-1.21.1-v2.9.1.jar"
+      ],
+      "hashes": {
+        "sha1": "789cabd9b1fed079af87f675d1d6c1c95b603e19",
+        "sha512": "23bb4a8a6a3f7071281cf97560e12f37e1f5f638a156e3fcb92a50ff0091f1fcfa3e090e7745e4b1175e7c2c784e38d73536a1044db1bf225a182fab758a5a29"
+      }
+    },
+    {
+      "path": "mods/geckolib-fabric-1.21.1-4.9.3.jar",
+      "downloads": [
+        "https://cdn.modrinth.com/data/8BmcQJ2H/versions/tmxM7U4W/geckolib-fabric-1.21.1-4.9.3.jar"
+      ],
+      "hashes": {
+        "sha1": "b3a6aff6ffff34d20ffde1faa640bcf17ff4b646",
+        "sha512": "e26a1c15d10cf5c1234309dbb82fb23d4783b2594b2454b16a9c964fab9e9912be66904b03eb01ebb94dada298d98de18d66f5e3f4173f771579b56e13f7da16"
       }
     }
   ],
-  "overrides": {
-    "biome-cloud-transitions-fabric-1.21.1-1.0.1.jar": {
+  "forks": [
+    {
+      "id": "biome_cloud_transitions",
+      "version": "1.0.1",
+      "file": "biome-cloud-transitions-fabric-1.21.1-1.0.1.jar",
       "repo": "dfgdrfgh/Biome-Cloud-Transitions",
-      "artifact": 11864225538,
+      "ref": "8b9705d174931157141b335de02ec3b23c613d09",
+      "kind": "cloud",
+      "content_digest": "72064bf3b0f8555beeb9d707a354297a68f6a192ba0cbe9665ac5082cd529f1d",
       "sha256": "026556cf7e11283a88a4c5c4751dc122aaa1976f4491341936f89d9be019a608"
     },
-    "mielons-the-sift-1.21.1-1.1.2-fabric-backport.4.jar": {
+    {
+      "id": "the_sift",
+      "version": "1.1.2+fabric.1.21.1.4",
+      "file": "mielons-the-sift-1.21.1-1.1.2-fabric-backport.4.jar",
       "repo": "dfgdrfgh/Mielon-s-The-Sift-1.21.1-Patch",
-      "artifact": 11788045264,
+      "ref": "7534a052f5d44bf20a459bfba724267ef3993186",
+      "kind": "sift",
+      "content_digest": "84d7c878ae4b989123bbb14fe29e5fac459319fd396661d0e6bd813d2c1d5285",
       "sha256": "2948011c472212ac4c57702264b81e93213bfd6abd7b61855f9b129daa16ca06"
     },
-    "terrain_slabs-fabric-3.1.12.jar": {
-      "repo": "dfgdrfgh/terrain_slabs_fork",
-      "artifact": 11730260747,
-      "sha256": "44bf801f5316bb9c49c2937d88301a91797c3ff7209c9993bbdf056a61db7185"
+    {
+      "id": "slabbed",
+      "version": "0.6.7-alpha+1.21.1-fabric",
+      "file": "slabbed-0.6.7-alpha+1.21.1-fabric.jar",
+      "repo": "dfgdrfgh/reslabbed",
+      "ref": "b65c13312acb48173d720ed1329fee6c200b0fca",
+      "kind": "control",
+      "content_digest": "07a327286ca5581ab5f7d686f782eb74d56a2e863fc71e53ac77c9dafe2e55a9",
+      "sha256": "62baf089d511738cda3e82cc0f8021b8af8575e497e1eb8c984a364225a9e3d1"
     },
-    "VanillaBackport-fabric-1.21.1-1.2.0.2639.2.jar": {
+    {
+      "id": "vanillabackport",
+      "version": "1.2.0.2639.2",
+      "file": "VanillaBackport-fabric-1.21.1-1.2.0.2639.2.jar",
       "repo": "dfgdrfgh/TrueVanillaBackport",
-      "artifact": 11688988703,
+      "ref": "3fafeea8c11d10092d70959ba4c3cf8265e4b619",
+      "kind": "backport",
+      "content_digest": "6ae33d086ff29ad775a95f5159cd0de5e6f445d7ae9a2f2891302531da82608f",
       "sha256": "295ecf8f8e7218765ab9def612173929210e5fe9fc799cf4bcef797df2d9b7c0"
     },
-    "wwoo-fabric-1.21.1-3.0.1-backport.jar": {
+    {
+      "id": "wwoo",
+      "version": "3.0.1+backport.1.21.1.6",
+      "file": "wwoo-fabric-1.21.1-3.0.1-backport.jar",
       "repo": "dfgdrfgh/wwoo-3.0.1-backport",
-      "artifact": 11785258216,
+      "ref": "d8be782f4f856522bcbcf71fe1e21d2cf486c543",
+      "kind": "worldgen",
+      "content_digest": "fe4833b7280249adcc79deb61c950e5dc32e3b67cc22c1ad705ad0ab2b4741ad",
       "sha256": "12580feeebf6cb3f49a2dc19df596e24e056e0b672d37c2ef56e55e60a46b042"
     }
-  },
+  ],
   "configs": {
-    "config/sodium-extra-options.json": "{\n  \"animation_settings\": {\n    \"animation\": true,\n    \"water\": true,\n    \"lava\": true,\n    \"fire\": true,\n    \"portal\": true,\n    \"block_animations\": true,\n    \"sculk_sensor\": true\n  },\n  \"particle_settings\": {\n    \"particles\": true,\n    \"rain_splash\": true,\n    \"block_break\": true,\n    \"block_breaking\": true,\n    \"other\": {}\n  },\n  \"detail_settings\": {\n    \"sky\": true,\n    \"sun\": true,\n    \"moon\": true,\n    \"stars\": true,\n    \"rain_snow\": true,\n    \"biome_colors\": true,\n    \"sky_colors\": true\n  },\n  \"render_settings\": {\n    \"fog_settings\": {\n      \"advanced\": false,\n      \"multi_dimension_fog_control\": false,\n      \"atmospheric\": {\n        \"distance_chunks\": 0,\n        \"start_percent\": 100,\n        \"shape_mode\": \"VANILLA\",\n        \"cloud_fog_percent\": 100\n      },\n      \"dimension_overrides\": {},\n      \"protected_gameplay\": {\n        \"enabled_when_allowed\": false,\n        \"blindness_distance_blocks\": 0,\n        \"darkness_distance_blocks\": 0,\n        \"lava_distance_blocks\": 0,\n        \"powder_snow_distance_blocks\": 0,\n        \"water_distance_blocks\": 0\n      }\n    },\n    \"light_updates\": true,\n    \"item_frame\": true,\n    \"armor_stand\": true,\n    \"painting\": true,\n    \"piston\": true,\n    \"beacon_beam\": true,\n    \"limit_beacon_beam_height\": false,\n    \"enchanting_table_book\": true,\n    \"item_frame_name_tag\": true,\n    \"player_name_tag\": true\n  },\n  \"extra_settings\": {\n    \"overlay_corner\": \"TOP_LEFT\",\n    \"text_contrast\": \"NONE\",\n    \"show_fps\": false,\n    \"show_f_p_s_extended\": true,\n    \"show_coords\": false,\n    \"reduce_resolution_on_mac\": false,\n    \"wayland_fullscreen_resolution\": false,\n    \"wayland_fullscreen_resolution_recovery_pending\": false,\n    \"use_adaptive_sync\": false,\n    \"cloud_height_override\": true,\n    \"cloud_height\": 319,\n    \"cloud_distance\": 100,\n    \"toasts\": true,\n    \"advancement_toast\": true,\n    \"recipe_toast\": true,\n    \"system_toast\": true,\n    \"tutorial_toast\": true,\n    \"instant_sneak\": false,\n    \"prevent_shaders\": false,\n    \"panini_projection\": false,\n    \"panini_projection_strength\": 25,\n    \"steady_debug_hud\": true,\n    \"steady_debug_hud_refresh_interval\": 1\n  }\n}\n",
-    "config/vanillabackport-common.toml": "[\"Bundles of Bravery\"]\n\thas_updated_bundles = true\n\thas_dyeable_bundle_recipe = true\n\tbundle_loot = true\n[\"The Garden Awakens\"]\n\tcreaking_particle_color = 6250335\n\tresin = true\n\tcreaking_particle_reverse_color = 16545810\n\tdo_creaking_hearts_work_on_day = false\n\tpale_trades = true\n\tpale_garden = true\n\tresin_loot = true\n\tcreaking = true\n[\"Spring to Life\"]\n\twolf_sound_variants = true\n\tspring_trades = true\n\tcactus_flower_spawn_chance = 0.25\n\tcamel_spawns = true\n\tmob_variants_spawn_chance = 1.0\n\tfirefly_bushes = true\n\tlodestone_loot = true\n\tcactus_flowers = true\n\tdry_grass = true\n\twildflowers = true\n\tbushes = true\n\tfallen_trees = true\n\tfarm_animal_variants = true\n\tleaf_litter = true\n[\"Chase the Skies\"]\n\tleash_drop_connections = true\n\thappy_ghast_speed_modifier = 1.0\n\tdried_ghasts = true\n\ttears_music_disc = true\n[\"Hot as Lava\"]\n\tlava_chicken_music_disc = true\n[\"Copper Age\"]\n\tgolem_item_carry_amount = 16\n\thas_copper_horse_armor_loot = true\n\tgolem_weathering_tick_to = 552000\n\thas_copper_toolset = true\n\tgolem_weathering_tick_from = 504000\n\thas_copper_golems = true\n\thas_copper_nuggets = true\n[\"Mounts of Mayhem\"]\n\thas_camel_husks = true\n\tzombie_nautilus_spawn_chance = 0.5\n\thas_nautilus = true\n\thas_zombie_horses = true\n\thas_parched_skeletons = true\n\tcan_mounts_float_while_ridden = true\n\thas_nautilus_armor_loot = true\n\thas_spears = true\n[\"Chaos Cubed\"]\n\thas_sulfur_springs = true\n\tdo_sulfur_cubes_damage = true\n\tdo_sulfur_cubes_explode = true\n\thas_sulfur_cubes = true\n\thas_sulfur_caves = true\n\tdo_geysers_erupt = true\n\thas_bounce_music_disc = true\n\tdo_merchant_trade_chaos_cubed_contents = true\n[\"Wilderness Bound\"]\n\thas_dappled_forest = true\n",
-    "config/trender.json": "{\n  \"version\": 1,\n  \"style\": \"VANILLA_MODERN\"\n}\n",
-    "config/fabric/indigo-renderer.properties": "always-tesselate-blocks=auto\nambient-occlusion-mode=hybrid\ndebug-compare-lighting=auto\nfix-exterior-vertex-lighting=auto\nfix-luminous-block-ambient-occlusion=auto\nfix-mean-light-calculation=auto\nfix-smooth-lighting-offset=auto\n",
-    "config/lithium.properties": "mixin.experimental=true\nmixin.world.raycast=false\n",
-    "config/ferritecore.mixin.properties": "replaceNeighborLookup = true\nreplacePropertyMap = true\ncacheMultipartPredicates = true\nmodelResourceLocations = true\nmultipartDeduplication = true\nblockstateCacheDeduplication = true\nbakedQuadDeduplication = true\nmodelSides = true\ndataComponentPatch = true\nuseSmallThreadingDetector = true\ncompactFastMap = false\npopulateNeighborTable = false\n",
-    "config/vanillabackport-client.toml": "[\"Bundles of Bravery\"]\n\tendless_bundle_ui = false\n\thas_modern_bundle_models = true\n\thas_modern_redstone_torch_models = true\n[\"Spring to Life\"]\n\tuse_legacy_spawn_eggs = false\n\tuse_sheep_wool_undercoat = false\n\tfalling_leaves = true\n\tfalling_leaves_frequency = 0.01\n[\"Chase the Skies\"]\n\tlocator_display_player_heads = false\n\tlocator_display_compass_info = false\n\tlocator_display_cardinal_points = false\n\tenable_locator_bar = true\n\tlocator_display_info_bar = false\n\textended_cloud_reach = true\n[\"Copper Age\"]\n\tend_flash_terrain_visuals = true\n\tend_flash_sky_visuals = true\n\tenable_modern_dye_textures = true\n\tenable_dye_palettes = true\n[\"Wilderness Bound\"]\n\texplorer_map_redesign = true\n\thas_modern_hay_bale_texture = true\n",
-    "config/smooth_steps.json": "{\n  \"smoothingAmount\": 0.7,\n  \"useExponentialSmoothing\": true\n}\n",
-    "config/sodium-extra.properties": "\n",
-    "config/c2me.toml": "version = 3\ndefaultGlobalExecutorParallelismExpression = \"default\"\nthreadPoolPriorityPreset = \"default\"\nglobalExecutorParallelism = \"default\"\n[fixes]\n\tdisableLoggingShutdownHook = \"default\"\n\tenforceSafeWorldRandomAccess = \"default\"\n\t[clientSideConfig.modifyMaxVDConfig]\n\t\tenabled = \"default\"\n\t\tmaxViewDistance = \"default\"\n\t\tenableExtRenderDistanceProtocol = \"default\"\n[noTickViewDistance]\n\tmaxConcurrentChunkLoads = \"default\"\n\tenableExtRenderDistanceProtocol = \"default\"\n\tensureChunkCorrectness = \"default\"\n\tchunkSendingSpeedMultiplierPercentage = \"default\"\n[ioSystem]\n\tchunkDataCacheSoftLimit = \"default\"\n\tchunkDataCacheLimit = \"default\"\n\treplaceImpl = \"default\"\n[vanillaWorldGenOptimizations]\n\tuseDensityFunctionCompiler = \"default\"\n\tenableBuiltinDFCIntegrations = \"default\"\n\toptimizeAquifer = \"default\"\n\tuseEndBiomeCache = \"default\"\n\toptimizeStructureWeightSampler = \"default\"\n\t[vanillaWorldGenOptimizations.nativeAcceleration]\n\t\tallowAVX512 = \"default\"\n\t\tenabled = \"default\"\n[generalOptimizations]\n\tmidTickChunkTasksInterval = \"default\"\n\t[generalOptimizations.autoSave]\n\t\tmode = \"default\"\n[chunkSystem]\n\tasyncSerialization = \"default\"\n\trecoverFromErrors = \"default\"\n\tallowPOIUnloading = \"default\"\n\tsuppressGhostMushrooms = \"default\"\n\tsyncPlayerTickets = \"default\"\n\tfluidPostProcessingToScheduledTick = \"default\"\n\tfilterFluidPostProcessing = \"default\"\n\tuseLegacyScheduling = \"default\"\n\tlowMemoryMode = \"default\"\n\tdelayFullChunkEvents = \"default\"\n",
-    "config/cirrus-client.json": "{\n  \"clouds\": {\n    \"enabled\": true,\n    \"dimensions\": {},\n    \"dimensionTints\": {},\n    \"timeTintEnabled\": true,\n    \"dayTint\": 16767152,\n    \"noonTint\": 16777215,\n    \"eveningTint\": 16752768,\n    \"nightTint\": 8820175,\n    \"dayFade\": 0.0,\n    \"dayFadeTransitionOnly\": false,\n    \"noonFade\": 0.0,\n    \"noonFadeTransitionOnly\": false,\n    \"eveningFade\": 0.0,\n    \"eveningFadeTransitionOnly\": false,\n    \"nightFade\": 0.0,\n    \"nightFadeTransitionOnly\": false,\n    \"shaderPackWarningsEnabled\": true,\n    \"distantHorizonsCompatibility\": true,\n    \"syncCloudDistanceWithDistantHorizons\": false,\n    \"translucentLayerOverlap\": true,\n    \"renderDistanceChunks\": 64,\n    \"detailedCloudRadiusChunks\": 64,\n    \"rainCloudCoverage\": 0.55,\n    \"thunderCloudCoverage\": 0.75,\n    \"customLightningEnabled\": true,\n    \"lightningBoltIntensity\": 1.0,\n    \"hideLightningCloudFlashes\": false,\n    \"lightningCloudFlashOpacity\": 0.75,\n    \"lowerLayerStyle\": \"fast\",\n    \"lowerLayerHeightOffset\": 128.0,\n    \"lowerLayerSpeed\": 2.0,\n    \"lowerLayerOpacity\": 0.25,\n    \"upperLayerEnabled\": true,\n    \"upperLayerStyle\": \"fast\",\n    \"upperLayerHeightOffset\": 256.0,\n    \"upperLayerSpeed\": 1.0,\n    \"upperLayerOpacity\": 0.5,\n    \"topLayerEnabled\": true,\n    \"topLayerStyle\": \"fast\",\n    \"topLayerHeightOffset\": 256.0,\n    \"topLayerSpeed\": 0.5,\n    \"topLayerOpacity\": 0.15\n  },\n  \"sky\": {\n    \"smoothTimeTransitions\": false,\n    \"timeTransitionSpeed\": 1.0,\n    \"sunAngledOrbit\": false,\n    \"moonAngledOrbit\": false,\n    \"starsAngledOrbit\": false,\n    \"milkyWayAngledOrbit\": true,\n    \"customStarsEnabled\": true,\n    \"starDensity\": 2000,\n    \"starMinimumOpacity\": 0.25,\n    \"starMaximumOpacity\": 1.0,\n    \"starMinimumSize\": 0.55,\n    \"starMaximumSize\": 2.0,\n    \"starTwinkleStrength\": 1.0,\n    \"starTwinkleSpeed\": 1.0,\n    \"starColorVariation\": 1.0,\n    \"shootingStarsEnabled\": true,\n    \"shootingStarPixelatedTrail\": true,\n    \"shootingStarFrequency\": 1.0,\n    \"shootingStarOpacity\": 0.85,\n    \"shootingStarMinimumSize\": 0.75,\n    \"shootingStarMaximumSize\": 1.5,\n    \"shootingStarMinimumSpeed\": 0.8,\n    \"shootingStarMaximumSpeed\": 1.8,\n    \"shootingStarSpeedVariation\": 0.65,\n    \"shootingStarTrailLength\": 3.0,\n    \"shootingStarBloom\": 2.0,\n    \"shootingStarColorVariation\": 1.0,\n    \"skyGradientsEnabled\": true,\n    \"fogUsesHorizonColor\": true,\n    \"fogHorizonTintStrength\": 0.6,\n    \"skyGradientOpacity\": 1.0,\n    \"skyGradientTransitionTicks\": 1800.0,\n    \"skyGradientHeight\": 0.9,\n    \"morningHorizonColor\": 16752248,\n    \"morningZenithColor\": 7575500,\n    \"morningGradientStrength\": 1.0,\n    \"dayHorizonColor\": 12180210,\n    \"dayZenithColor\": 5081290,\n    \"dayGradientStrength\": 1.0,\n    \"eveningHorizonColor\": 15759458,\n    \"eveningZenithColor\": 6052766,\n    \"eveningGradientStrength\": 1.0,\n    \"nightHorizonColor\": 4204111,\n    \"nightZenithColor\": 1514312,\n    \"nightGradientStrength\": 1.0,\n    \"milkyWayEnabled\": false,\n    \"milkyWayPixelationEnabled\": true,\n    \"milkyWayPixelationResolution\": 320,\n    \"milkyWayOpacity\": 0.65,\n    \"auroraEnabled\": false,\n    \"auroraPixelationEnabled\": true,\n    \"auroraPixelationResolution\": 320,\n    \"auroraColdBiomesOnly\": true,\n    \"auroraOpacity\": 1.0,\n    \"auroraCustomColors\": true,\n    \"auroraLowerColor\": 2030194,\n    \"auroraMiddleColor\": 2014970,\n    \"auroraUpperColor\": 14372853,\n    \"auroraAnimationSpeed\": 5.0,\n    \"auroraMovement\": 2.0,\n    \"auroraRibbonWidth\": 1.0,\n    \"auroraHeightDegrees\": -10.0,\n    \"auroraNightlyVariation\": 1.0,\n    \"endSkyEnabled\": false,\n    \"endGlassEnabled\": true,\n    \"endSkyQuality\": \"low\",\n    \"endSkyPixelationEnabled\": true,\n    \"endSkyPixelationResolution\": 64,\n    \"endSkyIntensity\": 1.0,\n    \"endSkyAnimationSpeed\": 1.0,\n    \"endSkyMorphSpeed\": 3.0,\n    \"endSkyVoidCoverage\": 2.0,\n    \"endSkyVoidDarkness\": 1.0,\n    \"endSkyLightningFrequency\": 3.0,\n    \"endSkyLightningIntensity\": 2.0,\n    \"endSkySurgeFrequency\": 3.0,\n    \"endSkySurgeStrength\": 1.0\n  }\n}\n",
-    "config/modernfix-mixins.properties": "mixin.bugfix.missing_block_entities=true\nmixin.bugfix.packet_leak=true\nmixin.perf.clear_fabric_mapping_tables=true\nmixin.perf.clear_mixin_classinfo=true\nmixin.perf.deduplicate_location=true\nmixin.perf.dynamic_entity_renderers=true\nmixin.perf.dynamic_resources=true\nmixin.perf.faster_item_rendering=true\n",
-    "config/sodium-mixins.properties": "\n",
-    "config/zfastnoise.mixin.toml": "\t[mixin.perf]\n\t\tnoise = true\n\t\tbiome = true\n",
-    "config/lithostitched.json": "{\n  \"breaks_seed_parity\": true,\n  \"log_debug_messages\": false\n}\n",
-    "config/structure_layout_optimizer.jsonc": "{\n    \"rconfig:version\": 0,\n    \"deduplicateShuffledTemplatePoolElementList\": false\n}\n",
     "config/asyncparticles/asyncparticles.json": "{\n  \"version\": 2,\n  \"particle\": {\n    \"particleLimit\": 16384,\n    \"cleanupStrategy\": \"PARALLEL_WITH_TICK\",\n    \"parallelQueueRemoval\": false,\n    \"parallelQueueEviction\": false,\n    \"particleLightCache\": true,\n    \"cullUnderwaterParticleType\": true\n  },\n  \"tick\": {\n    \"animationTickMode\": true,\n    \"particleAsyncMode\": \"SEQUENTIAL\",\n    \"gpuOnlyAsyncParticleTick\": false,\n    \"tickWeatherAsync\": true,\n    \"deferredTextureTick\": true,\n    \"failPerSecLimit\": 5,\n    \"failBehavior\": \"RAISE_CRASH\",\n    \"suppressCME\": false,\n    \"syncAnimationClasses\": [],\n    \"syncParticleClasses\": [\n      \"pigcart.particlerain.particle.BlockDisplayParticle\"\n    ]\n  },\n  \"rendering\": {\n    \"particleCulling\": \"SPHERE\",\n    \"gpuAcceleration\": true,\n    \"appendNewParticlesToRenderer\": true,\n    \"computeExecutionStage\": \"LEVEL_RENDERING\",\n    \"tickRendererOnMainThread\": false,\n    \"cullWeathers\": true\n  },\n  \"valkyrienSkies\": {\n    \"rainEffect\": \"STATIONARY\",\n    \"fixParticleLights\": true\n  },\n  \"sable\": {\n    \"fixParticleLights\": true\n  },\n  \"create\": {\n    \"rainEffect\": \"ALWAYS\",\n    \"tickRainBlockingRange\": 16\n  },\n  \"mobile\": {\n    \"multiDrawWorkaround\": true\n  }\n}\n",
-    "config/tiny_takeover_backport.json": "{\n  \"enableNameTagRecipe\": true,\n  \"spawnBabyDolphin\": true,\n  \"spawnBabySquid\": true,\n  \"enableTrumpetNoteBlocks\": true,\n  \"enableAnimalSoundVariants\": true,\n  \"enableArmadillo\": true,\n  \"enableAxolotl\": true,\n  \"enableBee\": true,\n  \"enableCamel\": true,\n  \"enableCat\": true,\n  \"enableChicken\": true,\n  \"enableCow\": true,\n  \"enableDolphin\": true,\n  \"enableDonkey\": true,\n  \"enableDrowned\": true,\n  \"enableFox\": true,\n  \"enableGoat\": true,\n  \"enableHoglin\": true,\n  \"enableHorse\": true,\n  \"enableHusk\": true,\n  \"enableLlama\": true,\n  \"enableMule\": true,\n  \"enableOcelot\": true,\n  \"enablePanda\": true,\n  \"enablePig\": true,\n  \"enablePiglin\": true,\n  \"enablePolarBear\": true,\n  \"enableRabbit\": true,\n  \"enableSheep\": true,\n  \"enableSniffer\": true,\n  \"enableSquid\": true,\n  \"enableStrider\": true,\n  \"enableTurtle\": true,\n  \"enableVillager\": true,\n  \"enableWolf\": true,\n  \"enableZombie\": true,\n  \"enableZombieVillager\": true,\n  \"enableZombifiedPiglin\": true,\n  \"replaceAdultRabbit\": true,\n  \"rabbitBoundingBox\": true,\n  \"enableModdedMobs\": false,\n  \"modelBlacklist\": [\n    \"rottencreatures:burned\"\n  ]\n}\n",
-    "config/terrain_slabs.json": "{\n  \"enableSlabGeneration\": true,\n  \"enableVegetationOnSlabs\": true,\n  \"enableSnowOnSlabs\": true,\n  \"enableExperimentalFeatures\": false,\n  \"enableCornerSlabs\": false,\n  \"slabRunLength\": 1,\n  \"adjustSlabAo\": 0.5\n}\n",
-    "config/moreculling.toml": "version = 1\nenableSodiumMenu = true\ncloudCulling = true\nsignTextCulling = true\nrainCulling = true\ndontCull = []\nuseBlockStateCulling = true\nuseCustomItemFrameRenderer = true\nitemFrameMapCulling = true\nuseItemFrameLOD = true\nitemFrameLODRange = 16\nuseItemFrame3FaceCulling = true\nitemFrame3FaceCullingRange = 2.0\npaintingCulling = true\nleavesCullingMode = \"DEPTH\"\nleavesCullingAmount = 4\nincludeMangroveRoots = true\nendGatewayCulling = true\nbeaconBeamCulling = true\nuseOnModdedBlocksByDefault = true\n[modCompatibility]\nseamlesssleep = true\nterrain_slabs = true\nwhite_pumpkins = true\nthe_sift = true\nminecraft = true\n",
-    "config/wwoo/config.json5": "WWOO Config\n{\n\t\"removeOres\": true\n}\n",
-    "config/entityculling.json": "{\n  \"configVersion\": 9,\n  \"safeMode\": true,\n  \"renderNametagsThroughWalls\": true,\n  \"blockEntityWhitelist\": [\n    \"botania:flame_ring\",\n    \"create:rope_pulley\",\n    \"minecraft:beacon\",\n    \"create:hose_pulley\",\n    \"betterend:eternal_pedestal\",\n    \"botania:magic_missile\",\n    \"botania:falling_star\"\n  ],\n  \"entityWhitelist\": [\n    \"botania:mana_burst\",\n    \"drg_flares:drg_flares\",\n    \"quark:soul_bead\"\n  ],\n  \"tracingDistance\": 128,\n  \"debugMode\": false,\n  \"sleepDelay\": 10,\n  \"hitboxLimit\": 50,\n  \"captureRate\": 5,\n  \"tickCulling\": true,\n  \"tickCullingWhitelist\": [\n    \"cinematiccataclysm:scylla_cutscene\",\n    \"minecraft:block_display\",\n    \"alexscaves:gum_worm\",\n    \"cinematiccataclysm:maledictus_cutscene\",\n    \"minecraft:jungle_boat\",\n    \"minecraft:spruce_boat\",\n    \"mts:builder_rendering\",\n    \"drg_flares:drg_flares\",\n    \"minecraft:mangrove_boat\",\n    \"mts:builder_existing\",\n    \"minecraft:acacia_boat\",\n    \"minecraft:birch_chest_boat\",\n    \"create:contraption\",\n    \"drg_flares:drg_flare\",\n    \"cinematiccataclysm:leviathan_cutscene\",\n    \"minecraft:birch_boat\",\n    \"minecraft:boat\",\n    \"mts:builder_seat\",\n    \"minecraft:cherry_boat\",\n    \"alexscaves:gum_worm_segment\",\n    \"cinematiccataclysm:ancient_remnant_cutscene\",\n    \"minecraft:spruce_chest_boat\",\n    \"minecraft:dark_oak_boat\",\n    \"minecraft:oak_chest_boat\",\n    \"avm_staff:campfire_flame\",\n    \"minecraft:dark_oak_chest_boat\",\n    \"minecraft:text_display\",\n    \"create:gantry_contraption\",\n    \"minecraft:oak_boat\",\n    \"createbigcannons:cannon_carriage\",\n    \"minecraft:pale_oak_boat\",\n    \"minecraft:acacia_chest_boat\",\n    \"minecraft:cherry_chest_boat\",\n    \"createbigcannons:pitch_contraption\",\n    \"minecraft:item_display\",\n    \"cinematiccataclysm:ignis_cutscene\",\n    \"create:stationary_contraption\",\n    \"minecraft:bamboo_raft\",\n    \"create:carriage_contraption\",\n    \"minecraft:firework_rocket\",\n    \"minecraft:jungle_chest_boat\",\n    \"minecraft:pale_oak_chest_boat\",\n    \"minecraft:bamboo_chest_raft\",\n    \"minecraft:mangrove_chest_boat\",\n    \"voidscape:corrupted_pawn\"\n  ],\n  \"disableF3\": false,\n  \"skipEntityCulling\": false,\n  \"skipBlockEntityCulling\": false,\n  \"blockEntityFrustumCulling\": true,\n  \"forceDisplayCulling\": false,\n  \"solidLeaves\": false\n}\n",
-    "config/wwoo/biome_size.json5": "Biome Size\nGlobal map scale and individual Overworld biome scales. Natural size variation remains.\n{\n\t\"sizeMultiplier\": 1.0,\n\t\"biomeScales\": {\n\t\t\"minecraft:badlands\": 1.0,\n\t\t\"minecraft:bamboo_jungle\": 1.0,\n\t\t\"minecraft:beach\": 1.0,\n\t\t\"minecraft:birch_forest\": 1.0,\n\t\t\"minecraft:cherry_grove\": 1.0,\n\t\t\"minecraft:cold_ocean\": 1.0,\n\t\t\"minecraft:dappled_forest\": 1.0,\n\t\t\"minecraft:dark_forest\": 1.0,\n\t\t\"minecraft:deep_cold_ocean\": 1.0,\n\t\t\"minecraft:deep_dark\": 1.0,\n\t\t\"minecraft:deep_frozen_ocean\": 1.0,\n\t\t\"minecraft:deep_lukewarm_ocean\": 1.0,\n\t\t\"minecraft:deep_ocean\": 1.0,\n\t\t\"minecraft:desert\": 1.0,\n\t\t\"minecraft:dripstone_caves\": 1.0,\n\t\t\"minecraft:eroded_badlands\": 1.0,\n\t\t\"minecraft:flower_forest\": 1.0,\n\t\t\"minecraft:forest\": 1.0,\n\t\t\"minecraft:frozen_ocean\": 1.0,\n\t\t\"minecraft:frozen_peaks\": 1.0,\n\t\t\"minecraft:frozen_river\": 1.0,\n\t\t\"minecraft:grove\": 1.0,\n\t\t\"minecraft:ice_spikes\": 1.0,\n\t\t\"minecraft:jagged_peaks\": 1.0,\n\t\t\"minecraft:jungle\": 1.0,\n\t\t\"minecraft:lukewarm_ocean\": 1.0,\n\t\t\"minecraft:lush_caves\": 1.0,\n\t\t\"minecraft:mangrove_swamp\": 1.0,\n\t\t\"minecraft:meadow\": 1.0,\n\t\t\"minecraft:mushroom_fields\": 1.0,\n\t\t\"minecraft:ocean\": 1.0,\n\t\t\"minecraft:old_growth_birch_forest\": 1.0,\n\t\t\"minecraft:old_growth_pine_taiga\": 1.0,\n\t\t\"minecraft:old_growth_spruce_taiga\": 1.0,\n\t\t\"minecraft:pale_garden\": 1.0,\n\t\t\"minecraft:plains\": 1.0,\n\t\t\"minecraft:river\": 1.0,\n\t\t\"minecraft:savanna\": 1.0,\n\t\t\"minecraft:savanna_plateau\": 1.0,\n\t\t\"minecraft:snowy_beach\": 1.0,\n\t\t\"minecraft:snowy_plains\": 1.0,\n\t\t\"minecraft:snowy_slopes\": 1.0,\n\t\t\"minecraft:snowy_taiga\": 1.0,\n\t\t\"minecraft:sparse_jungle\": 1.0,\n\t\t\"minecraft:stony_peaks\": 1.0,\n\t\t\"minecraft:stony_shore\": 1.0,\n\t\t\"minecraft:sulfur_caves\": 1.0,\n\t\t\"minecraft:sunflower_plains\": 1.0,\n\t\t\"minecraft:swamp\": 1.0,\n\t\t\"minecraft:taiga\": 1.0,\n\t\t\"minecraft:warm_ocean\": 1.0,\n\t\t\"minecraft:windswept_forest\": 1.0,\n\t\t\"minecraft:windswept_gravelly_hills\": 1.0,\n\t\t\"minecraft:windswept_hills\": 1.0,\n\t\t\"minecraft:windswept_savanna\": 1.0,\n\t\t\"minecraft:wooded_badlands\": 1.0\n\t}\n}\n",
-    "config/continuity.json": "{\n  \"connected_textures\": true,\n  \"emissive_textures\": true,\n  \"custom_block_layers\": true,\n  \"use_manual_culling\": true\n}\n",
     "config/transition.json": "{\n  \"version\": 1,\n  \"userConsentedToSendCrashReports\": false,\n  \"disableRecipeBookCodes\": false\n}\n",
-    "config/tectonic.json": "{\n  \"biomes\": {\n    \"temperature_multiplier\": 1.0,\n    \"temperature_offset\": 0.0,\n    \"temperature_scale\": 0.25,\n    \"vegetation_multiplier\": 1.0,\n    \"vegetation_offset\": 0.0,\n    \"vegetation_scale\": 0.25\n  },\n  \"caves\": {\n    \"carvers_enabled\": true,\n    \"cheese_additive\": 0.27,\n    \"cheese_enabled\": true,\n    \"depth_cutoff_size\": 0.1,\n    \"depth_cutoff_start\": 0.1,\n    \"noodle_additive\": -0.075,\n    \"noodle_enabled\": true,\n    \"ore_fix\": false,\n    \"spaghetti_enabled\": true\n  },\n  \"continents\": {\n    \"continents_scale\": 0.13,\n    \"erosion_scale\": 0.25,\n    \"flat_terrain_skew\": 0.1,\n    \"jungle_pillars\": true,\n    \"ocean_offset\": -0.8,\n    \"ridge_scale\": 0.25,\n    \"river_ice\": false,\n    \"river_lanterns\": true,\n    \"rolling_hills\": true,\n    \"underground_rivers\": true\n  },\n  \"experimental\": {\n    \"alternate_continents_scaling\": false,\n    \"alternate_erosion_scaling\": false,\n    \"improved_jungle_pillars\": false\n  },\n  \"general\": {\n    \"mod_enabled\": true,\n    \"snow_start_offset\": 128\n  },\n  \"global_terrain\": {\n    \"elevation_boost\": 0.0,\n    \"lava_tunnels\": true,\n    \"max_y\": 320,\n    \"min_y\": -64,\n    \"ultrasmooth\": false,\n    \"vertical_scale\": 1.125\n  },\n  \"islands\": {\n    \"enabled\": true,\n    \"noise_multiplier\": 1.0,\n    \"noise_offset\": 0.0,\n    \"noise_scale\": 0.11\n  },\n  \"minor_version\": 1,\n  \"oceans\": {\n    \"deep_ocean_depth\": -0.45,\n    \"monument_offset\": -30,\n    \"ocean_depth\": -0.22,\n    \"remove_frozen_ocean_ice\": false\n  }\n}\n",
+    "config/vanillabackport-common.toml": "[\"Bundles of Bravery\"]\n\thas_updated_bundles = true\n\thas_dyeable_bundle_recipe = true\n\tbundle_loot = true\n[\"The Garden Awakens\"]\n\tcreaking_particle_color = 6250335\n\tresin = true\n\tcreaking_particle_reverse_color = 16545810\n\tdo_creaking_hearts_work_on_day = false\n\tpale_trades = true\n\tpale_garden = true\n\tresin_loot = true\n\tcreaking = true\n[\"Spring to Life\"]\n\twolf_sound_variants = true\n\tspring_trades = true\n\tcactus_flower_spawn_chance = 0.25\n\tcamel_spawns = true\n\tmob_variants_spawn_chance = 1.0\n\tfirefly_bushes = true\n\tlodestone_loot = true\n\tcactus_flowers = true\n\tdry_grass = true\n\twildflowers = true\n\tbushes = true\n\tfallen_trees = true\n\tfarm_animal_variants = true\n\tleaf_litter = true\n[\"Chase the Skies\"]\n\tleash_drop_connections = true\n\thappy_ghast_speed_modifier = 1.0\n\tdried_ghasts = true\n\ttears_music_disc = true\n[\"Hot as Lava\"]\n\tlava_chicken_music_disc = true\n[\"Copper Age\"]\n\tgolem_item_carry_amount = 16\n\thas_copper_horse_armor_loot = true\n\tgolem_weathering_tick_to = 552000\n\thas_copper_toolset = true\n\tgolem_weathering_tick_from = 504000\n\thas_copper_golems = true\n\thas_copper_nuggets = true\n[\"Mounts of Mayhem\"]\n\thas_camel_husks = true\n\tzombie_nautilus_spawn_chance = 0.5\n\thas_nautilus = true\n\thas_zombie_horses = true\n\thas_parched_skeletons = true\n\tcan_mounts_float_while_ridden = true\n\thas_nautilus_armor_loot = true\n\thas_spears = true\n[\"Chaos Cubed\"]\n\thas_sulfur_springs = true\n\tdo_sulfur_cubes_damage = true\n\tdo_sulfur_cubes_explode = true\n\thas_sulfur_cubes = true\n\thas_sulfur_caves = true\n\tdo_geysers_erupt = true\n\thas_bounce_music_disc = true\n\tdo_merchant_trade_chaos_cubed_contents = true\n[\"Wilderness Bound\"]\n\thas_dappled_forest = true\n",
+    "config/sodium-extra-options.json": "{\n  \"animation_settings\": {\n    \"animation\": true,\n    \"water\": true,\n    \"lava\": true,\n    \"fire\": true,\n    \"portal\": true,\n    \"block_animations\": true,\n    \"sculk_sensor\": true\n  },\n  \"particle_settings\": {\n    \"particles\": true,\n    \"rain_splash\": true,\n    \"block_break\": true,\n    \"block_breaking\": true,\n    \"other\": {}\n  },\n  \"detail_settings\": {\n    \"sky\": true,\n    \"sun\": true,\n    \"moon\": true,\n    \"stars\": true,\n    \"rain_snow\": true,\n    \"biome_colors\": true,\n    \"sky_colors\": true\n  },\n  \"render_settings\": {\n    \"fog_settings\": {\n      \"advanced\": false,\n      \"multi_dimension_fog_control\": false,\n      \"atmospheric\": {\n        \"distance_chunks\": 0,\n        \"start_percent\": 100,\n        \"shape_mode\": \"VANILLA\",\n        \"cloud_fog_percent\": 100\n      },\n      \"dimension_overrides\": {},\n      \"protected_gameplay\": {\n        \"enabled_when_allowed\": false,\n        \"blindness_distance_blocks\": 0,\n        \"darkness_distance_blocks\": 0,\n        \"lava_distance_blocks\": 0,\n        \"powder_snow_distance_blocks\": 0,\n        \"water_distance_blocks\": 0\n      }\n    },\n    \"light_updates\": true,\n    \"item_frame\": true,\n    \"armor_stand\": true,\n    \"painting\": true,\n    \"piston\": true,\n    \"beacon_beam\": true,\n    \"limit_beacon_beam_height\": false,\n    \"enchanting_table_book\": true,\n    \"item_frame_name_tag\": true,\n    \"player_name_tag\": true\n  },\n  \"extra_settings\": {\n    \"overlay_corner\": \"TOP_LEFT\",\n    \"text_contrast\": \"NONE\",\n    \"show_fps\": false,\n    \"show_f_p_s_extended\": true,\n    \"show_coords\": false,\n    \"reduce_resolution_on_mac\": false,\n    \"wayland_fullscreen_resolution\": false,\n    \"wayland_fullscreen_resolution_recovery_pending\": false,\n    \"use_adaptive_sync\": false,\n    \"cloud_height_override\": true,\n    \"cloud_height\": 319,\n    \"cloud_distance\": 100,\n    \"toasts\": false,\n    \"advancement_toast\": true,\n    \"recipe_toast\": true,\n    \"system_toast\": true,\n    \"tutorial_toast\": true,\n    \"instant_sneak\": false,\n    \"prevent_shaders\": false,\n    \"panini_projection\": false,\n    \"panini_projection_strength\": 25,\n    \"steady_debug_hud\": true,\n    \"steady_debug_hud_refresh_interval\": 1\n  }\n}\n",
+    "config/tiny_takeover_backport.json": "{\n  \"enableNameTagRecipe\": true,\n  \"spawnBabyDolphin\": true,\n  \"spawnBabySquid\": true,\n  \"enableTrumpetNoteBlocks\": true,\n  \"enableAnimalSoundVariants\": true,\n  \"enableArmadillo\": true,\n  \"enableAxolotl\": true,\n  \"enableBee\": true,\n  \"enableCamel\": true,\n  \"enableCat\": true,\n  \"enableChicken\": true,\n  \"enableCow\": true,\n  \"enableDolphin\": true,\n  \"enableDonkey\": true,\n  \"enableDrowned\": true,\n  \"enableFox\": true,\n  \"enableGoat\": true,\n  \"enableHoglin\": true,\n  \"enableHorse\": true,\n  \"enableHusk\": true,\n  \"enableLlama\": true,\n  \"enableMule\": true,\n  \"enableOcelot\": true,\n  \"enablePanda\": true,\n  \"enablePig\": true,\n  \"enablePiglin\": true,\n  \"enablePolarBear\": true,\n  \"enableRabbit\": true,\n  \"enableSheep\": true,\n  \"enableSniffer\": true,\n  \"enableSquid\": true,\n  \"enableStrider\": true,\n  \"enableTurtle\": true,\n  \"enableVillager\": true,\n  \"enableWolf\": true,\n  \"enableZombie\": true,\n  \"enableZombieVillager\": true,\n  \"enableZombifiedPiglin\": true,\n  \"replaceAdultRabbit\": true,\n  \"rabbitBoundingBox\": true,\n  \"enableModdedMobs\": false,\n  \"modelBlacklist\": [\n    \"rottencreatures:burned\"\n  ]\n}\n",
     "config/sodium-options.json": "{\n  \"quality\": {\n    \"weather_quality\": \"DEFAULT\",\n    \"leaves_quality\": \"DEFAULT\",\n    \"enable_vignette\": true,\n    \"use_closest_point_entity_sort\": false\n  },\n  \"advanced\": {\n    \"enable_memory_tracing\": false,\n    \"use_advanced_staging_buffers\": true,\n    \"cpu_render_ahead_limit\": 3\n  },\n  \"performance\": {\n    \"chunk_builder_threads\": 0,\n    \"chunk_build_defer_mode\": \"ONE_FRAME\",\n    \"animate_only_visible_textures\": true,\n    \"use_entity_culling\": true,\n    \"use_fog_occlusion\": false,\n    \"use_block_face_culling\": true,\n    \"use_no_error_g_l_context\": true,\n    \"quad_splitting_mode\": \"SAFE\"\n  },\n  \"notifications\": {\n    \"has_cleared_donation_button\": false,\n    \"has_seen_donation_prompt\": true\n  },\n  \"debug\": {\n    \"terrain_sorting_enabled\": true\n  }\n}\n",
+    "config/c2me.toml": "version = 3\ndefaultGlobalExecutorParallelismExpression = \"default\"\nthreadPoolPriorityPreset = \"default\"\nglobalExecutorParallelism = \"default\"\n[fixes]\n\tdisableLoggingShutdownHook = \"default\"\n\tenforceSafeWorldRandomAccess = \"default\"\n\t[clientSideConfig.modifyMaxVDConfig]\n\t\tenabled = \"default\"\n\t\tmaxViewDistance = \"default\"\n\t\tenableExtRenderDistanceProtocol = \"default\"\n[noTickViewDistance]\n\tmaxConcurrentChunkLoads = \"default\"\n\tenableExtRenderDistanceProtocol = \"default\"\n\tensureChunkCorrectness = \"default\"\n\tchunkSendingSpeedMultiplierPercentage = \"default\"\n[ioSystem]\n\tchunkDataCacheSoftLimit = \"default\"\n\tchunkDataCacheLimit = \"default\"\n\treplaceImpl = \"default\"\n[vanillaWorldGenOptimizations]\n\tuseDensityFunctionCompiler = \"default\"\n\tenableBuiltinDFCIntegrations = \"default\"\n\toptimizeAquifer = \"default\"\n\tuseEndBiomeCache = \"default\"\n\toptimizeStructureWeightSampler = \"default\"\n\t[vanillaWorldGenOptimizations.nativeAcceleration]\n\t\tallowAVX512 = \"default\"\n\t\tenabled = \"default\"\n[generalOptimizations]\n\tmidTickChunkTasksInterval = \"default\"\n\t[generalOptimizations.autoSave]\n\t\tmode = \"default\"\n[chunkSystem]\n\tasyncSerialization = \"default\"\n\trecoverFromErrors = \"default\"\n\tallowPOIUnloading = \"default\"\n\tsuppressGhostMushrooms = \"default\"\n\tsyncPlayerTickets = \"default\"\n\tfluidPostProcessingToScheduledTick = \"default\"\n\tfilterFluidPostProcessing = \"default\"\n\tuseLegacyScheduling = \"default\"\n\tlowMemoryMode = \"default\"\n\tdelayFullChunkEvents = \"default\"\n",
     "config/ixeris.toml": "enabledOnWindows = true\nenabledOnMacOS = false\nenabledOnLinux = true\nenabledOnOtherPlatforms = true\nallowBusyWaitInFramerateLimiter = true\naggressiveCaching = false\nflexibleThreading = true\nfullyBlockingMode = false\neventPollingThreadPriority = 0\nlogPollingCalls = false\nlogBlockingCalls = false\nlogCacheIssues = false\n[bufferedRawInput]\n\tmouse = true\n\tkeyboard = false\n\tminRawInputBufferSize = 32\n\tmaxRawInputBufferSize = 1024\n\tmessageOptimizationStrategy = \"DEFAULT\"\n",
+    "config/continuity.json": "{\n  \"connected_textures\": true,\n  \"emissive_textures\": true,\n  \"custom_block_layers\": true,\n  \"use_manual_culling\": true\n}\n",
+    "config/terrain_slabs.json": "{\n  \"enableSlabGeneration\": true,\n  \"enableVegetationOnSlabs\": true,\n  \"enableSnowOnSlabs\": true,\n  \"enableExperimentalFeatures\": false,\n  \"enableCornerSlabs\": false,\n  \"slabRunLength\": 1,\n  \"adjustSlabAo\": 0.5\n}\n",
+    "config/wwoo/biome_size.json5": "Biome Size\nGlobal map scale and individual Overworld biome scales. Natural size variation remains.\n{\n\t\"sizeMultiplier\": 1.0,\n\t\"biomeScales\": {\n\t\t\"minecraft:badlands\": 1.0,\n\t\t\"minecraft:bamboo_jungle\": 1.0,\n\t\t\"minecraft:beach\": 1.0,\n\t\t\"minecraft:birch_forest\": 1.0,\n\t\t\"minecraft:cherry_grove\": 1.0,\n\t\t\"minecraft:cold_ocean\": 1.0,\n\t\t\"minecraft:dappled_forest\": 1.0,\n\t\t\"minecraft:dark_forest\": 1.0,\n\t\t\"minecraft:deep_cold_ocean\": 1.0,\n\t\t\"minecraft:deep_dark\": 1.0,\n\t\t\"minecraft:deep_frozen_ocean\": 1.0,\n\t\t\"minecraft:deep_lukewarm_ocean\": 1.0,\n\t\t\"minecraft:deep_ocean\": 1.0,\n\t\t\"minecraft:desert\": 1.0,\n\t\t\"minecraft:dripstone_caves\": 1.0,\n\t\t\"minecraft:eroded_badlands\": 1.0,\n\t\t\"minecraft:flower_forest\": 1.0,\n\t\t\"minecraft:forest\": 1.0,\n\t\t\"minecraft:frozen_ocean\": 1.0,\n\t\t\"minecraft:frozen_peaks\": 1.0,\n\t\t\"minecraft:frozen_river\": 1.0,\n\t\t\"minecraft:grove\": 1.0,\n\t\t\"minecraft:ice_spikes\": 1.0,\n\t\t\"minecraft:jagged_peaks\": 1.0,\n\t\t\"minecraft:jungle\": 1.0,\n\t\t\"minecraft:lukewarm_ocean\": 1.0,\n\t\t\"minecraft:lush_caves\": 1.0,\n\t\t\"minecraft:mangrove_swamp\": 1.0,\n\t\t\"minecraft:meadow\": 1.0,\n\t\t\"minecraft:mushroom_fields\": 1.0,\n\t\t\"minecraft:ocean\": 1.0,\n\t\t\"minecraft:old_growth_birch_forest\": 1.0,\n\t\t\"minecraft:old_growth_pine_taiga\": 1.0,\n\t\t\"minecraft:old_growth_spruce_taiga\": 1.0,\n\t\t\"minecraft:pale_garden\": 1.0,\n\t\t\"minecraft:plains\": 1.0,\n\t\t\"minecraft:river\": 1.0,\n\t\t\"minecraft:savanna\": 1.0,\n\t\t\"minecraft:savanna_plateau\": 1.0,\n\t\t\"minecraft:snowy_beach\": 1.0,\n\t\t\"minecraft:snowy_plains\": 1.0,\n\t\t\"minecraft:snowy_slopes\": 1.0,\n\t\t\"minecraft:snowy_taiga\": 1.0,\n\t\t\"minecraft:sparse_jungle\": 1.0,\n\t\t\"minecraft:stony_peaks\": 1.0,\n\t\t\"minecraft:stony_shore\": 1.0,\n\t\t\"minecraft:sulfur_caves\": 1.0,\n\t\t\"minecraft:sunflower_plains\": 1.0,\n\t\t\"minecraft:swamp\": 1.0,\n\t\t\"minecraft:taiga\": 1.0,\n\t\t\"minecraft:warm_ocean\": 1.0,\n\t\t\"minecraft:windswept_forest\": 1.0,\n\t\t\"minecraft:windswept_gravelly_hills\": 1.0,\n\t\t\"minecraft:windswept_hills\": 1.0,\n\t\t\"minecraft:windswept_savanna\": 1.0,\n\t\t\"minecraft:wooded_badlands\": 1.0\n\t}\n}\n",
+    "config/wwoo/config.json5": "WWOO Config\n{\n\t\"removeOres\": true\n}\n",
+    "config/sodium-mixins.properties": "\n",
+    "config/sodium-extra.properties": "\n",
+    "config/vanillabackport-client.toml": "[\"Bundles of Bravery\"]\n\tendless_bundle_ui = false\n\thas_modern_bundle_models = true\n\thas_modern_redstone_torch_models = true\n[\"Spring to Life\"]\n\tuse_legacy_spawn_eggs = false\n\tuse_sheep_wool_undercoat = false\n\tfalling_leaves = true\n\tfalling_leaves_frequency = 0.01\n[\"Chase the Skies\"]\n\tlocator_display_player_heads = false\n\tlocator_display_compass_info = false\n\tlocator_display_cardinal_points = false\n\tenable_locator_bar = true\n\tlocator_display_info_bar = false\n\textended_cloud_reach = true\n[\"Copper Age\"]\n\tend_flash_terrain_visuals = true\n\tend_flash_sky_visuals = true\n\tenable_modern_dye_textures = true\n\tenable_dye_palettes = true\n[\"Wilderness Bound\"]\n\texplorer_map_redesign = true\n\thas_modern_hay_bale_texture = true\n",
+    "config/lithium.properties": "mixin.experimental=true\nmixin.world.raycast=false\n",
+    "config/cirrus-client.json": "{\n  \"clouds\": {\n    \"enabled\": true,\n    \"dimensions\": {},\n    \"dimensionTints\": {},\n    \"timeTintEnabled\": true,\n    \"dayTint\": 16767152,\n    \"noonTint\": 16777215,\n    \"eveningTint\": 16752768,\n    \"nightTint\": 8820175,\n    \"dayFade\": 0.0,\n    \"dayFadeTransitionOnly\": false,\n    \"noonFade\": 0.0,\n    \"noonFadeTransitionOnly\": false,\n    \"eveningFade\": 0.0,\n    \"eveningFadeTransitionOnly\": false,\n    \"nightFade\": 0.0,\n    \"nightFadeTransitionOnly\": false,\n    \"shaderPackWarningsEnabled\": true,\n    \"distantHorizonsCompatibility\": true,\n    \"syncCloudDistanceWithDistantHorizons\": false,\n    \"translucentLayerOverlap\": true,\n    \"renderDistanceChunks\": 64,\n    \"detailedCloudRadiusChunks\": 64,\n    \"rainCloudCoverage\": 0.55,\n    \"thunderCloudCoverage\": 0.75,\n    \"customLightningEnabled\": true,\n    \"lightningBoltIntensity\": 1.0,\n    \"hideLightningCloudFlashes\": false,\n    \"lightningCloudFlashOpacity\": 0.75,\n    \"lowerLayerStyle\": \"fast\",\n    \"lowerLayerHeightOffset\": 128.0,\n    \"lowerLayerSpeed\": 2.0,\n    \"lowerLayerOpacity\": 0.25,\n    \"upperLayerEnabled\": true,\n    \"upperLayerStyle\": \"fast\",\n    \"upperLayerHeightOffset\": 256.0,\n    \"upperLayerSpeed\": 1.0,\n    \"upperLayerOpacity\": 0.5,\n    \"topLayerEnabled\": true,\n    \"topLayerStyle\": \"fast\",\n    \"topLayerHeightOffset\": 256.0,\n    \"topLayerSpeed\": 0.5,\n    \"topLayerOpacity\": 0.15\n  },\n  \"sky\": {\n    \"smoothTimeTransitions\": false,\n    \"timeTransitionSpeed\": 1.0,\n    \"sunAngledOrbit\": false,\n    \"moonAngledOrbit\": false,\n    \"starsAngledOrbit\": false,\n    \"milkyWayAngledOrbit\": true,\n    \"customStarsEnabled\": true,\n    \"starDensity\": 2000,\n    \"starMinimumOpacity\": 0.25,\n    \"starMaximumOpacity\": 1.0,\n    \"starMinimumSize\": 0.55,\n    \"starMaximumSize\": 2.0,\n    \"starTwinkleStrength\": 1.0,\n    \"starTwinkleSpeed\": 1.0,\n    \"starColorVariation\": 1.0,\n    \"shootingStarsEnabled\": true,\n    \"shootingStarPixelatedTrail\": true,\n    \"shootingStarFrequency\": 1.0,\n    \"shootingStarOpacity\": 0.85,\n    \"shootingStarMinimumSize\": 0.75,\n    \"shootingStarMaximumSize\": 1.5,\n    \"shootingStarMinimumSpeed\": 0.8,\n    \"shootingStarMaximumSpeed\": 1.8,\n    \"shootingStarSpeedVariation\": 0.65,\n    \"shootingStarTrailLength\": 3.0,\n    \"shootingStarBloom\": 2.0,\n    \"shootingStarColorVariation\": 1.0,\n    \"skyGradientsEnabled\": true,\n    \"fogUsesHorizonColor\": true,\n    \"fogHorizonTintStrength\": 0.6,\n    \"skyGradientOpacity\": 1.0,\n    \"skyGradientTransitionTicks\": 1800.0,\n    \"skyGradientHeight\": 0.9,\n    \"morningHorizonColor\": 16752248,\n    \"morningZenithColor\": 7575500,\n    \"morningGradientStrength\": 1.0,\n    \"dayHorizonColor\": 12180210,\n    \"dayZenithColor\": 5081290,\n    \"dayGradientStrength\": 1.0,\n    \"eveningHorizonColor\": 15759458,\n    \"eveningZenithColor\": 6052766,\n    \"eveningGradientStrength\": 1.0,\n    \"nightHorizonColor\": 4204111,\n    \"nightZenithColor\": 1514312,\n    \"nightGradientStrength\": 1.0,\n    \"milkyWayEnabled\": false,\n    \"milkyWayPixelationEnabled\": true,\n    \"milkyWayPixelationResolution\": 320,\n    \"milkyWayOpacity\": 0.65,\n    \"auroraEnabled\": false,\n    \"auroraPixelationEnabled\": true,\n    \"auroraPixelationResolution\": 320,\n    \"auroraColdBiomesOnly\": true,\n    \"auroraOpacity\": 1.0,\n    \"auroraCustomColors\": true,\n    \"auroraLowerColor\": 2030194,\n    \"auroraMiddleColor\": 2014970,\n    \"auroraUpperColor\": 14372853,\n    \"auroraAnimationSpeed\": 5.0,\n    \"auroraMovement\": 2.0,\n    \"auroraRibbonWidth\": 1.0,\n    \"auroraHeightDegrees\": -10.0,\n    \"auroraNightlyVariation\": 1.0,\n    \"endSkyEnabled\": false,\n    \"endGlassEnabled\": true,\n    \"endSkyQuality\": \"low\",\n    \"endSkyPixelationEnabled\": true,\n    \"endSkyPixelationResolution\": 64,\n    \"endSkyIntensity\": 1.0,\n    \"endSkyAnimationSpeed\": 1.0,\n    \"endSkyMorphSpeed\": 3.0,\n    \"endSkyVoidCoverage\": 2.0,\n    \"endSkyVoidDarkness\": 1.0,\n    \"endSkyLightningFrequency\": 3.0,\n    \"endSkyLightningIntensity\": 2.0,\n    \"endSkySurgeFrequency\": 3.0,\n    \"endSkySurgeStrength\": 1.0\n  }\n}\n",
+    "config/structure_layout_optimizer.jsonc": "{\n    \"rconfig:version\": 0,\n    \"deduplicateShuffledTemplatePoolElementList\": false\n}\n",
+    "config/modernfix-mixins.properties": "mixin.bugfix.missing_block_entities=true\nmixin.bugfix.packet_leak=true\nmixin.perf.clear_fabric_mapping_tables=true\nmixin.perf.clear_mixin_classinfo=true\nmixin.perf.deduplicate_location=true\nmixin.perf.dynamic_entity_renderers=true\nmixin.perf.dynamic_resources=true\nmixin.perf.faster_item_rendering=true\n",
+    "config/tectonic.json": "{\n  \"biomes\": {\n    \"temperature_multiplier\": 1.0,\n    \"temperature_offset\": 0.0,\n    \"temperature_scale\": 0.25,\n    \"vegetation_multiplier\": 1.0,\n    \"vegetation_offset\": 0.0,\n    \"vegetation_scale\": 0.25\n  },\n  \"caves\": {\n    \"carvers_enabled\": true,\n    \"cheese_additive\": 0.27,\n    \"cheese_enabled\": true,\n    \"depth_cutoff_size\": 0.1,\n    \"depth_cutoff_start\": 0.1,\n    \"noodle_additive\": -0.075,\n    \"noodle_enabled\": true,\n    \"ore_fix\": false,\n    \"spaghetti_enabled\": true\n  },\n  \"continents\": {\n    \"continents_scale\": 0.13,\n    \"erosion_scale\": 0.25,\n    \"flat_terrain_skew\": 0.1,\n    \"jungle_pillars\": true,\n    \"ocean_offset\": -0.8,\n    \"ridge_scale\": 0.25,\n    \"river_ice\": false,\n    \"river_lanterns\": true,\n    \"rolling_hills\": true,\n    \"underground_rivers\": true\n  },\n  \"experimental\": {\n    \"alternate_continents_scaling\": false,\n    \"alternate_erosion_scaling\": false,\n    \"improved_jungle_pillars\": false\n  },\n  \"general\": {\n    \"mod_enabled\": true,\n    \"snow_start_offset\": 128\n  },\n  \"global_terrain\": {\n    \"elevation_boost\": 0.0,\n    \"lava_tunnels\": true,\n    \"max_y\": 320,\n    \"min_y\": -64,\n    \"ultrasmooth\": false,\n    \"vertical_scale\": 1.125\n  },\n  \"islands\": {\n    \"enabled\": true,\n    \"noise_multiplier\": 1.0,\n    \"noise_offset\": 0.0,\n    \"noise_scale\": 0.11\n  },\n  \"minor_version\": 1,\n  \"oceans\": {\n    \"deep_ocean_depth\": -0.45,\n    \"monument_offset\": -30,\n    \"ocean_depth\": -0.22,\n    \"remove_frozen_ocean_ice\": false\n  }\n}\n",
+    "config/moreculling.toml": "version = 1\nenableSodiumMenu = true\ncloudCulling = true\nsignTextCulling = true\nrainCulling = true\ndontCull = []\nuseBlockStateCulling = true\nuseCustomItemFrameRenderer = true\nitemFrameMapCulling = true\nuseItemFrameLOD = true\nitemFrameLODRange = 16\nuseItemFrame3FaceCulling = true\nitemFrame3FaceCullingRange = 2.0\npaintingCulling = true\nleavesCullingMode = \"DEPTH\"\nleavesCullingAmount = 4\nincludeMangroveRoots = true\nendGatewayCulling = true\nbeaconBeamCulling = true\nuseOnModdedBlocksByDefault = true\n[modCompatibility]\nseamlesssleep = true\nterrain_slabs = true\nwhite_pumpkins = true\nthe_sift = true\nminecraft = true\n",
+    "config/ferritecore.mixin.properties": "replaceNeighborLookup = true\nreplacePropertyMap = true\ncacheMultipartPredicates = true\nmodelResourceLocations = true\nmultipartDeduplication = true\nblockstateCacheDeduplication = true\nbakedQuadDeduplication = true\nmodelSides = true\ndataComponentPatch = true\nuseSmallThreadingDetector = true\ncompactFastMap = false\npopulateNeighborTable = false\n",
+    "config/trender.json": "{\n  \"version\": 1,\n  \"style\": \"VANILLA_MODERN\"\n}\n",
     "config/immediatelyfast.json": "{\n  \"REGULAR_INFO\": \"----- Regular config values below -----\",\n  \"font_atlas_resizing\": true,\n  \"map_atlas_generation\": true,\n  \"hud_batching\": true,\n  \"fast_text_lookup\": true,\n  \"fast_buffer_upload\": true,\n  \"COSMETIC_INFO\": \"----- Cosmetic only config values below (Does not optimize anything) -----\",\n  \"dont_add_info_into_debug_hud\": false,\n  \"EXPERIMENTAL_INFO\": \"----- Experimental config values below (Rendering glitches may occur) -----\",\n  \"experimental_disable_error_checking\": true,\n  \"experimental_disable_resource_pack_conflict_handling\": true,\n  \"experimental_sign_text_buffering\": true,\n  \"experimental_screen_batching\": true,\n  \"DEBUG_INFO\": \"----- Debug only config values below (Do not touch) -----\",\n  \"debug_only_and_not_recommended_disable_universal_batching\": false,\n  \"debug_only_and_not_recommended_disable_mod_conflict_handling\": false,\n  \"debug_only_and_not_recommended_disable_hardware_conflict_handling\": false,\n  \"debug_only_print_additional_error_information\": false,\n  \"debug_only_use_last_usage_for_batch_ordering\": false,\n  \"debug_only_detailed_memory_leak_detection\": false\n}\n",
-    "config/asyncparticles/asyncparticles-mixin.properties": "create$contraptionNoParticleCollision=rbasamoyai.createbigcannons.cannon_control.contraption.PitchOrientedContraptionEntity,rbasamoyai.createbigcannons.cannon_control.contraption.AbstractMountedCannonContraption\nparticle$lockProvider=yesman.epicfight.client.particle.TrailParticle,yesman.epicfight.client.particle.AbstractTrailParticle,com.lowdragmc.photon.client.gameobject.FXObject\nparticle$lockRequired=yesman.epicfight.client.particle.TrailParticle,yesman.epicfight.client.particle.AbstractTrailParticle,com.lowdragmc.photon.client.gameobject.FXObject\nparticle$noCulling=com.lowdragmc.photon.client.gameobject.FXObject,net.bettercombat.client.particle.SlashParticle\nparticle$noLightCache=dev.shadowsoffire.gateways.client.GatewayParticle,com.chailotl.particular.particles.FireflyParticle,com.lowdragmc.photon.client.gameobject.FXObject,net.diebuddies.minecraft.weather.WeatherParticle\nreplaceRandom=appeng.client.render.effects.LightningArcFX,appeng.client.render.effects.LightningFX,de.cheaterpaul.fallingleaves.util.LeafUtil\nsafeBlockEntityMap=false\nsafeClassInstanceMultiMap=false\nsafeLegacyRandomSource=true\nversion=3\n"
+    "config/smooth_steps.json": "{\n  \"smoothingAmount\": 0.7,\n  \"useExponentialSmoothing\": true\n}\n",
+    "config/entityculling.json": "{\n  \"configVersion\": 9,\n  \"safeMode\": true,\n  \"renderNametagsThroughWalls\": true,\n  \"blockEntityWhitelist\": [\n    \"botania:flame_ring\",\n    \"create:rope_pulley\",\n    \"minecraft:beacon\",\n    \"create:hose_pulley\",\n    \"betterend:eternal_pedestal\",\n    \"botania:magic_missile\",\n    \"botania:falling_star\"\n  ],\n  \"entityWhitelist\": [\n    \"botania:mana_burst\",\n    \"drg_flares:drg_flares\",\n    \"quark:soul_bead\"\n  ],\n  \"tracingDistance\": 128,\n  \"debugMode\": false,\n  \"sleepDelay\": 10,\n  \"hitboxLimit\": 50,\n  \"captureRate\": 5,\n  \"tickCulling\": true,\n  \"tickCullingWhitelist\": [\n    \"cinematiccataclysm:scylla_cutscene\",\n    \"minecraft:block_display\",\n    \"alexscaves:gum_worm\",\n    \"cinematiccataclysm:maledictus_cutscene\",\n    \"minecraft:jungle_boat\",\n    \"minecraft:spruce_boat\",\n    \"mts:builder_rendering\",\n    \"drg_flares:drg_flares\",\n    \"minecraft:mangrove_boat\",\n    \"mts:builder_existing\",\n    \"minecraft:acacia_boat\",\n    \"minecraft:birch_chest_boat\",\n    \"create:contraption\",\n    \"drg_flares:drg_flare\",\n    \"cinematiccataclysm:leviathan_cutscene\",\n    \"minecraft:birch_boat\",\n    \"minecraft:boat\",\n    \"mts:builder_seat\",\n    \"minecraft:cherry_boat\",\n    \"alexscaves:gum_worm_segment\",\n    \"cinematiccataclysm:ancient_remnant_cutscene\",\n    \"minecraft:spruce_chest_boat\",\n    \"minecraft:dark_oak_boat\",\n    \"minecraft:oak_chest_boat\",\n    \"avm_staff:campfire_flame\",\n    \"minecraft:dark_oak_chest_boat\",\n    \"minecraft:text_display\",\n    \"create:gantry_contraption\",\n    \"minecraft:oak_boat\",\n    \"createbigcannons:cannon_carriage\",\n    \"minecraft:pale_oak_boat\",\n    \"minecraft:acacia_chest_boat\",\n    \"minecraft:cherry_chest_boat\",\n    \"createbigcannons:pitch_contraption\",\n    \"minecraft:item_display\",\n    \"cinematiccataclysm:ignis_cutscene\",\n    \"create:stationary_contraption\",\n    \"minecraft:bamboo_raft\",\n    \"create:carriage_contraption\",\n    \"minecraft:firework_rocket\",\n    \"minecraft:jungle_chest_boat\",\n    \"minecraft:pale_oak_chest_boat\",\n    \"minecraft:bamboo_chest_raft\",\n    \"minecraft:mangrove_chest_boat\",\n    \"voidscape:corrupted_pawn\"\n  ],\n  \"disableF3\": false,\n  \"skipEntityCulling\": false,\n  \"skipBlockEntityCulling\": false,\n  \"blockEntityFrustumCulling\": true,\n  \"forceDisplayCulling\": false,\n  \"solidLeaves\": false\n}\n",
+    "config/zfastnoise.mixin.toml": "\t[mixin.perf]\n\t\tnoise = true\n\t\tbiome = true\n",
+    "config/asyncparticles/asyncparticles-mixin.properties": "create$contraptionNoParticleCollision=rbasamoyai.createbigcannons.cannon_control.contraption.PitchOrientedContraptionEntity,rbasamoyai.createbigcannons.cannon_control.contraption.AbstractMountedCannonContraption\nparticle$lockProvider=yesman.epicfight.client.particle.TrailParticle,yesman.epicfight.client.particle.AbstractTrailParticle,com.lowdragmc.photon.client.gameobject.FXObject\nparticle$lockRequired=yesman.epicfight.client.particle.TrailParticle,yesman.epicfight.client.particle.AbstractTrailParticle,com.lowdragmc.photon.client.gameobject.FXObject\nparticle$noCulling=com.lowdragmc.photon.client.gameobject.FXObject,net.bettercombat.client.particle.SlashParticle\nparticle$noLightCache=dev.shadowsoffire.gateways.client.GatewayParticle,com.chailotl.particular.particles.FireflyParticle,com.lowdragmc.photon.client.gameobject.FXObject,net.diebuddies.minecraft.weather.WeatherParticle\nreplaceRandom=appeng.client.render.effects.LightningArcFX,appeng.client.render.effects.LightningFX,de.cheaterpaul.fallingleaves.util.LeafUtil\nsafeBlockEntityMap=false\nsafeClassInstanceMultiMap=false\nsafeLegacyRandomSource=true\nversion=3\n",
+    "config/lithostitched.json": "{\n  \"breaks_seed_parity\": true,\n  \"enable_debug_suite\": false,\n  \"log_debug_messages\": false\n}\n",
+    "config/fabric/indigo-renderer.properties": "always-tesselate-blocks=auto\nambient-occlusion-mode=hybrid\ndebug-compare-lighting=auto\nfix-exterior-vertex-lighting=auto\nfix-luminous-block-ambient-occlusion=auto\nfix-mean-light-calculation=auto\nfix-smooth-lighting-offset=auto\n"
   }
 }

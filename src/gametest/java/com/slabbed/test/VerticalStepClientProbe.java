@@ -97,6 +97,25 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
             System.out.println("REAL_TERRAIN_SLABS_LOADED version=" + mod.getMetadata().getVersion()
                     + " block=" + terrainSlab().getClass().getName());
         }
+        if (Boolean.getBoolean("slabbed.vanillaSlabProbe")) {
+            require(!net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("terrain_slabs")
+                            && !net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("continuity"),
+                    "Updated pack must not acquire removed compatibility mods from the test fixture");
+        }
+        String manifest = System.getProperty("slabbed.packManifest");
+        if (manifest != null) {
+            try {
+                var entries = com.google.gson.JsonParser.parseString(Files.readString(Path.of(manifest))).getAsJsonArray();
+                for (var value : entries) {
+                    var entry = value.getAsJsonObject();
+                    String id = entry.get("id").getAsString();
+                    var mod = net.fabricmc.loader.api.FabricLoader.getInstance().getModContainer(id).orElseThrow();
+                    require(mod.getMetadata().getVersion().getFriendlyString().equals(entry.get("version").getAsString()),
+                            "Pack mod resolved to an unexpected version: " + id);
+                }
+                System.out.println("FULL_PACK_BASELINE_LOADED count=" + entries.size());
+            } catch (Exception error) { throw new IllegalStateException("Cannot verify pack baseline", error); }
+        }
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             try { tick(client); }
             catch (Throwable error) { error.printStackTrace(); System.exit(1); }
@@ -250,6 +269,9 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
         }
         if (phase == 6) {
             System.out.println("WEIGHTED_TERRAIN_SLAB_MODEL_OUTLINE_RELOAD_PASS");
+            if (Boolean.getBoolean("slabbed.vanillaSlabProbe")) {
+                phase = 8; started = ticks; return;
+            }
             checkMeshedFace(NATURAL_TOP, Direction.DOWN, 0, false);
             var chunk = client.world.getWorldChunk(naturalBase().up());
             terrainMarkers = new it.unimi.dsi.fastutil.longs.LongOpenHashSet(
@@ -333,6 +355,7 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
     }
 
     private static Block terrainSlab() {
+        if (Boolean.getBoolean("slabbed.vanillaSlabProbe")) return Blocks.STONE_SLAB;
         var id = net.minecraft.util.Identifier.of("terrain_slabs", "grass_slab");
         return net.minecraft.registry.Registries.BLOCK.containsId(id)
                 ? net.minecraft.registry.Registries.BLOCK.get(id) : TerrainSlabsTestShim.TEST_TS_SLAB;
@@ -472,3 +495,4 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
         if (!value) throw new AssertionError(message);
     }
 }
+
