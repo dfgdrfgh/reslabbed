@@ -197,4 +197,55 @@ public final class PlacementOccupancyTest {
         h.assertTrue(height(world, owner) == ownerHeight, "Fitting slab moved the placed owner");
         h.complete();
     }
+
+    @GameTest(templateName = "slabbed:empty_16")
+    public void terrainSlabCannotPullDownExistingFrozenFlatBlocks(TestContext h) {
+        ServerWorld world = h.getWorld();
+        BlockState[] states = {Blocks.STONE.getDefaultState(), Blocks.OAK_LOG.getDefaultState(),
+                Blocks.OAK_PLANKS.getDefaultState()};
+        for (int i = 0; i < states.length; i++) {
+            BlockPos ground = h.getAbsolutePos(new BlockPos(2 + i * 4, 1, 3));
+            BlockPos upper = ground.up(2);
+            world.setBlockState(ground, Blocks.STONE.getDefaultState(), Block.NOTIFY_ALL);
+            world.setBlockState(ground.up(), Blocks.STONE.getDefaultState(), Block.NOTIFY_ALL);
+            world.setBlockState(upper, states[i], Block.NOTIFY_ALL);
+            SlabAnchorAttachment.freezeLoweredOnPlace(world, upper, states[i]);
+            h.assertTrue(SlabAnchorAttachment.isFrozenFlat(world, upper)
+                            && !SlabAnchorAttachment.isModernPlacement(world, upper),
+                    "Existing-world control must carry only a legacy flat marker");
+            long before = height(world, upper);
+            world.breakBlock(ground.up(), false);
+            h.assertTrue(place(player(h, ground), new ItemStack(TerrainSlabsTestShim.TEST_TS_SLAB.asItem()),
+                            ground).isAccepted(), "Terrain slab must fit under the unchanged upper block");
+            h.assertTrue(height(world, upper) == before,
+                    "A new Terrain Slabs support pulled an existing frozen-flat block down: " + states[i]);
+            h.assertTrue(world.getBlockState(upper).getOutlineShape(world, upper).getMin(Direction.Axis.Y) == 0.0,
+                    "Existing upper block acquired a displaced ghost outline");
+        }
+        h.complete();
+    }
+
+    @GameTest(templateName = "slabbed:empty_16")
+    public void newSlabCannotAdoptUntouchedObjectCubesAboveIt(TestContext h) {
+        ServerWorld world = h.getWorld();
+        BlockState[] states = {Blocks.GLASS.getDefaultState(), Blocks.CRAFTING_TABLE.getDefaultState(),
+                Blocks.FURNACE.getDefaultState()};
+        Item[] slabs = {Items.STONE_SLAB, TerrainSlabsTestShim.TEST_TS_SLAB.asItem()};
+        for (int z = 0; z < slabs.length; z++) for (int i = 0; i < states.length; i++) {
+            BlockPos ground = h.getAbsolutePos(new BlockPos(2 + i * 4, 1, 3 + z * 5));
+            BlockPos upper = ground.up(2);
+            world.setBlockState(ground, Blocks.STONE.getDefaultState(), Block.NOTIFY_ALL);
+            world.setBlockState(upper, states[i], Block.NOTIFY_ALL);
+            long before = height(world, upper);
+            h.assertTrue(before == Double.doubleToRawLongBits(0.0), "Untouched cube must begin flat");
+            h.assertTrue(place(player(h, ground), new ItemStack(slabs[z]), ground).isAccepted(),
+                    "Slab must fit below the untouched cube");
+            h.assertTrue(height(world, upper) == before,
+                    "A new slab pulled an untouched object cube down: " + states[i]);
+            h.assertTrue(!SlabAnchorAttachment.isModernPlacement(world, upper)
+                            && world.getBlockState(upper).equals(states[i]),
+                    "Protecting an existing cube must not rewrite it or author placement provenance");
+        }
+        h.complete();
+    }
 }
