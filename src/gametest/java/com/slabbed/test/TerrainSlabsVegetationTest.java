@@ -41,7 +41,7 @@ public final class TerrainSlabsVegetationTest {
                 for (BlockState plant : new BlockState[]{Blocks.SHORT_GRASS.getDefaultState(),
                         Blocks.FERN.getDefaultState(), Blocks.DANDELION.getDefaultState()}) {
                     states.put(pos, plant);
-                    assertOneSeat(ctx, view, pos, plant, -0.5d);
+                    assertOneSeat(ctx, view, pos, plant, 0.0d);
                     Vec3d nativeJitter = plant.getModelOffset(EmptyBlockView.INSTANCE, pos);
                     Vec3d combinedJitter = plant.getModelOffset(view, pos);
                     ctx.assertTrue(nativeJitter.x == combinedJitter.x && nativeJitter.z == combinedJitter.z,
@@ -51,8 +51,8 @@ public final class TerrainSlabsVegetationTest {
             BlockState tall = Blocks.TALL_GRASS.getDefaultState().with(Properties.DOUBLE_BLOCK_HALF, DoubleBlockHalf.LOWER);
             states.put(pos, tall);
             states.put(pos.up(), tall.with(Properties.DOUBLE_BLOCK_HALF, DoubleBlockHalf.UPPER));
-            assertOneSeat(ctx, view, pos, tall, -0.5d);
-            assertOneSeat(ctx, view, pos.up(), states.get(pos.up()), -0.5d);
+            assertOneSeat(ctx, view, pos, tall, 0.0d);
+            assertOneSeat(ctx, view, pos.up(), states.get(pos.up()), 0.0d);
             states.put(pos.down(), Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP));
             states.put(pos, Blocks.SHORT_GRASS.getDefaultState());
             assertOneSeat(ctx, view, pos, states.get(pos), 0.0d);

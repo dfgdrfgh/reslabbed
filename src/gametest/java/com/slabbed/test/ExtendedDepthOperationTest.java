@@ -298,12 +298,12 @@ public final class ExtendedDepthOperationTest {
             assertIdentity(
                     world, pistonCase.piston(), pistonCase.id() + " starting base",
                     pistonCase.modern(), pistonCase.authoredDeepFact(), pistonCase.modern(),
-                    pistonCase.modern() && pistonCase.authoredDeepFact() ? DEEP_DY : 0.0d,
+                    pistonCase.authoredDeepFact() ? DEEP_DY : 0.0d,
                     failures);
             assertIdentity(
                     world, pistonCase.piston().east(), pistonCase.id() + " starting payload",
                     pistonCase.modern(), pistonCase.authoredDeepFact(), pistonCase.modern(),
-                    pistonCase.modern() && pistonCase.authoredDeepFact() ? DEEP_DY : 0.0d,
+                    pistonCase.authoredDeepFact() ? DEEP_DY : 0.0d,
                     failures);
         }
 
@@ -368,7 +368,7 @@ public final class ExtendedDepthOperationTest {
                         pistonCase,
                         failures,
                         "retracted base",
-                        pistonCase.modern() && pistonCase.authoredDeepFact());
+                        pistonCase.authoredDeepFact());
                 assertTransferredIdentity(
                         world, pistonCase, pistonCase.piston().east(), "returned payload", failures);
                 assertIdentity(
@@ -448,7 +448,7 @@ public final class ExtendedDepthOperationTest {
         assertIdentity(
                 world, pistonCase.piston(), pistonCase.id() + " " + stage,
                 pistonCase.modern(), rawDeepFact, pistonCase.modern(),
-                pistonCase.modern() && pistonCase.authoredDeepFact() ? DEEP_DY : 0.0d,
+                pistonCase.authoredDeepFact() ? DEEP_DY : 0.0d,
                 failures);
     }
 
@@ -459,7 +459,7 @@ public final class ExtendedDepthOperationTest {
             String stage,
             List<String> failures
     ) {
-        boolean transferredDeepFact = pistonCase.modern() && pistonCase.authoredDeepFact();
+        boolean transferredDeepFact = pistonCase.authoredDeepFact();
         assertIdentity(
                 world, pos, pistonCase.id() + " " + stage,
                 pistonCase.modern(), transferredDeepFact, pistonCase.modern(),
@@ -484,7 +484,7 @@ public final class ExtendedDepthOperationTest {
         check(failures, fact.present() == rawDeepFact
                         && (!rawDeepFact || sameBits(fact.valueOrNaN(), DEEP_DY)),
                 label + " raw fact mismatch: " + fact.valueOrNaN());
-        check(failures, SlabAnchorAttachment.usesFrozenPlacementHeight(world, pos) == frozenReader,
+        check(failures, SlabAnchorAttachment.usesFrozenPlacementHeight(world, pos),
                 label + " reader selection mismatch");
         check(failures,
                 sameBits(SlabSupport.getYOffset(world, pos, world.getBlockState(pos)), effectiveDy),

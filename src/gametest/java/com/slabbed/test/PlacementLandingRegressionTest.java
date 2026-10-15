@@ -274,6 +274,7 @@ public final class PlacementLandingRegressionTest {
                     world.setBlockState(pedestal, (BlockState) c[1], Block.NOTIFY_ALL);
                 }
                 world.setBlockState(target, (BlockState) c[2], Block.NOTIFY_ALL);
+                PlacementCaptureBoundaryGameTest.forceStore(world, target, (Double) c[4]);
                 player.setPosition(g.getX() + 3.5d, g.getY(), g.getZ() + 0.5d);
                 ActionResult r = PlacementCaptureBoundaryGameTest.useOn(player, new ItemStack((net.minecraft.item.Item) c[3]), target, Direction.UP);
                 double expected = (Double) c[4];

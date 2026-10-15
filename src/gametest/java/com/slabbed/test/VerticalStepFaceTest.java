@@ -73,7 +73,7 @@ public final class VerticalStepFaceTest {
     }
 
     @GameTest(templateName = "fabric-gametest-api-v1:empty")
-    public void naturalCarpetMatchesLoweredSupportAndPlacedCarpetKeepsItsSeat(TestContext h) {
+    public void naturalCarpetStaysNativeAndPlacedCarpetKeepsItsSeat(TestContext h) {
         ServerWorld world = h.getWorld();
         BlockPos ground = h.getAbsolutePos(new BlockPos(2, 1, 2));
         world.setBlockState(ground, Blocks.STONE.getDefaultState(), Block.NOTIFY_ALL);
@@ -84,12 +84,12 @@ public final class VerticalStepFaceTest {
         BlockPos carpet = ground.up(3);
         world.setBlockState(carpet, Blocks.RED_CARPET.getDefaultState(), Block.NOTIFY_ALL);
         h.assertTrue(!SlabAnchorAttachment.isModernPlacement(world, carpet), "Natural carpet must have no placement fact");
-        h.assertTrue(SlabSupport.getYOffset(world, carpet, world.getBlockState(carpet)) == -0.5,
-                "Natural carpet floated above its lowered full-block support");
+        h.assertTrue(SlabSupport.getYOffset(world, carpet, world.getBlockState(carpet)) == 0.0,
+                "Natural carpet must retain native geometry without a stored fact");
         var shape = world.getBlockState(carpet).getOutlineShape(world, carpet);
-        h.assertTrue(Math.abs(shape.getMin(Direction.Axis.Y) + .5) < 1.0e-6
-                        && Math.abs(shape.getMax(Direction.Axis.Y) + .4375) < 1.0e-6,
-                "Natural carpet outline must use the same support plane");
+        h.assertTrue(Math.abs(shape.getMin(Direction.Axis.Y)) < 1.0e-6
+                        && Math.abs(shape.getMax(Direction.Axis.Y) - .0625) < 1.0e-6,
+                "Natural carpet outline must remain native");
         world.breakBlock(carpet, false);
         place(h, player, Items.RED_CARPET, ground.up(2));
         long before = SlabAnchorAttachment.rawPlacementDyFact(world, carpet).rawBits();

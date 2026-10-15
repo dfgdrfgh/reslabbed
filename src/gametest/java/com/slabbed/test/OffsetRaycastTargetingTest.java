@@ -114,6 +114,7 @@ public final class OffsetRaycastTargetingTest {
                 Block.NOTIFY_LISTENERS);
         BlockPos fullPos = slabPos.up();
         world.setBlockState(fullPos, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
+        PlacementCaptureBoundaryGameTest.forceStore(world, fullPos, -0.5d);
         return fullPos;
     }
 
@@ -213,6 +214,7 @@ public final class OffsetRaycastTargetingTest {
         world.setBlockState(sideSlab,
                 Blocks.OAK_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                 Block.NOTIFY_LISTENERS);
+        PlacementCaptureBoundaryGameTest.forceStore(world, sideSlab, -0.5d);
         double slabDy = SlabSupport.getYOffset(world, sideSlab, world.getBlockState(sideSlab));
         ctx.assertTrue(slabDy == -0.5, "fixture: side slab beside lowered FB should inherit -0.5, got " + slabDy);
 
@@ -239,6 +241,8 @@ public final class OffsetRaycastTargetingTest {
         BlockPos compound = sideSlab.up();
         world.setBlockState(compound, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
 
+        PlacementCaptureBoundaryGameTest.forceStore(world, sideSlab, -0.5d);
+        PlacementCaptureBoundaryGameTest.forceStore(world, compound, -1.0d);
         double dy = SlabSupport.getYOffset(world, compound, world.getBlockState(compound));
         ctx.assertTrue(dy == -1.0, "fixture: full block above lowered side slab should be compound -1.0, got " + dy);
 
@@ -264,6 +268,7 @@ public final class OffsetRaycastTargetingTest {
                 Blocks.LANTERN.getDefaultState().with(net.minecraft.state.property.Properties.HANGING, true),
                 Block.NOTIFY_LISTENERS);
 
+        PlacementCaptureBoundaryGameTest.forceStore(world, lantern, 0.5d);
         double dy = SlabSupport.getYOffset(world, lantern, world.getBlockState(lantern));
         ctx.assertTrue(dy == 0.5, "fixture: hanging lantern under top slab should be +0.5, got " + dy);
 

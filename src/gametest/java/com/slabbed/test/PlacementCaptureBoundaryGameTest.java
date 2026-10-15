@@ -246,16 +246,16 @@ public final class PlacementCaptureBoundaryGameTest {
     public void singleInitialWriter(TestContext h) {
         try {
             Path root = locateProjectRoot();
-            String blockMixin = Files.readString(root.resolve(
-                    "src/main/java/com/slabbed/mixin/BlockOnPlacedAnchorMixin.java"));
             String itemMixin = Files.readString(root.resolve(
                     "src/main/java/com/slabbed/mixin/BlockItemPlacementIntentMixin.java"));
-            h.assertTrue(!blockMixin.contains("SlabAnchorAttachment.capturePlacementDy("),
-                    "C3 single-writer structure regressed: BlockOnPlacedAnchorMixin regained a capture call");
-            h.assertTrue(occurrences(itemMixin, "SlabAnchorAttachment.writePlacementDyBatch(") == 1,
-                    "C3 single-writer structure regressed: BlockItemPlacementIntentMixin must contain "
-                            + "exactly one writePlacementDyBatch call, found "
-                            + occurrences(itemMixin, "SlabAnchorAttachment.writePlacementDyBatch("));
+            String transaction = Files.readString(root.resolve(
+                    "src/main/java/com/slabbed/placement/PlacementTransaction.java"));
+            h.assertTrue(!Files.exists(root.resolve("src/main/java/com/slabbed/mixin/BlockOnPlacedAnchorMixin.java")),
+                    "Duplicate placement author was reintroduced");
+            h.assertTrue(occurrences(itemMixin, "current.prepared.commit()") == 1
+                            && !itemMixin.contains("writePlacementDyBatch(")
+                            && occurrences(transaction, "publication.commit()") == 1,
+                    "Placement must have one group publication boundary");
         } catch (IOException exception) {
             h.assertTrue(false, "unable to inspect C3 single-writer sources: " + exception);
         }
@@ -265,15 +265,15 @@ public final class PlacementCaptureBoundaryGameTest {
     @GameTest(templateName = "fabric-gametest-api-v1:empty", batchId = "slabbed_keep_async_guard_isolated")
     public void keepExistingCollisionGuardSkipsPolicyLookupsOnUnsafeWorkers(TestContext h) {
         boolean previousFrozen = SlabAnchorAttachment.FROZEN_DY_ENABLED;
-        var previousModernLookup = SlabAnchorAttachment.clientModernPlacementLookup;
+        var previousModernLookup = SlabAnchorAttachment.clientPlacementDyLookup;
         Thread currentThread = Thread.currentThread();
         String previousThreadName = currentThread.getName();
         java.util.concurrent.atomic.AtomicInteger modernLookups =
                 new java.util.concurrent.atomic.AtomicInteger();
         SlabAnchorAttachment.FROZEN_DY_ENABLED = false;
-        SlabAnchorAttachment.clientModernPlacementLookup = pos -> {
+        SlabAnchorAttachment.clientPlacementDyLookup = pos -> {
             modernLookups.incrementAndGet();
-            return false;
+            return SlabAnchorAttachment.PlacementDyFact.absent();
         };
         try {
             BlockView view = EmptyBlockView.INSTANCE;
@@ -306,7 +306,7 @@ public final class PlacementCaptureBoundaryGameTest {
         } finally {
             currentThread.setName(previousThreadName);
             SlabAnchorAttachment.FROZEN_DY_ENABLED = previousFrozen;
-            SlabAnchorAttachment.clientModernPlacementLookup = previousModernLookup;
+            SlabAnchorAttachment.clientPlacementDyLookup = previousModernLookup;
         }
         pass(h, "keep_existing_collision_guard_skips_policy_lookups_on_unsafe_workers");
     }
@@ -381,10 +381,10 @@ public final class PlacementCaptureBoundaryGameTest {
             h.assertTrue(placed.isAccepted()
                             && !SlabAnchorAttachment.isModernPlacement(world, legacy)
                             && sameHeight(SlabAnchorAttachment.storedPlacementDy(world, legacy), -1.5d)
-                            && sameHeight(SlabSupport.getYOffset(world, legacy, world.getBlockState(legacy)), -0.5d)
+                            && sameHeight(SlabSupport.getYOffset(world, legacy, world.getBlockState(legacy)), -1.5d)
                             && SlabAnchorAttachment.isModernPlacement(world, modern)
                             && SlabAnchorAttachment.rawPlacementDyFact(world, modern).present()
-                            && sameHeight(SlabSupport.getYOffset(world, modern, world.getBlockState(modern)), -0.5d)
+                            && sameHeight(SlabSupport.getYOffset(world, modern, world.getBlockState(modern)), -1.5d)
                             && SlabAnchorAttachment.isModernPlacement(world, missingFact)
                             && !SlabAnchorAttachment.rawPlacementDyFact(world, missingFact).present()
                             && sameHeight(missingBefore, 0.0d) && sameHeight(missingAfter, 0.0d),
@@ -407,8 +407,8 @@ public final class PlacementCaptureBoundaryGameTest {
             BlockView renderView = ChunkAccessSafetyTest.renderView();
             h.assertTrue(SlabAnchorAttachment.usesFrozenPlacementHeight(renderView, modern)
                             && SlabAnchorAttachment.usesFrozenPlacementHeight(renderView, predicted)
-                            && !SlabAnchorAttachment.usesFrozenPlacementHeight(renderView, legacy)
-                            && !SlabAnchorAttachment.usesFrozenPlacementHeight(world, predicted),
+                            && SlabAnchorAttachment.usesFrozenPlacementHeight(renderView, legacy)
+                            && SlabAnchorAttachment.usesFrozenPlacementHeight(world, predicted),
                     "client bridge or server/client prediction separation selected the wrong route");
         } finally {
             WorldUpgradeRuntimePolicy.deactivate(world);
@@ -671,11 +671,11 @@ public final class PlacementCaptureBoundaryGameTest {
             double conflictingBefore = SlabSupport.getYOffset(world, conflictingLegacy,
                     world.getBlockState(conflictingLegacy));
             h.assertTrue(placed.isAccepted()
-                            && sameHeight(legacyHalfBefore, -0.5d)
-                            && sameHeight(legacyCompoundBefore, -1.0d)
+                            && sameHeight(legacyHalfBefore, 0.0d)
+                            && sameHeight(legacyCompoundBefore, 0.0d)
                             && sameHeight(alphaBefore, -0.5d)
                             && sameHeight(flatBefore, 0.0d)
-                            && sameHeight(conflictingBefore, 0.0d)
+                            && sameHeight(conflictingBefore, -2.0d)
                             && !SlabAnchorAttachment.rawPlacementDyFact(world, legacyHalf).present()
                             && !SlabAnchorAttachment.rawPlacementDyFact(world, legacyCompound).present()
                             && SlabAnchorAttachment.rawPlacementDyFact(world, alphaPlaced).present()
@@ -722,11 +722,11 @@ public final class PlacementCaptureBoundaryGameTest {
             double flatAfter = SlabSupport.getYOffset(world, flatControl, world.getBlockState(flatControl));
             double conflictingAfter = SlabSupport.getYOffset(world, conflictingLegacy,
                     world.getBlockState(conflictingLegacy));
-            h.assertTrue(sameHeight(legacyHalfAfter, -0.5d)
-                            && sameHeight(legacyCompoundAfter, -1.0d)
+            h.assertTrue(sameHeight(legacyHalfAfter, 0.0d)
+                            && sameHeight(legacyCompoundAfter, 0.0d)
                             && sameHeight(alphaAfter, -0.5d)
                             && sameHeight(flatAfter, 0.0d)
-                            && sameHeight(conflictingAfter, 0.0d)
+                            && sameHeight(conflictingAfter, -2.0d)
                             && SlabAnchorAttachment.isModernPlacement(world, alphaPlaced)
                             && !SlabAnchorAttachment.isModernPlacement(world, conflictingLegacy)
                             && !SlabAnchorAttachment.isModernPlacement(world, legacyHalf),
@@ -885,7 +885,7 @@ public final class PlacementCaptureBoundaryGameTest {
         Path cursor = Path.of("").toAbsolutePath();
         while (cursor != null) {
             if (Files.isRegularFile(cursor.resolve(
-                    "src/main/java/com/slabbed/mixin/BlockOnPlacedAnchorMixin.java"))) {
+                    "src/main/java/com/slabbed/placement/PlacementTransaction.java"))) {
                 return cursor;
             }
             cursor = cursor.getParent();

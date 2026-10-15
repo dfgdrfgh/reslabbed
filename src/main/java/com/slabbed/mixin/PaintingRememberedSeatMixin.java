@@ -54,6 +54,25 @@ public abstract class PaintingRememberedSeatMixin extends AbstractDecorationEnti
     @Unique
     private boolean slabbed$seatPending;
 
+    @Unique
+    private boolean slabbed$layoutReady;
+
+    @Override
+    public void slabbed$completeHangPlacement() {
+        slabbed$layoutReady = true;
+        if (Double.isFinite(slabbed$tryMintSeat(attachedBlockPos, facing))) updateAttachmentPosition();
+    }
+
+    @Inject(method = "<init>(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;Lnet/minecraft/registry/entry/RegistryEntry;)V", at = @At("TAIL"))
+    private void slabbed$finishConstruction(CallbackInfo ci) {
+        slabbed$completeHangPlacement();
+    }
+
+    @Inject(method = "placePainting", at = @At("RETURN"))
+    private static void slabbed$finishFactory(CallbackInfoReturnable<java.util.Optional<PaintingEntity>> cir) {
+        cir.getReturnValue().ifPresent(entity -> ((HangingSeatDyHolder) entity).slabbed$completeHangPlacement());
+    }
+
     protected PaintingRememberedSeatMixin(EntityType<? extends AbstractDecorationEntity> type, World world) {
         super(type, world);
     }
@@ -80,7 +99,7 @@ public abstract class PaintingRememberedSeatMixin extends AbstractDecorationEnti
                                             CallbackInfoReturnable<Box> cir) {
         double dy = Double.longBitsToDouble(dataTracker.get(SLABBED_HANG_DY));
         if (!Double.isFinite(dy)) {
-            if (getWorld().isClient) {
+            if (getWorld().isClient || !slabbed$layoutReady) {
                 return;
             }
             dy = slabbed$tryMintSeat(attached, facing);
@@ -123,9 +142,6 @@ public abstract class PaintingRememberedSeatMixin extends AbstractDecorationEnti
         // Provenance and stored-height reads below touch only the backing chunk, which the readiness
         // check above has just proven complete, so they never wait. Keep every chunk access after
         // the reading and thread checks.
-        if (!SlabAnchorAttachment.usesFrozenPlacementHeight(world, backing)) {
-            return Double.NaN;
-        }
         BlockState support = backingChunk.getBlockState(backing);
         double dy = SlabSupport.getYOffset(world, backing, support);
         if (!Double.isFinite(dy)) {
@@ -144,6 +160,7 @@ public abstract class PaintingRememberedSeatMixin extends AbstractDecorationEnti
         } finally {
             slabbed$readingData = false;
         }
+        slabbed$layoutReady = true;
         slabbed$seatPending = !getWorld().isClient && !slabbed$hasHangSeat();
         BlockPos entityPos = getBlockPos();
         if (getWorld() instanceof ServerWorld world && world.getServer().isOnThread()

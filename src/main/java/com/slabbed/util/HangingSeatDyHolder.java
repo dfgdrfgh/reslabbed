@@ -16,4 +16,7 @@ public interface HangingSeatDyHolder {
 
     /** True once a seat has been minted (or restored from save data). */
     boolean slabbed$hasHangSeat();
+
+    /** Completes construction after the attachment position and facing are final. */
+    default void slabbed$completeHangPlacement() {}
 }
