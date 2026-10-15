@@ -56,7 +56,8 @@
       "com.slabbed.test.RedstoneWireVisualStepTest",
       "com.slabbed.test.ChunkAccessSafetyTest",
       "com.slabbed.test.TerrainSlabsVegetationTest",
-      "com.slabbed.test.VerticalStepFaceTest"
+      "com.slabbed.test.VerticalStepFaceTest",
+      "com.slabbed.test.RepeatedStackingTest"
     ]
   },
   "depends": {

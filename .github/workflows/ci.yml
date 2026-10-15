@@ -17,7 +17,7 @@ concurrency:
 jobs:
   verify:
     name: Build and server GameTests
-    if: github.ref != 'refs/heads/port/fabric-1.21.1-full-pack-verification'
+    if: github.ref != 'refs/heads/port/fabric-1.21.1-full-pack-verification' && github.ref != 'refs/heads/port/fabric-1.21.1-stacking-repair'
     runs-on: ubuntu-24.04
     timeout-minutes: 30
 

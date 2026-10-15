@@ -2,7 +2,7 @@ name: Full pack slab integration
 
 on:
   push:
-    branches: ["port/fabric-1.21.1-full-pack-verification"]
+    branches: ["port/fabric-1.21.1-stacking-repair"]
   workflow_dispatch:
 
 permissions:
