@@ -30,6 +30,7 @@ assert len(expected)==61
 with zipfile.ZipFile(root/'build/vertical-step-runtime/vertical-step-probe.jar') as archive:
     probe={i.filename:archive.read(i.filename) for i in archive.infolist()}
 metadata=json.loads(probe['fabric.mod.json']);metadata.pop('provides',None)
+metadata.get('entrypoints',{}).pop('fabric-gametest',None)
 probe['fabric.mod.json']=json.dumps(metadata).encode()
 with zipfile.ZipFile(mods/'vertical-step-probe.jar','w',zipfile.ZIP_DEFLATED) as archive:
     for name,data in probe.items():archive.writestr(name,data)
