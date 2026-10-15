@@ -441,102 +441,94 @@ public final class SlabAnchorAttachment {
      * @return the number of cells whose stored fact actually changed
      */
     public static int writePlacementDyBatch(World world, Map<BlockPos, Long> rawBitsByPos) {
-        if (world == null || world.isClient() || rawBitsByPos == null || rawBitsByPos.isEmpty()) {
-            return 0;
-        }
-        LinkedHashMap<BlockPos, PlacementDyFact> facts = new LinkedHashMap<>();
-        for (Map.Entry<BlockPos, Long> entry : rawBitsByPos.entrySet()) {
-            double value = Double.longBitsToDouble(entry.getValue());
-            if (!Double.isFinite(value)) {
-                throw new IllegalArgumentException("non-finite placement dy batch value");
-            }
-            facts.put(entry.getKey().toImmutable(), new PlacementDyFact(true,
-                    value == 0.0d ? 0L : entry.getValue()));
-        }
-        return writePlacementDyFactsInternal(world, facts);
+        PreparedHeightWrite prepared = preparePlacementDyBatch(world, rawBitsByPos);
+        return prepared != null && prepared.commit() ? prepared.changedCells() : 0;
     }
 
-    /**
-     * COPY-ON-WRITE: the attached map is never mutated in place (a live map handed out to a render
-     * thread must stay stable), and each touched chunk publishes exactly ONCE, at the end. An
-     * unchanged value short-circuits before the chunk is marked, so an idempotent rewrite publishes
-     * nothing at all.
-     */
-    private static int writePlacementDyFactsInternal(World world, Map<BlockPos, PlacementDyFact> facts) {
+    /** Preflights the complete group before publishing any changed chunk (LAW.md). */
+    public static PreparedHeightWrite preparePlacementDyBatch(World world, Map<BlockPos, Long> rawBitsByPos) {
+        if (world == null || world.isClient() || rawBitsByPos == null) return null;
+        IdentityHashMap<WorldChunk, Long2IntOpenHashMap> originals = new IdentityHashMap<>();
         IdentityHashMap<WorldChunk, Long2IntOpenHashMap> copies = new IdentityHashMap<>();
-        IdentityHashMap<WorldChunk, Boolean> changedChunks = new IdentityHashMap<>();
         int writes = 0;
-        for (Map.Entry<BlockPos, PlacementDyFact> entry : facts.entrySet()) {
+        for (var entry : rawBitsByPos.entrySet()) {
             BlockPos pos = entry.getKey();
-            PlacementDyFact desired = entry.getValue();
-            if (pos == null || desired == null) {
-                continue;
-            }
-            WorldChunk chunk = world.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
-            if (chunk == null) {
-                continue;
-            }
-            Long2IntOpenHashMap map = copies.get(chunk);
-            if (map == null) map = chunk.getAttached(PLACEMENT_DY_TYPE);
+            if (pos == null || entry.getValue() == null) return null;
+            double value = Double.longBitsToDouble(entry.getValue());
+            if (!Double.isFinite(value)) throw new IllegalArgumentException("non-finite placement dy batch value");
+            int quantised = quantiseDy(value);
+            if (quantised == UNREPRESENTABLE) return null;
+            WorldChunk chunk = loadedAttachmentChunk(world, pos);
+            if (chunk == null) return null;
+            Long2IntOpenHashMap original = chunk.getAttached(PLACEMENT_DY_TYPE);
+            originals.putIfAbsent(chunk, original);
+            Long2IntOpenHashMap candidate = copies.get(chunk);
+            Long2IntOpenHashMap current = candidate == null ? original : candidate;
             long key = pos.asLong();
-            PlacementDyFact current = map != null && map.containsKey(key)
-                    ? PlacementDyFact.fromStoredSixteenths(map.get(key))
-                    : PlacementDyFact.absent();
-            if (current.equals(desired)) {
-                continue;
+            if (current != null && current.containsKey(key) && current.get(key) == quantised) continue;
+            if (candidate == null) {
+                candidate = original == null ? newDyMap() : new PlacementHeightMap(original);
+                copies.put(chunk, candidate);
             }
-            if (desired.present()) {
-                double value = Double.longBitsToDouble(desired.rawBits());
-                if (!Double.isFinite(value)) {
-                    throw new IllegalArgumentException("non-finite authoritative placement dy");
-                }
-                int quantised = quantiseDy(value);
-                if (quantised == UNREPRESENTABLE) {
-                    // DECLINED, never rounded: a rounded height is a moved block, and LAW.md
-                    // forbids a placed block moving. The cell keeps whatever the live lanes
-                    // answer for it, exactly as it would with no fact at all.
-                    if (TRACE) {
-                        Slabbed.LOGGER.info(
-                                "[PLACEMENT_DY] declined pos={} dy={} reason=not_on_sixteenth_grid",
-                                pos.toShortString(), value);
-                    }
-                    continue;
-                }
-                if (!copies.containsKey(chunk)) {
-                    map = map == null ? newDyMap() : new PlacementHeightMap(map);
-                    copies.put(chunk, map);
-                }
-                map.put(key, quantised);
-                if (ChunkPositionDyMapPacketCodec.encodedByteLength(map) > SYNC_SAFE_ENCODED_BYTES) {
-                    if (current.present()) map.put(key, quantiseDy(current.valueOrNaN()));
-                    else map.remove(key);
-                    // The chunk is saturated. Decline the new fact rather than let setAttached
-                    // throw and take the whole chunk's synchronization down with it; the cell
-                    // falls back to the live lanes, which is this line's pre-store behaviour.
-                    if (!dyBudgetReported) {
-                        dyBudgetReported = true;
-                        Slabbed.LOGGER.warn(
-                                "[PLACEMENT_DY] chunk {},{} is at its synchronization budget ({} "
-                                        + "bytes); further placement heights there are not stored. "
-                                        + "This message appears once per session.",
-                                chunk.getPos().x, chunk.getPos().z, SYNC_SAFE_ENCODED_BYTES);
-                    }
-                    continue;
-                }
-            } else {
-                if (!copies.containsKey(chunk)) {
-                    map = new PlacementHeightMap(map);
-                    copies.put(chunk, map);
-                }
-                map.remove(key);
-            }
-            changedChunks.put(chunk, Boolean.TRUE);
+            candidate.put(key, quantised);
             writes++;
         }
-        for (WorldChunk chunk : changedChunks.keySet()) {
-            chunk.setAttached(PLACEMENT_DY_TYPE, copies.get(chunk));
+        for (var entry : copies.entrySet()) {
+            if (ChunkPositionDyMapPacketCodec.encodedByteLength(entry.getValue()) > SYNC_SAFE_ENCODED_BYTES) {
+                if (!dyBudgetReported) {
+                    dyBudgetReported = true;
+                    Slabbed.LOGGER.warn("[PLACEMENT_DY] placement group refused: chunk {},{} exceeds its {}-byte synchronization budget",
+                            entry.getKey().getPos().x, entry.getKey().getPos().z, SYNC_SAFE_ENCODED_BYTES);
+                }
+                return null;
+            }
         }
-        return writes;
+        return new PreparedHeightWrite(world, originals, copies, writes);
+    }
+
+    /** One-use publication plan; stale snapshots refuse the entire group before any write. */
+    public static final class PreparedHeightWrite {
+        private final World world;
+        private final IdentityHashMap<WorldChunk, Long2IntOpenHashMap> originals;
+        private final IdentityHashMap<WorldChunk, Long2IntOpenHashMap> copies;
+        private final int changedCells;
+        private boolean consumed;
+
+        private PreparedHeightWrite(World world, IdentityHashMap<WorldChunk, Long2IntOpenHashMap> originals,
+                                    IdentityHashMap<WorldChunk, Long2IntOpenHashMap> copies, int changedCells) {
+            this.world = world;
+            this.originals = originals;
+            this.copies = copies;
+            this.changedCells = changedCells;
+        }
+
+        public int changedCells() { return changedCells; }
+
+        public boolean commit() {
+            if (consumed || world.isClient()
+                    || world instanceof ServerWorld serverWorld && !serverWorld.getServer().isOnThread()) return false;
+            consumed = true;
+            for (var entry : originals.entrySet()) {
+                WorldChunk chunk = entry.getKey();
+                if (loadedAttachmentChunk(world, chunk.getPos().getStartPos()) != chunk
+                        || chunk.getAttached(PLACEMENT_DY_TYPE) != entry.getValue()) return false;
+            }
+            java.util.ArrayList<WorldChunk> published = new java.util.ArrayList<>();
+            try {
+                for (var entry : copies.entrySet()) {
+                    published.add(entry.getKey());
+                    entry.getKey().setAttached(PLACEMENT_DY_TYPE, entry.getValue());
+                }
+                return true;
+            } catch (RuntimeException failure) {
+                for (WorldChunk chunk : published) {
+                    var before = originals.get(chunk);
+                    if (before == null) chunk.removeAttached(PLACEMENT_DY_TYPE);
+                    else chunk.setAttached(PLACEMENT_DY_TYPE, before);
+                }
+                throw failure;
+            }
+        }
     }
 
     /**
