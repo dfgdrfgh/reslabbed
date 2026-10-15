@@ -41,7 +41,7 @@ public final class TerrainSlabsVegetationTest {
                 for (BlockState plant : new BlockState[]{Blocks.SHORT_GRASS.getDefaultState(),
                         Blocks.FERN.getDefaultState(), Blocks.DANDELION.getDefaultState()}) {
                     states.put(pos, plant);
-                    assertOneSeat(ctx, view, pos, plant, 0.0d);
+                    assertNativeSeat(ctx, view, pos, plant, -0.5d);
                     Vec3d nativeJitter = plant.getModelOffset(EmptyBlockView.INSTANCE, pos);
                     Vec3d combinedJitter = plant.getModelOffset(view, pos);
                     ctx.assertTrue(nativeJitter.x == combinedJitter.x && nativeJitter.z == combinedJitter.z,
@@ -51,11 +51,11 @@ public final class TerrainSlabsVegetationTest {
             BlockState tall = Blocks.TALL_GRASS.getDefaultState().with(Properties.DOUBLE_BLOCK_HALF, DoubleBlockHalf.LOWER);
             states.put(pos, tall);
             states.put(pos.up(), tall.with(Properties.DOUBLE_BLOCK_HALF, DoubleBlockHalf.UPPER));
-            assertOneSeat(ctx, view, pos, tall, 0.0d);
-            assertOneSeat(ctx, view, pos.up(), states.get(pos.up()), 0.0d);
+            assertNativeSeat(ctx, view, pos, tall, -0.5d);
+            assertNativeSeat(ctx, view, pos.up(), states.get(pos.up()), -0.5d);
             states.put(pos.down(), Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP));
             states.put(pos, Blocks.SHORT_GRASS.getDefaultState());
-            assertOneSeat(ctx, view, pos, states.get(pos), 0.0d);
+            assertNativeSeat(ctx, view, pos, states.get(pos), 0.0d);
         } finally {
             nativeOffsetsEnabled = previous;
         }
@@ -123,6 +123,18 @@ public final class TerrainSlabsVegetationTest {
             SlabAnchorAttachment.clientEffectivePlacementDyLookup = oldOverlay;
         }
         ctx.complete();
+    }
+
+    private static void assertNativeSeat(TestContext ctx, BlockRenderView view, BlockPos pos,
+                                         BlockState plant, double nativeOffset) {
+        ctx.assertTrue(SlabSupport.getYOffset(view,pos,plant)==0.0d,
+                "Missing placement facts must add zero Slabbed translation");
+        ctx.assertTrue(plant.getModelOffset(view,pos).y==nativeOffset,
+                "NATIVE_COMPAT_OFFSET_DISCARDED: an unowned plant must retain its native model offset");
+        double baseMin=plant.getOutlineShape(EmptyBlockView.INSTANCE,pos,ShapeContext.absent()).getMin(Direction.Axis.Y);
+        ctx.assertTrue(plant.getOutlineShape(view,pos,ShapeContext.absent()).getMin(Direction.Axis.Y)==baseMin+nativeOffset,
+                "Native plant outline differs from the unchanged native model");
+        ctx.assertTrue(plant.getCollisionShape(view,pos).isEmpty(),"Native empty plant collision acquired a ghost body");
     }
 
     private static void assertOneSeat(TestContext ctx, BlockRenderView view, BlockPos pos,
