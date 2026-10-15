@@ -18,6 +18,27 @@ import java.util.Map;
 /** Refused storage must refuse the real placement before block or item mutation (LAW.md). */
 public final class PlacementTransactionTest {
     @GameTest(templateName = "fabric-gametest-api-v1:empty")
+    public void componentFacingBedCannotOverwriteAnOccupiedPartner(TestContext h) {
+        var world=h.getWorld();
+        BlockPos support=h.getAbsolutePos(new BlockPos(3,3,3));
+        world.setBlockState(support,Blocks.STONE.getDefaultState(),Block.NOTIFY_ALL);
+        BlockPos foot=support.up(), head=foot.east();
+        world.setBlockState(head,Blocks.GOLD_BLOCK.getDefaultState(),Block.NOTIFY_ALL);
+        ItemStack bed=new ItemStack(Items.RED_BED,2);
+        bed.set(net.minecraft.component.DataComponentTypes.BLOCK_STATE,
+                net.minecraft.component.type.BlockStateComponent.DEFAULT.with(
+                        net.minecraft.state.property.Properties.HORIZONTAL_FACING,Direction.EAST));
+        var player=h.createMockPlayer(GameMode.SURVIVAL);
+        player.setPosition(support.getX()+4.5,support.getY(),support.getZ()+4.5);
+        var result=PlacementCaptureBoundaryGameTest.useOn(player,bed,support,Direction.UP);
+        h.assertTrue(!result.isAccepted() && bed.getCount()==2 && world.getBlockState(foot).isAir()
+                        && world.getBlockState(head).isOf(Blocks.GOLD_BLOCK)
+                        && !SlabAnchorAttachment.rawPlacementDyFact(world,foot).present(),
+                "PAIR_OVERWROTE_EXISTING_BODY: a component changed the partner after vanilla's initial check");
+        h.complete();
+    }
+
+    @GameTest(templateName = "fabric-gametest-api-v1:empty")
     public void directAimlessPlacementNeverInfersNearbySlabHeight(TestContext h) {
         var world = h.getWorld();
         BlockPos support = h.getAbsolutePos(new BlockPos(3, 3, 3));

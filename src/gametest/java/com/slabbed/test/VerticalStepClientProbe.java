@@ -226,6 +226,7 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
             return;
         }
         if (phase == 2) {
+            checkAuthorityWithoutProvenance(client);
             checkOverheadControls(client);
             checkRepeatedStack(client, false);
             checkMeshedFace(GROUND.up(2), Direction.UP, 0.5, true);
@@ -322,6 +323,28 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
         started = ticks;
         MESH_FACES.clear();
         client.worldRenderer.reload();
+    }
+
+    private static void checkAuthorityWithoutProvenance(MinecraftClient client) throws Exception {
+        BlockPos pos=GROUND.up(2);
+        var chunk=client.world.getWorldChunk(pos);
+        var markers=chunk.getAttached(SlabAnchorAttachment.MODERN_PLACEMENT_TYPE);
+        try {
+            if (markers!=null) {
+                var copy=new it.unimi.dsi.fastutil.longs.LongOpenHashSet(markers);
+                copy.remove(pos.asLong());
+                chunk.setAttached(SlabAnchorAttachment.MODERN_PLACEMENT_TYPE,copy);
+            }
+            var method=com.slabbed.client.PlacementDyPredictionClient.class.getDeclaredMethod("backingFact",long.class);
+            method.setAccessible(true);
+            var fact=(SlabAnchorAttachment.PlacementDyFact)method.invoke(null,pos.asLong());
+            require(fact.present() && fact.valueOrNaN()==-.5,
+                    "AUTHORITATIVE_HEIGHT_WAITED_FOR_PROVENANCE: backing readiness discarded a saved height");
+        } finally {
+            if (markers==null) chunk.removeAttached(SlabAnchorAttachment.MODERN_PLACEMENT_TYPE);
+            else chunk.setAttached(SlabAnchorAttachment.MODERN_PLACEMENT_TYPE,markers);
+        }
+        System.out.println("AUTHORITATIVE_HEIGHT_WITHOUT_PROVENANCE_PASS");
     }
 
     private static final BlockPos TOWER_BASE = new BlockPos(18, 198, 12);

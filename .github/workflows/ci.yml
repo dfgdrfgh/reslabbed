@@ -124,6 +124,7 @@ jobs:
           test -f build/run/vertical-step-client/vertical-step-pass.txt
 
       - name: Upload Fabric release jar
+        if: github.ref != 'refs/heads/port/fabric-1.21.1-stored-core-cleanup'
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: slabbed-mc1.21.1-fabric
