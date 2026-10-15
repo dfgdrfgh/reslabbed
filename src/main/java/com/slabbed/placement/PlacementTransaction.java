@@ -47,9 +47,14 @@ public final class PlacementTransaction {
             heights = plan == null ? Map.of() : plan.rawHeights();
             if (world == null || plan == null) return;
             Set<BlockPos> replaced = plan.cells().stream().map(PlacementPlan.Cell::pos).collect(Collectors.toSet());
+            boolean primary = true;
             for (var cell : plan.cells()) {
                 var chunk = SlabAnchorAttachment.loadedAttachmentChunk(world, cell.pos());
                 if (chunk == null || world.isOutOfHeightLimit(cell.pos())) return;
+                // Vanilla's initial check can precede item state components changing a pair's facing.
+                // Every secondary cell in the final plan must still be a replaceable destination.
+                if (!primary && !chunk.getBlockState(cell.pos()).isReplaceable()) return;
+                primary = false;
                 beforeStates.put(cell.pos(), chunk.getBlockState(cell.pos()));
                 var fact = SlabAnchorAttachment.rawPlacementDyFact(world, cell.pos());
                 if (fact.present()) beforeHeights.put(cell.pos(), fact.rawBits());
