@@ -1245,7 +1245,7 @@ public final class SlabSupport {
         // A modern support must not adopt an untouched structural block into its new stack.
         // Transparent and functional cubes occupy the same volume as opaque terrain. Fresh item
         // placements already returned their own stored seat above; legacy columns stay live.
-        if ((state.getBlock() instanceof SlabBlock
+        if ((state.contains(SlabBlock.TYPE)
                 || state.isFullCube(EmptyBlockView.INSTANCE, BlockPos.ORIGIN))
                 && !anchored
                 && hasModernColumnSupport(world, pos)) {

@@ -31,6 +31,11 @@ for candidate in (gradle / 'caches/fabric-loom').rglob('minecraft-client.jar'):
     selected.add(candidate)
 for candidate in (gradle / 'caches/fabric-loom').rglob('indexes/*17*.json'):
     selected.add(candidate)
+    for name, asset in json.loads(candidate.read_text()).get('objects', {}).items():
+        if '/font/' not in name and not name.endswith('/lang/en_us.json'): continue
+        value = asset['hash']
+        source = candidate.parent.parent / 'objects' / value[:2] / value
+        if source.is_file(): selected.add(source)
 for source in selected:
     if source.name.endswith(('-sources.jar', '-javadoc.jar')): continue
     target = out / 'gradle' / source.relative_to(gradle)
@@ -40,6 +45,8 @@ for name in ['dependencies.json', 'vertical-step-probe.jar']:
     shutil.copy2(project / 'build/vertical-step-runtime' / name, out / name)
 for source in (project / 'build/libs').glob('*.jar'):
     if not source.name.endswith(('-sources.jar', '-dev.jar')): shutil.copy2(source, out / source.name)
+(out / 'fabric-loader-0.19.5.jar').write_bytes(urllib.request.urlopen(
+    'https://maven.fabricmc.net/net/fabricmc/fabric-loader/0.19.5/fabric-loader-0.19.5.jar', timeout=60).read())
 manifest = project / 'tools/verification-pack-downloads.json'
 if manifest.exists():
     def download(entry):
