@@ -281,4 +281,76 @@ public final class PlacementDyAttachmentCapacityTest {
         }
         return facts;
     }
+
+    @GameTest(templateName = "fabric-gametest-api-v1:empty")
+    public void offGridMemberRejectsTheWholeBatch(TestContext ctx) {
+        var world = ctx.getWorld();
+        BlockPos first = ctx.getAbsolutePos(new BlockPos(2, 3, 2));
+        BlockPos second = first.east();
+        var chunk = world.getWorldChunk(first);
+        var before = chunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE);
+        try {
+            var writes = new java.util.LinkedHashMap<BlockPos, Long>();
+            writes.put(first, Double.doubleToRawLongBits(-0.5d));
+            writes.put(second, Double.doubleToRawLongBits(0.01d));
+            int changed = SlabAnchorAttachment.writePlacementDyBatch(world, writes);
+            ctx.assertTrue(changed == 0
+                            && chunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE) == before,
+                    "PARTIAL_INVALID_BATCH: invalid second member committed the valid first member");
+        } finally {
+            if (before == null) chunk.removeAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE);
+            else chunk.setAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE, before);
+        }
+        ctx.complete();
+    }
+
+    @GameTest(templateName = "fabric-gametest-api-v1:empty")
+    public void saturatedSecondChunkRejectsTheWholeBatch(TestContext ctx) {
+        var world = ctx.getWorld();
+        BlockPos origin = ctx.getAbsolutePos(new BlockPos(2, 3, 2));
+        var firstChunk = world.getWorldChunk(origin);
+        var secondChunk = world.getChunk(firstChunk.getPos().x + 1, firstChunk.getPos().z);
+        var beforeFirst = firstChunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE);
+        var beforeSecond = secondChunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE);
+        try {
+            BlockPos section = new BlockPos(secondChunk.getPos().x << 4,
+                    (origin.getY() >> 4) << 4, secondChunk.getPos().z << 4);
+            int low = 0, high = 4096;
+            while (low < high) {
+                int middle = (low + high + 1) >>> 1;
+                var map = distinctFacts(section, middle);
+                if (ChunkPositionDyMapPacketCodec.encodedByteLength(map)
+                        <= SlabAnchorAttachment.SYNC_SAFE_ENCODED_BYTES) low = middle;
+                else high = middle - 1;
+            }
+            ctx.assertTrue(low > 0 && low < 4096, "capacity boundary fixture failed");
+            var full = distinctFacts(section, low);
+            secondChunk.setAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE, full);
+            BlockPos next = distinctPosition(section, low);
+            var writes = new java.util.LinkedHashMap<BlockPos, Long>();
+            writes.put(origin, Double.doubleToRawLongBits(-0.5d));
+            writes.put(next, Double.doubleToRawLongBits((-1024 - low) / 16.0d));
+            int changed = SlabAnchorAttachment.writePlacementDyBatch(world, writes);
+            ctx.assertTrue(changed == 0
+                            && firstChunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE) == beforeFirst
+                            && secondChunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE) == full,
+                    "PARTIAL_CAPACITY_BATCH: saturated second chunk left a committed first member");
+        } finally {
+            if (beforeFirst == null) firstChunk.removeAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE);
+            else firstChunk.setAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE, beforeFirst);
+            if (beforeSecond == null) secondChunk.removeAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE);
+            else secondChunk.setAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE, beforeSecond);
+        }
+        ctx.complete();
+    }
+
+    private static Long2IntOpenHashMap distinctFacts(BlockPos section, int count) {
+        var result = new Long2IntOpenHashMap();
+        for (int i = 0; i < count; i++) result.put(distinctPosition(section, i).asLong(), -1024 - i);
+        return result;
+    }
+
+    private static BlockPos distinctPosition(BlockPos section, int i) {
+        return section.add(i & 15, i >> 8, (i >> 4) & 15);
+    }
 }
