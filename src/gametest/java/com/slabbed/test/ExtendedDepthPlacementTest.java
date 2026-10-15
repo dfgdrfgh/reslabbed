@@ -125,34 +125,57 @@ public final class ExtendedDepthPlacementTest {
             new PlacementCase("top_trapdoor", Items.OAK_TRAPDOOR)
     };
 
-    @GameTest(templateName = "fabric-gametest-api-v1:empty")
+    @GameTest(templateName = "fabric-gametest-api-v1:empty", tickLimit = 200)
     public void floorFamiliesReachEveryDepthThroughRealRaycastAndUse(TestContext h) {
         Failures failures = new Failures();
+        ServerWorld world = h.getWorld();
+        BlockPos owner = h.getAbsolutePos(new BlockPos(3, 8, 3));
         withFrozenDy(() -> {
-            ServerWorld world = h.getWorld();
-            BlockPos owner = h.getAbsolutePos(new BlockPos(3, 8, 3));
             for (double depth : DEPTHS) {
                 for (PlacementCase placementCase : FLOOR_CASES) {
+                    if (placementCase.item() == Items.WHEAT_SEEDS) continue;
                     runCase(failures, placementCase.id() + "@" + depth, () -> {
                         clearArena(world, owner);
                         seedOwner(world, owner, placementCase.support().getDefaultState(), depth);
-                        prepareFloorFixture(world, owner, placementCase);
-                        BlockHitResult hit = rayAtFace(world, owner, Direction.UP);
-                        requireHit(hit, owner, Direction.UP, "support");
-                        PlayerEntity player = h.createMockPlayer(GameMode.SURVIVAL);
-                        positionPlayer(player, rayStart(world, owner, Direction.UP));
-                        ActionResult result = use(player, placementCase.item(), hit);
-                        BlockPos placed = owner.up();
-                        require(result.isAccepted(), "use was not accepted: " + result
-                                + floorFailureContext(world, owner, placementCase));
-                        require(isPlacedItem(world.getBlockState(placed), placementCase.item()),
-                                "wrong final block: " + world.getBlockState(placed));
-                        verifyPlaced(world, placed, depth, Direction.UP);
+                        verifyFloorPlacement(h, world, owner, placementCase, depth);
                     });
                 }
             }
         });
-        failures.finish(h, "floor families");
+        PlacementCase crop = FLOOR_CASES[FLOOR_CASES.length - 1];
+        // Native lighting runs between server ticks; crop placement must observe the settled fixture.
+        int tick = 2;
+        for (double depth : DEPTHS) {
+            h.runAtTick(tick, () -> withFrozenDy(() ->
+                    runCase(failures, "crop_fixture@" + depth, () -> {
+                        clearArena(world, owner);
+                        seedOwner(world, owner, crop.support().getDefaultState(), depth);
+                        prepareFloorFixture(world, owner, crop);
+                    })));
+            h.runAtTick(tick + 8, () -> withFrozenDy(() ->
+                    runCase(failures, crop.id() + "@" + depth, () -> {
+                        require(world.getLightLevel(owner.up()) >= 8 || world.isSkyVisible(owner.up()),
+                                "Crop fixture lighting was not ready");
+                        verifyFloorPlacement(h, world, owner, crop, depth);
+                    })));
+            tick += 12;
+        }
+        h.runAtTick(tick, () -> failures.finish(h, "floor families"));
+    }
+
+    private static void verifyFloorPlacement(
+            TestContext h, ServerWorld world, BlockPos owner, PlacementCase placementCase, double depth) {
+        BlockHitResult hit = rayAtFace(world, owner, Direction.UP);
+        requireHit(hit, owner, Direction.UP, "support");
+        PlayerEntity player = h.createMockPlayer(GameMode.SURVIVAL);
+        positionPlayer(player, rayStart(world, owner, Direction.UP));
+        ActionResult result = use(player, placementCase.item(), hit);
+        BlockPos placed = owner.up();
+        require(result.isAccepted(), "use was not accepted: " + result
+                + floorFailureContext(world, owner, placementCase));
+        require(isPlacedItem(world.getBlockState(placed), placementCase.item()),
+                "wrong final block: " + world.getBlockState(placed));
+        verifyPlaced(world, placed, depth, Direction.UP);
     }
 
     @GameTest(templateName = "fabric-gametest-api-v1:empty")
@@ -424,16 +447,7 @@ public final class ExtendedDepthPlacementTest {
         if (placementCase.item() == Items.WHEAT_SEEDS) {
             // Crop placement has a vanilla light-or-sky requirement in addition to farmland.
             // Keep a deterministic light source outside the target, support, ray, and mutation cells.
-            BlockPos lamp = owner.add(2, 1, 0);
-            world.setBlockState(lamp, Blocks.GLOWSTONE.getDefaultState(), Block.NOTIFY_ALL);
-            var lighting = world.getChunkManager().getLightingProvider();
-            var ready = java.util.concurrent.CompletableFuture.allOf(
-                    lighting.enqueue(owner.getX() >> 4, owner.getZ() >> 4),
-                    lighting.enqueue(lamp.getX() >> 4, lamp.getZ() >> 4));
-            lighting.tick();
-            ready.orTimeout(10, java.util.concurrent.TimeUnit.SECONDS).join();
-            require(world.getLightLevel(owner.up()) >= 8 || world.isSkyVisible(owner.up()),
-                    "Crop fixture lighting was not ready");
+            world.setBlockState(owner.add(2, 1, 0), Blocks.GLOWSTONE.getDefaultState(), Block.NOTIFY_ALL);
         }
     }
 
