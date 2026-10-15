@@ -218,18 +218,9 @@ public final class PlacementCaptureBoundaryGameTest {
         pass(h, "terrain_slabs_final_state_writes_nothing");
     }
 
-    /**
-     * ORDERING LAW: every legacy marker author must have finished before the placement fact is
-     * published, or the store would freeze a height taken before the markers that decide it exist.
-     *
-     * <p>PORT NOTE: the donor's publish phase carries its {@code setPlacedBy} observation
-     * ({@code "publish:setPlacedBy=true"}). This line does not wrap {@code Block.onPlaced} — the five
-     * C3 seams here are place / getPlacementContext / getPlacementState / decrementUnlessCreative /
-     * place-RETURN — so the publish phase is the constant {@code "publish"} and the asserted trace is
-     * exactly {@code [markers_complete, publish]}.
-     */
+    /** Height preflight precedes publication and item consumption (LAW.md). */
     @GameTest(templateName = "fabric-gametest-api-v1:empty")
-    public void markerAuthorsCompleteBeforePublish(TestContext h) {
+    public void heightPreflightCompletesBeforePublish(TestContext h) {
         ServerWorld world = h.getWorld();
         BlockPos owner = flatOwner(h);
         C3TestPhaseTrace.beginTestPhaseTrace();
@@ -240,11 +231,11 @@ public final class PlacementCaptureBoundaryGameTest {
         } finally {
             C3TestPhaseTrace.endTestPhaseTrace();
         }
-        h.assertTrue(trace.equals(List.of("markers_complete", "publish"))
+        h.assertTrue(trace.equals(List.of("prepare", "publish"))
                         && Double.isFinite(stored(world, owner.up())),
-                "legacy marker completion did not precede dy publication: trace=" + trace
+                "height preflight did not precede publication: trace=" + trace
                         + " dy=" + stored(world, owner.up()));
-        pass(h, "marker_authors_complete_before_publish");
+        pass(h, "height_preflight_completes_before_publish");
     }
 
     /**

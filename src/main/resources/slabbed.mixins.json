@@ -35,7 +35,6 @@
     "RedstoneWireVisualStepMixin",
     "BlockItemPlacementIntentMixin",
     "ServerInteractBlockHitToleranceMixin",
-    "BlockOnPlacedAnchorMixin",
     "BlockOnStateReplacedAnchorMixin",
     "FencePaneSlabConnectionMixin",
     "WallSlabConnectionMixin",

@@ -97,7 +97,7 @@ exclusion can leave a manifest advertising a class the archive no longer has. Th
 | --- | --- |
 | `com/slabbed/compat/*` | Compat dispatch and the slab-surface-kind enum consumed by third-party slab mods. Dispatch is documented subtractive-only and unreachable when the target mod is absent. |
 | `com/slabbed/compat/terrainslabs/*` | Terrain Slabs compat, mod-id gated. |
-| `com/slabbed/placement/*` | Placement-law decision helpers: `LandingResolver` (one immutable server height from the player's root aim), `LandingHitValidationPolicy` (server-side interact/use validation against a deeply-lowered cell), `ConnectorPlacementSettle` (settles fence/wall/pane/bars connections after a placement's height is published). None does file I/O, registration, rendering or diagnostics. |
+| `com/slabbed/placement/*` | Explicit aim and family planning, operation-local staging, group preflight/commit, geometry occupancy, hit validation and connector settling. No file I/O or registrations. |
 | `com/slabbed/client/model/*` | Offset block-state model, the Y-offset emitter, the alternate chain-ceiling geometry, and the fitted rail geometry that draws a rail on its seat-fitted slope — the lowering render path. |
 | `com/slabbed/client/runtime/PistonMovingRenderScope` | Prevents nested piston models from applying the destination height twice. |
 | `com/slabbed/mixin/client/*` | Client mixins declared in `slabbed.client.mixins.json`. Non-recursive on purpose. |
@@ -134,7 +134,6 @@ Every row below is declared in `slabbed.mixins.json`. Inactive, unregistered mix
 | `com/slabbed/mixin/LoweredRailSupportNeighborMixin` | A neighbour change delivered to the cell a lowered powered rail is drawn in is forwarded to the rail, so a lever or repeater beside the slab reaches it (maintainer ruling, 2026-09-28). |
 | `com/slabbed/mixin/ArmorStandItemOffsetPlacementMixin` | Places armor stands against the stored visible support plane while retaining vanilla item collision and entity-data handling. |
 | `com/slabbed/mixin/BlockItemPlacementIntentMixin` | Captures placement intent for the placement law. |
-| `com/slabbed/mixin/BlockOnPlacedAnchorMixin` | Writes the dy anchor on placement. |
 | `com/slabbed/mixin/BlockOnStateReplacedAnchorMixin` | Clears the dy anchor on state replacement; a same-shape kind change keeps it. |
 | `com/slabbed/mixin/CarpetBlockMixin` | Carpet support and shape over a lowered slab. |
 | `com/slabbed/mixin/FencePaneSlabConnectionMixin` | Fence and pane connection against a lowered slab. |

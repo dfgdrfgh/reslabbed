@@ -123,7 +123,7 @@ public final class LandingResolver {
                 context.getSide(),
                 context.getHitPos(),
                 ownerState.canReplace(new ItemPlacementContext(context)),
-                SlabAnchorAttachment.isModernPlacement(world, ownerPos));
+                com.slabbed.anchor.PlacementGeometry.fact(world, ownerPos).present());
     }
 
     /**
@@ -373,17 +373,7 @@ public final class LandingResolver {
     }
 
     public static double visibleOwnerDy(BlockView world, BlockPos ownerPos, BlockState ownerState) {
-        if (ownerState == null || ownerState.isAir()) {
-            return 0.0;
-        }
-        if (!(world instanceof World w) || !WorldUpgradeRuntimePolicy.authorsModernPlacements(w)) {
-            double stored = SlabAnchorAttachment.storedPlacementDy(world, ownerPos);
-            if (Double.isFinite(stored)) {
-                return stored;
-            }
-        }
-        double live = SlabSupport.getYOffset(world, ownerPos, ownerState);
-        return Double.isFinite(live) ? live : 0.0;
+        return com.slabbed.anchor.PlacementGeometry.offsetY(world, ownerPos, ownerState);
     }
 
     /**

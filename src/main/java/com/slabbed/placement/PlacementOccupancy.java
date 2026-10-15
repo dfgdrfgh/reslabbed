@@ -32,6 +32,15 @@ public final class PlacementOccupancy {
                 && current.isOf(state.getBlock()) && current.get(SlabBlock.TYPE) != SlabType.DOUBLE) {
             candidateDy = LandingResolver.visibleOwnerDy(world, target, current);
         }
+        return intersectsDisplacedBody(world, target, state, candidateDy);
+    }
+
+    public static boolean intersectsDisplacedBody(World world, BlockPos target, BlockState state, double candidateDy) {
+        return intersectsDisplacedBody(world, target, state, candidateDy, java.util.Set.of(target));
+    }
+
+    static boolean intersectsDisplacedBody(World world, BlockPos target, BlockState state, double candidateDy,
+                                           java.util.Set<BlockPos> replaced) {
         if (!Double.isFinite(candidateDy)) return false;
         VoxelShape body = baseBody(state).offset(target.getX(), target.getY() + candidateDy, target.getZ());
         if (body.isEmpty()) return false;
@@ -45,7 +54,7 @@ public final class PlacementOccupancy {
                 int reach = com.slabbed.util.StoredGeometry.ownerRadius(world, x, z);
                 for (int y = MathHelper.floor(bounds.minY) - Math.max(2, reach); y <= MathHelper.ceil(bounds.maxY) + reach; y++) {
                     owner.set(x, y, z);
-                    if (owner.equals(target) || world.isOutOfHeightLimit(owner)) continue;
+                    if (replaced.contains(owner) || world.isOutOfHeightLimit(owner)) continue;
                     WorldChunk chunk = SlabAnchorAttachment.loadedAttachmentChunk(world, owner);
                     if (chunk == null) continue;
                     BlockState existing = chunk.getBlockState(owner);

@@ -13,6 +13,8 @@ public final class PlacementGeometry {
         if (pos == null || SlabSupport.isUnsafeGeometryView(view)) {
             return SlabAnchorAttachment.PlacementDyFact.absent();
         }
+        var staged = com.slabbed.placement.PlacementTransaction.stagedFact(view, pos);
+        if (staged != null) return staged;
         return SlabAnchorAttachment.effectivePlacementDyFact(view, pos);
     }
 

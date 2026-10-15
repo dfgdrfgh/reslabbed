@@ -441,13 +441,14 @@ public final class SlabAnchorAttachment {
      * @return the number of cells whose stored fact actually changed
      */
     public static int writePlacementDyBatch(World world, Map<BlockPos, Long> rawBitsByPos) {
+        if (world == null || world.isClient()) return 0;
         PreparedHeightWrite prepared = preparePlacementDyBatch(world, rawBitsByPos);
         return prepared != null && prepared.commit() ? prepared.changedCells() : 0;
     }
 
     /** Preflights the complete group before publishing any changed chunk (LAW.md). */
     public static PreparedHeightWrite preparePlacementDyBatch(World world, Map<BlockPos, Long> rawBitsByPos) {
-        if (world == null || world.isClient() || rawBitsByPos == null) return null;
+        if (world == null || rawBitsByPos == null) return null;
         IdentityHashMap<WorldChunk, Long2IntOpenHashMap> originals = new IdentityHashMap<>();
         IdentityHashMap<WorldChunk, Long2IntOpenHashMap> copies = new IdentityHashMap<>();
         int writes = 0;
@@ -580,20 +581,7 @@ public final class SlabAnchorAttachment {
      * cell with modern provenance, or — on the client only — a cell the prediction overlay owns.
      */
     public static boolean usesFrozenPlacementHeight(BlockView world, BlockPos pos) {
-        if (FROZEN_DY_ENABLED) {
-            return true;
-        }
-        if (isModernPlacement(world, pos)) {
-            return true;
-        }
-        // A server never consults the integrated client's prediction overlay. Only the client World
-        // or its render-region bridge may select the modern path before provenance sync arrives.
-        if (!isClientAttachmentView(world)) {
-            return false;
-        }
-        return clientPostPolicyPredictionLookup != null && clientPostPolicyPredictionLookup.test(pos)
-                && clientEffectivePlacementDyLookup != null
-                && clientEffectivePlacementDyLookup.lookup(pos) != null;
+        return pos != null && !SlabSupport.isUnsafeGeometryView(world);
     }
 
     /** Marks accepted item-placement cells with modern provenance (the policy is unconditional here). */
