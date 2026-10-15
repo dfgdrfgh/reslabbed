@@ -12,9 +12,12 @@ def download(repo,artifact):
             headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json'})
     try: response=opener.open(request,timeout=90)
     except urllib.error.HTTPError as e:
-        if e.code not in (301,302,303,307,308):
+        if e.code in (301,302,303,307,308):
+            response=urllib.request.urlopen(e.headers['Location'],timeout=90)
+        elif e.code in (403,404) and repo != 'dfgdrfgh/reslabbed':
+            response=urllib.request.urlopen(f'https://nightly.link/{repo}/actions/artifacts/{artifact}.zip',timeout=90)
+        else:
             raise RuntimeError(f'Public build download unavailable: {repo} artifact {artifact}, HTTP {e.code}') from None
-        response=urllib.request.urlopen(e.headers['Location'],timeout=90)
     target=root/f'artifact-{artifact}.zip'
     with response,target.open('wb') as output:
         while chunk:=response.read(1024*1024): output.write(chunk)
