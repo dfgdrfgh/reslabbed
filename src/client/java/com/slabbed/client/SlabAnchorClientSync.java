@@ -314,7 +314,7 @@ public final class SlabAnchorClientSync {
                 || !mc.world.getChunkManager().isChunkLoaded(pos.getX() >> 4, pos.getZ() >> 4)) return;
         // Cover displaced owners below and the full natural support column above, including
         // its carpet. Provenance-only changes can affect that column across section borders.
-        int depth = Math.max(previousReach, SlabAnchorAttachment.ownerSearchRadius(mc.world, pos.getX(), pos.getZ()));
+        int depth = Math.max(previousReach, com.slabbed.util.StoredGeometry.ownerRadius(mc.world, pos.getX(), pos.getZ()));
         mc.worldRenderer.scheduleBlockRenders(pos.getX() - 1, pos.getY() - depth - 1, pos.getZ() - 1,
                 pos.getX() + 1, pos.getY() + Math.max(depth, SlabSupport.SUPPORT_COLUMN_DEPTH) + 1, pos.getZ() + 1);
     }

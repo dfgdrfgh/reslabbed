@@ -17,7 +17,7 @@ concurrency:
 jobs:
   verify:
     name: Build and server GameTests
-    if: github.ref != 'refs/heads/port/fabric-1.21.1-full-pack-verification' && github.ref != 'refs/heads/port/fabric-1.21.1-stacking-repair'
+    if: github.ref != 'refs/heads/port/fabric-1.21.1-full-pack-verification' && github.ref != 'refs/heads/port/fabric-1.21.1-stacking-repair' && github.ref != 'refs/heads/port/fabric-1.21.1-core-overhaul'
     runs-on: ubuntu-24.04
     timeout-minutes: 30
 
@@ -122,37 +122,6 @@ jobs:
           PYCODE
           timeout 10m xvfb-run -a python3 tools/vertical-step-runtime.py
           test -f build/run/vertical-step-client/vertical-step-pass.txt
-
-      - name: Upload vertical face checks
-        if: always()
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
-        with:
-          name: vertical-step-client-checks
-          path: |
-            build/vertical-step-indigo/production-launch.log
-            build/vertical-step-indigo/logs/
-            build/vertical-step-indigo/vertical-step*.png
-            build/vertical-step-indigo/vertical-step-pass.txt
-            build/vertical-step-sodium/production-launch.log
-            build/vertical-step-sodium/logs/
-            build/vertical-step-sodium/vertical-step*.png
-            build/vertical-step-sodium/vertical-step-pass.txt
-            build/run/vertical-step-client/production-launch.log
-            build/run/vertical-step-client/logs/
-            build/run/vertical-step-client/vertical-step*.png
-            build/run/vertical-step-client/vertical-step-pass.txt
-          if-no-files-found: ignore
-          retention-days: 7
-
-      - name: Upload gametest logs
-        if: always()
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
-        with:
-          name: gametest-logs
-          path: |
-            build/run/gameTest/logs/
-          if-no-files-found: ignore
-          retention-days: 7
 
       - name: Upload Fabric release jar
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0

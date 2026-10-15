@@ -60,7 +60,7 @@ its nest members and its source file at once, and one list covers both jars:
 - **Class-level rows for genuinely mixed packages** — `com/slabbed/mixin/`, `com/slabbed/client/`
   and `com/slabbed/anchor/`. Each of those contains feature code sitting beside something the
   exclusion list removes, or beside something that turned out to need its own scrutiny (see the
-  two ORPHANED entries below). A package-level approval there would rebuild the exact blindness
+  explicitly listed entries below). A package-level approval there would rebuild the exact blindness
   this gate exists to remove.
 
 ### The manifest is checked too
@@ -108,6 +108,7 @@ exclusion can leave a manifest advertising a class the archive no longer has. Th
 | Entry | Reason |
 | --- | --- |
 | `com/slabbed/anchor/SlabAnchorAttachment` | The dy anchor store — the feature's data model. Server-authoritative, persistent, synchronised; writes no file and reaches nothing outside the save. |
+| `com/slabbed/anchor/PlacementHeightMap` | Copy-on-write height snapshot with cached column geometry and packet plans; caches derive from saved values without changing them (LAW.md). |
 | `com/slabbed/anchor/ChunkPositionSetPacketCodec` | Compact per-chunk network codec for packed block positions — the anchor set's sync wire. |
 | `com/slabbed/anchor/ChunkPositionDyMapPacketCodec` | Compact per-chunk network codec for the placement-height map — the store's sync wire, the sibling of the row above. Groups by 16-cubed section, stores occupancy as a non-empty-word mask, and stores heights as a per-section palette. Ported from the Fabric 1.21.11 line 2026-09-03 to replace a raw sixteen-bytes-per-height wire form that overflowed Fabric's attachment ceiling at 1,024 stored heights in one chunk; the same measurement now fits 64,000. Pure encoding: no world access, no file or network I/O of its own, no registration. |
 | `com/slabbed/anchor/PlacementDyOverlay` | The client-prediction overlay that sits above the authoritative store without writing it — the shared decision logic `PlacementDyPredictionClient` (client) supplies platform wiring for. No file or network access beyond the ordinary sync path. |
@@ -122,10 +123,7 @@ exclusion can leave a manifest advertising a class the archive no longer has. Th
 
 ### Main mixins (class-level; `com/slabbed/mixin/` is a mixed package)
 
-Every row below is declared in `slabbed.mixins.json` **except the two marked ORPHANED**, which
-compile and would ship as bytes but are not declared in any mixin config and therefore never load.
-Found while authoring this file (2026-09-03); disposition (wire in with proof, or delete) is owed
-before this line's behaviour work closes — see the note beneath the table.
+Every row below is declared in `slabbed.mixins.json`. Inactive, unregistered mixins are not packaged.
 
 | Entry | Reason |
 | --- | --- |
@@ -167,8 +165,6 @@ before this line's behaviour work closes — see the note beneath the table.
 | `com/slabbed/mixin/TorchParticleMixin` | Particle origin tracks the lowered block. |
 | `com/slabbed/mixin/WallSlabConnectionMixin` | Wall connection against a lowered slab. |
 | `com/slabbed/mixin/WallTorchParticleMixin` | Particle origin tracks the lowered block. |
-| `com/slabbed/mixin/ChainBlockNeighborSurvivalMixin` | **ORPHANED — ships, never applies.** Adds an axis-aware support check so a chain pops when it loses support (vanilla's `AbstractBlock.canPlaceAt` is unconditionally true for chains, so today nothing enforces this). Compiles and would pass the hygiene/allowlist gates, but is not listed in `slabbed.mixins.json` or any other config, so Mixin never loads it. Approved to ship as inert bytes rather than excluded, because excluding it would hide the finding; wiring it in (or deleting it) is a behaviour decision for the placement-work phase, with its own teeth-first proof, not a hygiene-pass edit. |
-| `com/slabbed/mixin/SlabBlockPlacementFixMixin` | **ORPHANED — ships, never applies.** Forces a slab placed against the top face of a lowered support to become a TOP slab instead of BOTTOM. Same disposition as above: compiles, ships as inert bytes, is not declared in any mixin config, so it currently does nothing. Its target behaviour — a slab landing at the wrong sub-type on a lowered support — is plausibly related to a cluster of open render-vs-hitbox bug reports on this line; that connection is unverified and must be traced, not assumed, before this mixin is wired in. |
 
 ### Client (class-level; `com/slabbed/client/` is a mixed package)
 
@@ -191,6 +187,7 @@ before this line's behaviour work closes — see the note beneath the table.
 | `com/slabbed/util/RailVisualSignal` | The cell a lowered rail is drawn in and the redstone arriving at that row — the read the powered-rail hooks share. Reads seats, writes nothing (maintainer ruling, 2026-09-28). |
 | `com/slabbed/util/WireVisualSignal` | The wire drawn inside a neighbouring cell and the one-block reach of a wire's read — the read the wire's incoming-signal hook uses. Reads seats, writes nothing (maintainer ruling, 2026-09-28). |
 | `com/slabbed/util/SlabSupport` | Support-surface resolution and the visual Y offset — the core of the feature. |
+| `com/slabbed/util/StoredGeometry` | Shared bounds for collision, targeting and placement queries; restricts saved geometry lookups to relevant block columns (LAW.md). |
 | `com/slabbed/util/SlabbedOffsetRaycast` | Offset-aware nearest-hit raycast — the targeting overhaul. |
 | `com/slabbed/util/RuntimeDiagnostics` | The release-safe diagnostics boundary: every method is gated behind a `System.getProperty` flag (default off) or an `isEnabled()` check, and is the sole caller shipped code uses to reach recording/inspection behaviour. Architecture keeping diagnostics gated, not diagnostics leaking in — analogous in role to the donor line's `SlabbedAuditBridge`, though this line has not yet consolidated onto that class; see the dev-tooling port phase. |
 
@@ -219,17 +216,6 @@ Some sibling lines run a second, independent gate over file *content* (a forbidd
 catches an already-approved file that later grows a reference to a diagnostic seam. This line has no
 such task. Recorded as port debt, not silently improvised — do not invent one under time pressure;
 it wants a token set with a maintainer sign-off, the same way the sibling line's does.
-
-## Known gap on this line: two orphaned mixins ship inert
-
-See the two ORPHANED rows above under "Main mixins". Both compile, both pass every gate here, and
-neither has ever executed on this line because neither is declared in a loaded mixin config. This
-was found while authoring this file (2026-09-03), by comparing the source tree against every mixin
-config in `src/main/resources` and `src/client/resources` — not by running anything. Disposition
-(wire in with a teeth-first GameTest row, or delete) belongs to the behaviour-work phase, under the
-same law-preflight and reachability discipline as any other placement-affecting change; it is
-recorded here rather than acted on now because a hygiene pass is the wrong place to activate
-previously-inert placement behaviour.
 
 ## Maintenance
 

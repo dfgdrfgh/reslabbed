@@ -42,7 +42,7 @@ public final class PlacementOccupancy {
         BlockPos.Mutable owner = new BlockPos.Mutable();
         for (int x = MathHelper.floor(bounds.minX) - 1; x <= MathHelper.ceil(bounds.maxX); x++) {
             for (int z = MathHelper.floor(bounds.minZ) - 1; z <= MathHelper.ceil(bounds.maxZ); z++) {
-                int reach = SlabAnchorAttachment.ownerSearchRadius(world, x, z);
+                int reach = com.slabbed.util.StoredGeometry.ownerRadius(world, x, z);
                 for (int y = MathHelper.floor(bounds.minY) - Math.max(2, reach); y <= MathHelper.ceil(bounds.maxY) + reach; y++) {
                     owner.set(x, y, z);
                     if (owner.equals(target) || world.isOutOfHeightLimit(owner)) continue;

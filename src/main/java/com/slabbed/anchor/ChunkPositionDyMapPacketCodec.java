@@ -24,73 +24,74 @@ final class ChunkPositionDyMapPacketCodec {
     private ChunkPositionDyMapPacketCodec() {
     }
 
-    // ── encode ────────────────────────────────────────────────────────
+    record Section(SectionKey key, long[] words, long nonEmptyWords, int[] palette,
+                   it.unimi.dsi.fastutil.ints.Int2IntMap indices) {}
+    record Prepared(java.util.List<Section> sections, int byteLength) {}
 
-    private static void encode(Long2IntMap facts, RegistryByteBuf buf) {
-        TreeMap<SectionKey, long[]> sections = groupSections(facts);
-        buf.writeVarInt(COMPACT_FORMAT_MARKER);
-        buf.writeVarInt(sections.size());
-        for (Map.Entry<SectionKey, long[]> entry : sections.entrySet()) {
+    private static Prepared prepared(Long2IntMap facts) {
+        return facts instanceof PlacementHeightMap snapshot ? snapshot.packetPlan() : prepareFresh(facts);
+    }
+
+    static Prepared prepareFresh(Long2IntMap facts) {
+        var grouped = groupSections(facts);
+        var sections = new java.util.ArrayList<Section>(grouped.size());
+        int length = varIntLength(COMPACT_FORMAT_MARKER) + varIntLength(grouped.size());
+        for (var entry : grouped.entrySet()) {
             SectionKey key = entry.getKey();
             long[] words = entry.getValue();
+            var values = new it.unimi.dsi.fastutil.ints.IntArrayList();
+            var indices = new it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap(2);
+            indices.defaultReturnValue(-1);
+            forEachPosition(key, words, packed -> {
+                int value = facts.get(packed);
+                if (indices.get(value) < 0) {
+                    indices.put(value, values.size());
+                    values.add(value);
+                }
+            });
+            int[] palette = values.toIntArray();
+            long mask = nonEmptyWordMask(words);
+            length += varIntLength(key.chunkX()) + varIntLength(key.sectionY()) + varIntLength(key.chunkZ());
+            length += Long.BYTES + Long.BYTES * Long.bitCount(mask) + varIntLength(palette.length);
+            for (int value : palette) length += varIntLength(zigZag(value));
+            if (palette.length > 1) {
+                int occupied = 0;
+                for (long word : words) occupied += Long.bitCount(word);
+                length += (occupied * bitsPerIndex(palette.length) + 7) / 8;
+            }
+            sections.add(new Section(key, words, mask, palette, palette.length > 1 ? indices : null));
+        }
+        return new Prepared(java.util.List.copyOf(sections), length);
+    }
+
+    private static void encode(Long2IntMap facts, RegistryByteBuf buf) {
+        Prepared plan = prepared(facts);
+        buf.writeVarInt(COMPACT_FORMAT_MARKER);
+        buf.writeVarInt(plan.sections().size());
+        for (Section section : plan.sections()) {
+            SectionKey key = section.key();
             buf.writeVarInt(key.chunkX());
             buf.writeVarInt(key.sectionY());
             buf.writeVarInt(key.chunkZ());
-
-            long nonEmptyWordMask = nonEmptyWordMask(words);
-            buf.writeLong(nonEmptyWordMask);
-            for (int wordIndex = 0; wordIndex < WORDS_PER_SECTION; wordIndex++) {
-                if ((nonEmptyWordMask & (1L << wordIndex)) != 0L) {
-                    buf.writeLong(words[wordIndex]);
-                }
+            buf.writeLong(section.nonEmptyWords());
+            for (int i = 0; i < WORDS_PER_SECTION; i++) {
+                if ((section.nonEmptyWords() & (1L << i)) != 0L) buf.writeLong(section.words()[i]);
             }
-
-            int[] palette = paletteOf(facts, key, words);
-            // Palette cardinality and values stay independent of a machine-byte height limit.
+            int[] palette = section.palette();
             buf.writeVarInt(palette.length);
-            for (int paletteValue : palette) {
-                buf.writeVarInt(zigZag(paletteValue));
-            }
-            if (palette.length <= 1) {
-                // Uniform section: the occupancy bitmap already carries the height.
-                continue;
-            }
-            int bitsPerIndex = bitsPerIndex(palette.length);
-            BitWriter writer = new BitWriter(buf, bitsPerIndex);
-            forEachPosition(key, words, packed -> writer.write(paletteIndex(palette, facts.get(packed))));
+            for (int value : palette) buf.writeVarInt(zigZag(value));
+            if (palette.length <= 1) continue;
+            BitWriter writer = new BitWriter(buf, bitsPerIndex(palette.length));
+            forEachPosition(key, section.words(), packed -> {
+                int index = section.indices().get(facts.get(packed));
+                if (index < 0) throw new IllegalStateException("Placement snapshot changed during encoding");
+                writer.write(index);
+            });
             writer.flush();
         }
     }
 
-    // ── size, computed exactly and without a buffer ───────────────────
-
-    /**
-     * Exact number of bytes {@link #encode} will write for {@code facts}. Shares
-     * {@link #groupSections} and {@link #paletteOf} with the encoder so the prediction and the
-     * write can never drift apart.
-     */
-    static int encodedByteLength(Long2IntMap facts) {
-        TreeMap<SectionKey, long[]> sections = groupSections(facts);
-        int length = varIntLength(COMPACT_FORMAT_MARKER) + varIntLength(sections.size());
-        for (Map.Entry<SectionKey, long[]> entry : sections.entrySet()) {
-            SectionKey key = entry.getKey();
-            long[] words = entry.getValue();
-            length += varIntLength(key.chunkX()) + varIntLength(key.sectionY()) + varIntLength(key.chunkZ());
-            length += Long.BYTES;
-            length += Long.BYTES * Long.bitCount(nonEmptyWordMask(words));
-            int[] palette = paletteOf(facts, key, words);
-            length += varIntLength(palette.length);
-            for (int value : palette) length += varIntLength(zigZag(value));
-            if (palette.length > 1) {
-                int occupied = 0;
-                for (long word : words) {
-                    occupied += Long.bitCount(word);
-                }
-                length += (occupied * bitsPerIndex(palette.length) + 7) / 8;
-            }
-        }
-        return length;
-    }
+    static int encodedByteLength(Long2IntMap facts) { return prepared(facts).byteLength(); }
 
     // ── decode ────────────────────────────────────────────────────────
 
@@ -106,7 +107,7 @@ final class ChunkPositionDyMapPacketCodec {
                     "Invalid chunk-position-dy attachment section count " + sectionCount);
         }
 
-        Long2IntOpenHashMap facts = new SlabAnchorAttachment.PlacementDyMap();
+        Long2IntOpenHashMap facts = new PlacementHeightMap();
         for (int sectionIndex = 0; sectionIndex < sectionCount; sectionIndex++) {
             int chunkX = buf.readVarInt();
             int sectionY = buf.readVarInt();
@@ -173,28 +174,6 @@ final class ChunkPositionDyMapPacketCodec {
             }
         }
         return mask;
-    }
-
-    /**
-     * The distinct quantised heights present in one section, in the canonical position order the
-     * encoder and decoder both walk. Never empty for a section that exists.
-     */
-    private static int[] paletteOf(Long2IntMap facts, SectionKey key, long[] words) {
-        it.unimi.dsi.fastutil.ints.IntArrayList palette = new it.unimi.dsi.fastutil.ints.IntArrayList();
-        forEachPosition(key, words, packed -> {
-            int value = facts.get(packed);
-            if (!palette.contains(value)) palette.add(value);
-        });
-        return palette.toIntArray();
-    }
-
-    private static int paletteIndex(int[] palette, int value) {
-        for (int index = 0; index < palette.length; index++) {
-            if (palette[index] == value) {
-                return index;
-            }
-        }
-        return 0;
     }
 
     /** 1, 2, 4 or 8 — the smallest power-of-two bit width that addresses the palette. */

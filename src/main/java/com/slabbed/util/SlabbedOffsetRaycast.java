@@ -47,7 +47,6 @@ import net.minecraft.world.BlockView;
  */
 public final class SlabbedOffsetRaycast {
 
-    public static final double DEEPEST_TARGETABLE_DY = -3.0d;
 
     private SlabbedOffsetRaycast() {
     }
@@ -99,6 +98,8 @@ public final class SlabbedOffsetRaycast {
         private final ShapeContext shapeContext;
         private final LongOpenHashSet shapeTested = new LongOpenHashSet();
         private final Long2DoubleOpenHashMap dyMemo = new Long2DoubleOpenHashMap();
+        private final it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap reachMemo =
+                new it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap();
 
         private BlockHitResult best = null;
         private double bestDistSq = Double.POSITIVE_INFINITY;
@@ -113,7 +114,13 @@ public final class SlabbedOffsetRaycast {
 
         void consumeCell(int x, int y, int z) {
             testPrimary(x, y, z);
-            for (int distance = 1; distance <= com.slabbed.anchor.SlabAnchorAttachment.ownerSearchRadius(world, x, z); distance++) {
+            long column = BlockPos.asLong(x, 0, z);
+            int radius = reachMemo.getOrDefault(column, -1);
+            if (radius < 0) {
+                radius = StoredGeometry.ownerRadius(world, x, z);
+                reachMemo.put(column, radius);
+            }
+            for (int distance = 1; distance <= radius; distance++) {
                 testNeighbor(x, y - distance, z);
                 testNeighbor(x, y + distance, z);
             }

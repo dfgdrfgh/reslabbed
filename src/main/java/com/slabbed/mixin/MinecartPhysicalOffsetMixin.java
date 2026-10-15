@@ -142,7 +142,7 @@ public abstract class MinecartPhysicalOffsetMixin extends VehicleEntity {
             return;
         }
         // Re-entry finds the rail's visible band without moving the entity into its logical cell.
-        int radius = SlabAnchorAttachment.ownerSearchRadius(getWorld(), getBlockPos().getX(), getBlockPos().getZ());
+        int radius = com.slabbed.util.StoredGeometry.ownerRadius(getWorld(), getBlockPos().getX(), getBlockPos().getZ());
         BlockPos physicalCell = getBlockPos();
         for (int above = -1; above <= radius + 1; above++) {
             BlockPos candidate = physicalCell.up(above);

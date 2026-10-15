@@ -38,6 +38,12 @@ Keep the "do not re-add X" guard comments — they are anti-regression tripwires
   `build`; debug/dev tooling ships in every jar default-off, but the file-writing audit/recorder
   packages never ship.
 
+## Pack validation and distribution
+
+Use the latest supplied modpack, including approved changes to that pack, for compatibility tests.
+Publish only the changed mod's production JAR. Keep test output in Actions logs; do not publish a
+full modpack archive or diagnostic artifacts with the mod download.
+
 ## Commit hygiene
 
 `git config core.hooksPath tools/hooks` once per checkout. Gates: S-1 (any tracked doc using law

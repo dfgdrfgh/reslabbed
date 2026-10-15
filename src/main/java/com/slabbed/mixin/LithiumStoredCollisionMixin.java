@@ -36,7 +36,7 @@ public abstract class LithiumStoredCollisionMixin extends AbstractIterator<Voxel
     private void slabbed$visitStoredBodies(CallbackInfoReturnable<VoxelShape> cir) {
         if (!slabbed$checked) {
             slabbed$checked = true;
-            if (SlabAnchorAttachment.hasStoredDisplacement(world, box)) {
+            if (com.slabbed.util.StoredGeometry.hasDisplacement(world, box)) {
                 slabbed$storedCollisions = world.getBlockCollisions(slabbed$entity, box).iterator();
             }
         }

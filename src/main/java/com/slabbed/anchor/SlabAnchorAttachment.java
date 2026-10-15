@@ -237,9 +237,6 @@ public final class SlabAnchorAttachment {
     // value the player aimed at — never a value derived afresh from the current neighbours. Synced to
     // clients exactly like the flags, so the frozen height is what renders.
 
-    private record DyEntry(long pos, double dy) {
-    }
-
     /** Presence and raw bits are one indivisible C3 authority fact. */
     public record PlacementDyFact(boolean present, long rawBits) {
         /**
@@ -328,63 +325,14 @@ public final class SlabAnchorAttachment {
     }
 
     private static Long2IntOpenHashMap newDyMap() {
-        return new PlacementDyMap();
+        return new PlacementHeightMap();
     }
 
-    /** Copy-on-write maps cache their geometry reach without a global cache (LAW.md). */
-    public static final class PlacementDyMap extends Long2IntOpenHashMap {
-        private transient volatile int radius = -1;
-
-        public PlacementDyMap() { super(); }
-        public PlacementDyMap(it.unimi.dsi.fastutil.longs.Long2IntMap source) { super(source); }
-        @Override public int put(long key, int value) { radius = -1; return super.put(key, value); }
-        @Override public int remove(long key) { radius = -1; return super.remove(key); }
-        @Override public void clear() { radius = -1; super.clear(); }
-        public int ownerRadius() {
-            int result = radius;
-            if (result < 0) radius = result = radiusOf(this);
-            return result;
-        }
-    }
-
-    private static int radiusOf(Long2IntOpenHashMap map) {
-        long maximum = 0;
-        for (int height : map.values()) maximum = Math.max(maximum, Math.abs((long) height));
-        return (int) Math.min(Integer.MAX_VALUE, (maximum + 15L) / 16L + 1L);
-    }
-
-    /** Owner discovery uses the actual saved heights in loaded chunks; it never changes a seat. */
-    public static int ownerSearchRadius(BlockView view, int x, int z) {
-        int radius = 3; // Legacy geometry and extended attachment shapes retain their old envelope.
-        if (view instanceof World world) {
-            WorldChunk chunk = loadedAttachmentChunk(world, new BlockPos(x, world.getBottomY(), z));
-            Long2IntOpenHashMap map = chunk == null ? null : chunk.getAttached(PLACEMENT_DY_TYPE);
-            if (map != null && !map.isEmpty()) {
-                radius = Math.max(radius, map instanceof PlacementDyMap indexed
-                        ? indexed.ownerRadius() : radiusOf(map));
-            }
-            radius = Math.min(radius, world.getHeight());
-        }
-        return radius;
-    }
-
-    /** The optimized collision path is valid only where no stored body has left its cell. */
-    public static boolean hasStoredDisplacement(World world, Box bounds) {
-        int minX = ((int) Math.floor(bounds.minX) - 1) >> 4;
-        int minZ = ((int) Math.floor(bounds.minZ) - 1) >> 4;
-        int maxX = ((int) Math.ceil(bounds.maxX)) >> 4;
-        int maxZ = ((int) Math.ceil(bounds.maxZ)) >> 4;
-        for (int x = minX; x <= maxX; x++) {
-            for (int z = minZ; z <= maxZ; z++) {
-                WorldChunk chunk = loadedAttachmentChunk(world, new BlockPos(x << 4, world.getBottomY(), z << 4));
-                Long2IntOpenHashMap map = chunk == null ? null : chunk.getAttached(PLACEMENT_DY_TYPE);
-                if (map != null && !map.isEmpty()
-                        && (map instanceof PlacementDyMap indexed ? indexed.ownerRadius() : radiusOf(map)) > 1) {
-                    return true;
-                }
-            }
-        }
-        return false;
+    /** Saved reach in one block column, read only from an already loaded chunk. */
+    public static int storedOwnerRadius(World world, int x, int z) {
+        WorldChunk chunk = loadedAttachmentChunk(world, new BlockPos(x, world.getBottomY(), z));
+        Long2IntOpenHashMap map = chunk == null ? null : chunk.getAttached(PLACEMENT_DY_TYPE);
+        return map == null || map.isEmpty() ? 0 : PlacementHeightMap.ownerRadius(map, x, z);
     }
 
     /**
@@ -502,7 +450,8 @@ public final class SlabAnchorAttachment {
             if (!Double.isFinite(value)) {
                 throw new IllegalArgumentException("non-finite placement dy batch value");
             }
-            facts.put(entry.getKey().toImmutable(), new PlacementDyFact(true, entry.getValue()));
+            facts.put(entry.getKey().toImmutable(), new PlacementDyFact(true,
+                    value == 0.0d ? 0L : entry.getValue()));
         }
         return writePlacementDyFactsInternal(world, facts);
     }
@@ -527,12 +476,10 @@ public final class SlabAnchorAttachment {
             if (chunk == null) {
                 continue;
             }
-            Long2IntOpenHashMap map = copies.computeIfAbsent(chunk, ignored -> {
-                Long2IntOpenHashMap existing = chunk.getAttached(PLACEMENT_DY_TYPE);
-                return existing == null ? newDyMap() : new PlacementDyMap(existing);
-            });
+            Long2IntOpenHashMap map = copies.get(chunk);
+            if (map == null) map = chunk.getAttached(PLACEMENT_DY_TYPE);
             long key = pos.asLong();
-            PlacementDyFact current = map.containsKey(key)
+            PlacementDyFact current = map != null && map.containsKey(key)
                     ? PlacementDyFact.fromStoredSixteenths(map.get(key))
                     : PlacementDyFact.absent();
             if (current.equals(desired)) {
@@ -555,10 +502,14 @@ public final class SlabAnchorAttachment {
                     }
                     continue;
                 }
-                Long2IntOpenHashMap candidate = new PlacementDyMap(map);
-                candidate.put(key, quantised);
-                if (ChunkPositionDyMapPacketCodec.encodedByteLength(candidate)
-                        > SYNC_SAFE_ENCODED_BYTES) {
+                if (!copies.containsKey(chunk)) {
+                    map = map == null ? newDyMap() : new PlacementHeightMap(map);
+                    copies.put(chunk, map);
+                }
+                map.put(key, quantised);
+                if (ChunkPositionDyMapPacketCodec.encodedByteLength(map) > SYNC_SAFE_ENCODED_BYTES) {
+                    if (current.present()) map.put(key, quantiseDy(current.valueOrNaN()));
+                    else map.remove(key);
                     // The chunk is saturated. Decline the new fact rather than let setAttached
                     // throw and take the whole chunk's synchronization down with it; the cell
                     // falls back to the live lanes, which is this line's pre-store behaviour.
@@ -572,8 +523,11 @@ public final class SlabAnchorAttachment {
                     }
                     continue;
                 }
-                map.put(key, quantised);
             } else {
+                if (!copies.containsKey(chunk)) {
+                    map = new PlacementHeightMap(map);
+                    copies.put(chunk, map);
+                }
                 map.remove(key);
             }
             changedChunks.put(chunk, Boolean.TRUE);
@@ -1068,7 +1022,7 @@ public final class SlabAnchorAttachment {
             if (dyChunk != null) {
                 Long2IntOpenHashMap dyMap = dyChunk.getAttached(PLACEMENT_DY_TYPE);
                 if (dyMap != null && dyMap.containsKey(pos.asLong())) {
-                    Long2IntOpenHashMap copy = new PlacementDyMap(dyMap);
+                    Long2IntOpenHashMap copy = new PlacementHeightMap(dyMap);
                     copy.remove(pos.asLong());
                     dyChunk.setAttached(PLACEMENT_DY_TYPE, copy);
                 }

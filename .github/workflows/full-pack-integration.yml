@@ -2,7 +2,7 @@ name: Full pack slab integration
 
 on:
   push:
-    branches: ["port/fabric-1.21.1-stacking-repair"]
+    branches: ["port/fabric-1.21.1-core-overhaul"]
   workflow_dispatch:
 
 permissions:
@@ -48,6 +48,6 @@ jobs:
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         with:
           name: slabbed-mc1.21.1-fabric
-          path: build/libs/slabbed-0.6.9-alpha+1.21.1-fabric.jar
+          path: build/libs/slabbed-0.7.0-alpha+1.21.1-fabric.jar
           if-no-files-found: error
           retention-days: 30
