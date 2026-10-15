@@ -1,71 +1,24 @@
 package com.slabbed.anchor;
 
-import it.unimi.dsi.fastutil.longs.Long2ByteMap;
-import it.unimi.dsi.fastutil.longs.Long2ByteOpenHashMap;
+import it.unimi.dsi.fastutil.longs.Long2IntMap;
+import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
 import java.util.Map;
 import java.util.TreeMap;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.util.math.BlockPos;
 
-/**
- * Exact, compact network representation for a per-chunk map of packed block position to a
- * placement height quantised into sixteenths of a block.
- *
- * <p>WHY THIS IS NOT {@code ChunkPositionSetPacketCodec} WITH A VALUE TACKED ON. Issue #38
- * ({@code 5817d264}) exists because a per-chunk position SET overflowed Fabric's per-attachment
- * synchronization ceiling once it grew dense: Fabric measures the Netty backing-array capacity, and
- * Netty rounds that capacity up to a power of two, so the real budget is 16,384 written bytes even
- * though the documented ceiling is 32,502. A naive {@code long -> double} map is nine bytes per
- * entry — worse than the eight-byte raw-long set that already blew the budget at 2,048 entries.
- * This codec therefore stores the OCCUPANCY exactly the way the set codec does (a 64-bit
- * non-empty-word mask per 16-cubed section, then only the non-empty words) and stores the VALUES
- * as a per-section palette, because the height alphabet on this line is tiny
- * ({@code DY_SPEC.md} CS-CAP: {@code {-1.0, -0.5, 0.0}}, plus the deeper values a real placement
- * reaches on this line, which the interaction envelope bounds at {@code -3.0}). Ported from the
- * Fabric 1.21.11 line 2026-09-03; that line's {@code SlabSupport.DEEP_DY_ALPHABET} developer
- * override does not exist here, so the widths quoted below are its measurements, not this line's —
- * this line's own boundary is measured by {@code PlacementDyAttachmentCapacityTest}.
- *
- * <p><b>The deeper alphabet needs NO format change here</b> (Stage 4, 2026-08-07). {@code -2.0} is
- * 32 sixteenths and the signed-byte value range is {@code [-8.0, +7.9375]}, so the wire shape is
- * untouched. What it does change is the palette WIDTH a mixed section pays: three or more distinct
- * stored heights in one section push {@code bitsPerIndex} from 1 to 2, halving the dense-mixed
- * capacity. That is measured, not assumed — see {@code PlacementDyAttachmentCapacityTest}'s
- * re-measured boundary row.
- *
- * <p>A section whose facts all share one height costs a single extra palette byte for the whole
- * section, so the realistic dense shape — a whole chunk built on one lowered surface — encodes in
- * about the same space as the plain position set. A section with a mixed alphabet spends
- * {@code ceil(log2(paletteSize))} bits per occupied position, rounded up to 1, 2, 4 or 8, so even
- * a pathological 256-value section degrades to one byte per entry rather than throwing.
- *
- * <p>MEASURED on the built-in Overworld (a chunk column holds 98,304 positions), by
- * {@code PlacementDyAttachmentCapacityTest}: every one of those positions at ONE height encodes in
- * 12,766 bytes, well inside the budget. The mixed-height boundary depends on how many distinct
- * heights share a section — 64,136 positions at TWO heights (1 bit per entry, measured
- * 2026-08-06), about 43,000 at THREE (2 bits per entry, re-measured 2026-08-07 for the deeper
- * alphabet; the exact figure moves with the chunk's coordinate VarInt widths).
- * Even the smaller figure is 44% of a completely full chunk column, far past anything a real build
- * reaches, and past the boundary the store declines new facts rather than failing.
- *
- * <p>{@link #encodedByteLength} computes the exact size this codec will write WITHOUT allocating a
- * buffer, sharing the section grouping and palette construction with {@link #encode} so the two can
- * never disagree. {@code SlabAnchorAttachment} consults it before every write, so a chunk that
- * cannot fit the sync budget simply records no fact (and keeps this line's pre-existing live
- * behaviour for that cell) instead of throwing out of {@code setAttached} in a real world.
- *
- * <p>The stream starts with a negative marker so a future format can be told apart from this one.
- * There is no legacy format to read: this attachment is new, and a server without it sends nothing
- * at all.
+/** Section palettes preserve exact sixteenth-grid heights, including tall stacks (LAW.md).
+ * Disk heights retain their existing integer-array representation. The network decoder also
+ * accepts the previous signed-byte palette; new packets use ZigZag VarInts for palette values.
  */
 final class ChunkPositionDyMapPacketCodec {
-    private static final int COMPACT_FORMAT_MARKER = -1;
+    private static final int COMPACT_FORMAT_MARKER = -2;
     private static final int WORDS_PER_SECTION = 64;
     private static final int MAX_SECTION_GROUPS = 4_096;
-    private static final int MAX_PALETTE_ENTRIES = 256;
+    private static final int MAX_PALETTE_ENTRIES = 4_096;
 
-    static final PacketCodec<RegistryByteBuf, Long2ByteOpenHashMap> INSTANCE =
+    static final PacketCodec<RegistryByteBuf, Long2IntOpenHashMap> INSTANCE =
             PacketCodec.of(ChunkPositionDyMapPacketCodec::encode, ChunkPositionDyMapPacketCodec::decode);
 
     private ChunkPositionDyMapPacketCodec() {
@@ -73,7 +26,7 @@ final class ChunkPositionDyMapPacketCodec {
 
     // ── encode ────────────────────────────────────────────────────────
 
-    private static void encode(Long2ByteMap facts, RegistryByteBuf buf) {
+    private static void encode(Long2IntMap facts, RegistryByteBuf buf) {
         TreeMap<SectionKey, long[]> sections = groupSections(facts);
         buf.writeVarInt(COMPACT_FORMAT_MARKER);
         buf.writeVarInt(sections.size());
@@ -92,12 +45,11 @@ final class ChunkPositionDyMapPacketCodec {
                 }
             }
 
-            byte[] palette = paletteOf(facts, key, words);
-            // Written biased by one so all 256 possible quantised heights can share a section
-            // without the size byte wrapping to zero.
-            buf.writeByte(palette.length - 1);
-            for (byte paletteValue : palette) {
-                buf.writeByte(paletteValue);
+            int[] palette = paletteOf(facts, key, words);
+            // Palette cardinality and values stay independent of a machine-byte height limit.
+            buf.writeVarInt(palette.length);
+            for (int paletteValue : palette) {
+                buf.writeVarInt(zigZag(paletteValue));
             }
             if (palette.length <= 1) {
                 // Uniform section: the occupancy bitmap already carries the height.
@@ -117,7 +69,7 @@ final class ChunkPositionDyMapPacketCodec {
      * {@link #groupSections} and {@link #paletteOf} with the encoder so the prediction and the
      * write can never drift apart.
      */
-    static int encodedByteLength(Long2ByteMap facts) {
+    static int encodedByteLength(Long2IntMap facts) {
         TreeMap<SectionKey, long[]> sections = groupSections(facts);
         int length = varIntLength(COMPACT_FORMAT_MARKER) + varIntLength(sections.size());
         for (Map.Entry<SectionKey, long[]> entry : sections.entrySet()) {
@@ -126,8 +78,9 @@ final class ChunkPositionDyMapPacketCodec {
             length += varIntLength(key.chunkX()) + varIntLength(key.sectionY()) + varIntLength(key.chunkZ());
             length += Long.BYTES;
             length += Long.BYTES * Long.bitCount(nonEmptyWordMask(words));
-            byte[] palette = paletteOf(facts, key, words);
-            length += 1 + palette.length;
+            int[] palette = paletteOf(facts, key, words);
+            length += varIntLength(palette.length);
+            for (int value : palette) length += varIntLength(zigZag(value));
             if (palette.length > 1) {
                 int occupied = 0;
                 for (long word : words) {
@@ -141,9 +94,9 @@ final class ChunkPositionDyMapPacketCodec {
 
     // ── decode ────────────────────────────────────────────────────────
 
-    private static Long2ByteOpenHashMap decode(RegistryByteBuf buf) {
+    private static Long2IntOpenHashMap decode(RegistryByteBuf buf) {
         int marker = buf.readVarInt();
-        if (marker != COMPACT_FORMAT_MARKER) {
+        if (marker != COMPACT_FORMAT_MARKER && marker != -1) {
             throw new IllegalArgumentException(
                     "Unsupported chunk-position-dy attachment packet format " + marker);
         }
@@ -153,7 +106,7 @@ final class ChunkPositionDyMapPacketCodec {
                     "Invalid chunk-position-dy attachment section count " + sectionCount);
         }
 
-        Long2ByteOpenHashMap facts = new Long2ByteOpenHashMap();
+        Long2IntOpenHashMap facts = new SlabAnchorAttachment.PlacementDyMap();
         for (int sectionIndex = 0; sectionIndex < sectionCount; sectionIndex++) {
             int chunkX = buf.readVarInt();
             int sectionY = buf.readVarInt();
@@ -167,19 +120,19 @@ final class ChunkPositionDyMapPacketCodec {
                 }
             }
 
-            int paletteSize = buf.readUnsignedByte() + 1;
+            int paletteSize = marker == -1 ? buf.readUnsignedByte() + 1 : buf.readVarInt();
             if (paletteSize < 1 || paletteSize > MAX_PALETTE_ENTRIES) {
                 throw new IllegalArgumentException(
                         "Invalid chunk-position-dy attachment palette size " + paletteSize);
             }
-            byte[] palette = new byte[paletteSize];
+            int[] palette = new int[paletteSize];
             for (int index = 0; index < paletteSize; index++) {
-                palette[index] = buf.readByte();
+                palette[index] = marker == -1 ? buf.readByte() : unZigZag(buf.readVarInt());
             }
 
             SectionKey key = new SectionKey(chunkX, sectionY, chunkZ);
             if (paletteSize == 1) {
-                byte uniform = palette[0];
+                int uniform = palette[0];
                 forEachPosition(key, words, packed -> facts.put(packed, uniform));
                 continue;
             }
@@ -198,7 +151,7 @@ final class ChunkPositionDyMapPacketCodec {
 
     // ── shared structure ──────────────────────────────────────────────
 
-    private static TreeMap<SectionKey, long[]> groupSections(Long2ByteMap facts) {
+    private static TreeMap<SectionKey, long[]> groupSections(Long2IntMap facts) {
         TreeMap<SectionKey, long[]> sections = new TreeMap<>();
         for (long packed : facts.keySet()) {
             int x = BlockPos.unpackLongX(packed);
@@ -226,26 +179,16 @@ final class ChunkPositionDyMapPacketCodec {
      * The distinct quantised heights present in one section, in the canonical position order the
      * encoder and decoder both walk. Never empty for a section that exists.
      */
-    private static byte[] paletteOf(Long2ByteMap facts, SectionKey key, long[] words) {
-        byte[] scratch = new byte[MAX_PALETTE_ENTRIES];
-        int[] size = new int[1];
+    private static int[] paletteOf(Long2IntMap facts, SectionKey key, long[] words) {
+        it.unimi.dsi.fastutil.ints.IntArrayList palette = new it.unimi.dsi.fastutil.ints.IntArrayList();
         forEachPosition(key, words, packed -> {
-            byte value = facts.get(packed);
-            for (int index = 0; index < size[0]; index++) {
-                if (scratch[index] == value) {
-                    return;
-                }
-            }
-            if (size[0] < MAX_PALETTE_ENTRIES) {
-                scratch[size[0]++] = value;
-            }
+            int value = facts.get(packed);
+            if (!palette.contains(value)) palette.add(value);
         });
-        byte[] palette = new byte[Math.max(1, size[0])];
-        System.arraycopy(scratch, 0, palette, 0, size[0]);
-        return palette;
+        return palette.toIntArray();
     }
 
-    private static int paletteIndex(byte[] palette, byte value) {
+    private static int paletteIndex(int[] palette, int value) {
         for (int index = 0; index < palette.length; index++) {
             if (palette[index] == value) {
                 return index;
@@ -265,7 +208,7 @@ final class ChunkPositionDyMapPacketCodec {
         if (paletteSize <= 16) {
             return 4;
         }
-        return 8;
+        return paletteSize <= 256 ? 8 : 16;
     }
 
     /**
@@ -294,6 +237,9 @@ final class ChunkPositionDyMapPacketCodec {
     }
 
     /** Vanilla's own VarInt width formula, inlined so the size prediction needs no buffer. */
+    private static int zigZag(int value) { return (value << 1) ^ (value >> 31); }
+    private static int unZigZag(int value) { return (value >>> 1) ^ -(value & 1); }
+
     private static int varIntLength(int value) {
         for (int width = 1; width < 5; width++) {
             if ((value & (-1 << (width * 7))) == 0) {
@@ -321,6 +267,7 @@ final class ChunkPositionDyMapPacketCodec {
         }
 
         void write(int value) {
+            if (bits == 16) { buf.writeShort(value); return; }
             accumulator |= (value & ((1 << bits) - 1)) << filled;
             filled += bits;
             if (filled == 8) {
@@ -352,6 +299,7 @@ final class ChunkPositionDyMapPacketCodec {
         }
 
         int read() {
+            if (bits == 16) return buf.readUnsignedShort();
             if (remaining == 0) {
                 accumulator = buf.readUnsignedByte();
                 remaining = 8;

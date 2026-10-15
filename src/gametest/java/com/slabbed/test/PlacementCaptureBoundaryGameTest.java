@@ -8,7 +8,7 @@ import com.slabbed.util.SlabSupport;
 import com.slabbed.util.SlabbedOffsetRaycast;
 import com.slabbed.upgrade.WorldUpgradeDecision;
 import com.slabbed.upgrade.WorldUpgradeRuntimePolicy;
-import it.unimi.dsi.fastutil.longs.Long2ByteOpenHashMap;
+import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.fabricmc.fabric.impl.attachment.AttachmentTargetImpl;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentTarget;
@@ -657,13 +657,13 @@ public final class PlacementCaptureBoundaryGameTest {
                     : new LongOpenHashSet(chunk.getAttached(SlabAnchorAttachment.COMPOUND_FULL_BLOCK_ANCHOR_TYPE));
             compounds.add(legacyCompound.asLong());
             chunk.setAttached(SlabAnchorAttachment.COMPOUND_FULL_BLOCK_ANCHOR_TYPE, compounds);
-            Long2ByteOpenHashMap placementDy = chunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE) == null
-                    ? new Long2ByteOpenHashMap()
-                    : new Long2ByteOpenHashMap(chunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE));
+            Long2IntOpenHashMap placementDy = chunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE) == null
+                    ? new Long2IntOpenHashMap()
+                    : new Long2IntOpenHashMap(chunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE));
             placementDy.remove(legacyHalf.asLong());
             placementDy.remove(legacyCompound.asLong());
             placementDy.remove(flatControl.asLong());
-            placementDy.put(conflictingLegacy.asLong(), (byte) SlabAnchorAttachment.quantiseDy(-2.0d));
+            placementDy.put(conflictingLegacy.asLong(), SlabAnchorAttachment.quantiseDy(-2.0d));
             chunk.setAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE, placementDy);
             LongOpenHashSet modern = chunk.getAttached(SlabAnchorAttachment.MODERN_PLACEMENT_TYPE);
             h.assertTrue(modern == null || !modern.contains(conflictingLegacy.asLong()),
@@ -836,16 +836,16 @@ public final class PlacementCaptureBoundaryGameTest {
     /** Test-only fixture: plant an exact raw value in the store without going through a placement. */
     static void forceStore(ServerWorld world, BlockPos pos, double dy) {
         WorldChunk chunk = world.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
-        Long2ByteOpenHashMap existing = chunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE);
-        Long2ByteOpenHashMap copy = existing == null
-                ? new Long2ByteOpenHashMap()
-                : new Long2ByteOpenHashMap(existing);
+        Long2IntOpenHashMap existing = chunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE);
+        Long2IntOpenHashMap copy = existing == null
+                ? new Long2IntOpenHashMap()
+                : new Long2IntOpenHashMap(existing);
         int quantised = SlabAnchorAttachment.quantiseDy(dy);
         if (quantised == SlabAnchorAttachment.UNREPRESENTABLE) {
             throw new IllegalArgumentException(
                     "fixture: " + dy + " is not on the stored sixteenth grid");
         }
-        copy.put(pos.asLong(), (byte) quantised);
+        copy.put(pos.asLong(), quantised);
         chunk.setAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE, copy);
     }
 

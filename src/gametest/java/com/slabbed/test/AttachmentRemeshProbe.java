@@ -2,7 +2,7 @@ package com.slabbed.test;
 
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.client.ClientDy;
-import it.unimi.dsi.fastutil.longs.Long2ByteOpenHashMap;
+import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -35,7 +35,7 @@ public final class AttachmentRemeshProbe implements ClientModInitializer {
     private int ticks, phase, since;
     private boolean requested;
     private volatile boolean prepared;
-    private Long2ByteOpenHashMap dy;
+    private Long2IntOpenHashMap dy;
     private LongOpenHashSet anchors, modern, flat;
     private int initialPixels, missingPixels, autoPixels;
 
@@ -119,11 +119,11 @@ public final class AttachmentRemeshProbe implements ClientModInitializer {
             requireDy(client, -0.5);
             initialPixels = capture(client, "initial_visible");
             if (initialPixels < 50) throw new AssertionError("visible-scene control invalid: " + initialPixels);
-            dy = new Long2ByteOpenHashMap(chunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE));
+            dy = new Long2IntOpenHashMap(chunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE));
             anchors = copy(chunk.getAttached(SlabAnchorAttachment.ANCHOR_TYPE));
             modern = copy(chunk.getAttached(SlabAnchorAttachment.MODERN_PLACEMENT_TYPE));
             flat = copy(chunk.getAttached(SlabAnchorAttachment.FROZEN_FLAT_TYPE));
-            var withheldDy = new Long2ByteOpenHashMap(dy); withheldDy.remove(TARGET.asLong());
+            var withheldDy = new Long2IntOpenHashMap(dy); withheldDy.remove(TARGET.asLong());
             chunk.setAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE, withheldDy);
             chunk.setAttached(SlabAnchorAttachment.ANCHOR_TYPE, without(anchors));
             chunk.setAttached(SlabAnchorAttachment.MODERN_PLACEMENT_TYPE, without(modern));

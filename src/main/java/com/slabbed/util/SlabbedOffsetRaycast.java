@@ -114,7 +114,7 @@ public final class SlabbedOffsetRaycast {
 
         void consumeCell(int x, int y, int z) {
             testPrimary(x, y, z);
-            for (int distance = 1; distance <= WINDOW_RADIUS; distance++) {
+            for (int distance = 1; distance <= com.slabbed.anchor.SlabAnchorAttachment.ownerSearchRadius(world, x, z); distance++) {
                 testNeighbor(x, y - distance, z);
                 testNeighbor(x, y + distance, z);
             }

@@ -3,7 +3,7 @@ package com.slabbed.test;
 import com.slabbed.Slabbed;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.SlabSupport;
-import it.unimi.dsi.fastutil.longs.Long2ByteOpenHashMap;
+import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -133,10 +133,10 @@ public final class NeighborUpdateInvarianceTest {
     /** Test-only fixture: drop exactly one placement-dy fact, leaving the block itself untouched. */
     private static void removePlacementDyOnly(TestContext h, ServerWorld world, BlockPos subject) {
         WorldChunk chunk = world.getChunk(subject.getX() >> 4, subject.getZ() >> 4);
-        Long2ByteOpenHashMap existing = chunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE);
+        Long2IntOpenHashMap existing = chunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE);
         h.assertTrue(existing != null && existing.containsKey(subject.asLong()),
                 "premise: subject PLACEMENT_DY fact was already absent at " + subject);
-        Long2ByteOpenHashMap copy = new Long2ByteOpenHashMap(existing);
+        Long2IntOpenHashMap copy = new Long2IntOpenHashMap(existing);
         copy.remove(subject.asLong());
         chunk.setAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE, copy);
     }
@@ -153,14 +153,14 @@ public final class NeighborUpdateInvarianceTest {
             TestContext h, ServerWorld world, BlockPos subject, double dy
     ) {
         WorldChunk chunk = world.getChunk(subject.getX() >> 4, subject.getZ() >> 4);
-        Long2ByteOpenHashMap existing = chunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE);
+        Long2IntOpenHashMap existing = chunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE);
         h.assertTrue(existing != null && existing.containsKey(subject.asLong()),
                 "premise: subject PLACEMENT_DY fact was absent before overwrite at " + subject);
         int quantised = SlabAnchorAttachment.quantiseDy(dy);
         h.assertTrue(quantised != SlabAnchorAttachment.UNREPRESENTABLE,
                 "fixture premise: " + dy + " is not on the stored sixteenth grid");
-        Long2ByteOpenHashMap copy = new Long2ByteOpenHashMap(existing);
-        copy.put(subject.asLong(), (byte) quantised);
+        Long2IntOpenHashMap copy = new Long2IntOpenHashMap(existing);
+        copy.put(subject.asLong(), quantised);
         chunk.setAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE, copy);
     }
 
@@ -583,10 +583,10 @@ public final class NeighborUpdateInvarianceTest {
                     dy + " is on the sixteenth grid and must be storable");
             h.assertTrue(
                     Double.doubleToRawLongBits(
-                            SlabAnchorAttachment.dequantiseDy((byte) quantised))
+                            SlabAnchorAttachment.dequantiseDy(quantised))
                             == Double.doubleToRawLongBits(dy),
                     "round-trip through the stored grid changed " + dy + " to "
-                            + SlabAnchorAttachment.dequantiseDy((byte) quantised));
+                            + SlabAnchorAttachment.dequantiseDy(quantised));
         }
 
         // Off the grid, or outside what a byte of sixteenths can hold: declined, not rounded.
@@ -596,8 +596,8 @@ public final class NeighborUpdateInvarianceTest {
                 Double.NEGATIVE_INFINITY,
                 -0.03d,      // between two sixteenths
                 -0.51d,      // just off -0.5
-                -9.0d,       // beyond the signed-byte range
-                8.0d,
+                -200_000_000.0d, // beyond the exact integer-sixteenth range
+                200_000_000.0d,
         };
         for (double dy : unrepresentable) {
             h.assertTrue(

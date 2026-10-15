@@ -3,7 +3,7 @@ package com.slabbed.client;
 import com.slabbed.Slabbed;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.util.SlabSupport;
-import it.unimi.dsi.fastutil.longs.Long2ByteOpenHashMap;
+import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.fabricmc.api.EnvType;
@@ -39,7 +39,7 @@ public final class SlabAnchorClientSync {
     private static final Long2ObjectOpenHashMap<WorldChunk> TRACKED_CHUNKS = new Long2ObjectOpenHashMap<>();
     private static final Long2ObjectOpenHashMap<Map<AttachmentType<LongOpenHashSet>, LongOpenHashSet>>
             ATTACHMENT_SNAPSHOTS = new Long2ObjectOpenHashMap<>();
-    private static final Long2ObjectOpenHashMap<Long2ByteOpenHashMap> DY_SNAPSHOTS = new Long2ObjectOpenHashMap<>();
+    private static final Long2ObjectOpenHashMap<Long2IntOpenHashMap> DY_SNAPSHOTS = new Long2ObjectOpenHashMap<>();
     private static boolean initialized;
 
     private SlabAnchorClientSync() {
@@ -124,7 +124,7 @@ public final class SlabAnchorClientSync {
             if (chunk == null) {
                 return null;
             }
-            Long2ByteOpenHashMap map = chunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE);
+            Long2IntOpenHashMap map = chunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE);
             long key = pos.asLong();
             return map != null && map.containsKey(key)
                     ? SlabAnchorAttachment.PlacementDyFact.fromStoredSixteenths(map.get(key))
@@ -182,11 +182,11 @@ public final class SlabAnchorClientSync {
 
         // FROZEN-DY: rerender stored-height cells already synced at chunk-load time, then
         // snapshot the dy map so the poll can catch later attachment syncs.
-        Long2ByteOpenHashMap initialDy = chunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE);
+        Long2IntOpenHashMap initialDy = chunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE);
         if (initialDy != null && !initialDy.isEmpty()) {
             MinecraftClient mc = MinecraftClient.getInstance();
             if (mc.worldRenderer != null) {
-                scheduleDyRerenders(mc, initialDy.keySet());
+                scheduleDyRerenders(mc, initialDy);
             }
         }
         DY_SNAPSHOTS.put(chunk.getPos().toLong(), initialDy);
@@ -267,8 +267,8 @@ public final class SlabAnchorClientSync {
     /** FROZEN-DY analog of {@link #pollAttachmentChange}: rerender the union of old/new stored cells. */
     private static void pollPlacementDyChange(MinecraftClient mc, WorldChunk chunk) {
         long chunkPos = chunk.getPos().toLong();
-        Long2ByteOpenHashMap oldMap = DY_SNAPSHOTS.get(chunkPos);
-        Long2ByteOpenHashMap newMap = chunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE);
+        Long2IntOpenHashMap oldMap = DY_SNAPSHOTS.get(chunkPos);
+        Long2IntOpenHashMap newMap = chunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE);
         if (oldMap == newMap) {
             return;
         }
@@ -279,40 +279,44 @@ public final class SlabAnchorClientSync {
             return;
         }
         if (!oldEmpty) {
-            scheduleDyRerenders(mc, oldMap.keySet());
+            scheduleDyRerenders(mc, oldMap);
         }
         if (!newEmpty) {
-            scheduleDyRerenders(mc, newMap.keySet());
+            scheduleDyRerenders(mc, newMap);
         }
         DY_SNAPSHOTS.put(chunkPos, newMap);
     }
 
-    private static void scheduleDyRerenders(MinecraftClient mc, it.unimi.dsi.fastutil.longs.LongSet keys) {
+    private static void scheduleDyRerenders(MinecraftClient mc, Long2IntOpenHashMap heights) {
         if (mc.world == null || mc.worldRenderer == null) {
             return;
         }
         BlockPos.Mutable mutable = new BlockPos.Mutable();
-        for (long packed : keys) {
+        for (long packed : heights.keySet()) {
             mutable.set(packed);
             BlockPos pos = mutable.toImmutable();
             BlockState current = mc.world.getBlockState(pos);
             if (current != null) {
                 // Height attachments can change without changing the vanilla block state.
                 // The model-equality shortcut would discard this redraw.
-                scheduleHeightRefresh(mc, pos);
+                scheduleHeightRefresh(mc, pos, (int) Math.ceil(Math.abs(heights.get(packed) / 16.0d)) + 1);
             }
         }
     }
 
     /** Height-only updates also invalidate neighboring faces and the support's carpet (LAW.md). */
     public static void scheduleHeightRefresh(MinecraftClient mc, BlockPos pos) {
+        scheduleHeightRefresh(mc, pos, 0);
+    }
+
+    private static void scheduleHeightRefresh(MinecraftClient mc, BlockPos pos, int previousReach) {
         if (mc == null || mc.world == null || mc.worldRenderer == null || pos == null
                 || !mc.world.getChunkManager().isChunkLoaded(pos.getX() >> 4, pos.getZ() >> 4)) return;
         // Cover displaced owners below and the full natural support column above, including
         // its carpet. Provenance-only changes can affect that column across section borders.
-        int depth = (int)Math.ceil(-com.slabbed.util.SlabbedOffsetRaycast.DEEPEST_TARGETABLE_DY);
+        int depth = Math.max(previousReach, SlabAnchorAttachment.ownerSearchRadius(mc.world, pos.getX(), pos.getZ()));
         mc.worldRenderer.scheduleBlockRenders(pos.getX() - 1, pos.getY() - depth - 1, pos.getZ() - 1,
-                pos.getX() + 1, pos.getY() + SlabSupport.SUPPORT_COLUMN_DEPTH + 1, pos.getZ() + 1);
+                pos.getX() + 1, pos.getY() + Math.max(depth, SlabSupport.SUPPORT_COLUMN_DEPTH) + 1, pos.getZ() + 1);
     }
 
     private static void snapshotAttachment(

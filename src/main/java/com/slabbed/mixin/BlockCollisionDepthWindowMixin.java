@@ -29,7 +29,19 @@ public abstract class BlockCollisionDepthWindowMixin {
                 || collisionView instanceof World world
                 && WorldUpgradeRuntimePolicy.authorsModernPlacements(world)) {
             int maxY = args.get(4);
-            int radius = (int) Math.ceil(-SlabbedOffsetRaycast.DEEPEST_TARGETABLE_DY);
+            int radius = 3;
+            int minChunkX = ((int) Math.floor(box.minX) - 1) >> 4;
+            int minChunkZ = ((int) Math.floor(box.minZ) - 1) >> 4;
+            int maxChunkX = ((int) Math.ceil(box.maxX)) >> 4;
+            int maxChunkZ = ((int) Math.ceil(box.maxZ)) >> 4;
+            for (int x = minChunkX; x <= maxChunkX; x++) {
+                for (int z = minChunkZ; z <= maxChunkZ; z++) {
+                    radius = Math.max(radius,
+                            SlabAnchorAttachment.ownerSearchRadius(collisionView, x << 4, z << 4));
+                }
+            }
+            int minY = args.get(1);
+            args.set(1, minY - radius);
             args.set(4, maxY + radius);
         }
     }

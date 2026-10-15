@@ -10,7 +10,7 @@ import com.slabbed.Slabbed;
 import com.slabbed.util.SlabSupport;
 import com.slabbed.util.RuntimeDiagnostics;
 import com.slabbed.upgrade.WorldUpgradeRuntimePolicy;
-import it.unimi.dsi.fastutil.longs.Long2ByteOpenHashMap;
+import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentSyncPredicate;
@@ -164,7 +164,7 @@ public final class SlabAnchorAttachment {
      * {@link #PLACEMENT_DY_TYPE}, so the test cannot exercise a duplicate approximation of the
      * production sync path.
      */
-    static PacketCodec<RegistryByteBuf, Long2ByteOpenHashMap> dyMapPacketCodecForTesting() {
+    static PacketCodec<RegistryByteBuf, Long2IntOpenHashMap> dyMapPacketCodecForTesting() {
         return DY_MAP_PACKET_CODEC;
     }
 
@@ -256,14 +256,14 @@ public final class SlabAnchorAttachment {
         }
 
         /**
-         * The ONE door from a stored byte of sixteenths back to a height. Every reader of
+         * The ONE door from stored sixteenths back to a height. Every reader of
          * {@link #PLACEMENT_DY_TYPE} — the direct chunk read and the client mesh bridge alike —
-         * comes through here. Do not add a factory that takes a {@code double} height: a stored
-         * byte passed to it widens silently (-8 sixteenths reads as -8.0 blocks), the compiler
+         * comes through here. Do not add a factory that takes a {@code double} height: stored
+         * sixteenths passed to it widens silently (-8 sixteenths reads as -8.0 blocks), the compiler
          * says nothing, and the block is drawn eight blocks underground while every direct read
          * stays right. {@code storedByteReadsAsTheSameHeightThroughEveryDoor} pins this.
          */
-        public static PlacementDyFact fromStoredSixteenths(byte sixteenths) {
+        public static PlacementDyFact fromStoredSixteenths(int sixteenths) {
             return new PlacementDyFact(true, Double.doubleToRawLongBits(dequantiseDy(sixteenths)));
         }
 
@@ -316,26 +316,63 @@ public final class SlabAnchorAttachment {
         if (Math.abs(sixteenths - rounded) > 1.0e-9d) {
             return UNREPRESENTABLE;
         }
-        if (rounded < Byte.MIN_VALUE || rounded > Byte.MAX_VALUE) {
+        if (sixteenths <= Integer.MIN_VALUE || sixteenths > Integer.MAX_VALUE) {
             return UNREPRESENTABLE;
         }
         return rounded;
     }
 
     /** The stored grid value back as a height. Exact: both sides are powers of two. */
-    public static double dequantiseDy(byte sixteenths) {
+    public static double dequantiseDy(int sixteenths) {
         return sixteenths / QUANTUM_DENOMINATOR;
     }
 
-    private static Long2ByteOpenHashMap newDyMap() {
-        return new Long2ByteOpenHashMap();
+    private static Long2IntOpenHashMap newDyMap() {
+        return new PlacementDyMap();
+    }
+
+    /** Copy-on-write maps cache their geometry reach without a global cache (LAW.md). */
+    public static final class PlacementDyMap extends Long2IntOpenHashMap {
+        private transient volatile int radius = -1;
+
+        public PlacementDyMap() { super(); }
+        public PlacementDyMap(it.unimi.dsi.fastutil.longs.Long2IntMap source) { super(source); }
+        @Override public int put(long key, int value) { radius = -1; return super.put(key, value); }
+        @Override public int remove(long key) { radius = -1; return super.remove(key); }
+        @Override public void clear() { radius = -1; super.clear(); }
+        public int ownerRadius() {
+            int result = radius;
+            if (result < 0) radius = result = radiusOf(this);
+            return result;
+        }
+    }
+
+    private static int radiusOf(Long2IntOpenHashMap map) {
+        long maximum = 0;
+        for (int height : map.values()) maximum = Math.max(maximum, Math.abs((long) height));
+        return (int) Math.min(Integer.MAX_VALUE, (maximum + 15L) / 16L + 1L);
+    }
+
+    /** Owner discovery uses the actual saved heights in loaded chunks; it never changes a seat. */
+    public static int ownerSearchRadius(BlockView view, int x, int z) {
+        int radius = 3; // Legacy geometry and extended attachment shapes retain their old envelope.
+        if (view instanceof World world) {
+            WorldChunk chunk = loadedAttachmentChunk(world, new BlockPos(x, world.getBottomY(), z));
+            Long2IntOpenHashMap map = chunk == null ? null : chunk.getAttached(PLACEMENT_DY_TYPE);
+            if (map != null && !map.isEmpty()) {
+                radius = Math.max(radius, map instanceof PlacementDyMap indexed
+                        ? indexed.ownerRadius() : radiusOf(map));
+            }
+            radius = Math.min(radius, world.getHeight());
+        }
+        return radius;
     }
 
     /**
      * Disk form: packed positions beside their quantised heights, both in ascending position order
      * so a save is stable.
      */
-    private static final Codec<Long2ByteOpenHashMap> DY_MAP_CODEC = RecordCodecBuilder.create(
+    private static final Codec<Long2IntOpenHashMap> DY_MAP_CODEC = RecordCodecBuilder.create(
             inst -> inst.group(
                     Codec.LONG_STREAM.fieldOf("positions")
                             .forGetter(map -> java.util.stream.LongStream.of(sortedDyPositions(map))),
@@ -344,13 +381,13 @@ public final class SlabAnchorAttachment {
                                     dyHeightsInPositionOrder(map)))
             ).apply(inst, SlabAnchorAttachment::dyMapFromStreams));
 
-    private static long[] sortedDyPositions(Long2ByteOpenHashMap map) {
+    private static long[] sortedDyPositions(Long2IntOpenHashMap map) {
         long[] positions = map.keySet().toLongArray();
         java.util.Arrays.sort(positions);
         return positions;
     }
 
-    private static int[] dyHeightsInPositionOrder(Long2ByteOpenHashMap map) {
+    private static int[] dyHeightsInPositionOrder(Long2IntOpenHashMap map) {
         long[] positions = sortedDyPositions(map);
         int[] heights = new int[positions.length];
         for (int i = 0; i < positions.length; i++) {
@@ -359,16 +396,20 @@ public final class SlabAnchorAttachment {
         return heights;
     }
 
-    private static Long2ByteOpenHashMap dyMapFromStreams(
+    private static Long2IntOpenHashMap dyMapFromStreams(
             java.util.stream.LongStream positions, java.util.stream.IntStream heights) {
         long[] p = positions.toArray();
         int[] h = heights.toArray();
-        Long2ByteOpenHashMap map = newDyMap();
+        Long2IntOpenHashMap map = newDyMap();
         int n = Math.min(p.length, h.length);
         for (int i = 0; i < n; i++) {
-            map.put(p[i], (byte) h[i]);
+            map.put(p[i], h[i]);
         }
         return map;
+    }
+
+    static Codec<Long2IntOpenHashMap> dyMapCodecForTesting() {
+        return DY_MAP_CODEC;
     }
 
     /**
@@ -377,11 +418,11 @@ public final class SlabAnchorAttachment {
      * alphabet a real build produces is tiny, so a section built on one lowered surface costs a
      * single palette byte for the whole section.
      */
-    private static final PacketCodec<RegistryByteBuf, Long2ByteOpenHashMap> DY_MAP_PACKET_CODEC =
+    private static final PacketCodec<RegistryByteBuf, Long2IntOpenHashMap> DY_MAP_PACKET_CODEC =
             ChunkPositionDyMapPacketCodec.INSTANCE;
 
-    public static final AttachmentType<Long2ByteOpenHashMap> PLACEMENT_DY_TYPE =
-            AttachmentRegistry.<Long2ByteOpenHashMap>create(PLACEMENT_DY_ID, builder -> builder
+    public static final AttachmentType<Long2IntOpenHashMap> PLACEMENT_DY_TYPE =
+            AttachmentRegistry.<Long2IntOpenHashMap>create(PLACEMENT_DY_ID, builder -> builder
                     .persistent(DY_MAP_CODEC)
                     .syncWith(DY_MAP_PACKET_CODEC, AttachmentSyncPredicate.all())
             );
@@ -454,7 +495,7 @@ public final class SlabAnchorAttachment {
      * nothing at all.
      */
     private static int writePlacementDyFactsInternal(World world, Map<BlockPos, PlacementDyFact> facts) {
-        IdentityHashMap<WorldChunk, Long2ByteOpenHashMap> copies = new IdentityHashMap<>();
+        IdentityHashMap<WorldChunk, Long2IntOpenHashMap> copies = new IdentityHashMap<>();
         IdentityHashMap<WorldChunk, Boolean> changedChunks = new IdentityHashMap<>();
         int writes = 0;
         for (Map.Entry<BlockPos, PlacementDyFact> entry : facts.entrySet()) {
@@ -467,9 +508,9 @@ public final class SlabAnchorAttachment {
             if (chunk == null) {
                 continue;
             }
-            Long2ByteOpenHashMap map = copies.computeIfAbsent(chunk, ignored -> {
-                Long2ByteOpenHashMap existing = chunk.getAttached(PLACEMENT_DY_TYPE);
-                return existing == null ? newDyMap() : new Long2ByteOpenHashMap(existing);
+            Long2IntOpenHashMap map = copies.computeIfAbsent(chunk, ignored -> {
+                Long2IntOpenHashMap existing = chunk.getAttached(PLACEMENT_DY_TYPE);
+                return existing == null ? newDyMap() : new PlacementDyMap(existing);
             });
             long key = pos.asLong();
             PlacementDyFact current = map.containsKey(key)
@@ -495,8 +536,8 @@ public final class SlabAnchorAttachment {
                     }
                     continue;
                 }
-                Long2ByteOpenHashMap candidate = new Long2ByteOpenHashMap(map);
-                candidate.put(key, (byte) quantised);
+                Long2IntOpenHashMap candidate = new PlacementDyMap(map);
+                candidate.put(key, quantised);
                 if (ChunkPositionDyMapPacketCodec.encodedByteLength(candidate)
                         > SYNC_SAFE_ENCODED_BYTES) {
                     // The chunk is saturated. Decline the new fact rather than let setAttached
@@ -512,7 +553,7 @@ public final class SlabAnchorAttachment {
                     }
                     continue;
                 }
-                map.put(key, (byte) quantised);
+                map.put(key, quantised);
             } else {
                 map.remove(key);
             }
@@ -641,7 +682,7 @@ public final class SlabAnchorAttachment {
         if (chunk == null) {
             return PlacementDyFact.absent();
         }
-        Long2ByteOpenHashMap map = chunk.getAttached(PLACEMENT_DY_TYPE);
+        Long2IntOpenHashMap map = chunk.getAttached(PLACEMENT_DY_TYPE);
         long key = pos.asLong();
         return (map != null && map.containsKey(key))
                 ? PlacementDyFact.fromStoredSixteenths(map.get(key))
@@ -1006,9 +1047,9 @@ public final class SlabAnchorAttachment {
         if (world != null && !world.isClient()) {
             WorldChunk dyChunk = loadedAttachmentChunk(world, pos);
             if (dyChunk != null) {
-                Long2ByteOpenHashMap dyMap = dyChunk.getAttached(PLACEMENT_DY_TYPE);
+                Long2IntOpenHashMap dyMap = dyChunk.getAttached(PLACEMENT_DY_TYPE);
                 if (dyMap != null && dyMap.containsKey(pos.asLong())) {
-                    Long2ByteOpenHashMap copy = new Long2ByteOpenHashMap(dyMap);
+                    Long2IntOpenHashMap copy = new PlacementDyMap(dyMap);
                     copy.remove(pos.asLong());
                     dyChunk.setAttached(PLACEMENT_DY_TYPE, copy);
                 }

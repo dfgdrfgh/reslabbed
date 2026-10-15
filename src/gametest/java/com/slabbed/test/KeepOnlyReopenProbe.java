@@ -4,7 +4,7 @@ import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.client.ClientDy;
 import com.slabbed.client.model.OffsetBlockStateModel;
 import com.slabbed.util.SlabSupport;
-import it.unimi.dsi.fastutil.longs.Long2ByteOpenHashMap;
+import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -249,10 +249,10 @@ public final class KeepOnlyReopenProbe implements ClientModInitializer {
             compounds.add(legacyCompound.asLong());
             compoundChunk.setAttached(SlabAnchorAttachment.COMPOUND_FULL_BLOCK_ANCHOR_TYPE, compounds);
             WorldChunk latentChunk = world.getWorldChunk(latent);
-            Long2ByteOpenHashMap facts = latentChunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE) == null
-                    ? new Long2ByteOpenHashMap()
-                    : new Long2ByteOpenHashMap(latentChunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE));
-            facts.put(latent.asLong(), (byte) SlabAnchorAttachment.quantiseDy(-2.0d));
+            Long2IntOpenHashMap facts = latentChunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE) == null
+                    ? new Long2IntOpenHashMap()
+                    : new Long2IntOpenHashMap(latentChunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE));
+            facts.put(latent.asLong(), SlabAnchorAttachment.quantiseDy(-2.0d));
             latentChunk.setAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE, facts);
             // The modern cell carries exactly what an accepted item placement writes: fact + provenance.
             SlabAnchorAttachment.writePlacementDyBatch(world, Map.of(modern, Double.doubleToRawLongBits(-0.5d)));

@@ -74,7 +74,7 @@ with (game/'production-launch.log').open('w') as log:
     result=subprocess.run(command,cwd=game,stdout=log,stderr=subprocess.STDOUT,timeout=360)
 lines=(game/'production-launch.log').read_text(errors='replace').splitlines()
 for line in lines:
-    if any(s in line for s in ['FULL_PACK','OVERHEAD','VERTICAL_STEP_CLIENT_PASS','Caused by:','AssertionError']):print(line[:650])
+    if any(s in line for s in ['FULL_PACK','REPEATED_STACK','OVERHEAD','VERTICAL_STEP_CLIENT_PASS','Caused by:','AssertionError']):print(line[:650])
 if control:
     assert result.returncode!=0 and any('pulled an existing overhead block down' in line for line in lines), 'Control did not reach the expected regression'
     print('FULL_PACK_CONTROL_REPRODUCED')

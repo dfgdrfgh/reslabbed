@@ -43,7 +43,8 @@ public final class PlacementOccupancy {
         BlockPos.Mutable owner = new BlockPos.Mutable();
         for (int x = MathHelper.floor(bounds.minX) - 1; x <= MathHelper.ceil(bounds.maxX); x++) {
             for (int z = MathHelper.floor(bounds.minZ) - 1; z <= MathHelper.ceil(bounds.maxZ); z++) {
-                for (int y = MathHelper.floor(bounds.minY) - 2; y <= MathHelper.ceil(bounds.maxY) + depth; y++) {
+                int reach = SlabAnchorAttachment.ownerSearchRadius(world, x, z);
+                for (int y = MathHelper.floor(bounds.minY) - Math.max(2, reach); y <= MathHelper.ceil(bounds.maxY) + reach; y++) {
                     owner.set(x, y, z);
                     if (owner.equals(target) || world.isOutOfHeightLimit(owner)) continue;
                     WorldChunk chunk = SlabAnchorAttachment.loadedAttachmentChunk(world, owner);

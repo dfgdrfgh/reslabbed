@@ -1,6 +1,6 @@
 package com.slabbed.anchor;
 
-import it.unimi.dsi.fastutil.longs.Long2ByteOpenHashMap;
+import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.network.RegistryByteBuf;
 import net.minecraft.server.world.ServerWorld;
@@ -57,7 +57,7 @@ public final class PlacementDyAttachmentCapacityTest {
         int chunkZ = origin.getZ() >> 4;
         WorldChunk chunk = world.getChunk(chunkX, chunkZ);
 
-        Long2ByteOpenHashMap dense = denseFacts(chunkX, chunkZ, origin.getY(),
+        Long2IntOpenHashMap dense = denseFacts(chunkX, chunkZ, origin.getY(),
                 REALISTIC_DENSE_BUILD_FACTS);
 
         RuntimeException overflow = null;
@@ -84,7 +84,7 @@ public final class PlacementDyAttachmentCapacityTest {
     public void realisticDenseBuildEncodesBelowFabricLimit(TestContext ctx) {
         ServerWorld world = ctx.getWorld();
         BlockPos origin = ctx.getAbsolutePos(BlockPos.ORIGIN);
-        Long2ByteOpenHashMap dense = denseFacts(origin.getX() >> 4, origin.getZ() >> 4,
+        Long2IntOpenHashMap dense = denseFacts(origin.getX() >> 4, origin.getZ() >> 4,
                 origin.getY(), REALISTIC_DENSE_BUILD_FACTS);
 
         RegistryByteBuf buf =
@@ -107,22 +107,22 @@ public final class PlacementDyAttachmentCapacityTest {
     public void denseFactsRoundTripExactly(TestContext ctx) {
         ServerWorld world = ctx.getWorld();
         BlockPos origin = ctx.getAbsolutePos(BlockPos.ORIGIN);
-        Long2ByteOpenHashMap dense = denseFacts(origin.getX() >> 4, origin.getZ() >> 4,
+        Long2IntOpenHashMap dense = denseFacts(origin.getX() >> 4, origin.getZ() >> 4,
                 origin.getY(), FACTS_PER_FULL_LAYER);
 
         RegistryByteBuf buf =
                 new RegistryByteBuf(PacketByteBufs.create(), world.getRegistryManager());
         SlabAnchorAttachment.dyMapPacketCodecForTesting().encode(buf, dense);
-        Long2ByteOpenHashMap decoded =
+        Long2IntOpenHashMap decoded =
                 SlabAnchorAttachment.dyMapPacketCodecForTesting().decode(buf);
 
         ctx.assertTrue(dense.size() == decoded.size(),
                 "round-trip changed the fact count: " + dense.size() + " -> " + decoded.size());
-        for (var entry : dense.long2ByteEntrySet()) {
-            byte back = decoded.get(entry.getLongKey());
-            ctx.assertTrue(back == entry.getByteValue(),
+        for (var entry : dense.long2IntEntrySet()) {
+            int back = decoded.get(entry.getLongKey());
+            ctx.assertTrue(back == entry.getIntValue(),
                     "round-trip changed a stored height at " + entry.getLongKey()
-                            + ": " + entry.getByteValue() + " -> " + back);
+                            + ": " + entry.getIntValue() + " -> " + back);
         }
         ctx.complete();
     }
@@ -150,7 +150,7 @@ public final class PlacementDyAttachmentCapacityTest {
         // order of magnitude a player could reach is.
         for (int layers = 1; layers <= 384 / 16 * 16; layers++) {
             int facts = FACTS_PER_FULL_LAYER * layers;
-            Long2ByteOpenHashMap dense = denseFacts(chunkX, chunkZ, origin.getY(), facts);
+            Long2IntOpenHashMap dense = denseFacts(chunkX, chunkZ, origin.getY(), facts);
             RegistryByteBuf buf =
                     new RegistryByteBuf(PacketByteBufs.create(), world.getRegistryManager());
             buf.writeBoolean(true);
@@ -197,10 +197,10 @@ public final class PlacementDyAttachmentCapacityTest {
                 Map.of(pos, Double.doubleToRawLongBits(placed)));
         ctx.assertTrue(written == 1, "premise: exactly one fact should have been written, got " + written);
         WorldChunk chunk = world.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
-        Long2ByteOpenHashMap map = chunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE);
+        Long2IntOpenHashMap map = chunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE);
         ctx.assertTrue(map != null && map.containsKey(pos.asLong()),
                 "premise: the written fact is absent from the chunk map");
-        byte stored = map.get(pos.asLong());
+        int stored = map.get(pos.asLong());
         try {
             double direct = SlabAnchorAttachment.rawPlacementDyFact(world, pos).valueOrNaN();
             double viaBridgeShape =
@@ -216,8 +216,58 @@ public final class PlacementDyAttachmentCapacityTest {
         ctx.complete();
     }
 
-    private static Long2ByteOpenHashMap denseFacts(int chunkX, int chunkZ, int baseY, int count) {
-        Long2ByteOpenHashMap facts = new Long2ByteOpenHashMap();
+    @GameTest(templateName = "fabric-gametest-api-v1:empty")
+    public void wideHeightPaletteRoundTripsExactlyAndPredictsItsSize(TestContext ctx) {
+        var map = new Long2IntOpenHashMap();
+        for (int i = 0; i < 600; i++) {
+            map.put(BlockPos.asLong(i & 15, (i >> 8) & 15, (i >> 4) & 15), i - 3000);
+        }
+        RegistryByteBuf buf = new RegistryByteBuf(PacketByteBufs.create(), ctx.getWorld().getRegistryManager());
+        try {
+            SlabAnchorAttachment.dyMapPacketCodecForTesting().encode(buf, map);
+            ctx.assertTrue(buf.writerIndex() == ChunkPositionDyMapPacketCodec.encodedByteLength(map),
+                    "Wide palette size estimate differs from the actual packet");
+            ctx.assertTrue(map.equals(SlabAnchorAttachment.dyMapPacketCodecForTesting().decode(buf)),
+                    "Wide palette changed exact heights or owner positions");
+        } finally { buf.release(); }
+        ctx.complete();
+    }
+
+    @GameTest(templateName = "fabric-gametest-api-v1:empty")
+    public void previousBytePaletteStillDecodes(TestContext ctx) {
+        RegistryByteBuf buf = new RegistryByteBuf(PacketByteBufs.create(), ctx.getWorld().getRegistryManager());
+        try {
+            buf.writeVarInt(-1); buf.writeVarInt(1);
+            buf.writeVarInt(0); buf.writeVarInt(0); buf.writeVarInt(0);
+            buf.writeLong(1); buf.writeLong(1);
+            buf.writeByte(0); buf.writeByte(-8);
+            var decoded = SlabAnchorAttachment.dyMapPacketCodecForTesting().decode(buf);
+            ctx.assertTrue(decoded.size() == 1 && decoded.get(BlockPos.ORIGIN.asLong()) == -8,
+                    "Previous signed-byte palette was not preserved");
+        } finally { buf.release(); }
+        ctx.complete();
+    }
+
+    @GameTest(templateName = "fabric-gametest-api-v1:empty")
+    public void savedIntegerArrayPreservesExistingAndDeepHeights(TestContext ctx) {
+        var saved = new net.minecraft.nbt.NbtCompound();
+        long[] positions = {0L, 1L, 2L, 3L};
+        int[] heights = {-8, -128, -136, -6144};
+        saved.putLongArray("positions", positions);
+        saved.putIntArray("dy_sixteenths", heights);
+        var codec = SlabAnchorAttachment.dyMapCodecForTesting();
+        var loaded = codec.parse(net.minecraft.nbt.NbtOps.INSTANCE, saved).getOrThrow();
+        for (int i = 0; i < positions.length; i++) {
+            ctx.assertTrue(loaded.get(positions[i]) == heights[i], "Saved height changed during loading");
+        }
+        var encoded = codec.encodeStart(net.minecraft.nbt.NbtOps.INSTANCE, loaded).getOrThrow();
+        ctx.assertTrue(loaded.equals(codec.parse(net.minecraft.nbt.NbtOps.INSTANCE, encoded).getOrThrow()),
+                "Saved heights changed after writing and reopening");
+        ctx.complete();
+    }
+
+    private static Long2IntOpenHashMap denseFacts(int chunkX, int chunkZ, int baseY, int count) {
+        Long2IntOpenHashMap facts = new Long2IntOpenHashMap();
         int written = 0;
         for (int layer = 0; written < count; layer++) {
             for (int z = 0; z < 16 && written < count; z++) {

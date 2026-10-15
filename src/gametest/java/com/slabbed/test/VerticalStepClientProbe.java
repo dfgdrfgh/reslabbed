@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
-import it.unimi.dsi.fastutil.longs.Long2ByteOpenHashMap;
+import it.unimi.dsi.fastutil.longs.Long2IntOpenHashMap;
 import net.minecraft.block.SlabBlock;
 import net.minecraft.block.enums.SlabType;
 import net.fabricmc.fabric.api.renderer.v1.mesh.MutableQuadView;
@@ -59,7 +59,7 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
     private record MeshFace(float minY, float maxY, Direction cull, boolean visible, String view) {}
     public static void recordMeshedQuad(BlockRenderView view, BlockPos pos, MutableQuadView quad, RenderContext context) {
         if (Math.abs(pos.getX() - GROUND.getX()) > 12 || Math.abs(pos.getZ() - GROUND.getZ()) > 12
-                || pos.getY() < 198 || pos.getY() > 212) return;
+                || pos.getY() < 198 || pos.getY() > 262) return;
         float minY = Float.POSITIVE_INFINITY, maxY = Float.NEGATIVE_INFINITY;
         for (int i = 0; i < 4; i++) { minY = Math.min(minY, quad.y(i)); maxY = Math.max(maxY, quad.y(i)); }
         MESH_FACES.put(pos.asLong() + ":" + quad.nominalFace(), new MeshFace(minY, maxY,
@@ -82,7 +82,7 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
         return new BlockPos(12, net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("sodium") ? 206 : 191, 12);
     }
     private it.unimi.dsi.fastutil.longs.LongOpenHashSet terrainMarkers;
-    private Long2ByteOpenHashMap edgeFacts;
+    private Long2IntOpenHashMap edgeFacts;
     private int ticks, phase, started, reloads;
     private boolean requested;
     private volatile boolean prepared;
@@ -200,6 +200,7 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
                     for (int y = 2; y <= NATURAL_TOP.getY() - naturalBase().getY(); y++)
                         world.setBlockState(naturalBase().up(y), Blocks.OAK_LOG.getDefaultState(), Block.NOTIFY_ALL);
                     prepareOverheadControls(world, player);
+                    prepareRepeatedStack(world, player);
                     player.setStackInHand(Hand.MAIN_HAND, ItemStack.EMPTY);
                     prepared = true;
                 } catch (Throwable error) { failure = error; }
@@ -211,6 +212,7 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
         if (ticks - started < 80) return;
         if (phase == 2) {
             checkOverheadControls(client);
+            checkRepeatedStack(client);
             checkMeshedFace(GROUND.up(2), Direction.UP, 0.5, true);
             BlockPos natural = GROUND.west(4);
             double lowerDy = SlabSupport.getYOffset(client.world, natural.up(2), client.world.getBlockState(natural.up(2)));
@@ -226,8 +228,8 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
             System.out.println("REPEATED_SECTION_RELOAD_PASS count=2");
             checkMeshedFace(EDGE.up(3), Direction.DOWN, 0, true);
             var chunk = client.world.getWorldChunk(EDGE.up(2));
-            edgeFacts = new Long2ByteOpenHashMap(chunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE));
-            var delayed = new Long2ByteOpenHashMap(edgeFacts); delayed.put(EDGE.up(2).asLong(), (byte)0);
+            edgeFacts = new Long2IntOpenHashMap(chunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE));
+            var delayed = new Long2IntOpenHashMap(edgeFacts); delayed.put(EDGE.up(2).asLong(), (byte)0);
             chunk.setAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE, delayed);
             MESH_FACES.clear(); client.worldRenderer.reload(); phase = 3; started = ticks; return;
         }
@@ -308,6 +310,51 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
         System.out.println("VERTICAL_STEP_CLIENT_PASS renderer=" + name);
         phase = 99;
         client.scheduleStop();
+    }
+
+    private static final BlockPos TOWER_BASE = new BlockPos(18, 198, 12);
+
+    private static void prepareRepeatedStack(ServerWorld world, ServerPlayerEntity player) {
+        world.setBlockState(TOWER_BASE, Blocks.STONE.getDefaultState(), Block.NOTIFY_ALL);
+        for (int step = 1; step <= 48; step++) {
+            BlockPos owner = TOWER_BASE.up(step - 1);
+            double top = owner.getY() + world.getBlockState(owner).getOutlineShape(world, owner).getMax(Direction.Axis.Y);
+            player.setPosition(TOWER_BASE.getX() + 4.5, top + 1, TOWER_BASE.getZ() + .5);
+            ItemStack stack = new ItemStack((step & 1) == 1 ? Items.STONE_SLAB : Items.STONE);
+            player.setStackInHand(Hand.MAIN_HAND, stack);
+            var hit = new BlockHitResult(new Vec3d(owner.getX() + .5, top, owner.getZ() + .5), Direction.UP, owner, false);
+            require(stack.useOnBlock(new ItemUsageContext(player, Hand.MAIN_HAND, hit)).isAccepted(),
+                    "Repeated native stack placement failed at " + step);
+            BlockPos placed = TOWER_BASE.up(step);
+            require(SlabSupport.getYOffset(world, placed, world.getBlockState(placed)) == -(step / 2) * .5,
+                    "Repeated native stack lost its server height at " + step);
+        }
+    }
+
+    private static void checkRepeatedStack(MinecraftClient client) {
+        for (int step = 1; step <= 48; step++) {
+            BlockPos owner = TOWER_BASE.up(step);
+            BlockState state = client.world.getBlockState(owner);
+            double dy = -(step / 2) * .5;
+            require(SlabSupport.getYOffset(client.world, owner, state) == dy,
+                    "Repeated stack height did not synchronize at " + step);
+            double top = owner.getY() + dy + ((step & 1) == 1 ? .5 : 1);
+            var interior = new net.minecraft.util.math.Box(owner.getX() + .3, top - .4, owner.getZ() + .3,
+                    owner.getX() + .7, top - .1, owner.getZ() + .7);
+            require(!client.world.isSpaceEmpty(null, interior), "Client collision missed repeated stack at " + step);
+            Vec3d start = new Vec3d(owner.getX() + .5, top - .25, owner.getZ() - 1);
+            var hit = com.slabbed.util.SlabbedOffsetRaycast.raycast(client.world, start, start.add(0, 0, 2.75),
+                    net.minecraft.block.ShapeContext.of(client.player));
+            require(hit.getType() == net.minecraft.util.hit.HitResult.Type.BLOCK && hit.getBlockPos().equals(owner),
+                    "Repeated stack ray selected a ghost cell at " + step);
+        }
+        BlockPos top = TOWER_BASE.up(48);
+        checkMeshedFace(top, Direction.UP, -11.0d, false);
+        require(MESH_FACES.get(top.asLong() + ":" + Direction.UP).visible,
+                "Repeated stack top disappeared from the real mesh");
+        require(client.world.isSpaceEmpty(null, new net.minecraft.util.math.Box(top).contract(.2)),
+                "Repeated stack left a ghost collision in its old logical cell");
+        System.out.println("REPEATED_STACK_CLIENT_COLLISION_TARGET_MESH_PASS pieces=48");
     }
 
     private static BlockPos overheadGround(int i, boolean legacy) {
