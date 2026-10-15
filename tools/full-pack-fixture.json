@@ -604,7 +604,8 @@
       "ref": "8b9705d174931157141b335de02ec3b23c613d09",
       "kind": "cloud",
       "content_digest": "72064bf3b0f8555beeb9d707a354297a68f6a192ba0cbe9665ac5082cd529f1d",
-      "sha256": "026556cf7e11283a88a4c5c4751dc122aaa1976f4491341936f89d9be019a608"
+      "sha256": "026556cf7e11283a88a4c5c4751dc122aaa1976f4491341936f89d9be019a608",
+      "artifact": 11864225538
     },
     {
       "id": "the_sift",
@@ -614,7 +615,8 @@
       "ref": "7534a052f5d44bf20a459bfba724267ef3993186",
       "kind": "sift",
       "content_digest": "84d7c878ae4b989123bbb14fe29e5fac459319fd396661d0e6bd813d2c1d5285",
-      "sha256": "2948011c472212ac4c57702264b81e93213bfd6abd7b61855f9b129daa16ca06"
+      "sha256": "2948011c472212ac4c57702264b81e93213bfd6abd7b61855f9b129daa16ca06",
+      "artifact": 11788045264
     },
     {
       "id": "slabbed",
@@ -624,7 +626,8 @@
       "ref": "b65c13312acb48173d720ed1329fee6c200b0fca",
       "kind": "control",
       "content_digest": "07a327286ca5581ab5f7d686f782eb74d56a2e863fc71e53ac77c9dafe2e55a9",
-      "sha256": "62baf089d511738cda3e82cc0f8021b8af8575e497e1eb8c984a364225a9e3d1"
+      "sha256": "62baf089d511738cda3e82cc0f8021b8af8575e497e1eb8c984a364225a9e3d1",
+      "artifact": 11932900631
     },
     {
       "id": "vanillabackport",
@@ -634,7 +637,8 @@
       "ref": "3fafeea8c11d10092d70959ba4c3cf8265e4b619",
       "kind": "backport",
       "content_digest": "6ae33d086ff29ad775a95f5159cd0de5e6f445d7ae9a2f2891302531da82608f",
-      "sha256": "295ecf8f8e7218765ab9def612173929210e5fe9fc799cf4bcef797df2d9b7c0"
+      "sha256": "295ecf8f8e7218765ab9def612173929210e5fe9fc799cf4bcef797df2d9b7c0",
+      "artifact": 11688988703
     },
     {
       "id": "wwoo",
@@ -644,7 +648,8 @@
       "ref": "d8be782f4f856522bcbcf71fe1e21d2cf486c543",
       "kind": "worldgen",
       "content_digest": "fe4833b7280249adcc79deb61c950e5dc32e3b67cc22c1ad705ad0ab2b4741ad",
-      "sha256": "12580feeebf6cb3f49a2dc19df596e24e056e0b672d37c2ef56e55e60a46b042"
+      "sha256": "12580feeebf6cb3f49a2dc19df596e24e056e0b672d37c2ef56e55e60a46b042",
+      "artifact": 11785258216
     }
   ],
   "configs": {

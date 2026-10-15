@@ -7,113 +7,13 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 jobs:
-  dependencies:
-    name: Pinned pack dependency (${{ matrix.kind }})
-    runs-on: ubuntu-22.04
-    timeout-minutes: 40
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - kind: cloud
-            repository: dfgdrfgh/Biome-Cloud-Transitions
-            ref: 8b9705d174931157141b335de02ec3b23c613d09
-          - kind: sift
-            repository: dfgdrfgh/Mielon-s-The-Sift-1.21.1-Patch
-            ref: 7534a052f5d44bf20a459bfba724267ef3993186
-          - kind: backport
-            repository: dfgdrfgh/TrueVanillaBackport
-            ref: 3fafeea8c11d10092d70959ba4c3cf8265e4b619
-          - kind: worldgen
-            repository: dfgdrfgh/wwoo-3.0.1-backport
-            ref: d8be782f4f856522bcbcf71fe1e21d2cf486c543
-          - kind: control
-            repository: dfgdrfgh/reslabbed
-            ref: b65c13312acb48173d720ed1329fee6c200b0fca
-    steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
-        with:
-          persist-credentials: false
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
-        with:
-          repository: ${{ matrix.repository }}
-          ref: ${{ matrix.ref }}
-          path: dependency
-          persist-credentials: false
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
-        if: matrix.kind == 'backport'
-        with:
-          repository: ItsBlackGear/Platform
-          ref: f735aebbc1b6efc90ac72f01fe10eaac69f4051a
-          path: dependency/vendor/platform
-          persist-credentials: false
-      - uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95
-        if: matrix.kind == 'backport'
-        with:
-          distribution: temurin
-          java-version: |
-            17
-            21
-            25
-      - uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95
-        if: matrix.kind != 'backport'
-        with:
-          distribution: temurin
-          java-version: '21'
-      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
-        with:
-          python-version: '3.11'
-      - uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92
-        with:
-          cache-provider: basic
-      - name: Build pinned cloud or world-generation dependency
-        if: matrix.kind == 'cloud' || matrix.kind == 'worldgen'
-        working-directory: dependency
-        env:
-          BUILD_KIND: ${{ matrix.kind }}
-        run: |
-          python3 port/bootstrap.py
-          if [ "$BUILD_KIND" = cloud ]; then python3 build.py; else python3 port/build.py; fi
-      - name: Build pinned Gradle dependency
-        if: matrix.kind == 'sift' || matrix.kind == 'control'
-        working-directory: dependency
-        run: |
-          rm -rf build/run/gameTest
-          bash gradlew --no-daemon --console=plain build
-      - name: Prepare pinned VanillaBackport dependencies
-        if: matrix.kind == 'backport'
-        working-directory: dependency
-        run: python3 .github/scripts/prepare_dependencies.py vendor/platform 1.21.1
-      - name: Build pinned VanillaBackport
-        if: matrix.kind == 'backport'
-        working-directory: dependency
-        env:
-          JAVA_HOME: ${{ env.JAVA_HOME_21_X64 }}
-        run: |
-          bash vendor/platform/gradlew -p vendor/platform :common:remapJar :fabric:remapJar :neoforge:remapJar --no-daemon --console=plain
-          mkdir -p libs
-          cp vendor/platform/common/build/libs/Platform-common-1.21.1-1.4.0.2638.1.1.jar libs/
-          cp vendor/platform/{fabric,neoforge}/build/libs/Platform-*-1.21.1-1.4.0.2638.1.1.jar libs/
-          bash gradlew :fabric:remapJar --no-daemon --console=plain
-          python3 .github/scripts/bundle.py 1.21.1 fabric
-      - name: Verify pack code and resources
-        env:
-          BUILD_KIND: ${{ matrix.kind }}
-        run: python3 tools/verify-pack-fork.py "$BUILD_KIND"
-      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
-        with:
-          name: pinned-pack-mod-${{ matrix.kind }}
-          path: pack-forks/*.jar
-          if-no-files-found: error
-          retention-days: 7
-
   verify:
     name: Updated pack control and fixed clients
-    needs: dependencies
     runs-on: ubuntu-22.04
-    timeout-minutes: 25
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
         with:
@@ -128,16 +28,13 @@ jobs:
       - uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92
         with:
           cache-provider: basic
-      - uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0
-        with:
-          pattern: pinned-pack-mod-*
-          path: pack-forks
-          merge-multiple: true
       - name: Build and verify the fixed mod and client probe
         run: |
           rm -rf build/run/gameTest
           bash gradlew --no-daemon --console=plain build runGameTest writeVerticalStepRuntime
       - name: Stage the updated pack
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: python3 tools/stage-full-pack.py
       - name: Reproduce the old overhead-block behavior
         env:
