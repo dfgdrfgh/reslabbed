@@ -105,6 +105,8 @@ with (game / 'production-launch.log').open('w') as log:
         result = subprocess.run(command, cwd=game, stdout=log, stderr=subprocess.STDOUT, timeout=300)
     except subprocess.TimeoutExpired:
         raise AssertionError('Production client timed out; see production-launch.log') from None
+if result.returncode != 0:
+    print('\n'.join((game / 'production-launch.log').read_text(errors='replace').splitlines()[-100:]), flush=True)
 assert result.returncode == 0, 'Production client failed; see production-launch.log'
 assert (game / 'vertical-step-pass.txt').exists(), 'Production client did not complete the face checks'
 print((game / 'vertical-step-pass.txt').read_text().strip())
