@@ -60,7 +60,8 @@
       "com.slabbed.test.RepeatedStackingTest",
       "com.slabbed.anchor.PlacementCoreOverhaulTest",
       "com.slabbed.test.NoRecordGeometryTest",
-      "com.slabbed.anchor.PlacementGeometryTest"
+      "com.slabbed.anchor.PlacementGeometryTest",
+      "com.slabbed.anchor.LegacyPlacementImportTest"
     ]
   },
   "depends": {
