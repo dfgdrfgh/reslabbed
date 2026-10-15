@@ -180,6 +180,7 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
                     place(world, player, terrainSlab().asItem(), naturalBase());
                     for (int y = 2; y <= NATURAL_TOP.getY() - naturalBase().getY(); y++)
                         world.setBlockState(naturalBase().up(y), Blocks.OAK_LOG.getDefaultState(), Block.NOTIFY_ALL);
+                    prepareOverheadControls(world, player);
                     player.setStackInHand(Hand.MAIN_HAND, ItemStack.EMPTY);
                     prepared = true;
                 } catch (Throwable error) { failure = error; }
@@ -190,6 +191,7 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
         if (phase == 1) { phase = 2; started = ticks; return; }
         if (ticks - started < 80) return;
         if (phase == 2) {
+            checkOverheadControls(client);
             checkMeshedFace(GROUND.up(2), Direction.UP, 0.5, true);
             BlockPos natural = GROUND.west(4);
             double lowerDy = SlabSupport.getYOffset(client.world, natural.up(2), client.world.getBlockState(natural.up(2)));
@@ -284,6 +286,50 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
         System.out.println("VERTICAL_STEP_CLIENT_PASS renderer=" + name);
         phase = 99;
         client.scheduleStop();
+    }
+
+    private static BlockPos overheadGround(int i, boolean legacy) {
+        return new BlockPos(4 + i * 4, 198, legacy ? 16 : 20);
+    }
+
+    private static void prepareOverheadControls(ServerWorld world, ServerPlayerEntity player) {
+        Block[] legacy = {Blocks.STONE, Blocks.OAK_LOG, Blocks.OAK_PLANKS};
+        Block[] untouched = {Blocks.GLASS, Blocks.CRAFTING_TABLE, Blocks.FURNACE};
+        for (boolean old : new boolean[]{true, false}) for (int i = 0; i < 3; i++) {
+            BlockPos ground = overheadGround(i, old);
+            BlockPos upper = ground.up(2);
+            BlockState state = (old ? legacy[i] : untouched[i]).getDefaultState();
+            world.setBlockState(ground, Blocks.STONE.getDefaultState(), Block.NOTIFY_ALL);
+            world.setBlockState(ground.up(), Blocks.STONE.getDefaultState(), Block.NOTIFY_ALL);
+            world.setBlockState(upper, state, Block.NOTIFY_ALL);
+            if (old) SlabAnchorAttachment.freezeLoweredOnPlace(world, upper, state);
+            world.breakBlock(ground.up(), false);
+            player.setPosition(ground.getX() + 3.5, 198, ground.getZ() + .5);
+            place(world, player, terrainSlab().asItem(), ground);
+            require(SlabSupport.getYOffset(world, upper, state) == 0.0,
+                    "Server pulled an existing overhead block down: " + state);
+        }
+    }
+
+    private static void checkOverheadControls(MinecraftClient client) {
+        for (boolean old : new boolean[]{true, false}) for (int i = 0; i < 3; i++) {
+            BlockPos upper = overheadGround(i, old).up(2);
+            BlockState state = client.world.getBlockState(upper);
+            require(SlabSupport.getYOffset(client.world, upper, state) == 0.0,
+                    "Client pulled an existing overhead block down: " + state);
+            var outline = state.getOutlineShape(client.world, upper);
+            require(outline.getMin(Direction.Axis.Y) == 0 && outline.getMax(Direction.Axis.Y) == 1,
+                    "Overhead outline moved outside its original full block");
+            checkMeshedFace(upper, Direction.DOWN, 0, false);
+            var face = MESH_FACES.get(upper.asLong() + ":" + Direction.DOWN);
+            require(face.visible, "Overhead block lost its exposed underside");
+            Vec3d start = new Vec3d(upper.getX() + .5, upper.getY() - .25, upper.getZ() - 1);
+            var hit = com.slabbed.util.SlabbedOffsetRaycast.raycast(client.world, start,
+                    start.add(0, 0, 1.75), net.minecraft.block.ShapeContext.of(client.player));
+            require(hit.getType() == net.minecraft.util.hit.HitResult.Type.MISS,
+                    "Empty half-block gap contains a ghost selection target: " + hit);
+        }
+        System.out.println("EXISTING_OVERHEAD_BLOCKS_MESH_OUTLINE_GAP_PASS");
     }
 
     private static Block terrainSlab() {

@@ -5,6 +5,9 @@ from pathlib import Path
 import shutil
 import subprocess
 import tarfile
+import urllib.request
+import hashlib
+import concurrent.futures
 
 project = Path.cwd()
 metadata = json.loads((project / 'build/vertical-step-runtime/dependencies.json').read_text())
@@ -37,6 +40,17 @@ for name in ['dependencies.json', 'vertical-step-probe.jar']:
     shutil.copy2(project / 'build/vertical-step-runtime' / name, out / name)
 for source in (project / 'build/libs').glob('*.jar'):
     if not source.name.endswith(('-sources.jar', '-dev.jar')): shutil.copy2(source, out / source.name)
+manifest = project / 'tools/verification-pack-downloads.json'
+if manifest.exists():
+    def download(entry):
+        data = urllib.request.urlopen(entry['downloads'][0], timeout=90).read()
+        for kind, expected in entry['hashes'].items():
+            assert hashlib.new(kind, data).hexdigest() == expected, entry['path']
+        target = out / 'pack-indexed' / entry['path']
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(data)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=6) as pool:
+        list(pool.map(download, json.loads(manifest.read_text())))
 xvfb = Path(shutil.which('Xvfb'))
 shutil.copy2(xvfb, out / 'Xvfb')
 libs = subprocess.check_output(['ldd', str(xvfb)], text=True)

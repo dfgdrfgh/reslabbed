@@ -1235,13 +1235,19 @@ public final class SlabSupport {
             return Double.isFinite(frozen) ? frozen : 0.0d;
         }
 
-        // A modern support must not adopt untouched structural terrain into its new stack.
-        // Retain the live lane for wholly legacy columns, and retain authored legacy markers.
-        // Modern placements already returned their permanent seat above (LAW.md).
-        if (isOpaqueFullCubeViewIndependent(state)
-                && !isSlabSitCandidate(world, pos, state)
-                && !SlabAnchorAttachment.isAnchored(world, pos)
-                && !SlabAnchorAttachment.isFrozenFlat(world, pos)
+        // Legacy flat markers are remembered placement seats too. They must take priority over
+        // the Terrain Slabs full-cube fallback, just as modern facts do above (LAW.md).
+        boolean anchored = SlabAnchorAttachment.isAnchored(world, pos);
+        if (!anchored && SlabAnchorAttachment.isFrozenFlat(world, pos)) {
+            return 0.0d;
+        }
+
+        // A modern support must not adopt an untouched structural block into its new stack.
+        // Transparent and functional cubes occupy the same volume as opaque terrain. Fresh item
+        // placements already returned their own stored seat above; legacy columns stay live.
+        if ((state.getBlock() instanceof SlabBlock
+                || state.isFullCube(EmptyBlockView.INSTANCE, BlockPos.ORIGIN))
+                && !anchored
                 && hasModernColumnSupport(world, pos)) {
             return 0.0d;
         }
