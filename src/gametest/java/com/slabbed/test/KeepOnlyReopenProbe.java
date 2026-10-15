@@ -86,6 +86,7 @@ public final class KeepOnlyReopenProbe implements ClientModInitializer {
     private static String mode = "";
     private static String corePhase = "";
     private static boolean packChecked;
+    private static volatile double measuredReadSum;
     private static Path evidenceDir, observations, controlsFile;
     private static String worldName;
     private static final List<Control> CONTROLS = new ArrayList<>();
@@ -393,6 +394,7 @@ public final class KeepOnlyReopenProbe implements ClientModInitializer {
             if (world != null) {
                 BlockState state = world.getBlockState(pos);
                 var fact = SlabAnchorAttachment.rawPlacementDyFact(world, pos);
+                if (!corePhase.isEmpty() && name.equals("modern_half")) measureReads(world,pos,state);
                 SERVER.put(name, new ServerObservation(state.getBlock().toString(),
                         SlabSupport.getYOffset(world, pos, state), fact.present(), fact.valueOrNaN(),
                         SlabAnchorAttachment.isModernPlacement(world, pos),
@@ -401,6 +403,22 @@ public final class KeepOnlyReopenProbe implements ClientModInitializer {
             }
             serverPending = false;
         });
+    }
+
+    private static void measureReads(ServerWorld world,BlockPos pos,BlockState state) {
+        var bean=java.lang.management.ManagementFactory.getThreadMXBean();
+        if (!(bean instanceof com.sun.management.ThreadMXBean allocations)
+                || !allocations.isThreadAllocatedMemorySupported() || !allocations.isThreadAllocatedMemoryEnabled()) {
+            System.out.println("CORE_SAVED_WORLD_READ_METRICS unavailable");return;
+        }
+        double sum=0;
+        for(int i=0;i<10000;i++) sum+=SlabSupport.getYOffset(world,pos,state);
+        long id=Thread.currentThread().threadId(), before=allocations.getThreadAllocatedBytes(id), start=System.nanoTime();
+        for(int i=0;i<100000;i++) sum+=SlabSupport.getYOffset(world,pos,state);
+        long nanos=System.nanoTime()-start, bytes=allocations.getThreadAllocatedBytes(id)-before;
+        measuredReadSum=sum;
+        System.out.println("CORE_SAVED_WORLD_READ_METRICS phase="+corePhase+" reads=100000 allocatedBytes="+bytes
+                +" elapsedNanos="+nanos+" checksum="+measuredReadSum);
     }
 
     private static void observe(MinecraftClient client) {

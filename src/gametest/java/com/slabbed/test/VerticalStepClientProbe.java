@@ -197,7 +197,12 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
                     player.setPosition(carpet.getX() + 3.5, 198, carpet.getZ() + 0.5);
                     place(world, player, Items.STONE_SLAB, carpet);
                     place(world, player, Items.OAK_LOG, carpet.up());
-                    world.setBlockState(carpet.up(3), Blocks.RED_CARPET.getDefaultState(), Block.NOTIFY_ALL);
+                    place(world,player,Items.RED_CARPET,carpet.up(2));
+                    BlockPos nativeCarpet=carpet.east(2);
+                    world.setBlockState(nativeCarpet,Blocks.STONE.getDefaultState(),Block.NOTIFY_ALL);
+                    place(world,player,Items.STONE_SLAB,nativeCarpet);
+                    place(world,player,Items.OAK_LOG,nativeCarpet.up());
+                    world.setBlockState(nativeCarpet.up(3),Blocks.RED_CARPET.getDefaultState(),Block.NOTIFY_ALL);
                     world.setBlockState(naturalBase(), Blocks.STONE.getDefaultState(), Block.NOTIFY_ALL);
                     player.setPosition(15.5, 191, 12.5);
                     place(world, player, terrainSlab().asItem(), naturalBase());
@@ -239,6 +244,7 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
             checkMeshedFace(natural.up(2), Direction.UP, 1 + lowerDy, lowerDy < upperDy);
             checkMeshedFace(natural.up(3), Direction.DOWN, upperDy, lowerDy < upperDy);
             checkMeshedFace(GROUND.south(4).up(3), Direction.UP, -0.5 + 1.0 / 16, false);
+            checkMeshedFace(GROUND.south(4).east(2).up(3),Direction.UP,1.0/16,false);
             if (reloads++ < 2) {
                 MESH_FACES.clear(); client.worldRenderer.reload(); started = ticks; return;
             }

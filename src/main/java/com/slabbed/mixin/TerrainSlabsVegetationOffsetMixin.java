@@ -11,7 +11,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.BlockView;
 import org.spongepowered.asm.mixin.Mixin;
 
-/** Vegetation has one vertical owner: Slabbed's geometry and stored placement seat (LAW.md). */
+/** Authored vegetation uses its saved seat; unowned vegetation keeps native geometry (LAW.md). */
 @Mixin(value = AbstractBlock.AbstractBlockState.class, priority = 500)
 public abstract class TerrainSlabsVegetationOffsetMixin {
     @WrapMethod(method = "getModelOffset")
@@ -22,10 +22,9 @@ public abstract class TerrainSlabsVegetationOffsetMixin {
                 || !(((BlockState) (Object) this).getBlock() instanceof PlantBlock)) {
             return offset;
         }
-        // Terrain Slabs inserts -0.5 into the native model/outline offset. Slabbed already
-        // applies the plant's total seat, so retain native horizontal jitter without adding
-        // that second vertical translation. No support or attachment lookup belongs here.
-        if (offset.y == -0.5d) {
+        // Suppress the competing vertical seat only when Slabbed actually owns this placement.
+        // Absence adds no Slabbed translation and must preserve the compat mod's native offset.
+        if (offset.y == -0.5d && com.slabbed.anchor.PlacementGeometry.fact(world, pos).present()) {
             return new Vec3d(offset.x, 0.0d, offset.z);
         }
         return offset;
