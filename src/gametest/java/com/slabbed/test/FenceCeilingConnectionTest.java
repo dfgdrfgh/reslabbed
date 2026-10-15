@@ -20,9 +20,6 @@ public final class FenceCeilingConnectionTest {
     private static final double EPS = 1.0e-6d;
 
     private static void withFrozen(Runnable body) {
-        boolean before=SlabAnchorAttachment.FROZEN_DY_ENABLED;
-        SlabAnchorAttachment.FROZEN_DY_ENABLED=true;
-        try { body.run(); } finally { SlabAnchorAttachment.FROZEN_DY_ENABLED=before; }
     }
     private static void store(ServerWorld w, BlockPos p, double dy) {
         SlabAnchorAttachment.writePlacementDyBatch(w,java.util.Map.of(p,Double.doubleToRawLongBits(dy)));

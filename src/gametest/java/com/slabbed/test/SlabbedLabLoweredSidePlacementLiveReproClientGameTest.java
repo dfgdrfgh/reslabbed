@@ -900,8 +900,8 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
             BlockState leftFull = world.getBlockState(leftFullPos);
             BlockState rightFull = world.getBlockState(rightFullPos);
-            SlabAnchorAttachment.addAnchor(world, leftFullPos, leftFull);
-            SlabAnchorAttachment.addAnchor(world, rightFullPos, rightFull);
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, leftFullPos, leftFull);
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, rightFullPos, rightFull);
         });
         ctx.waitTick();
         singleplayer.getClientWorld().waitForChunksRender();
@@ -1034,7 +1034,7 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
                     aPos,
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE),
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, bPos, world.getBlockState(bPos));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, bPos, world.getBlockState(bPos));
 
             BlockState aState = world.getBlockState(aPos);
             BlockState bState = world.getBlockState(bPos);
@@ -1226,7 +1226,7 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
             BlockState bSupportState = world.getBlockState(bSupportPos);
             BlockState aState = world.getBlockState(aPos);
             BlockState topState = world.getBlockState(aTopPos);
-            SlabAnchorAttachment.addAnchor(world, bPos, bState);
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, bPos, bState);
             if (!bState.isOf(Blocks.STONE)) {
                 throw new RuntimeException("live-chain replay expected anchored stone at "
                         + bPos.toShortString() + ", found " + bState);
@@ -1550,7 +1550,7 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
             BlockState aState = world.getBlockState(aPos);
             BlockState bState = world.getBlockState(bPos);
             BlockState bSupportState = world.getBlockState(bSupportPos);
-            SlabAnchorAttachment.addAnchor(world, bPos, bState);
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, bPos, bState);
             if (!topState.isOf(Blocks.STONE_SLAB)
                     || !topState.contains(SlabBlock.TYPE)
                     || topState.get(SlabBlock.TYPE) != SlabType.TOP) {
@@ -1711,7 +1711,7 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
             BlockState aState = world.getBlockState(aPos);
             BlockState bState = world.getBlockState(bPos);
             BlockState bSupportState = world.getBlockState(bSupportPos);
-            SlabAnchorAttachment.addAnchor(world, bPos, bState);
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, bPos, bState);
             double topDy = SlabSupport.getYOffset(world, aTopPos, topState);
             double aDy = SlabSupport.getYOffset(world, aPos, aState);
             double bDy = SlabSupport.getYOffset(world, bPos, bState);
@@ -1812,8 +1812,8 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
             BlockState sourceState = world.getBlockState(sourceFullPos);
             BlockState slabState = world.getBlockState(inheritedSlabPos);
             BlockState survivorState = world.getBlockState(survivorFullPos);
-            SlabAnchorAttachment.addAnchor(world, sourceFullPos, sourceState);
-            SlabAnchorAttachment.addAnchor(world, survivorFullPos, survivorState);
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, sourceFullPos, sourceState);
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, survivorFullPos, survivorState);
             if (!sourceState.isOf(Blocks.STONE)) {
                 throw new RuntimeException("dependent-support setup expected source FB at "
                         + sourceFullPos.toShortString() + ", found " + sourceState);
@@ -2399,7 +2399,7 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
             // Explicitly force source anchor for the baseline path; this mirrors a placed FB on BS.
             BlockState sourceState = world.getBlockState(sourceFullPos);
-            SlabAnchorAttachment.addAnchor(world, sourceFullPos, sourceState);
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, sourceFullPos, sourceState);
         });
         ctx.waitTick();
         singleplayer.getClientWorld().waitForChunksRender();
@@ -2592,7 +2592,7 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
         singleplayer.getServer().runOnServer(server -> {
             var world = server.getOverworld();
             BlockState sourceState = world.getBlockState(sourcePos);
-            SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(world, sourcePos, sourceState);
+            com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(world, sourcePos, sourceState);
             world.setBlockState(FULL_POS, Blocks.AIR.getDefaultState(), net.minecraft.block.Block.NOTIFY_LISTENERS);
             world.setBlockState(SUPPORT_POS, Blocks.AIR.getDefaultState(), net.minecraft.block.Block.NOTIFY_LISTENERS);
             world.setBlockState(placePos, Blocks.AIR.getDefaultState(), net.minecraft.block.Block.NOTIFY_LISTENERS);
@@ -2671,7 +2671,7 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
             world.setBlockState(sourceCarrierPos, Blocks.STONE.getDefaultState(), net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, sourceCarrierPos, world.getBlockState(sourceCarrierPos));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, sourceCarrierPos, world.getBlockState(sourceCarrierPos));
             world.setBlockState(
                     sourceBelowPos,
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE),
@@ -2908,9 +2908,9 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
             BlockState westState = world.getBlockState(westFullPos);
             BlockState eastState = world.getBlockState(eastFullPos);
 
-            SlabAnchorAttachment.addAnchor(world, centerFullPos, centerState);
-            SlabAnchorAttachment.addSideAdjacentLoweredFullAnchor(world, westFullPos, westState, centerFullPos, centerState);
-            SlabAnchorAttachment.addSideAdjacentLoweredFullAnchor(world, eastFullPos, eastState, centerFullPos, centerState);
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, centerFullPos, centerState);
+            com.slabbed.dev.LegacyPlacementFixtures.addSideAdjacentLoweredFullAnchor(world, westFullPos, westState, centerFullPos, centerState);
+            com.slabbed.dev.LegacyPlacementFixtures.addSideAdjacentLoweredFullAnchor(world, eastFullPos, eastState, centerFullPos, centerState);
         });
 
         ctx.waitTick();
@@ -3221,7 +3221,7 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
         setupFixture(singleplayer, SUPPORT_POS, FULL_POS);
         singleplayer.getServer().runOnServer(server -> {
             var world = server.getOverworld();
-            SlabAnchorAttachment.addAnchor(world, FULL_POS, world.getBlockState(FULL_POS));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, FULL_POS, world.getBlockState(FULL_POS));
         });
         setLoweredSlabTarget(singleplayer, laneRootPos, SlabType.TOP);
         ctx.waitTick();
@@ -3357,7 +3357,7 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
         setupFixture(singleplayer, SUPPORT_POS, FULL_POS);
         singleplayer.getServer().runOnServer(server -> {
             var world = server.getOverworld();
-            SlabAnchorAttachment.addAnchor(world, FULL_POS, world.getBlockState(FULL_POS));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, FULL_POS, world.getBlockState(FULL_POS));
         });
         setLoweredSlabTarget(singleplayer, laneDoublePos, SlabType.DOUBLE);
         ctx.waitTick();
@@ -3485,7 +3485,7 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
                     seamSupportPos.down(),
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, seamSupportPos, world.getBlockState(seamSupportPos));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, seamSupportPos, world.getBlockState(seamSupportPos));
 
             BlockState bottomState = world.getBlockState(bottomPos);
             world.setBlockState(
@@ -4939,18 +4939,18 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
             world.setBlockState(loweredCarrierPos, Blocks.STONE.getDefaultState(), net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, loweredCarrierPos, world.getBlockState(loweredCarrierPos));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, loweredCarrierPos, world.getBlockState(loweredCarrierPos));
             world.setBlockState(
                     compoundSourcePos,
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(
+            com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(
                     world,
                     compoundSourcePos,
                     world.getBlockState(compoundSourcePos));
             world.setBlockState(compoundPos, Blocks.STONE.getDefaultState(), net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, compoundPos, world.getBlockState(compoundPos));
-            SlabAnchorAttachment.addCompoundFullBlockAnchor(world, compoundPos, world.getBlockState(compoundPos));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, compoundPos, world.getBlockState(compoundPos));
+            com.slabbed.dev.LegacyPlacementFixtures.addCompoundFullBlockAnchor(world, compoundPos, world.getBlockState(compoundPos));
         });
     }
 
@@ -4979,18 +4979,18 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
             world.setBlockState(lowerFullBlock, Blocks.STONE.getDefaultState(), net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, lowerFullBlock, world.getBlockState(lowerFullBlock));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, lowerFullBlock, world.getBlockState(lowerFullBlock));
             world.setBlockState(
                     loweredLaneBelowTop,
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(
+            com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(
                     world,
                     loweredLaneBelowTop,
                     world.getBlockState(loweredLaneBelowTop));
             world.setBlockState(clickedTopFullPos, Blocks.STONE.getDefaultState(), net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, clickedTopFullPos, world.getBlockState(clickedTopFullPos));
-            SlabAnchorAttachment.addCompoundFullBlockAnchor(world, clickedTopFullPos, world.getBlockState(clickedTopFullPos));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, clickedTopFullPos, world.getBlockState(clickedTopFullPos));
+            com.slabbed.dev.LegacyPlacementFixtures.addCompoundFullBlockAnchor(world, clickedTopFullPos, world.getBlockState(clickedTopFullPos));
 
             if (server.getPlayerManager().getPlayerList().isEmpty()) {
                 throw new RuntimeException("singleplayer player missing during live screenshot shape setup");
@@ -5340,7 +5340,7 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
         singleplayer.getServer().runOnServer(server -> {
             var world = server.getOverworld();
             BlockState fullState = world.getBlockState(expectedOwnerPos);
-            SlabAnchorAttachment.addAnchor(world, expectedOwnerPos, fullState);
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, expectedOwnerPos, fullState);
             world.setBlockState(
                     visibleSlabOwnerPos,
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE),
@@ -5470,12 +5470,12 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
         singleplayer.getServer().runOnServer(server -> {
             var world = server.getOverworld();
             BlockState fullState = world.getBlockState(anchoredOwnerPos);
-            SlabAnchorAttachment.addAnchor(world, anchoredOwnerPos, fullState);
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, anchoredOwnerPos, fullState);
             world.setBlockState(
                     lowerFrontOwnerPos,
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(
+            com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(
                     world,
                     lowerFrontOwnerPos,
                     world.getBlockState(lowerFrontOwnerPos));
@@ -5774,12 +5774,12 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
         singleplayer.getServer().runOnServer(server -> {
             var world = server.getOverworld();
             BlockState fullState = world.getBlockState(anchoredOwnerPos);
-            SlabAnchorAttachment.addAnchor(world, anchoredOwnerPos, fullState);
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, anchoredOwnerPos, fullState);
             world.setBlockState(
                     visibleUpperSlabOwnerPos,
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(
+            com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(
                     world,
                     visibleUpperSlabOwnerPos,
                     world.getBlockState(visibleUpperSlabOwnerPos));
@@ -5903,12 +5903,12 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
         singleplayer.getServer().runOnServer(server -> {
             var world = server.getOverworld();
             BlockState fullState = world.getBlockState(anchoredOwnerPos);
-            SlabAnchorAttachment.addAnchor(world, anchoredOwnerPos, fullState);
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, anchoredOwnerPos, fullState);
             world.setBlockState(
                     visibleUpperSlabOwnerPos,
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(
+            com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(
                     world,
                     visibleUpperSlabOwnerPos,
                     world.getBlockState(visibleUpperSlabOwnerPos));
@@ -6051,12 +6051,12 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
         singleplayer.getServer().runOnServer(server -> {
             var world = server.getOverworld();
             BlockState fullState = world.getBlockState(anchoredOwnerPos);
-            SlabAnchorAttachment.addAnchor(world, anchoredOwnerPos, fullState);
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, anchoredOwnerPos, fullState);
             world.setBlockState(
                     visibleUpperSlabOwnerPos,
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(
+            com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(
                     world,
                     visibleUpperSlabOwnerPos,
                     world.getBlockState(visibleUpperSlabOwnerPos));
@@ -6287,12 +6287,12 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
         singleplayer.getServer().runOnServer(server -> {
             var world = server.getOverworld();
             BlockState fullState = world.getBlockState(anchoredOwnerPos);
-            SlabAnchorAttachment.addAnchor(world, anchoredOwnerPos, fullState);
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, anchoredOwnerPos, fullState);
             world.setBlockState(
                     visibleUpperSlabOwnerPos,
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(
+            com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(
                     world,
                     visibleUpperSlabOwnerPos,
                     world.getBlockState(visibleUpperSlabOwnerPos));
@@ -6541,15 +6541,15 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
             world.setBlockState(midFullB, Blocks.STONE.getDefaultState(), net.minecraft.block.Block.NOTIFY_LISTENERS);
             world.setBlockState(rightFull, Blocks.STONE.getDefaultState(), net.minecraft.block.Block.NOTIFY_LISTENERS);
 
-            SlabAnchorAttachment.addAnchor(world, leftFull, world.getBlockState(leftFull));
-            SlabAnchorAttachment.addAnchor(world, rightFull, world.getBlockState(rightFull));
-            SlabAnchorAttachment.addSideAdjacentLoweredFullAnchor(
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, leftFull, world.getBlockState(leftFull));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, rightFull, world.getBlockState(rightFull));
+            com.slabbed.dev.LegacyPlacementFixtures.addSideAdjacentLoweredFullAnchor(
                     world,
                     midFullA,
                     world.getBlockState(midFullA),
                     leftFull,
                     world.getBlockState(leftFull));
-            SlabAnchorAttachment.addSideAdjacentLoweredFullAnchor(
+            com.slabbed.dev.LegacyPlacementFixtures.addSideAdjacentLoweredFullAnchor(
                     world,
                     midFullB,
                     world.getBlockState(midFullB),
@@ -7175,7 +7175,7 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
         singleplayer.getServer().runOnServer(server -> {
             var world = server.getOverworld();
             BlockState fullState = world.getBlockState(expectedOwnerPos);
-            SlabAnchorAttachment.addAnchor(world, expectedOwnerPos, fullState);
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, expectedOwnerPos, fullState);
         });
         ctx.waitTick();
         singleplayer.getClientWorld().waitForChunksRender();
@@ -8088,14 +8088,14 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
             world.setBlockState(targetSupportPos,
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(
+            com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(
                     world,
                     targetSupportPos,
                     world.getBlockState(targetSupportPos));
             world.setBlockState(expectedTorchPos, Blocks.AIR.getDefaultState(), net.minecraft.block.Block.NOTIFY_LISTENERS);
             world.setBlockState(upperTorchPos, Blocks.TORCH.getDefaultState(), net.minecraft.block.Block.NOTIFY_LISTENERS);
             world.setBlockState(flankTorchSupportPos, Blocks.STONE.getDefaultState(), net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, flankTorchSupportPos, world.getBlockState(flankTorchSupportPos));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, flankTorchSupportPos, world.getBlockState(flankTorchSupportPos));
             world.setBlockState(flankTorchPos, Blocks.TORCH.getDefaultState(), net.minecraft.block.Block.NOTIFY_LISTENERS);
         });
         ctx.waitTick();
@@ -8377,20 +8377,20 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
             world.setBlockState(towerAnchor, Blocks.STONE.getDefaultState(), net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, towerAnchor, world.getBlockState(towerAnchor));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, towerAnchor, world.getBlockState(towerAnchor));
             world.setBlockState(towerCarrier,
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(
+            com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(
                     world, towerCarrier, world.getBlockState(towerCarrier));
             world.setBlockState(compoundSourcePos, Blocks.STONE.getDefaultState(), net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, compoundSourcePos, world.getBlockState(compoundSourcePos));
-            SlabAnchorAttachment.addCompoundFullBlockAnchor(
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, compoundSourcePos, world.getBlockState(compoundSourcePos));
+            com.slabbed.dev.LegacyPlacementFixtures.addCompoundFullBlockAnchor(
                     world, compoundSourcePos, world.getBlockState(compoundSourcePos));
             world.setBlockState(supportCandidatePos,
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addCompoundVisibleSideLowerSlab(
+            com.slabbed.dev.LegacyPlacementFixtures.addCompoundVisibleSideLowerSlab(
                     world,
                     supportCandidatePos,
                     world.getBlockState(supportCandidatePos),
@@ -8852,15 +8852,15 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
             world.setBlockState(towerAnchor, Blocks.STONE.getDefaultState(), net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, towerAnchor, world.getBlockState(towerAnchor));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, towerAnchor, world.getBlockState(towerAnchor));
             world.setBlockState(towerCarrier,
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(
+            com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(
                     world, towerCarrier, world.getBlockState(towerCarrier));
             world.setBlockState(compoundSourcePos, Blocks.STONE.getDefaultState(), net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, compoundSourcePos, world.getBlockState(compoundSourcePos));
-            SlabAnchorAttachment.addCompoundFullBlockAnchor(
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, compoundSourcePos, world.getBlockState(compoundSourcePos));
+            com.slabbed.dev.LegacyPlacementFixtures.addCompoundFullBlockAnchor(
                     world, compoundSourcePos, world.getBlockState(compoundSourcePos));
             world.setBlockState(supportCandidatePos,
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, supportCandidateType),
@@ -8868,10 +8868,10 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
             BlockState supportState = world.getBlockState(supportCandidatePos);
             BlockState compoundState = world.getBlockState(compoundSourcePos);
             if (useUpperMark) {
-                SlabAnchorAttachment.addCompoundVisibleSideUpperSlab(
+                com.slabbed.dev.LegacyPlacementFixtures.addCompoundVisibleSideUpperSlab(
                         world, supportCandidatePos, supportState, compoundSourcePos, compoundState);
             } else {
-                SlabAnchorAttachment.addCompoundVisibleSideLowerSlab(
+                com.slabbed.dev.LegacyPlacementFixtures.addCompoundVisibleSideLowerSlab(
                         world, supportCandidatePos, supportState, compoundSourcePos, compoundState);
             }
             world.setBlockState(torchPos, Blocks.AIR.getDefaultState(), net.minecraft.block.Block.NOTIFY_LISTENERS);
@@ -9183,20 +9183,20 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
             world.setBlockState(towerAnchor, Blocks.STONE.getDefaultState(), net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, towerAnchor, world.getBlockState(towerAnchor));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, towerAnchor, world.getBlockState(towerAnchor));
             world.setBlockState(towerCarrier,
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(world, towerCarrier,
+            com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(world, towerCarrier,
                     world.getBlockState(towerCarrier));
             world.setBlockState(compoundSourcePos, Blocks.STONE.getDefaultState(), net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, compoundSourcePos, world.getBlockState(compoundSourcePos));
-            SlabAnchorAttachment.addCompoundFullBlockAnchor(world, compoundSourcePos,
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, compoundSourcePos, world.getBlockState(compoundSourcePos));
+            com.slabbed.dev.LegacyPlacementFixtures.addCompoundFullBlockAnchor(world, compoundSourcePos,
                     world.getBlockState(compoundSourcePos));
             world.setBlockState(supportCandidatePos,
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addCompoundVisibleOwnerTopSlab(
+            com.slabbed.dev.LegacyPlacementFixtures.addCompoundVisibleOwnerTopSlab(
                     world,
                     supportCandidatePos,
                     world.getBlockState(supportCandidatePos),
@@ -9441,7 +9441,7 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
             world.setBlockState(anchoredCarrierBelow, Blocks.STONE.getDefaultState(),
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, anchoredCarrierBelow, world.getBlockState(anchoredCarrierBelow));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, anchoredCarrierBelow, world.getBlockState(anchoredCarrierBelow));
             world.setBlockState(loweredDoubleCarrier,
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE),
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
@@ -9688,15 +9688,15 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
             world.setBlockState(towerAnchor, Blocks.STONE.getDefaultState(), net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, towerAnchor, world.getBlockState(towerAnchor));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, towerAnchor, world.getBlockState(towerAnchor));
             world.setBlockState(towerCarrier,
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(
+            com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(
                     world, towerCarrier, world.getBlockState(towerCarrier));
             world.setBlockState(fullBlockSupportPos, Blocks.STONE.getDefaultState(), net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, fullBlockSupportPos, world.getBlockState(fullBlockSupportPos));
-            SlabAnchorAttachment.addCompoundFullBlockAnchor(
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, fullBlockSupportPos, world.getBlockState(fullBlockSupportPos));
+            com.slabbed.dev.LegacyPlacementFixtures.addCompoundFullBlockAnchor(
                     world, fullBlockSupportPos, world.getBlockState(fullBlockSupportPos));
             world.setBlockState(torchPos, Blocks.AIR.getDefaultState(), net.minecraft.block.Block.NOTIFY_LISTENERS);
         });
@@ -9986,15 +9986,15 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
             world.setBlockState(towerAnchor, Blocks.STONE.getDefaultState(), net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, towerAnchor, world.getBlockState(towerAnchor));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, towerAnchor, world.getBlockState(towerAnchor));
             world.setBlockState(towerCarrier,
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(
+            com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(
                     world, towerCarrier, world.getBlockState(towerCarrier));
             world.setBlockState(compoundSourcePos, Blocks.STONE.getDefaultState(), net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, compoundSourcePos, world.getBlockState(compoundSourcePos));
-            SlabAnchorAttachment.addCompoundFullBlockAnchor(
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, compoundSourcePos, world.getBlockState(compoundSourcePos));
+            com.slabbed.dev.LegacyPlacementFixtures.addCompoundFullBlockAnchor(
                     world, compoundSourcePos, world.getBlockState(compoundSourcePos));
             // Support slab: plain bottom slab, NO compound-visible-lower mark yet.
             world.setBlockState(supportCandidatePos,
@@ -10069,7 +10069,7 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
             var world = server.getOverworld();
             BlockState supportState = world.getBlockState(supportCandidatePos);
             BlockState compoundState = world.getBlockState(compoundSourcePos);
-            SlabAnchorAttachment.addCompoundVisibleSideLowerSlab(
+            com.slabbed.dev.LegacyPlacementFixtures.addCompoundVisibleSideLowerSlab(
                     world, supportCandidatePos, supportState, compoundSourcePos, compoundState);
         });
         ctx.waitTick();
@@ -10406,12 +10406,12 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
             world.setBlockState(anchoredFullBlockPos, Blocks.STONE.getDefaultState(),
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, anchoredFullBlockPos,
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, anchoredFullBlockPos,
                     world.getBlockState(anchoredFullBlockPos));
             world.setBlockState(supportCandidatePos,
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(
+            com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(
                     world,
                     supportCandidatePos,
                     world.getBlockState(supportCandidatePos));
@@ -14168,7 +14168,7 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
                     world.setBlockState(supportPos,
                             Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP),
                             net.minecraft.block.Block.NOTIFY_LISTENERS);
-                    SlabAnchorAttachment.addCompoundVisibleSideUpperSlab(
+                    com.slabbed.dev.LegacyPlacementFixtures.addCompoundVisibleSideUpperSlab(
                             world,
                             supportPos,
                             world.getBlockState(supportPos),
@@ -16429,7 +16429,7 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
             world.setBlockState(lowerPos, lower, net.minecraft.block.Block.NOTIFY_LISTENERS);
             world.setBlockState(upperPos, upper, net.minecraft.block.Block.NOTIFY_LISTENERS);
             if (addLowerAnchor) {
-                SlabAnchorAttachment.addAnchor(world, lowerPos, world.getBlockState(lowerPos));
+                com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, lowerPos, world.getBlockState(lowerPos));
             }
             world.updateNeighbors(supportPos, world.getBlockState(supportPos).getBlock());
             world.updateNeighbors(lowerPos, world.getBlockState(lowerPos).getBlock());
@@ -17755,7 +17755,7 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
         singleplayer.getServer().runOnServer(server -> {
             var world = server.getOverworld();
             world.setBlockState(objectPos, objectState, net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, objectPos, world.getBlockState(objectPos));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, objectPos, world.getBlockState(objectPos));
             world.updateNeighbors(supportPos, world.getBlockState(supportPos).getBlock());
             world.updateNeighbors(objectPos, world.getBlockState(objectPos).getBlock());
         });
@@ -18144,14 +18144,14 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
             world.setBlockState(supportPos,
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP),
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addCompoundVisibleSideUpperSlab(
+            com.slabbed.dev.LegacyPlacementFixtures.addCompoundVisibleSideUpperSlab(
                     world,
                     supportPos,
                     world.getBlockState(supportPos),
                     compoundSourcePos,
                     world.getBlockState(compoundSourcePos));
             world.setBlockState(objectPos, visibleObjectState, net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, objectPos, world.getBlockState(objectPos));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, objectPos, world.getBlockState(objectPos));
             world.updateNeighbors(supportPos, world.getBlockState(supportPos).getBlock());
             world.updateNeighbors(objectPos, world.getBlockState(objectPos).getBlock());
         });
@@ -19037,16 +19037,16 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
                 net.minecraft.block.Block.NOTIFY_LISTENERS);
         world.setBlockState(towerAnchor, Blocks.STONE.getDefaultState(),
                 net.minecraft.block.Block.NOTIFY_LISTENERS);
-        SlabAnchorAttachment.addAnchor(world, towerAnchor, world.getBlockState(towerAnchor));
+        com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, towerAnchor, world.getBlockState(towerAnchor));
         world.setBlockState(compoundSourceSlab,
                 Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                 net.minecraft.block.Block.NOTIFY_LISTENERS);
-        SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(
+        com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(
                 world, compoundSourceSlab, world.getBlockState(compoundSourceSlab));
         world.setBlockState(supportPos, Blocks.STONE.getDefaultState(),
                 net.minecraft.block.Block.NOTIFY_LISTENERS);
-        SlabAnchorAttachment.addAnchor(world, supportPos, world.getBlockState(supportPos));
-        SlabAnchorAttachment.addCompoundFullBlockAnchor(world, supportPos, world.getBlockState(supportPos));
+        com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, supportPos, world.getBlockState(supportPos));
+        com.slabbed.dev.LegacyPlacementFixtures.addCompoundFullBlockAnchor(world, supportPos, world.getBlockState(supportPos));
     }
 
     private static void beta35PlaceLoweredTopOrDoubleSupport(
@@ -19062,7 +19062,7 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
                 net.minecraft.block.Block.NOTIFY_LISTENERS);
         world.setBlockState(anchoredCarrierBelow, Blocks.STONE.getDefaultState(),
                 net.minecraft.block.Block.NOTIFY_LISTENERS);
-        SlabAnchorAttachment.addAnchor(world, anchoredCarrierBelow, world.getBlockState(anchoredCarrierBelow));
+        com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, anchoredCarrierBelow, world.getBlockState(anchoredCarrierBelow));
         world.setBlockState(loweredDoubleCarrier,
                 Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE),
                 net.minecraft.block.Block.NOTIFY_LISTENERS);
@@ -20809,7 +20809,7 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
                 BlockPos fullBlockPos = supportCandidatePos.east().up();
                 world.setBlockState(fullBlockPos, Blocks.STONE.getDefaultState(),
                         net.minecraft.block.Block.NOTIFY_LISTENERS);
-                SlabAnchorAttachment.addAnchor(world, fullBlockPos, world.getBlockState(fullBlockPos));
+                com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, fullBlockPos, world.getBlockState(fullBlockPos));
             }
         });
     }
@@ -20824,21 +20824,21 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
                 net.minecraft.block.Block.NOTIFY_LISTENERS);
         world.setBlockState(towerAnchor, Blocks.STONE.getDefaultState(),
                 net.minecraft.block.Block.NOTIFY_LISTENERS);
-        SlabAnchorAttachment.addAnchor(world, towerAnchor, world.getBlockState(towerAnchor));
+        com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, towerAnchor, world.getBlockState(towerAnchor));
         world.setBlockState(towerCarrier,
                 Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                 net.minecraft.block.Block.NOTIFY_LISTENERS);
-        SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(world, towerCarrier,
+        com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(world, towerCarrier,
                 world.getBlockState(towerCarrier));
         world.setBlockState(compoundSourcePos, Blocks.STONE.getDefaultState(),
                 net.minecraft.block.Block.NOTIFY_LISTENERS);
-        SlabAnchorAttachment.addAnchor(world, compoundSourcePos, world.getBlockState(compoundSourcePos));
-        SlabAnchorAttachment.addCompoundFullBlockAnchor(world, compoundSourcePos,
+        com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, compoundSourcePos, world.getBlockState(compoundSourcePos));
+        com.slabbed.dev.LegacyPlacementFixtures.addCompoundFullBlockAnchor(world, compoundSourcePos,
                 world.getBlockState(compoundSourcePos));
         world.setBlockState(pos,
                 Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                 net.minecraft.block.Block.NOTIFY_LISTENERS);
-        SlabAnchorAttachment.addCompoundVisibleOwnerTopSlab(
+        com.slabbed.dev.LegacyPlacementFixtures.addCompoundVisibleOwnerTopSlab(
                 world,
                 pos,
                 world.getBlockState(pos),
@@ -21288,21 +21288,21 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
                         net.minecraft.block.Block.NOTIFY_LISTENERS);
                 world.setBlockState(towerAnchor, Blocks.STONE.getDefaultState(),
                         net.minecraft.block.Block.NOTIFY_LISTENERS);
-                SlabAnchorAttachment.addAnchor(world, towerAnchor, world.getBlockState(towerAnchor));
+                com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, towerAnchor, world.getBlockState(towerAnchor));
                 world.setBlockState(towerCarrier,
                         Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                         net.minecraft.block.Block.NOTIFY_LISTENERS);
-                SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(world, towerCarrier,
+                com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(world, towerCarrier,
                         world.getBlockState(towerCarrier));
                 world.setBlockState(compoundSourcePos, Blocks.STONE.getDefaultState(),
                         net.minecraft.block.Block.NOTIFY_LISTENERS);
-                SlabAnchorAttachment.addAnchor(world, compoundSourcePos, world.getBlockState(compoundSourcePos));
-                SlabAnchorAttachment.addCompoundFullBlockAnchor(world, compoundSourcePos,
+                com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, compoundSourcePos, world.getBlockState(compoundSourcePos));
+                com.slabbed.dev.LegacyPlacementFixtures.addCompoundFullBlockAnchor(world, compoundSourcePos,
                         world.getBlockState(compoundSourcePos));
                 world.setBlockState(supportCandidatePos,
                         Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                         net.minecraft.block.Block.NOTIFY_LISTENERS);
-                SlabAnchorAttachment.addCompoundVisibleOwnerTopSlab(
+                com.slabbed.dev.LegacyPlacementFixtures.addCompoundVisibleOwnerTopSlab(
                         world,
                         supportCandidatePos,
                         world.getBlockState(supportCandidatePos),
@@ -21317,7 +21317,7 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
                         net.minecraft.block.Block.NOTIFY_LISTENERS);
                 world.setBlockState(anchoredCarrierBelow, Blocks.STONE.getDefaultState(),
                         net.minecraft.block.Block.NOTIFY_LISTENERS);
-                SlabAnchorAttachment.addAnchor(world, anchoredCarrierBelow,
+                com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, anchoredCarrierBelow,
                         world.getBlockState(anchoredCarrierBelow));
                 world.setBlockState(loweredDoubleCarrier,
                         Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE),
@@ -21603,21 +21603,21 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
                         net.minecraft.block.Block.NOTIFY_LISTENERS);
                 world.setBlockState(towerAnchor, Blocks.STONE.getDefaultState(),
                         net.minecraft.block.Block.NOTIFY_LISTENERS);
-                SlabAnchorAttachment.addAnchor(world, towerAnchor, world.getBlockState(towerAnchor));
+                com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, towerAnchor, world.getBlockState(towerAnchor));
                 world.setBlockState(towerCarrier,
                         Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                         net.minecraft.block.Block.NOTIFY_LISTENERS);
-                SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(world, towerCarrier,
+                com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(world, towerCarrier,
                         world.getBlockState(towerCarrier));
                 world.setBlockState(compoundSourcePos, Blocks.STONE.getDefaultState(),
                         net.minecraft.block.Block.NOTIFY_LISTENERS);
-                SlabAnchorAttachment.addAnchor(world, compoundSourcePos, world.getBlockState(compoundSourcePos));
-                SlabAnchorAttachment.addCompoundFullBlockAnchor(world, compoundSourcePos,
+                com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, compoundSourcePos, world.getBlockState(compoundSourcePos));
+                com.slabbed.dev.LegacyPlacementFixtures.addCompoundFullBlockAnchor(world, compoundSourcePos,
                         world.getBlockState(compoundSourcePos));
                 world.setBlockState(supportCandidatePos,
                         Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                         net.minecraft.block.Block.NOTIFY_LISTENERS);
-                SlabAnchorAttachment.addCompoundVisibleOwnerTopSlab(
+                com.slabbed.dev.LegacyPlacementFixtures.addCompoundVisibleOwnerTopSlab(
                         world,
                         supportCandidatePos,
                         world.getBlockState(supportCandidatePos),
@@ -21632,7 +21632,7 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
                         net.minecraft.block.Block.NOTIFY_LISTENERS);
                 world.setBlockState(anchoredCarrierBelow, Blocks.STONE.getDefaultState(),
                         net.minecraft.block.Block.NOTIFY_LISTENERS);
-                SlabAnchorAttachment.addAnchor(world, anchoredCarrierBelow,
+                com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, anchoredCarrierBelow,
                         world.getBlockState(anchoredCarrierBelow));
                 world.setBlockState(loweredDoubleCarrier,
                         Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE),
@@ -22162,19 +22162,19 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
             world.setBlockState(lowerAnchorBlock, Blocks.STONE.getDefaultState(),
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, lowerAnchorBlock, world.getBlockState(lowerAnchorBlock));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, lowerAnchorBlock, world.getBlockState(lowerAnchorBlock));
             world.setBlockState(middleCarrierSlab,
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(
+            com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(
                     world, middleCarrierSlab, world.getBlockState(middleCarrierSlab));
             world.setBlockState(upperAnchorBlock, Blocks.STONE.getDefaultState(),
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, upperAnchorBlock, world.getBlockState(upperAnchorBlock));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, upperAnchorBlock, world.getBlockState(upperAnchorBlock));
             world.setBlockState(supportPos,
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(
+            com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(
                     world, supportPos, world.getBlockState(supportPos));
         });
     }
@@ -22454,22 +22454,22 @@ public final class SlabbedLabLoweredSidePlacementLiveReproClientGameTest impleme
                 // B — lower ordinary full block, anchored (hasBottomSlabBelow = baseSlab)
                 world.setBlockState(lowerAnchorBlock, Blocks.STONE.getDefaultState(),
                         net.minecraft.block.Block.NOTIFY_LISTENERS);
-                SlabAnchorAttachment.addAnchor(world, lowerAnchorBlock, world.getBlockState(lowerAnchorBlock));
+                com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, lowerAnchorBlock, world.getBlockState(lowerAnchorBlock));
                 // S — middle carrier slab (qualifies because lowerAnchorBlock is anchored)
                 world.setBlockState(middleCarrierSlab,
                         Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                         net.minecraft.block.Block.NOTIFY_LISTENERS);
-                SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(
+                com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(
                         world, middleCarrierSlab, world.getBlockState(middleCarrierSlab));
                 // B — upper ordinary full block, anchored (hasBottomSlabBelow = middleCarrierSlab)
                 world.setBlockState(upperAnchorBlock, Blocks.STONE.getDefaultState(),
                         net.minecraft.block.Block.NOTIFY_LISTENERS);
-                SlabAnchorAttachment.addAnchor(world, upperAnchorBlock, world.getBlockState(upperAnchorBlock));
+                com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, upperAnchorBlock, world.getBlockState(upperAnchorBlock));
                 // S — support slab (qualifies because upperAnchorBlock is anchored)
                 world.setBlockState(supportPos,
                         Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                         net.minecraft.block.Block.NOTIFY_LISTENERS);
-                SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(
+                com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(
                         world, supportPos, world.getBlockState(supportPos));
                 // Clear torch position
                 world.setBlockState(torchPos, Blocks.AIR.getDefaultState(),

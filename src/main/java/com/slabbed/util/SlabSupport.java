@@ -96,19 +96,9 @@ public final class SlabSupport {
         return block == Registries.BLOCK.get(PALE_MOSS_CARPET_ID);
     }
 
-    /** Carpet layers share the support's visible plane when they have no stored seat (LAW.md). */
+    /** Identifies thin carpet geometry; positions come only from saved facts (LAW.md). */
     public static boolean isCarpetLike(BlockState state) {
         return state != null && (state.getBlock() instanceof CarpetBlock || isPaleMossCarpet(state.getBlock()));
-    }
-
-    private static double legacyCarpetSupportDy(BlockView world, BlockPos pos) {
-        BlockPos belowPos = pos.down();
-        BlockState below = world.getBlockState(belowPos);
-        if (below.isAir() || isThinTopLayer(below)) return 0.0d;
-        double supportDy = getYOffset(world, belowPos, below);
-        VoxelShape base = below.getOutlineShape(EmptyBlockView.INSTANCE, BlockPos.ORIGIN);
-        if (base.isEmpty()) return 0.0d;
-        return supportDy + base.getMax(Direction.Axis.Y) - 1.0d;
     }
 
     /**
@@ -223,10 +213,6 @@ public final class SlabSupport {
         }
         Block block = state.getBlock();
         return block instanceof net.minecraft.block.TorchBlock && !(block instanceof WallTorchBlock);
-    }
-
-    private static boolean isBeta35FloorTopContactObject(BlockState state) {
-        return state != null && (state.isOf(Blocks.CANDLE) || state.isOf(Blocks.FLOWER_POT));
     }
 
     public static boolean isBeta35FloorButtonContactObject(BlockState state) {
@@ -520,26 +506,7 @@ public final class SlabSupport {
      * lowered block. Chains are intentionally excluded so they keep extending to
      * connect to the support.
      */
-    private static boolean isBeta35LoweredFullBlockUndersideVisibleOwnerObject(
-            BlockView world, BlockPos pos, BlockState state
-    ) {
-        if (world == null || pos == null || state == null || state.isAir() || !state.getFluidState().isEmpty()) {
-            return false;
-        }
-        Block block = state.getBlock();
-        boolean supportedCeilingObject = state.isOf(Blocks.LANTERN)
-                || state.isOf(Blocks.SOUL_LANTERN)
-                || block instanceof SporeBlossomBlock
-                || block instanceof HangingRootsBlock
-                || isPaleHangingMossBlock(state);
-        if (!supportedCeilingObject) {
-            return false;
-        }
-        BlockPos supportPos = pos.up();
-        BlockState supportState = world.getBlockState(supportPos);
-        double supportDy = loweredFullBlockUndersideSupportDy(world, supportPos, supportState);
-        return Double.isFinite(supportDy) && supportDy < -1.0e-6d;
-    }
+
 
     public static boolean isBeta35FenceWallVariantContactObject(BlockState state) {
         return state != null
@@ -585,23 +552,6 @@ public final class SlabSupport {
         return state != null && state.getBlock() instanceof FenceGateBlock;
     }
 
-    private static boolean isBeta35OakTrapdoorContactObject(BlockState state) {
-        return state != null
-                && state.isOf(Blocks.OAK_TRAPDOOR)
-                && state.contains(Properties.BLOCK_HALF)
-                && state.get(Properties.BLOCK_HALF) == BlockHalf.BOTTOM;
-    }
-
-    private static boolean isBeta35RegularDoorContactObject(BlockState state) {
-        return state != null
-                && state.getBlock() instanceof DoorBlock
-                && state.contains(Properties.DOUBLE_BLOCK_HALF);
-    }
-
-    private static boolean isBeta35StandingOakSignContactObject(BlockState state) {
-        return state != null && state.isOf(Blocks.OAK_SIGN);
-    }
-
     private static double loweredSlabUndersideSupportDy(BlockView world, BlockPos pos, BlockState state) {
         if (world == null || pos == null || state == null || !(state.getBlock() instanceof SlabBlock)
                 || !state.contains(SlabBlock.TYPE) || !state.getFluidState().isEmpty()) {
@@ -621,92 +571,6 @@ public final class SlabSupport {
             return -0.5d;
         }
         return 0.0d;
-    }
-
-    /**
-     * Recursion-safe analogue of {@link #loweredSlabUndersideSupportDy} for a
-     * SOLID, NON-SLAB full-block ceiling support. Returns EXACTLY the dy that
-     * {@link #getYOffsetInner} assigns the full block at {@code pos}, computed
-     * without delegating to {@link #getYOffset} so it is safe to call inside the
-     * {@link #IN_GET_Y_OFFSET} recursion guard. Decorative hangers
-     * (lantern / soul lantern / spore blossom / hanging roots / pale hanging
-     * moss) follow this value down so they hang flush under a lowered support
-     * instead of clipping up into it.
-     *
-     * <p>Every predicate invoked here ({@code isAnchored},
-     * {@code isCompoundFullBlockAnchor}, {@link #isOrdinaryFullBlockWithCompoundDy},
-     * the {@code beta35*ContactDy} family, {@link #shouldOffset},
-     * {@link #slabColumnYOffset}) is already invoked by {@link #getYOffsetInner}
-     * under the same guard, so this mirror adds no new recursion risk and returns
-     * the support's true rendered dy by construction.
-     *
-     * <p>Only ever returns {@code 0.0}, a negative lowered dy ({@code -0.5} /
-     * {@code -1.0}), or {@link Double#NaN} (not a lowered full block — the hanger
-     * keeps its natural dy). Never returns a positive dy: top-slab {@code +0.5}
-     * adherence is a separate downstream branch and full blocks are not top slabs.
-     */
-    private static double loweredFullBlockUndersideSupportDy(BlockView world, BlockPos pos, BlockState state) {
-        if (world == null || pos == null || state == null
-                || state.isAir()
-                || state.getBlock() instanceof SlabBlock
-                || !state.getFluidState().isEmpty()
-                || !state.isSolidBlock(world, pos)) {
-            return Double.NaN;
-        }
-        // ── anchored full block: mirror the getYOffsetInner anchor branch ──────
-        if (SlabAnchorAttachment.isAnchored(world, pos)) {
-            // compound (-1.0): compound anchor OR resting on an adjacent-side-lowered bottom slab
-            if (isOrdinaryFullBlockWithCompoundDy(world, pos, state)) {
-                return -1.0d;
-            }
-            double specialFullblockContactDy = beta35SpecialFullblockContactDy(world, pos, state);
-            if (Double.isFinite(specialFullblockContactDy)) {
-                return specialFullblockContactDy;
-            }
-            double oakTrapdoorContactDy = beta35OakTrapdoorContactDy(world, pos, state);
-            if (Double.isFinite(oakTrapdoorContactDy)) {
-                return oakTrapdoorContactDy;
-            }
-            double regularDoorContactDy = beta35RegularDoorContactDy(world, pos, state);
-            if (Double.isFinite(regularDoorContactDy)) {
-                return regularDoorContactDy;
-            }
-            double standingOakSignContactDy = beta35StandingOakSignContactDy(world, pos, state);
-            if (Double.isFinite(standingOakSignContactDy)) {
-                return standingOakSignContactDy;
-            }
-            double floorButtonContactDy = beta35FloorButtonContactDy(world, pos, state);
-            if (Double.isFinite(floorButtonContactDy)) {
-                return floorButtonContactDy;
-            }
-            return -0.5d;
-        }
-        // ── non-anchored: mirror the standalone contact dys in getYOffsetInner ──
-        // (only special/ordinary full-block contacts can be finite for a solid
-        // full block; the button/fence/gate/trapdoor/door/sign contacts require
-        // non-solid owner types and would be NaN here.)
-        double specialFullblockContactDy = beta35SpecialFullblockContactDy(world, pos, state);
-        if (Double.isFinite(specialFullblockContactDy)) {
-            return specialFullblockContactDy;
-        }
-        double ordinaryFullBlockContactDy = beta35OrdinaryFullBlockContactDy(world, pos, state);
-        if (Double.isFinite(ordinaryFullBlockContactDy)) {
-            return ordinaryFullBlockContactDy;
-        }
-        // ── non-anchored full block lowered by a slab in its column ─────────────
-        if (shouldOffset(world, pos, state)) {
-            BlockPos belowPos = pos.down();
-            BlockState below = world.getBlockState(belowPos);
-            if (isBottomSlab(below) && isAdjacentSideSlabLowered(world, belowPos, below)) {
-                return -1.0d;
-            }
-            double columnDy = slabColumnYOffset(world, pos);
-            if (columnDy != 0.0d) {
-                return columnDy;
-            }
-            return -0.5d;
-        }
-        return Double.NaN;
     }
 
     private static double beta35FenceWallVariantContactDy(BlockView world, BlockPos pos, BlockState state) {
@@ -760,19 +624,6 @@ public final class SlabSupport {
         return Double.NaN;
     }
 
-    private static double beta35FenceGateContactDy(BlockView world, BlockPos pos, BlockState state) {
-        if (world == null || pos == null || !isBeta35FenceGateContactObject(state)) {
-            return Double.NaN;
-        }
-        BlockPos supportPos = pos.down();
-        BlockState supportState = world.getBlockState(supportPos);
-        double supportDy = floorTorchBottomSlabSupportDy(world, supportPos, supportState);
-        if (Double.isFinite(supportDy) && supportDy < -1.0e-6d) {
-            return supportDy - 0.5d;
-        }
-        return Double.NaN;
-    }
-
     private static double beta35FloorButtonContactDy(BlockView world, BlockPos pos, BlockState state) {
         if (world == null || pos == null || !isBeta35FloorButtonContactObject(state)) {
             return Double.NaN;
@@ -785,114 +636,6 @@ public final class SlabSupport {
         double supportDy = beta35FenceWallVisibleSupportDy(world, supportPos, supportState);
         if (Double.isFinite(supportDy) && supportDy < -1.0e-6d) {
             return supportDy + getSupportYOffset(supportState) - 1.0d;
-        }
-        return Double.NaN;
-    }
-
-    private static double beta35OakTrapdoorContactDy(BlockView world, BlockPos pos, BlockState state) {
-        if (world == null || pos == null || !isBeta35OakTrapdoorContactObject(state)) {
-            return Double.NaN;
-        }
-        BlockPos supportPos = pos.down();
-        BlockState supportState = world.getBlockState(supportPos);
-        double supportDy = floorTorchBottomSlabSupportDy(world, supportPos, supportState);
-        if (Double.isFinite(supportDy) && supportDy < -1.0e-6d) {
-            return supportDy - 0.5d;
-        }
-        return Double.NaN;
-    }
-
-    private static double beta35RegularDoorContactDy(BlockView world, BlockPos pos, BlockState state) {
-        if (world == null || pos == null || !isBeta35RegularDoorContactObject(state)) {
-            return Double.NaN;
-        }
-        BlockPos bottomPos = pos;
-        if (state.get(Properties.DOUBLE_BLOCK_HALF) == DoubleBlockHalf.UPPER) {
-            bottomPos = pos.down();
-            BlockState bottomState = world.getBlockState(bottomPos);
-            if (!isBeta35RegularDoorContactObject(bottomState)
-                    || bottomState.get(Properties.DOUBLE_BLOCK_HALF) != DoubleBlockHalf.LOWER) {
-                return Double.NaN;
-            }
-        }
-        BlockPos supportPos = bottomPos.down();
-        BlockState supportState = world.getBlockState(supportPos);
-        double supportDy = floorTorchBottomSlabSupportDy(world, supportPos, supportState);
-        if (Double.isFinite(supportDy) && supportDy < -1.0e-6d) {
-            return supportDy - 0.5d;
-        }
-        return Double.NaN;
-    }
-
-    private static double beta35StandingOakSignContactDy(BlockView world, BlockPos pos, BlockState state) {
-        if (world == null || pos == null || !isBeta35StandingOakSignContactObject(state)) {
-            return Double.NaN;
-        }
-        BlockPos supportPos = pos.down();
-        BlockState supportState = world.getBlockState(supportPos);
-        double supportDy = floorTorchBottomSlabSupportDy(world, supportPos, supportState);
-        if (Double.isFinite(supportDy) && supportDy < -1.0e-6d) {
-            return supportDy - 0.5d;
-        }
-        return Double.NaN;
-    }
-
-    private static boolean isBeta35OrdinaryFullBlockContactObject(BlockView world, BlockPos pos, BlockState state) {
-        if (world == null || pos == null || state == null
-                || state.isAir()
-                || state.getBlock() instanceof SlabBlock
-                || !state.getFluidState().isEmpty()) {
-            return false;
-        }
-        Block block = state.getBlock();
-        if (!(block instanceof CraftingTableBlock || block instanceof BlockEntityProvider)) {
-            return false;
-        }
-        return state.isSolidBlock(world, pos);
-    }
-
-    private static double beta35OrdinaryFullBlockContactDy(BlockView world, BlockPos pos, BlockState state) {
-        if (!isBeta35OrdinaryFullBlockContactObject(world, pos, state)) {
-            return Double.NaN;
-        }
-        BlockPos supportPos = pos.down();
-        BlockState supportState = world.getBlockState(supportPos);
-        double supportDy = floorTorchBottomSlabSupportDy(world, supportPos, supportState);
-        if (Double.isFinite(supportDy) && supportDy < -1.0e-6d) {
-            return supportDy - 0.5d;
-        }
-        return Double.NaN;
-    }
-
-    private static boolean isBeta35SpecialFullblockContactObject(BlockState state) {
-        if (state == null) {
-            return false;
-        }
-        Block block = state.getBlock();
-        return block == Blocks.CRAFTING_TABLE
-                || block == Blocks.FURNACE
-                || block == Blocks.BOOKSHELF
-                || block == Blocks.CHEST
-                || block == Blocks.BARREL
-                || block == Blocks.ENCHANTING_TABLE
-                || block == Blocks.STONECUTTER
-                || block == Blocks.ANVIL
-                || block == Blocks.GRINDSTONE;
-    }
-
-    private static double beta35SpecialFullblockContactDy(BlockView world, BlockPos pos, BlockState state) {
-        if (world == null || pos == null || state == null
-                || state.isAir()
-                || state.getBlock() instanceof SlabBlock
-                || !state.getFluidState().isEmpty()
-                || !isBeta35SpecialFullblockContactObject(state)) {
-            return Double.NaN;
-        }
-        BlockPos supportPos = pos.down();
-        BlockState supportState = world.getBlockState(supportPos);
-        double supportDy = floorTorchBottomSlabSupportDy(world, supportPos, supportState);
-        if (Double.isFinite(supportDy) && supportDy < -1.0e-6d) {
-            return supportDy - 0.5d;
         }
         return Double.NaN;
     }
@@ -957,7 +700,6 @@ public final class SlabSupport {
     private static final int MAX_CHAIN_DEPTH = SUPPORT_COLUMN_DEPTH;
 
     /** Recursion guard: prevents StackOverflow when isSolidBlock triggers getOutlineShape → getYOffset. */
-    private static final ThreadLocal<Boolean> IN_GET_Y_OFFSET = ThreadLocal.withInitial(() -> Boolean.FALSE);
 
     /** Kill switch for the slab-height step-face cull relaxation ({@link #isSlabHeightStepFace}). */
     private static final boolean STEP_CULL_DISABLED = Boolean.getBoolean("slabbed.disableStepCull");
@@ -1014,79 +756,6 @@ public final class SlabSupport {
      * where such a block sits over a TS slab without a top slab directly above it,
      * which the up-walk in {@link #isCeilingHungFromAbove} would otherwise miss.
      */
-    private static boolean isAlwaysCeilingHungDecoration(BlockState state) {
-        Block block = state.getBlock();
-        return block instanceof HangingRootsBlock
-                || block instanceof SporeBlossomBlock
-                || block instanceof HangingSignBlock
-                || block instanceof CaveVinesHeadBlock
-                || block instanceof CaveVinesBodyBlock;
-    }
-
-    /**
-     * Narrow successor to a blunt {@code isCeilingAttached} check, used ONLY by the
-     * directCustom (object-resting-on-a-TS-slab) lowering gate. Returns true only for
-     * instances that are GENUINELY hung from above; a FLOOR-standing instance of a
-     * ceiling-CAPABLE block (a chain resting on a slab, an upward dripstone, a floor
-     * bell/lever/button) returns false so it lowers -0.5 to sit flush — mirroring the
-     * vanilla-bottom-slab {@link #shouldOffset} nuance (which lowers those via
-     * {@code hasSlabInColumn} and only excludes a block when a top slab / ceiling-chain
-     * is directly ABOVE or it is HANGING).
-     *
-     * <p>View-independent (no {@code isSolidBlock}); does NOT call {@code getYOffset}
-     * (safe inside the {@code IN_GET_Y_OFFSET} recursion guard).
-     */
-    private static boolean isCeilingHungFromAbove(BlockView world, BlockPos pos, BlockState state) {
-        // hanging lantern / hanging sign (HANGING=true)
-        if (state.contains(Properties.HANGING) && state.get(Properties.HANGING)) {
-            return true;
-        }
-        // identity hangers (no floor variant) — exclude regardless of what's above
-        if (isAlwaysCeilingHungDecoration(state)) {
-            return true;
-        }
-        // only ceiling-CAPABLE blocks can be hung; everything else is floor-standing
-        if (!isCeilingAttached(state)) {
-            return false;
-        }
-        // vertical chain directly under a ceiling support (TOP *or DOUBLE* slab) renders the
-        // elongated ChainCeilingGeometry model at dy=0; it must skip directCustom so the dy lane
-        // cannot double-offset against that geometry. The up-walk below catches a TOP slab via
-        // isTopSlab; this also catches a DOUBLE slab directly above, matching exactly the
-        // predicate that triggers the elongated model (isVerticalChainDirectlyUnderCeilingSupport).
-        if (isVerticalChainDirectlyUnderCeilingSupport(world, pos, state)) {
-            return true;
-        }
-        // dripstone: DOWN hangs, UP stands on the floor
-        if (state.getBlock() instanceof PointedDripstoneBlock) {
-            return state.contains(Properties.VERTICAL_DIRECTION)
-                    && state.get(Properties.VERTICAL_DIRECTION) == Direction.DOWN;
-        }
-        // lever / button: CEILING face hangs; FLOOR / WALL stand
-        if (state.contains(Properties.BLOCK_FACE) && state.get(Properties.BLOCK_FACE) == BlockFace.CEILING) {
-            return true;
-        }
-        // bell: CEILING attachment hangs; FLOOR / WALL stand
-        if (state.contains(Properties.ATTACHMENT) && state.get(Properties.ATTACHMENT) == Attachment.CEILING) {
-            return true;
-        }
-        // otherwise hung only when a top slab / ceiling-chain is directly ABOVE
-        // (mirrors shouldOffset's up-walk at lines ~998-1011). Covers Y-chains and
-        // top-half trapdoors that bridge up to a top slab (chain ceiling geometry).
-        BlockPos cursor = pos.up();
-        for (int i = 0; i < MAX_CHAIN_DEPTH; i++) {
-            BlockState cur = world.getBlockState(cursor);
-            if (isTopSlab(cur)) {
-                return true;
-            }
-            if (isCeilingAttached(cur)) {
-                cursor = cursor.up();
-                continue;
-            }
-            break;
-        }
-        return false;
-    }
 
     /**
      * Master check: should the block at {@code pos} with state {@code state}
@@ -1196,76 +865,12 @@ public final class SlabSupport {
         return false;
     }
 
-    /**
-     * Returns the Y offset for the block at {@code pos}.
-     * <ul>
-     *   <li>{@code -0.5} for blocks sitting above a bottom slab (or chain).</li>
-     *   <li>{@code +0.5} for hanging blocks (HANGING=true) directly below a top slab.</li>
-     *   <li>{@code 0.0} otherwise (no offset).</li>
-     * </ul>
-     */
+    /** Returns the exact stored height, or native zero when absent (LAW.md). */
     public static double getYOffset(BlockView world, BlockPos pos, BlockState state) {
         return com.slabbed.anchor.PlacementGeometry.offsetY(world, pos, state);
     }
 
     /** Read-only provenance boundary for existing terrain above a new player support (LAW.md). */
-    private static boolean hasModernColumnSupport(BlockView world, BlockPos pos) {
-        BlockPos cursor = pos.down();
-        for (int i = 0; i < MAX_CHAIN_DEPTH; i++, cursor = cursor.down()) {
-            BlockState support = world.getBlockState(cursor);
-            if (support.isAir()) return false;
-            if (SlabAnchorAttachment.usesFrozenPlacementHeight(world, cursor)) return true;
-            if (support.contains(SlabBlock.TYPE) || isThinTopLayer(support)) return false;
-        }
-        return false;
-    }
-
-    /**
-     * The explicit placement-time offset reading at {@code pos}: byte-identical to
-     * {@link #getYOffset} except that it omits the frozen-store branch, so it always goes straight to
-     * the live lanes. Read-only and side-effect-free; it shares the same null / air / compat-skip
-     * guards, the same powder-snow hard zero, the same {@link #IN_GET_Y_OFFSET} recursion guard and
-     * the same Terrain Slabs full-cube lane.
-     *
-     * <p>Under frozen-OFF the two entries are the same code. Its callers are exactly the seams that
-     * must judge a cell whose placement fact does not exist yet: the C3 capture in
-     * {@code BlockItemPlacementIntentMixin}, the placement-time classifiers in
-     * {@code SlabAnchorAttachment}, and the scene fixture that authors facts for {@code setBlockState}
-     * terrain. It does not alter {@link #getYOffset} or any lane.
-     */
-    public static double getUnstoredYOffset(BlockView world, BlockPos pos, BlockState state) {
-        if (world == null || pos == null) {
-            return 0.0;
-        }
-        if (state == null || state.isAir()) {
-            return 0.0;
-        }
-        if (isUnsafeGeometryView(world)) {
-            return 0.0d;
-        }
-        if (CompatHooks.shouldSkipOffset(state)) {
-            return 0.0;
-        }
-        if (state.getBlock() instanceof PowderSnowBlock) {
-            return 0.0;
-        }
-        // Deliberately skips getYOffset's frozen-store / stable-flat policy: this IS the explicit
-        // placement-time offset value, straight from the live lanes.
-        if (IN_GET_Y_OFFSET.get()) {
-            return 0.0;
-        }
-        if (isCarpetLike(state)) return legacyCarpetSupportDy(world, pos);
-        IN_GET_Y_OFFSET.set(Boolean.TRUE);
-        try {
-            double tsBottomFullCubeDy = placedTerrainSlabBottomFullCubeDy(world, pos, state);
-            if (!Double.isNaN(tsBottomFullCubeDy)) {
-                return tsBottomFullCubeDy;
-            }
-            return getYOffsetInner(world, pos, state);
-        } finally {
-            IN_GET_Y_OFFSET.set(Boolean.FALSE);
-        }
-    }
 
     /**
      * Exposed faces between blocks with different stored seats must remain in the mesh.
@@ -1322,18 +927,7 @@ public final class SlabSupport {
         return Math.abs(difference) > 1.0e-6;
     }
 
-    /**
-     * Returns true if {@code slabPos} holds any slab variant (BOTTOM, TOP, or
-     * DOUBLE) that is adjacent to a solid full block sitting on a bottom slab —
-     * the exact condition that gives the slab its -0.5 adjacent-side-slab dy.
-     * Does not call getYOffset (safe inside the IN_GET_Y_OFFSET recursion guard).
-     *
-     * <p>BOTTOM → BS-FB-0.5S (slab visually fills the lower half beside the
-     * lowered FB, world Y span [pos.y - 0.5, pos.y]).
-     * <br>TOP → BS-FB-1S (slab visually fills the upper half beside the lowered
-     * FB, world Y span [pos.y, pos.y + 0.5]).
-     * <br>DOUBLE → full-cube alignment with the lowered FB.
-     */
+
     public static boolean isCompatibleLoweredSlabLane(SlabType existingType, SlabType incomingType) {
         return existingType == incomingType
                 || existingType == SlabType.DOUBLE
@@ -1688,15 +1282,7 @@ public final class SlabSupport {
                 && isAdjacentSideSlabLowered(world, pos, state);
     }
 
-    /**
-     * Beta4 compound-source predicate: the position is a bottom slab that is itself
-     * lowered (persistent lowered slab carrier or adjacent-side-slab lowered), so an
-     * ordinary full block placed directly above it is authored at compound lane
-     * {@code dy=-1.0}. Mirrors the inline check inside the anchored compound branch
-     * of {@link #getYOffsetInner}; exposed publicly so
-     * {@link com.slabbed.anchor.SlabAnchorAttachment#qualifiesForCompoundFullBlockAnchor}
-     * can decide sidecar authoring without duplicating the logic.
-     */
+
     public static boolean isLoweredCompoundSourceSlab(BlockView world, BlockPos pos, BlockState state) {
         return state != null
                 && isBottomSlab(state)
@@ -1786,108 +1372,6 @@ public final class SlabSupport {
         return hasBottomBelow || anchored;
     }
 
-    /**
-     * A solid, non-slab, non-block-entity full block with AIR directly below it —
-     * i.e. a block cantilevered out over empty space, the only case where merging a
-     * full block down to a lowered neighbour is wanted (a block resting on solid
-     * ground must NOT sink). Recursion-safe ({@code isSolidBlock} is guarded by
-     * {@link #IN_GET_Y_OFFSET}); never calls {@link #getYOffset}.
-     */
-    private static boolean isCantileverFullBlockCandidate(BlockView world, BlockPos pos, BlockState state) {
-        return world != null
-                && pos != null
-                && state != null
-                && !state.isAir()
-                && !(state.getBlock() instanceof SlabBlock)
-                && !(state.getBlock() instanceof BlockEntityProvider)
-                && state.getFluidState().isEmpty()
-                && state.isSolidBlock(world, pos)
-                && world.getBlockState(pos.down()).isAir();
-    }
-
-    /**
-     * A full block that is GENUINELY lowered by its own support — a slab directly
-     * below, a direct/vertical anchor, or a lowered column reaching a slab beneath it
-     * (e.g. an upper log in a lowered trunk). This is the "anchor" a cantilever lane
-     * may hang off of; cantilever-lowered blocks themselves are deliberately excluded
-     * (they are lane members, reached by the walk, not sources) so lowering can never
-     * be self-sustaining without a real support. Recursion-safe: every predicate here
-     * is already invoked by {@link #getYOffsetInner} under the {@link #IN_GET_Y_OFFSET}
-     * guard and none call {@link #getYOffset}.
-     */
-    private static boolean isGenuinelyLoweredFullBlockSource(BlockView world, BlockPos pos, BlockState state) {
-        if (world == null || pos == null || state == null
-                || state.isAir()
-                || state.getBlock() instanceof SlabBlock
-                || !state.getFluidState().isEmpty()
-                || !state.isSolidBlock(world, pos)) {
-            return false;
-        }
-        return hasBottomSlabBelow(world, pos)
-                || SlabAnchorAttachment.isAnchored(world, pos)
-                || (shouldOffset(world, pos, state) && slabColumnYOffset(world, pos) < -1.0e-6);
-    }
-
-    /**
-     * Geometric, recursion-safe replacement for the (removed) stale side-adjacent
-     * full-block anchor: a full block cantilevered over air lowers {@code -0.5} to
-     * merge flush with a lowered tower it is connected to, computed live so it
-     * recomputes whenever the structure changes — it never goes stale and never
-     * "pops" out of sync with its neighbours.
-     *
-     * <p>Breadth-first walk through connected cantilever full blocks (each over air),
-     * bounded by {@link #MAX_CHAIN_DEPTH}, returning true as soon as the lane reaches
-     * a GENUINE lowered source: a full-block carrier lowered by a slab below it or a
-     * direct/vertical anchor ({@link #isLoweredFullBlockCarrier}), or a lowered slab
-     * ({@link #isAdjacentSideSlabLowered}) so mixed slab+block canopies settle at one
-     * consistent level. Mirrors the slab lane BFS ({@code hasLoweredSlabLaneSupport})
-     * and the proven 1.21.11 {@code isAdjacentToLoweredFullBlock} model. Calls neither
-     * {@link #getYOffset} nor itself with circular dependence, so it is safe inside the
-     * {@link #IN_GET_Y_OFFSET} guard.
-     */
-    private static boolean isCantileverLoweredFullBlock(BlockView world, BlockPos pos, BlockState state) {
-        if (!isCantileverFullBlockCandidate(world, pos, state)) {
-            return false;
-        }
-        ArrayDeque<BlockPos> queue = new ArrayDeque<>();
-        Set<Long> visited = new HashSet<>();
-        queue.add(pos);
-        visited.add(pos.asLong());
-        while (!queue.isEmpty() && visited.size() <= MAX_CHAIN_DEPTH) {
-            BlockPos cursor = queue.removeFirst();
-            for (Direction dir : Direction.Type.HORIZONTAL) {
-                BlockPos neighborPos = cursor.offset(dir);
-                BlockState neighbor = world.getBlockState(neighborPos);
-                if (neighbor == null || neighbor.isAir()) {
-                    continue;
-                }
-                boolean neighborIsSlab = neighbor.getBlock() instanceof SlabBlock;
-                // Genuine lowered source: a full block lowered by its own support
-                // (slab-below / anchor / lowered column), or a lowered slab. Reaching
-                // one lowers the whole cantilever lane.
-                if (!neighborIsSlab && isGenuinelyLoweredFullBlockSource(world, neighborPos, neighbor)) {
-                    return true;
-                }
-                if (neighborIsSlab && isAdjacentSideSlabLowered(world, neighborPos, neighbor)) {
-                    return true;
-                }
-                // Propagate only through further cantilever full blocks (over air).
-                if (!neighborIsSlab
-                        && isCantileverFullBlockCandidate(world, neighborPos, neighbor)
-                        && visited.add(neighborPos.asLong())) {
-                    queue.addLast(neighborPos);
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Returns true when the non-slab solid block at {@code pos} carries compound dy=-1.0 —
-     * i.e. the same conditions that cause {@link #getYOffsetInner} to return -1.0 for it.
-     * Safe to call inside the IN_GET_Y_OFFSET recursion guard: does not delegate to getYOffset.
-     * Used exclusively by the floor-torch full-block support branch.
-     */
     private static boolean isOrdinaryFullBlockWithCompoundDy(BlockView world, BlockPos pos, BlockState state) {
         if (world == null || pos == null || state == null
                 || state.isAir()
@@ -2010,391 +1494,6 @@ public final class SlabSupport {
         return hasLoweredSlabLaneSupport(world, slabPos, slabState);
     }
 
-    private static double getYOffsetInner(BlockView world, BlockPos pos, BlockState state) {
-        // Slab-on-offset-block: a slab placed on top of a solid block that sits on a bottom slab
-        // inherits the same -0.5 dy so the stack stays visually continuous (no gap).
-        if (state.getBlock() instanceof SlabBlock) {
-            if (SlabAnchorAttachment.isCompoundVisibleSideDoubleSlab(world, pos, state)) {
-                return -1.0;
-            }
-            if (SlabAnchorAttachment.isCompoundVisibleSideLowerSlab(world, pos, state)) {
-                return -1.0;
-            }
-            if (SlabAnchorAttachment.isCompoundVisibleSideUpperSlab(world, pos, state)) {
-                return -1.0;
-            }
-            if (SlabAnchorAttachment.isCompoundVisibleOwnerTopSlab(world, pos, state)) {
-                return -1.0;
-            }
-            // FREEZE-ON-PLACE: a slab locked lowered at placement (freezeLoweredOnPlace) reads
-            // its anchor and never recomputes — so breaking an adjacent source can no longer
-            // pop it back up, and its rendered mesh never drifts from the value.
-            if (SlabAnchorAttachment.isAnchored(world, pos)) {
-                return -0.5;
-            }
-            // FREEZE-ON-PLACE: a slab locked FLAT at placement stays at 0 — a lowered carrier
-            // placed beside/under it later can no longer make it inherit a lowered position.
-            if (SlabAnchorAttachment.isFrozenFlat(world, pos)) {
-                return 0.0;
-            }
-            if (state.contains(SlabBlock.TYPE)
-                    && state.get(SlabBlock.TYPE) == SlabType.BOTTOM
-                    && isBottomPersistentTracePos(pos)) {
-                boolean persistentCarrier = SlabAnchorAttachment.isPersistentLoweredSlabCarrier(world, pos, state);
-                boolean nonRecursiveBottomCarrier =
-                        SlabAnchorAttachment.isPersistentLoweredBottomSlabCarrierNonRecursive(world, pos, state);
-                boolean branchReached = state.getFluidState().isEmpty() && nonRecursiveBottomCarrier;
-                Slabbed.LOGGER.info("[BOTTOM_PERSISTENT] getYOffsetInner pos=" + pos.toShortString()
-                        + " state=" + state
-                        + " slabType=" + state.get(SlabBlock.TYPE)
-                        + " fluidEmpty=" + state.getFluidState().isEmpty()
-                        + " worldClass=" + world.getClass().getName()
-                        + " guard=" + IN_GET_Y_OFFSET.get()
-                        + " persistentLoweredSlabCarrier=" + persistentCarrier
-                        + " nonRecursiveBottomCarrier=" + nonRecursiveBottomCarrier
-                        + " branchReached=" + branchReached);
-            }
-            if (state.contains(SlabBlock.TYPE)
-                    && state.get(SlabBlock.TYPE) == SlabType.BOTTOM
-                    && state.getFluidState().isEmpty()
-                    && SlabAnchorAttachment.isPersistentLoweredBottomSlabCarrierNonRecursive(world, pos, state)) {
-                if (isBottomPersistentTracePos(pos)) {
-                    Slabbed.LOGGER.info("[BOTTOM_PERSISTENT] branch=return_-0.5 pos=" + pos.toShortString());
-                }
-                return -0.5;
-            }
-            BlockPos belowPos = pos.down();
-            BlockState below = world.getBlockState(belowPos);
-            Block belowBlock = below.getBlock();
-            if (belowBlock instanceof SlabBlock) {
-                if (isLoweredDoubleSlabCarrier(world, belowPos, below)) {
-                    return -0.5;
-                }
-            } else if (!isCompoundVisibleOwnerTopSlab(world, pos, state)
-                    && hasLoweredCarrierBelow(world, pos)) {
-                return -0.5;
-            }
-            // Adjacent-side-slab alignment: a slab placed at the side of a
-            // lowered full block must visually inherit the lowered -0.5 dy so model/outline/
-            // raycast align with the neighbor. Use hasBottomSlabBelow directly: calling
-            // getYOffset here would be short-circuited to 0.0 by the IN_GET_Y_OFFSET recursion
-            // guard since this code runs inside getYOffsetInner.
-            if (!isCompoundVisibleOwnerTopSlab(world, pos, state)
-                    && isAdjacentSideSlabLowered(world, pos, state)) {
-                return -0.5;
-            }
-        }
-
-        // Persistent slab-anchor: an ordinary FB placed directly on a bottom slab is
-        // recorded on the chunk via SlabAnchorAttachment at placement time and cleared
-        // when the FB itself is broken/replaced. Anchors persist across supporting BS
-        // removal so the FB does not visually jump upward.
-        // Only honour anchors for non-slab blocks; slabs were handled above.
-        if (!(state.getBlock() instanceof SlabBlock)
-                && com.slabbed.anchor.SlabAnchorAttachment.isAnchored(world, pos)) {
-            // Beta4 sidecar: authored compound full-block anchor preserves dy=-1.0
-            // even after the source slab below is removed. Sidecar truth wins over
-            // the live below-slab predicate so source removal cannot silently
-            // renormalize the authored compound lane.
-            if (com.slabbed.anchor.SlabAnchorAttachment.isCompoundFullBlockAnchor(world, pos)) {
-                if (com.slabbed.anchor.SlabAnchorAttachment.TRACE) {
-                    String side = (world instanceof net.minecraft.world.World w && w.isClient()) ? "CLIENT" : "SERVER";
-                    Slabbed.LOGGER.info("[ANCHOR] compound sidecar dy applied side={} pos={} state={} dy=-1.0",
-                            side, pos.toShortString(), state);
-                }
-                return -1.0;
-            }
-            // Compound Lowered Full Block on Lowered Bottom Slab Carrier
-            // (named legal state). When the bottom slab directly below is itself
-            // in the lowered lane (persistent lowered slab carrier or
-            // adjacent-side-slab lowered, dy=-0.5), the anchored FB on top of it
-            // must drop an additional -0.5 to align with the slab's visual top
-            // surface, for a total of -1.0. Without this branch the generic
-            // anchor return -0.5 below collapses the freshly placed compound
-            // case (live evidence: BETA4_PLACEMENT_AUTHOR_RECORDER at 9bf3bdc).
-            // See docs/beta4-compound-lowered-fullblock-height.md.
-            BlockPos belowPos = pos.down();
-            BlockState belowSlab = world.getBlockState(belowPos);
-            if (isBottomSlab(belowSlab) && isAdjacentSideSlabLowered(world, belowPos, belowSlab)) {
-                if (com.slabbed.anchor.SlabAnchorAttachment.TRACE) {
-                    String side = (world instanceof net.minecraft.world.World w && w.isClient()) ? "CLIENT" : "SERVER";
-                    Slabbed.LOGGER.info("[ANCHOR] compound dy applied side={} pos={} state={} dy=-1.0 belowSlabPos={} belowSlabState={}",
-                            side, pos.toShortString(), state, belowPos.toShortString(), belowSlab);
-                }
-                return -1.0;
-            }
-            double specialFullblockContactDy = beta35SpecialFullblockContactDy(world, pos, state);
-            if (Double.isFinite(specialFullblockContactDy)) {
-                return specialFullblockContactDy;
-            }
-            double oakTrapdoorContactDy = beta35OakTrapdoorContactDy(world, pos, state);
-            if (Double.isFinite(oakTrapdoorContactDy)) {
-                return oakTrapdoorContactDy;
-            }
-            double regularDoorContactDy = beta35RegularDoorContactDy(world, pos, state);
-            if (Double.isFinite(regularDoorContactDy)) {
-                return regularDoorContactDy;
-            }
-            double standingOakSignContactDy = beta35StandingOakSignContactDy(world, pos, state);
-            if (Double.isFinite(standingOakSignContactDy)) {
-                return standingOakSignContactDy;
-            }
-            double floorButtonContactDy = beta35FloorButtonContactDy(world, pos, state);
-            if (Double.isFinite(floorButtonContactDy)) {
-                return floorButtonContactDy;
-            }
-            if (com.slabbed.anchor.SlabAnchorAttachment.TRACE) {
-                String side = (world instanceof net.minecraft.world.World w && w.isClient()) ? "CLIENT" : "SERVER";
-                Slabbed.LOGGER.info("[ANCHOR] dy applied side={} pos={} state={} dy=-0.5",
-                        side, pos.toShortString(), state);
-            }
-            return -0.5;
-        }
-
-        // FREEZE-ON-PLACE: a structural full block locked FLAT at placement stays at 0 — a
-        // slab or lowered carrier added under/beside it later can no longer pull it down
-        // (LAW 1 (the placement law): a placed block must not autonomously move). Read before any of the
-        // geometric lowering below. Decorative followers are never frozen-flat, so they keep
-        // tracking their supports.
-        if (SlabAnchorAttachment.isFrozenFlat(world, pos)) {
-            return 0.0;
-        }
-
-        // Cantilevered full block (air below, connected to a lowered tower): lower -0.5 to
-        // merge, computed GEOMETRICALLY — it recomputes whenever the structure changes, so it
-        // never goes stale and never pops out of sync (the replacement for the removed
-        // side-adjacent anchor). Air-gated, so a block resting on solid ground never sinks.
-        // Together with the isAdjacentSideSlabLowered slab branch above, mixed canopies of
-        // slabs and full blocks settle at one consistent lowered level off the same tower.
-        if (isCantileverLoweredFullBlock(world, pos, state)) {
-            return -0.5;
-        }
-
-        if (isFloorTorch(state)) {
-            BlockPos supportPos = pos.down();
-            BlockState supportState = world.getBlockState(supportPos);
-            if (isBottomSlab(supportState)
-                    && (SlabAnchorAttachment.isCompoundVisibleSideLowerSlab(world, supportPos, supportState)
-                            || SlabAnchorAttachment.isCompoundVisibleOwnerTopSlab(world, supportPos, supportState))) {
-                return -1.5;
-            }
-            double loweredBottomSupportDy = floorTorchBottomSlabSupportDy(world, supportPos, supportState);
-            if (Double.isFinite(loweredBottomSupportDy) && loweredBottomSupportDy < -1.0e-6d) {
-                return loweredBottomSupportDy - 0.5d;
-            }
-            if (isTopSlab(supportState)
-                    && SlabAnchorAttachment.isCompoundVisibleSideUpperSlab(world, supportPos, supportState)) {
-                return -1.0;
-            }
-            // floor_torch on a lowered ordinary full-block support (supportDy=-1.0):
-            // must follow the support down so the torch base contacts the support visual top.
-            // Only applies to floor_torch; does not affect wall_torch, lanterns, signs, or chains.
-            // dy=-1.0 does not violate the dy>=-1.0 invariant.
-            if (isOrdinaryFullBlockWithCompoundDy(world, supportPos, supportState)) {
-                return -1.0;
-            }
-        }
-
-        if (isBeta35FloorTopContactObject(state)) {
-            BlockPos supportPos = pos.down();
-            BlockState supportState = world.getBlockState(supportPos);
-            double loweredBottomSupportDy = floorTorchBottomSlabSupportDy(world, supportPos, supportState);
-            if (Double.isFinite(loweredBottomSupportDy) && loweredBottomSupportDy < -1.0e-6d) {
-                return loweredBottomSupportDy - 0.5d;
-            }
-        }
-
-        double floorButtonContactDy = beta35FloorButtonContactDy(world, pos, state);
-        if (Double.isFinite(floorButtonContactDy)) {
-            return floorButtonContactDy;
-        }
-
-        double fenceWallVariantContactDy = beta35FenceWallVariantContactDy(world, pos, state);
-        if (Double.isFinite(fenceWallVariantContactDy)) {
-            return fenceWallVariantContactDy;
-        }
-
-        double fenceGateContactDy = beta35FenceGateContactDy(world, pos, state);
-        if (Double.isFinite(fenceGateContactDy)) {
-            return fenceGateContactDy;
-        }
-
-        double oakTrapdoorContactDy = beta35OakTrapdoorContactDy(world, pos, state);
-        if (Double.isFinite(oakTrapdoorContactDy)) {
-            return oakTrapdoorContactDy;
-        }
-
-        double regularDoorContactDy = beta35RegularDoorContactDy(world, pos, state);
-        if (Double.isFinite(regularDoorContactDy)) {
-            return regularDoorContactDy;
-        }
-
-        double standingOakSignContactDy = beta35StandingOakSignContactDy(world, pos, state);
-        if (Double.isFinite(standingOakSignContactDy)) {
-            return standingOakSignContactDy;
-        }
-
-        double specialFullblockContactDy = beta35SpecialFullblockContactDy(world, pos, state);
-        if (Double.isFinite(specialFullblockContactDy)) {
-            return specialFullblockContactDy;
-        }
-
-        double ordinaryFullBlockContactDy = beta35OrdinaryFullBlockContactDy(world, pos, state);
-        if (Double.isFinite(ordinaryFullBlockContactDy)) {
-            return ordinaryFullBlockContactDy;
-        }
-
-        // Terrain Slabs direct object support: an object (or a VANILLA slab) resting directly on a
-        // Terrain Slabs BOTTOM_LIKE surface must lower -0.5 to sit FLUSH on it, exactly as it would
-        // on a vanilla bottom slab — the TS slab ITSELF stays subtractive (shouldSkipOffset), so this
-        // lane only ever lowers the OBJECT on top, never the TS slab. Ordered LATE — after the
-        // cantilever and every anchor/beta35 contact lane, immediately before the generic shouldOffset
-        // slab-column lane — so the real cantilever logic runs first and a vanilla slab cantilevered
-        // over a TS edge is NOT spuriously lowered by TS (faithful to COMPAT_REF, which dispatches the
-        // same lane right before shouldOffset). Ceiling-hung / HANGING decorations are excluded here
-        // (they hang from ABOVE and are handled by the ceiling-attached lanes below); without this
-        // guard the downward column walk in isDirectCustomSlabSupportedObject would drag a hanger
-        // beneath a flush TS slab down through it — the behavioural equivalent of COMPAT_REF's
-        // head-of-getYOffsetInner ceiling-hung dispatch.
-        //
-        // The exclusion uses isCeilingHungFromAbove (NOT the blunt isCeilingAttached): a
-        // FLOOR-standing instance of a ceiling-CAPABLE block (chain resting on a slab, upward
-        // dripstone, floor bell/lever/button) is NOT genuinely hung and MUST lower -0.5 to sit
-        // flush, exactly as it does on a vanilla bottom slab via shouldOffset. Only GENUINELY-hung
-        // instances (HANGING, identity hangers, downward dripstone, CEILING lever/button/bell, or a
-        // ceiling-chain/top-slab directly above) are excluded — matching shouldOffset's nuance and
-        // preserving the chain ceiling geometry (a vertical chain UNDER a ceiling support is
-        // hung-from-above ⇒ skips this lane). The old blunt isCeilingAttached gate wrongly excluded
-        // every floor-standing ceiling-CAPABLE block, which is why "only lanterns lowered".
-        if (!isCeilingHungFromAbove(world, pos, state)) {
-            double directCustomSurfaceDy = directCustomSlabSupportDy(world, pos, state);
-            if (!Double.isNaN(directCustomSurfaceDy)) {
-                double dy = directCustomSurfaceDy;
-                double supportLoweredDy = loweredBottomSlabSupportDy(world, pos.down());
-                if (Double.isFinite(supportLoweredDy) && supportLoweredDy < -1.0e-6) {
-                    dy += supportLoweredDy;
-                }
-                if (state.getBlock() instanceof SlabBlock
-                        && state.contains(SlabBlock.TYPE)
-                        && state.get(SlabBlock.TYPE) == SlabType.TOP) {
-                    dy += -0.5;
-                }
-                if (dy < -1.0) {
-                    dy = -1.0;
-                }
-                return dy;
-            }
-        }
-
-        if (shouldOffset(world, pos, state)) {
-            // Compound case: non-slab block above a bottom slab that is itself an adjacent-side
-            // slab lowered by -0.5.  The block must drop an additional -0.5 to align with the
-            // slab's visual top surface, for a total of -1.0.
-            BlockState belowSlab = world.getBlockState(pos.down());
-            if (isBottomSlab(belowSlab) && isAdjacentSideSlabLowered(world, pos.down(), belowSlab)) {
-                return -1.0;
-            }
-            double columnDy = slabColumnYOffset(world, pos);
-            if (columnDy != 0.0) {
-                return columnDy;
-            }
-            return -0.5;
-        }
-
-        // Top-half trapdoors under lowered slab undersides should follow the
-        // support lane height, not force vanilla top-slab +0.5.
-        if (state.getBlock() instanceof TrapdoorBlock
-                && state.contains(Properties.BLOCK_HALF)
-                && state.get(Properties.BLOCK_HALF) == BlockHalf.TOP) {
-            BlockPos supportPos = pos.up();
-            BlockState supportState = world.getBlockState(supportPos);
-            if (supportState.getBlock() instanceof SlabBlock && supportState.contains(SlabBlock.TYPE)) {
-                SlabType supportType = supportState.get(SlabBlock.TYPE);
-                if (supportType == SlabType.TOP || supportType == SlabType.BOTTOM || supportType == SlabType.DOUBLE) {
-                    double supportDy = loweredSlabUndersideSupportDy(world, supportPos, supportState);
-                    if (Double.isFinite(supportDy) && supportDy < -1.0e-6d) {
-                        return supportType == SlabType.TOP ? supportDy + 0.5d : supportDy;
-                    }
-                }
-            }
-        }
-
-        // Ceiling-attached visual owners under lowered slab undersides inherit
-        // the slab lane dy to stay attached. A hanger attaches at its own
-        // block-top (P.y+1); a slab's underside sits at P.y+1 for BOTTOM/DOUBLE
-        // (full-height bottom face) but at P.y+1.5 for a TOP slab (mid-block
-        // underside). So under a lowered TOP slab the hanger's correct dy is the
-        // slab dy PLUS the +0.5 raised-attach baseline; BOTTOM/DOUBLE take the
-        // slab dy directly. Mirrors the top-trapdoor branch above. Without the
-        // +0.5, hangers under a lowered top slab drop 0.5 too far (visible gap).
-        if (isBeta35LoweredSlabUndersideVisibleOwnerObject(world, pos, state)) {
-            BlockPos supportPos = pos.up();
-            BlockState supportState = world.getBlockState(supportPos);
-            double supportDy = loweredSlabUndersideSupportDy(world, supportPos, supportState);
-            if (Double.isFinite(supportDy) && supportDy < -1.0e-6d) {
-                return supportState.get(SlabBlock.TYPE) == SlabType.TOP ? supportDy + 0.5d : supportDy;
-            }
-        }
-
-        // Decorative hangers under a lowered FULL-BLOCK support inherit the
-        // support's exact rendered dy (the full-block analogue of the slab
-        // branch above) so they hang flush instead of clipping up into the
-        // lowered block. Runs BEFORE the top-slab +0.5 branch; full blocks are
-        // never top slabs so +0.5 adherence is untouched, and the helper returns
-        // NaN for normal (non-lowered) supports so the already-correct flush case
-        // is preserved. Chains are excluded (not in the decorative owner set).
-        if (isBeta35LoweredFullBlockUndersideVisibleOwnerObject(world, pos, state)) {
-            BlockPos supportPos = pos.up();
-            BlockState supportState = world.getBlockState(supportPos);
-            double supportDy = loweredFullBlockUndersideSupportDy(world, supportPos, supportState);
-            if (Double.isFinite(supportDy) && supportDy < -1.0e-6d) {
-                return supportDy;
-            }
-        }
-
-        // ── ceiling-attached blocks under a top slab: +0.5 UP ────────
-        // Only explicit ceiling-mounted cases may float into the slab space.
-        // Note: isSolidBlock is safe here because getYOffset has a recursion guard.
-        Block blk = state.getBlock();
-        if (blk instanceof SlabBlock
-                || blk instanceof StairsBlock
-                || blk instanceof FenceBlock
-                || blk instanceof WallBlock
-                || blk instanceof PaneBlock
-                || isThinTopLayer(state)
-                || state.isAir()
-                || !state.getFluidState().isEmpty()
-                || state.isSolidBlock(world, pos)) {
-            return 0.0;
-        }
-
-        BlockState above = world.getBlockState(pos.up());
-
-        // direct: ceiling-attached blocks directly under a top slab
-        if (isCeilingAttached(state) && isTopSlab(above)) {
-            return 0.5;
-        }
-
-        // cascading: ceiling-attached block below other ceiling-attached blocks
-        // leading up to a top slab (e.g. 2nd dripstone, 2nd vine segment)
-        if (isCeilingAttached(state)) {
-            BlockPos cursor = pos.up();
-            for (int i = 0; i < MAX_CHAIN_DEPTH; i++) {
-                BlockState cur = world.getBlockState(cursor);
-                if (isTopSlab(cur)) {
-                    return 0.5;
-                }
-                if (isCeilingAttached(cur)) {
-                    cursor = cursor.up();
-                    continue;
-                }
-                break;
-            }
-        }
-
-        return 0.0;
-    }
-
     private static double floorTorchBottomSlabSupportDy(BlockView world, BlockPos pos, BlockState state) {
         if (world == null || pos == null || state == null || !isBottomSlab(state) || !state.getFluidState().isEmpty()) {
             return Double.NaN;
@@ -2421,11 +1520,6 @@ public final class SlabSupport {
             return -0.5d;
         }
         return 0.0d;
-    }
-
-    private static boolean isBottomPersistentTracePos(BlockPos pos) {
-        return Boolean.getBoolean(BOTTOM_PERSISTENT_TRACE_OPT_IN)
-                && pos != null && pos.getX() == 0 && pos.getY() == 202 && pos.getZ() == 0;
     }
 
     /**
@@ -2641,20 +1735,7 @@ public final class SlabSupport {
         return isOpaqueFullCubeViewIndependent(state) ? -0.5 : Double.NaN;
     }
 
-    /**
-     * True when the full cube at {@code pos} is lowered by the Terrain Slabs full-cube lane
-     * ({@link #placedTerrainSlabBottomFullCubeDy}) — an opaque full cube resting directly on a
-     * placed TS bottom slab. Zero cost when TS is absent (the lane fast-returns NaN).
-     *
-     * <p>Lets the compound-inheritance walk ({@link #hasSlabInColumn} / {@link #slabColumnYOffset})
-     * treat such a cube as a LOWERING SUPPORT, so a block or object stacked on it inherits the
-     * -0.5 drop instead of gapping/floating above it. Needed because a TS-lowered cube is often
-     * NOT anchored: the lane runs in {@code getYOffset} ahead of {@code getYOffsetInner} and
-     * overrides a frozen-flat marker (so the cube can be frozen-flat or geometric yet render
-     * lowered), and {@code isAnchored}/{@code isBottomSlab} alone never recognised it. Recursion-safe:
-     * the lane only consults {@code isOpaqueFullCubeViewIndependent} (EmptyBlockView/ORIGIN probe)
-     * and the block below, never {@link #getYOffset}.
-     */
+
     private static boolean isTerrainSlabLoweredFullCube(BlockView world, BlockPos pos, BlockState state) {
         double dy = placedTerrainSlabBottomFullCubeDy(world, pos, state);
         return Double.isFinite(dy) && dy < -1.0e-6;
@@ -2718,13 +1799,6 @@ public final class SlabSupport {
         return false;
     }
 
-    private static double directCustomSlabSupportDy(BlockView world, BlockPos pos, BlockState state) {
-        if (!isDirectCustomSlabSupportedObject(world, pos, state)) {
-            return Double.NaN;
-        }
-        return -0.5;
-    }
-
     /**
      * Recursion-safe rendered dy of a VANILLA bottom-slab support directly beneath an object,
      * used to compound a mixed-slab lowering (a vanilla bottom slab capping a Terrain Slabs
@@ -2732,38 +1806,7 @@ public final class SlabSupport {
      * mixed-on-TS), 0.0 if it is a flush vanilla bottom slab, and NaN if the support is not a
      * vanilla bottom slab. Never re-enters {@link #getYOffset}. Mirrors COMPAT_REF.
      */
-    private static double loweredBottomSlabSupportDy(BlockView world, BlockPos supportPos) {
-        BlockState s = world.getBlockState(supportPos);
-        if (s == null
-                || !(s.getBlock() instanceof SlabBlock)
-                || !s.contains(SlabBlock.TYPE)
-                || s.get(SlabBlock.TYPE) == SlabType.DOUBLE
-                || !s.getFluidState().isEmpty()) {
-            return Double.NaN;
-        }
-        double base;
-        if (SlabAnchorAttachment.isAnchored(world, supportPos)) {
-            base = -0.5;
-        } else {
-            // A vanilla slab that itself sits on a Terrain Slabs surface (a MIXED slab) is
-            // lowered -0.5 by the directCustom lane; the object above it inherits that drop.
-            double directCustomDy = directCustomSlabSupportDy(world, supportPos, s);
-            if (Double.isFinite(directCustomDy) && directCustomDy < -1.0e-6) {
-                base = directCustomDy;
-            } else if (isAdjacentSideSlabLowered(world, supportPos, s)) {
-                base = -0.5;
-            } else {
-                base = 0.0;
-            }
-        }
-        // A lowered TOP slab support presents its top surface a full cell above its lowered base,
-        // so an object resting on it drops an extra -0.5 (mirrors the object-on-TOP-slab term in
-        // the directCustom lane). Bottom slabs unaffected; DOUBLE excluded above; caller clamps -1.0.
-        if (base < -1.0e-6 && s.get(SlabBlock.TYPE) == SlabType.TOP) {
-            base += -0.5;
-        }
-        return base;
-    }
+
 
     /**
      * True for a VANILLA (minecraft-namespace) slab — the only slab kind allowed to be a
@@ -2844,28 +1887,6 @@ public final class SlabSupport {
         return false;
     }
 
-    private static double slabColumnYOffset(BlockView world, BlockPos pos) {
-        BlockPos cursor = pos.down();
-        for (int i = 0; i < MAX_CHAIN_DEPTH; i++) {
-            BlockState cur = world.getBlockState(cursor);
-            if (cur.getBlock() instanceof SlabBlock
-                    && isAdjacentSideSlabLowered(world, cursor, cur)) {
-                return isBottomSlab(cur) ? -1.0 : -0.5;
-            }
-            if (isBottomSlab(cur) || SlabAnchorAttachment.isAnchored(world, cursor)) {
-                return -0.5;
-            }
-            // Terrain Slabs full-cube-lowered carrier (frozen-flat / un-anchored): the column above
-            // inherits its -0.5 so the stack stays flush (RED #1 stacking, RED #3 object-on-cube).
-            if (isTerrainSlabLoweredFullCube(world, cursor, cur)) {
-                return -0.5;
-            }
-            if (cur.isAir() || cur.getBlock() instanceof SlabBlock || isThinTopLayer(cur)) {
-                return 0.0;
-            }
-            cursor = cursor.down();
-        }
-        return 0.0;
-    }
+
 }
 

@@ -282,12 +282,8 @@ public final class ExtendedDepthChainContactTest {
     }
 
     private static void withFrozenDy(Runnable action) {
-        boolean previous = SlabAnchorAttachment.FROZEN_DY_ENABLED;
-        SlabAnchorAttachment.FROZEN_DY_ENABLED = true;
-        try {
+        {
             action.run();
-        } finally {
-            SlabAnchorAttachment.FROZEN_DY_ENABLED = previous;
         }
     }
 

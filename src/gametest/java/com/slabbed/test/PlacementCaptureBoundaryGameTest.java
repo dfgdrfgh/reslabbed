@@ -175,7 +175,7 @@ public final class PlacementCaptureBoundaryGameTest {
         useOn(h.createMockPlayer(GameMode.SURVIVAL), new ItemStack(Items.STONE), owner, Direction.UP);
         h.assertTrue(world.getBlockState(target).isOf(Blocks.STONE),
                 "premise: stone failed to place on the bottom slab at " + target);
-        double expected = SlabSupport.getUnstoredYOffset(world, target, world.getBlockState(target));
+        double expected = SlabSupport.getYOffset(world, target, world.getBlockState(target));
         double actual = stored(world, target);
         h.assertTrue(Math.abs(expected + 0.5d) <= 1.0e-9d,
                 "premise: placement on a bottom slab should read -0.5, got " + expected);
@@ -264,13 +264,11 @@ public final class PlacementCaptureBoundaryGameTest {
 
     @GameTest(templateName = "fabric-gametest-api-v1:empty", batchId = "slabbed_keep_async_guard_isolated")
     public void keepExistingCollisionGuardSkipsPolicyLookupsOnUnsafeWorkers(TestContext h) {
-        boolean previousFrozen = SlabAnchorAttachment.FROZEN_DY_ENABLED;
         var previousModernLookup = SlabAnchorAttachment.clientPlacementDyLookup;
         Thread currentThread = Thread.currentThread();
         String previousThreadName = currentThread.getName();
         java.util.concurrent.atomic.AtomicInteger modernLookups =
                 new java.util.concurrent.atomic.AtomicInteger();
-        SlabAnchorAttachment.FROZEN_DY_ENABLED = false;
         SlabAnchorAttachment.clientPlacementDyLookup = pos -> {
             modernLookups.incrementAndGet();
             return SlabAnchorAttachment.PlacementDyFact.absent();
@@ -305,7 +303,6 @@ public final class PlacementCaptureBoundaryGameTest {
                             + " meshEligible=" + meshEligibleLookups);
         } finally {
             currentThread.setName(previousThreadName);
-            SlabAnchorAttachment.FROZEN_DY_ENABLED = previousFrozen;
             SlabAnchorAttachment.clientPlacementDyLookup = previousModernLookup;
         }
         pass(h, "keep_existing_collision_guard_skips_policy_lookups_on_unsafe_workers");
@@ -346,11 +343,9 @@ public final class PlacementCaptureBoundaryGameTest {
     @GameTest(templateName = "fabric-gametest-api-v1:empty")
     public void keepExistingRoutesOnlyPostDecisionPlacementsToFrozenHeight(TestContext h) {
         ServerWorld world = h.getWorld();
-        boolean previousFrozen = SlabAnchorAttachment.FROZEN_DY_ENABLED;
         var previousModernLookup = SlabAnchorAttachment.clientModernPlacementLookup;
         var previousPredictionLookup = SlabAnchorAttachment.clientPostPolicyPredictionLookup;
         var previousEffectiveLookup = SlabAnchorAttachment.clientEffectivePlacementDyLookup;
-        SlabAnchorAttachment.FROZEN_DY_ENABLED = false;
         try {
             BlockPos legacy = h.getAbsolutePos(new BlockPos(2, 3, 2));
             BlockPos modernOwner = legacy;
@@ -362,7 +357,7 @@ public final class PlacementCaptureBoundaryGameTest {
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                     Block.NOTIFY_LISTENERS);
             world.setBlockState(legacy, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, legacy, world.getBlockState(legacy));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, legacy, world.getBlockState(legacy));
             SlabAnchorAttachment.writePlacementDyBatch(world,
                     java.util.Map.of(legacy, Double.doubleToRawLongBits(-1.5d)));
 
@@ -412,7 +407,6 @@ public final class PlacementCaptureBoundaryGameTest {
                     "client bridge or server/client prediction separation selected the wrong route");
         } finally {
             WorldUpgradeRuntimePolicy.deactivate(world);
-            SlabAnchorAttachment.FROZEN_DY_ENABLED = previousFrozen;
             SlabAnchorAttachment.clientModernPlacementLookup = previousModernLookup;
             SlabAnchorAttachment.clientPostPolicyPredictionLookup = previousPredictionLookup;
             SlabAnchorAttachment.clientEffectivePlacementDyLookup = previousEffectiveLookup;
@@ -423,8 +417,6 @@ public final class PlacementCaptureBoundaryGameTest {
     @GameTest(templateName = "fabric-gametest-api-v1:empty", batchId = "slabbed_keep_physical_isolated")
     public void keepExistingModernBlocksUseFrozenPhysicalShapes(TestContext h) {
         ServerWorld world = h.getWorld();
-        boolean previousFrozen = SlabAnchorAttachment.FROZEN_DY_ENABLED;
-        SlabAnchorAttachment.FROZEN_DY_ENABLED = false;
         try {
             BlockPos legacyOwner = h.getAbsolutePos(new BlockPos(1, 1, 1));
             assertAir(world, List.of(legacyOwner, legacyOwner.up()), "legacy fixture");
@@ -437,7 +429,7 @@ public final class PlacementCaptureBoundaryGameTest {
             // provenance. An item placement would receive provenance — the policy is unconditional.
             BlockPos legacy = legacyOwner.up();
             world.setBlockState(legacy, Blocks.STONE.getDefaultState(), Block.NOTIFY_ALL);
-            SlabAnchorAttachment.addAnchor(world, legacy, world.getBlockState(legacy));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, legacy, world.getBlockState(legacy));
             VoxelShape legacyCollisionBefore = world.getBlockState(legacy)
                     .getCollisionShape(world, legacy, ShapeContext.absent());
             VoxelShape legacyOutlineBefore = world.getBlockState(legacy)
@@ -561,7 +553,6 @@ public final class PlacementCaptureBoundaryGameTest {
                     deepDelta);
         } finally {
             WorldUpgradeRuntimePolicy.deactivate(world);
-            SlabAnchorAttachment.FROZEN_DY_ENABLED = previousFrozen;
         }
         pass(h, "keep_existing_modern_blocks_use_frozen_physical_shapes");
     }
@@ -601,8 +592,6 @@ public final class PlacementCaptureBoundaryGameTest {
     @GameTest(templateName = "fabric-gametest-api-v1:empty", batchId = "slabbed_keep_disk_isolated")
     public void shippedModeDiskRoundTripKeepsLegacyHeightsAndModernPlacements(TestContext h) {
         ServerWorld world = h.getWorld();
-        boolean previousFrozen = SlabAnchorAttachment.FROZEN_DY_ENABLED;
-        SlabAnchorAttachment.FROZEN_DY_ENABLED = false;
         try {
             h.assertTrue(WorldUpgradeRuntimePolicy.authorsModernPlacements(world),
                     "the placement policy must be unconditional on this line");
@@ -737,7 +726,6 @@ public final class PlacementCaptureBoundaryGameTest {
         } catch (IOException exception) {
             throw new IllegalStateException("disk round-trip failed", exception);
         } finally {
-            SlabAnchorAttachment.FROZEN_DY_ENABLED = previousFrozen;
         }
         pass(h, "shipped_mode_disk_round_trip_keeps_legacy_heights_and_modern_placements");
     }
@@ -841,12 +829,9 @@ public final class PlacementCaptureBoundaryGameTest {
     }
 
     static void withFrozen(Runnable body) {
-        boolean previous = SlabAnchorAttachment.FROZEN_DY_ENABLED;
-        SlabAnchorAttachment.FROZEN_DY_ENABLED = true;
         try {
             body.run();
         } finally {
-            SlabAnchorAttachment.FROZEN_DY_ENABLED = previous;
         }
     }
 

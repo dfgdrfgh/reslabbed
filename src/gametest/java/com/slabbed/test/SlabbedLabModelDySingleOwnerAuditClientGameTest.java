@@ -340,7 +340,7 @@ public final class SlabbedLabModelDySingleOwnerAuditClientGameTest implements Fa
                 Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                 Block.NOTIFY_LISTENERS);
         world.setBlockState(fullPos, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
-        SlabAnchorAttachment.addAnchor(world, fullPos, world.getBlockState(fullPos));
+        com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, fullPos, world.getBlockState(fullPos));
     }
 
     private static void seedLoweredBottomCarrier(World world, BlockPos supportPos, BlockPos fullPos, BlockPos carrierPos) {
@@ -348,7 +348,7 @@ public final class SlabbedLabModelDySingleOwnerAuditClientGameTest implements Fa
         world.setBlockState(carrierPos,
                 Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                 Block.NOTIFY_LISTENERS);
-        SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(world, carrierPos, world.getBlockState(carrierPos));
+        com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(world, carrierPos, world.getBlockState(carrierPos));
         SlabAnchorAttachment.removeAnchor(world, fullPos);
         world.setBlockState(fullPos, Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
     }
@@ -358,7 +358,7 @@ public final class SlabbedLabModelDySingleOwnerAuditClientGameTest implements Fa
         world.setBlockState(carrierPos,
                 Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE),
                 Block.NOTIFY_LISTENERS);
-        SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(world, carrierPos, world.getBlockState(carrierPos));
+        com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(world, carrierPos, world.getBlockState(carrierPos));
         SlabAnchorAttachment.removeAnchor(world, fullPos);
         world.setBlockState(fullPos, Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
     }

@@ -52,8 +52,6 @@ public final class ParticleDisplayCoverageTest {
 
     @GameTest(templateName = "fabric-gametest-api-v1:empty")
     public void candleExtinguishSmokeFollowsStoredDepth(TestContext context) {
-        boolean previousFrozen = SlabAnchorAttachment.FROZEN_DY_ENABLED;
-        SlabAnchorAttachment.FROZEN_DY_ENABLED = true;
         try {
             ServerWorld world = context.getWorld();
             BlockPos pos = context.getAbsolutePos(new BlockPos(4, 4, 4));
@@ -75,15 +73,12 @@ public final class ParticleDisplayCoverageTest {
             }
         } finally {
             ParticleCapture.reset();
-            SlabAnchorAttachment.FROZEN_DY_ENABLED = previousFrozen;
         }
         context.complete();
     }
 
     @GameTest(templateName = "fabric-gametest-api-v1:empty")
     public void nonEmitterStaysSilentAtStoredDepth(TestContext context) {
-        boolean previousFrozen = SlabAnchorAttachment.FROZEN_DY_ENABLED;
-        SlabAnchorAttachment.FROZEN_DY_ENABLED = true;
         try {
             ServerWorld world = context.getWorld();
             BlockPos pos = context.getAbsolutePos(new BlockPos(4, 4, 4));
@@ -98,7 +93,6 @@ public final class ParticleDisplayCoverageTest {
                     "a non-emitting vanilla block must stay silent at flat and stored deep heights");
         } finally {
             ParticleCapture.reset();
-            SlabAnchorAttachment.FROZEN_DY_ENABLED = previousFrozen;
         }
         context.complete();
     }
@@ -106,8 +100,6 @@ public final class ParticleDisplayCoverageTest {
     private static void assertDisplayEmitterFollowsDepth(
             TestContext context, String label, BlockState state
     ) {
-        boolean previousFrozen = SlabAnchorAttachment.FROZEN_DY_ENABLED;
-        SlabAnchorAttachment.FROZEN_DY_ENABLED = true;
         try {
             ServerWorld world = context.getWorld();
             BlockPos pos = context.getAbsolutePos(new BlockPos(4, 4, 4));
@@ -126,7 +118,6 @@ public final class ParticleDisplayCoverageTest {
             }
         } finally {
             ParticleCapture.reset();
-            SlabAnchorAttachment.FROZEN_DY_ENABLED = previousFrozen;
         }
         context.complete();
     }

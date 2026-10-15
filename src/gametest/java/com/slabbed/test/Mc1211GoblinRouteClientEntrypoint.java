@@ -2106,8 +2106,8 @@ public final class Mc1211GoblinRouteClientEntrypoint implements ClientModInitial
             client.world.setBlockState(goblinLoweredTrapdoorSupportPos, supportState, 3);
             client.world.setBlockState(ownerTopSlabPos, ownerTopState, 3);
             client.world.setBlockState(goblinLoweredTrapdoorTargetSlabPos, targetSlabState, 3);
-            SlabAnchorAttachment.addAnchor(serverWorld, goblinLoweredTrapdoorSupportPos, supportState);
-            SlabAnchorAttachment.addCompoundVisibleOwnerTopSlab(
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(serverWorld, goblinLoweredTrapdoorSupportPos, supportState);
+            com.slabbed.dev.LegacyPlacementFixtures.addCompoundVisibleOwnerTopSlab(
                     serverWorld, ownerTopSlabPos, ownerTopState, goblinLoweredTrapdoorSupportPos, supportState);
             addGoblinLoweredSlabMarker(
                     serverWorld, goblinLoweredTrapdoorTargetSlabPos, targetSlabState, ownerTopSlabPos, ownerTopState);
@@ -2115,13 +2115,13 @@ public final class Mc1211GoblinRouteClientEntrypoint implements ClientModInitial
                 BlockPos cornerSlabPos = ownerTopSlabPos.north();
                 serverWorld.setBlockState(cornerSlabPos, ownerTopState, 3);
                 client.world.setBlockState(cornerSlabPos, ownerTopState, 3);
-                SlabAnchorAttachment.addCompoundVisibleSideUpperSlab(
+                com.slabbed.dev.LegacyPlacementFixtures.addCompoundVisibleSideUpperSlab(
                         serverWorld, cornerSlabPos, ownerTopState, ownerTopSlabPos, ownerTopState);
             }
             goblinLoweredTrapdoorPlacementResult =
                     clickGoblinTrapdoorUnderSlab(client, goblinLoweredTrapdoorTargetSlabPos);
             BlockState authoredTargetState = serverWorld.getBlockState(goblinLoweredTrapdoorTargetSlabPos);
-            SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(
+            com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(
                     serverWorld, goblinLoweredTrapdoorTargetSlabPos, authoredTargetState);
             goblinLoweredTrapdoorCasePhase = 1;
             goblinLoweredTrapdoorPhaseTick = goblinLoweredTrapdoorTicks;
@@ -2138,7 +2138,7 @@ public final class Mc1211GoblinRouteClientEntrypoint implements ClientModInitial
                 return;
             }
             BlockState targetBeforeBreak = serverWorld.getBlockState(goblinLoweredTrapdoorTargetSlabPos);
-            SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(
+            com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(
                     serverWorld, goblinLoweredTrapdoorTargetSlabPos, targetBeforeBreak);
             goblinLoweredTrapdoorActualTrapdoorPos =
                     findNearbyTrapdoor(serverWorld, goblinLoweredTrapdoorExpectedTrapdoorPos);
@@ -2164,7 +2164,7 @@ public final class Mc1211GoblinRouteClientEntrypoint implements ClientModInitial
                 return;
             }
             BlockState targetAfterBreak = serverWorld.getBlockState(goblinLoweredTrapdoorTargetSlabPos);
-            SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(
+            com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(
                     serverWorld, goblinLoweredTrapdoorTargetSlabPos, targetAfterBreak);
             LoweredTrapdoorGoblinAssessment afterBreak = assessGoblinLoweredTrapdoorCase(
                     client, serverWorld, spec, goblinLoweredTrapdoorCaseOrigin,
@@ -2266,8 +2266,8 @@ public final class Mc1211GoblinRouteClientEntrypoint implements ClientModInitial
         client.world.setBlockState(baseSlabPos, baseSlabState, 3);
         client.world.setBlockState(supportPos, supportState, 3);
         client.world.setBlockState(ownerTopSlabPos, ownerTopState, 3);
-        SlabAnchorAttachment.addAnchor(serverWorld, supportPos, supportState);
-        SlabAnchorAttachment.addCompoundVisibleOwnerTopSlab(
+        com.slabbed.dev.LegacyPlacementFixtures.addAnchor(serverWorld, supportPos, supportState);
+        com.slabbed.dev.LegacyPlacementFixtures.addCompoundVisibleOwnerTopSlab(
                 serverWorld, ownerTopSlabPos, ownerTopState, supportPos, supportState);
         if (spec.sideExtension()) {
             serverWorld.setBlockState(targetSlabPos, targetSlabState, 3);
@@ -2277,12 +2277,12 @@ public final class Mc1211GoblinRouteClientEntrypoint implements ClientModInitial
         if (spec.cornerCase()) {
             serverWorld.setBlockState(cornerSlabPos, ownerTopState, 3);
             client.world.setBlockState(cornerSlabPos, ownerTopState, 3);
-            SlabAnchorAttachment.addCompoundVisibleSideUpperSlab(
+            com.slabbed.dev.LegacyPlacementFixtures.addCompoundVisibleSideUpperSlab(
                     serverWorld, cornerSlabPos, ownerTopState, ownerTopSlabPos, ownerTopState);
         }
         String trapdoorPlacementResult = clickGoblinTrapdoorUnderSlab(client, targetSlabPos);
         BlockState authoredTargetState = serverWorld.getBlockState(targetSlabPos);
-        SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(serverWorld, targetSlabPos, authoredTargetState);
+        com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(serverWorld, targetSlabPos, authoredTargetState);
         BlockPos actualTrapdoorPos = findNearbyTrapdoor(serverWorld, trapdoorPos);
         LoweredTrapdoorGoblinAssessment beforeBreak = assessGoblinLoweredTrapdoorCase(
                 client, serverWorld, spec, caseOrigin, supportPos, targetSlabPos, trapdoorPos,
@@ -2370,11 +2370,11 @@ public final class Mc1211GoblinRouteClientEntrypoint implements ClientModInitial
     ) {
         SlabType type = state.get(SlabBlock.TYPE);
         if (type == SlabType.BOTTOM) {
-            SlabAnchorAttachment.addCompoundVisibleSideLowerSlab(world, pos, state, sourcePos, sourceState);
+            com.slabbed.dev.LegacyPlacementFixtures.addCompoundVisibleSideLowerSlab(world, pos, state, sourcePos, sourceState);
         } else if (type == SlabType.TOP) {
-            SlabAnchorAttachment.addCompoundVisibleSideUpperSlab(world, pos, state, sourcePos, sourceState);
+            com.slabbed.dev.LegacyPlacementFixtures.addCompoundVisibleSideUpperSlab(world, pos, state, sourcePos, sourceState);
         } else {
-            SlabAnchorAttachment.addCompoundVisibleSideDoubleSlab(world, pos, state, sourcePos, sourceState);
+            com.slabbed.dev.LegacyPlacementFixtures.addCompoundVisibleSideDoubleSlab(world, pos, state, sourcePos, sourceState);
         }
     }
 
@@ -3271,7 +3271,7 @@ public final class Mc1211GoblinRouteClientEntrypoint implements ClientModInitial
             BlockPos undersidePos = sideSlabPos.down();
             serverWorld.setBlockState(carrierBaseSlabPos, Blocks.STONE_SLAB.getDefaultState(), 3);
             serverWorld.setBlockState(carrierPos, Blocks.STONE.getDefaultState(), 3);
-            SlabAnchorAttachment.addAnchor(serverWorld, carrierPos, serverWorld.getBlockState(carrierPos));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(serverWorld, carrierPos, serverWorld.getBlockState(carrierPos));
             serverWorld.setBlockState(sideSlabPos, Blocks.STONE_SLAB.getDefaultState(), 3);
             BlockState undersideState;
             String rowType;
@@ -4092,8 +4092,8 @@ public final class Mc1211GoblinRouteClientEntrypoint implements ClientModInitial
             client.world.setBlockState(supportPos, supportState, 3);
             client.world.setBlockState(ownerTopSlabPos, ownerTopState, 3);
             client.world.setBlockState(trapdoorUnderBottomTargetSlabPos, targetState, 3);
-            SlabAnchorAttachment.addAnchor(serverWorld, supportPos, supportState);
-            SlabAnchorAttachment.addCompoundVisibleOwnerTopSlab(
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(serverWorld, supportPos, supportState);
+            com.slabbed.dev.LegacyPlacementFixtures.addCompoundVisibleOwnerTopSlab(
                     serverWorld, ownerTopSlabPos, ownerTopState, supportPos, supportState);
             addGoblinLoweredSlabMarker(
                     serverWorld, trapdoorUnderBottomTargetSlabPos, targetState, ownerTopSlabPos, ownerTopState);
@@ -6538,13 +6538,13 @@ public final class Mc1211GoblinRouteClientEntrypoint implements ClientModInitial
                 serverWorld.setBlockState(pos, orange, 3);
                 client.world.setBlockState(supportPos, bottomOakSlab, 3);
                 client.world.setBlockState(pos, orange, 3);
-                SlabAnchorAttachment.addAnchor(serverWorld, pos, orange);
+                com.slabbed.dev.LegacyPlacementFixtures.addAnchor(serverWorld, pos, orange);
             } else {
                 serverWorld.setBlockState(supportPos, orange, 3);
                 serverWorld.setBlockState(pos, bottomOakSlab, 3);
                 client.world.setBlockState(supportPos, orange, 3);
                 client.world.setBlockState(pos, bottomOakSlab, 3);
-                SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(serverWorld, pos, bottomOakSlab);
+                com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(serverWorld, pos, bottomOakSlab);
             }
         }
         serverWorld.getChunkManager().markForUpdate(origin);
@@ -8623,7 +8623,7 @@ public final class Mc1211GoblinRouteClientEntrypoint implements ClientModInitial
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                     3);
             serverWorld.setBlockState(hitPos, Blocks.STONE.getDefaultState(), 3);
-            SlabAnchorAttachment.addAnchor(serverWorld, hitPos, serverWorld.getBlockState(hitPos));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(serverWorld, hitPos, serverWorld.getBlockState(hitPos));
             serverWorld.setBlockState(placePos, Blocks.AIR.getDefaultState(), 3);
             serverWorld.setBlockState(placePos.down(), Blocks.AIR.getDefaultState(), 3);
             serverWorld.setBlockState(placePos.up(), Blocks.AIR.getDefaultState(), 3);

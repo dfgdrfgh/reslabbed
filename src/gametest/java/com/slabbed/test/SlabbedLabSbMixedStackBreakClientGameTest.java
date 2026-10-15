@@ -117,9 +117,9 @@ public final class SlabbedLabSbMixedStackBreakClientGameTest implements FabricCl
             world.setBlockState(b1Pos, def.b1().getDefaultState(), Block.NOTIFY_LISTENERS);
             world.setBlockState(b2Pos, def.b2().getDefaultState(), Block.NOTIFY_LISTENERS);
             world.setBlockState(b3Pos, def.b3().getDefaultState(), Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, b1Pos, world.getBlockState(b1Pos));
-            SlabAnchorAttachment.addAnchor(world, b2Pos, world.getBlockState(b2Pos));
-            SlabAnchorAttachment.addAnchor(world, b3Pos, world.getBlockState(b3Pos));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, b1Pos, world.getBlockState(b1Pos));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, b2Pos, world.getBlockState(b2Pos));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, b3Pos, world.getBlockState(b3Pos));
         });
         for (int i = 0; i < 4; i++) {
             ctx.waitTick();

@@ -60,8 +60,6 @@ public final class ChunkAccessSafetyTest {
     @GameTest(templateName = "fabric-gametest-api-v1:empty")
     public void generationAndEmptyViewsNeverConsultClientBridges(TestContext ctx) throws Exception {
         Map<Field, Object> previous = poisonClientLookups();
-        boolean previousFrozen = SlabAnchorAttachment.FROZEN_DY_ENABLED;
-        SlabAnchorAttachment.FROZEN_DY_ENABLED = false;
         try {
             BlockPos pos = BlockPos.ORIGIN;
             BlockState stone = Blocks.STONE.getDefaultState();
@@ -72,7 +70,7 @@ public final class ChunkAccessSafetyTest {
                                 && !SlabAnchorAttachment.rawPlacementDyFact(view, pos).present()
                                 && Double.isNaN(SlabAnchorAttachment.storedPlacementDy(view, pos))
                                 && SlabSupport.getYOffset(view, pos, stone) == 0.0d
-                                && SlabSupport.getUnstoredYOffset(view, pos, stone) == 0.0d,
+                                && SlabSupport.getYOffset(view, pos, stone) == 0.0d,
                         "non-render views must retain base geometry without any client lookup");
                 ctx.assertTrue(stone.getCollisionShape(view, pos, ShapeContext.absent()).getMax(
                                 net.minecraft.util.math.Direction.Axis.Y) == 1.0d
@@ -81,7 +79,6 @@ public final class ChunkAccessSafetyTest {
                         "generation and shape-cache queries must keep vanilla stone geometry");
             }
         } finally {
-            SlabAnchorAttachment.FROZEN_DY_ENABLED = previousFrozen;
             restoreClientLookups(previous);
         }
         ctx.complete();
@@ -101,7 +98,7 @@ public final class ChunkAccessSafetyTest {
                         || SlabAnchorAttachment.rawPlacementDyFact(world, loaded).present()
                         || SlabAnchorAttachment.isPersistentLoweredBottomSlabCarrierNonRecursive(world, loaded, slab)
                         || SlabSupport.getYOffset(world, loaded, stone) != 0.0d
-                        || SlabSupport.getUnstoredYOffset(world, loaded, stone) != 0.0d) {
+                        || SlabSupport.getYOffset(world, loaded, stone) != 0.0d) {
                     throw new AssertionError("a server worker entered the live placement/chunk path");
                 }
                 stone.getCollisionShape(world, loaded, ShapeContext.absent());
@@ -127,14 +124,14 @@ public final class ChunkAccessSafetyTest {
         BlockPos pos = ctx.getAbsolutePos(new BlockPos(1, 2, 1));
         world.setBlockState(pos.down(), Blocks.STONE_SLAB.getDefaultState(), Block.NOTIFY_LISTENERS);
         world.setBlockState(pos, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
-        SlabAnchorAttachment.addAnchor(world, pos, world.getBlockState(pos));
+        com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, pos, world.getBlockState(pos));
         SlabAnchorAttachment.markPostPolicyPlacements(world, java.util.List.of(pos));
         SlabAnchorAttachment.writePlacementDyBatch(world,
                 Map.of(pos, Double.doubleToRawLongBits(-0.5d)));
         WorldChunk chunk = world.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
         LongOpenHashSet markers = chunk.getAttached(SlabAnchorAttachment.ANCHOR_TYPE);
         ctx.assertTrue(markers != null && markers.contains(pos.asLong()), "missing anchor fixture");
-        SlabAnchorAttachment.addAnchor(world, pos, world.getBlockState(pos));
+        com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, pos, world.getBlockState(pos));
         ctx.assertTrue(chunk.getAttached(SlabAnchorAttachment.ANCHOR_TYPE) == markers,
                 "an unchanged marker write must keep the published snapshot");
         world.setBlockState(pos.down(), Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);

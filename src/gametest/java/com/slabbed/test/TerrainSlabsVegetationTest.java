@@ -65,11 +65,9 @@ public final class TerrainSlabsVegetationTest {
     @GameTest(templateName = "fabric-gametest-api-v1:empty")
     public void frozenVegetationSeatSurvivesSupportChanges(TestContext ctx) {
         boolean oldNative = nativeOffsetsEnabled;
-        boolean oldFrozen = SlabAnchorAttachment.FROZEN_DY_ENABLED;
         var oldLookup = SlabAnchorAttachment.clientPlacementDyLookup;
         var oldOverlay = SlabAnchorAttachment.clientEffectivePlacementDyLookup;
         nativeOffsetsEnabled = true;
-        SlabAnchorAttachment.FROZEN_DY_ENABLED = true;
         SlabAnchorAttachment.clientEffectivePlacementDyLookup = null;
         try {
             BlockPos pos = new BlockPos(2, 3, 2);
@@ -89,7 +87,6 @@ public final class TerrainSlabsVegetationTest {
             }
         } finally {
             nativeOffsetsEnabled = oldNative;
-            SlabAnchorAttachment.FROZEN_DY_ENABLED = oldFrozen;
             SlabAnchorAttachment.clientPlacementDyLookup = oldLookup;
             SlabAnchorAttachment.clientEffectivePlacementDyLookup = oldOverlay;
         }
@@ -98,10 +95,8 @@ public final class TerrainSlabsVegetationTest {
 
     @GameTest(templateName = "fabric-gametest-api-v1:empty")
     public void meshCullMaskReadsEachNeighborSeatOnce(TestContext ctx) {
-        boolean oldFrozen = SlabAnchorAttachment.FROZEN_DY_ENABLED;
         var oldLookup = SlabAnchorAttachment.clientPlacementDyLookup;
         var oldOverlay = SlabAnchorAttachment.clientEffectivePlacementDyLookup;
-        SlabAnchorAttachment.FROZEN_DY_ENABLED = true;
         SlabAnchorAttachment.clientEffectivePlacementDyLookup = null;
         try {
             AtomicInteger reads = new AtomicInteger();
@@ -124,7 +119,6 @@ public final class TerrainSlabsVegetationTest {
             SlabSupport.slabHeightStepFaceMask(view(states), pos, Blocks.STONE.getDefaultState(), 0.0d);
             ctx.assertTrue(reads.get() == 3, "air neighbors should not read chunk attachments");
         } finally {
-            SlabAnchorAttachment.FROZEN_DY_ENABLED = oldFrozen;
             SlabAnchorAttachment.clientPlacementDyLookup = oldLookup;
             SlabAnchorAttachment.clientEffectivePlacementDyLookup = oldOverlay;
         }

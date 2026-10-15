@@ -207,7 +207,6 @@ public final class ExtendedDepthClientProbe implements ClientModInitializer {
             client.options.pauseOnLostFocus = false;
             if (client.currentScreen != null) client.setScreen(null);
             if (pistonsOnly()) {
-                SlabAnchorAttachment.FROZEN_DY_ENABLED = false;
                 WorldUpgradeRuntimePolicy.activate(client.world, WorldUpgradeDecision.Mode.KEEP_EXISTING);
                 append("PISTON_MODE\tpolicy=KEEP_EXISTING\tglobalFrozen=false");
             }

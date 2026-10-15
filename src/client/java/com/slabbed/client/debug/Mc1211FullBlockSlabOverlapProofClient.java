@@ -742,18 +742,18 @@ public final class Mc1211FullBlockSlabOverlapProofClient {
         BlockState bottomSlab = Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM);
         BlockState topSlab = Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP);
         BlockPos ordinaryFull = lane(origin, 0).up();
-        SlabAnchorAttachment.addAnchor(world, ordinaryFull, stone);
+        com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, ordinaryFull, stone);
         BlockPos compoundBaseFull = lane(origin, 3).up();
         BlockPos loweredCarrier = compoundBaseFull.up();
         BlockPos compoundFull = loweredCarrier.up();
-        SlabAnchorAttachment.addAnchor(world, compoundBaseFull, stone);
-        SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(world, loweredCarrier, bottomSlab);
-        SlabAnchorAttachment.addAnchor(world, compoundFull, stone);
-        SlabAnchorAttachment.addCompoundFullBlockAnchor(world, compoundFull, stone);
+        com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, compoundBaseFull, stone);
+        com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(world, loweredCarrier, bottomSlab);
+        com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, compoundFull, stone);
+        com.slabbed.dev.LegacyPlacementFixtures.addCompoundFullBlockAnchor(world, compoundFull, stone);
         BlockPos sideTopSlab = compoundFull.east();
-        SlabAnchorAttachment.addCompoundVisibleSideUpperSlab(world, sideTopSlab, topSlab, compoundFull, stone);
+        com.slabbed.dev.LegacyPlacementFixtures.addCompoundVisibleSideUpperSlab(world, sideTopSlab, topSlab, compoundFull, stone);
         BlockPos decorativeFull = lane(origin, 5).up();
-        SlabAnchorAttachment.addAnchor(world, decorativeFull, stone);
+        com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, decorativeFull, stone);
     }
 
     private static BlockPos parseOriginPropertyForReload() {
@@ -828,7 +828,7 @@ public final class Mc1211FullBlockSlabOverlapProofClient {
         BlockPos ordinaryFull = ordinarySupport.up();
         set(world, ordinarySupport, bottomSlab);
         set(world, ordinaryFull, stone);
-        SlabAnchorAttachment.addAnchor(world, ordinaryFull, stone);
+        com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, ordinaryFull, stone);
 
         BlockPos topSupport = lane(origin, 1);
         set(world, topSupport, topSlab);
@@ -844,18 +844,18 @@ public final class Mc1211FullBlockSlabOverlapProofClient {
         BlockPos compoundFull = loweredCarrierSlab.up();
         set(world, compoundRootSupport, bottomSlab);
         set(world, compoundBaseFull, stone);
-        SlabAnchorAttachment.addAnchor(world, compoundBaseFull, stone);
+        com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, compoundBaseFull, stone);
         set(world, loweredCarrierSlab, bottomSlab);
-        SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(world, loweredCarrierSlab, bottomSlab);
+        com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(world, loweredCarrierSlab, bottomSlab);
         set(world, compoundFull, stone);
-        SlabAnchorAttachment.addAnchor(world, compoundFull, stone);
-        SlabAnchorAttachment.addCompoundFullBlockAnchor(world, compoundFull, stone);
+        com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, compoundFull, stone);
+        com.slabbed.dev.LegacyPlacementFixtures.addCompoundFullBlockAnchor(world, compoundFull, stone);
 
         BlockPos loweredSideSupport = compoundFull.east().down();
         BlockPos loweredSideTopSlab = loweredSideSupport.up();
         set(world, loweredSideSupport, stone);
         set(world, loweredSideTopSlab, topSlab);
-        SlabAnchorAttachment.addCompoundVisibleSideUpperSlab(
+        com.slabbed.dev.LegacyPlacementFixtures.addCompoundVisibleSideUpperSlab(
                 world, loweredSideTopSlab, topSlab, compoundFull, stone);
 
         BlockPos decorativeSupport = lane(origin, 5);
@@ -864,7 +864,7 @@ public final class Mc1211FullBlockSlabOverlapProofClient {
         BlockPos decorativeLantern = decorativeWall.up();
         set(world, decorativeSupport, bottomSlab);
         set(world, decorativeFull, stone);
-        SlabAnchorAttachment.addAnchor(world, decorativeFull, stone);
+        com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, decorativeFull, stone);
         set(world, decorativeWall, wall);
         set(world, decorativeLantern, lantern);
 

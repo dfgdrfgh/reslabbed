@@ -301,14 +301,14 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
             phase = 7; started = ticks; return;
         }
         if (phase == 7) {
-            checkMeshedFace(NATURAL_TOP, Direction.DOWN, -.5, false);
+            checkMeshedFace(NATURAL_TOP, Direction.DOWN, 0, false);
             MESH_FACES.remove(NATURAL_TOP.asLong() + ":" + Direction.DOWN);
             client.world.getWorldChunk(naturalBase().up()).setAttached(
                     SlabAnchorAttachment.MODERN_PLACEMENT_TYPE, terrainMarkers);
             phase = 8; started = ticks; return;
         }
         checkMeshedFace(NATURAL_TOP, Direction.DOWN, 0, false);
-        System.out.println("NATURAL_COLUMN_PROVENANCE_REFRESH_PASS");
+        System.out.println("NATURAL_COLUMN_IGNORES_PROVENANCE_REFRESH_PASS");
 
         Renderer renderer = RendererAccess.INSTANCE.getRenderer();
         require(renderer != null, "No active native renderer");
@@ -413,7 +413,7 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
             world.setBlockState(ground, Blocks.STONE.getDefaultState(), Block.NOTIFY_ALL);
             world.setBlockState(ground.up(), Blocks.STONE.getDefaultState(), Block.NOTIFY_ALL);
             world.setBlockState(upper, state, Block.NOTIFY_ALL);
-            if (old) SlabAnchorAttachment.freezeLoweredOnPlace(world, upper, state);
+            if (old) com.slabbed.dev.LegacyPlacementFixtures.freezeLoweredOnPlace(world, upper, state);
             world.breakBlock(ground.up(), false);
             player.setPosition(ground.getX() + 3.5, 198, ground.getZ() + .5);
             place(world, player, terrainSlab().asItem(), ground);

@@ -71,15 +71,14 @@ public final class PistonLiveCycleProbe {
         serverPending = false;
         serverSnapshot = null;
         terminal = null;
-        keepMode = ready(client) && !SlabAnchorAttachment.FROZEN_DY_ENABLED
+        keepMode = ready(client)
                 && WorldUpgradeRuntimePolicy.mode(client.world) == WorldUpgradeDecision.Mode.KEEP_EXISTING;
         if (!renderDyComparisonSentinelGreen()) {
             phase = Phase.DONE;
             terminal = Result.error("render dy comparison sentinel failed");
             return;
         }
-        if (!ready(client) || basePos == null
-                || (!SlabAnchorAttachment.FROZEN_DY_ENABLED && !keepMode)) {
+        if (!ready(client) || basePos == null) {
             phase = Phase.DONE;
             terminal = Result.error("client/server/base unavailable or no frozen/KEEP height authority");
             return;

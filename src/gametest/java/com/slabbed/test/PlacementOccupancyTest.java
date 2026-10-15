@@ -217,7 +217,7 @@ public final class PlacementOccupancyTest {
             world.setBlockState(ground, Blocks.STONE.getDefaultState(), Block.NOTIFY_ALL);
             world.setBlockState(ground.up(), Blocks.STONE.getDefaultState(), Block.NOTIFY_ALL);
             world.setBlockState(upper, states[i], Block.NOTIFY_ALL);
-            SlabAnchorAttachment.freezeLoweredOnPlace(world, upper, states[i]);
+            com.slabbed.dev.LegacyPlacementFixtures.freezeLoweredOnPlace(world, upper, states[i]);
             h.assertTrue(SlabAnchorAttachment.isFrozenFlat(world, upper)
                             && !SlabAnchorAttachment.isModernPlacement(world, upper),
                     "Existing-world control must carry only a legacy flat marker");

@@ -200,14 +200,14 @@ public final class SlabbedLabBeta4CompoundLoweredFullBlockCollapseClientGameTest
                 Block.NOTIFY_LISTENERS);
         world.setBlockState(BASE_FULL, Blocks.STONE.getDefaultState(),
                 Block.NOTIFY_LISTENERS);
-        SlabAnchorAttachment.addAnchor(world, BASE_FULL,
+        com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, BASE_FULL,
                 world.getBlockState(BASE_FULL));
 
         world.setBlockState(
                 LOWERED_BOTTOM_SLAB,
                 Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                 Block.NOTIFY_LISTENERS);
-        SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(world, LOWERED_BOTTOM_SLAB,
+        com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(world, LOWERED_BOTTOM_SLAB,
                 world.getBlockState(LOWERED_BOTTOM_SLAB));
 
         // Mirror the live placement flow: setBlockState then addAnchor in
@@ -217,7 +217,7 @@ public final class SlabbedLabBeta4CompoundLoweredFullBlockCollapseClientGameTest
         // the live recorder run.
         world.setBlockState(PLACED_FULL, Blocks.STONE.getDefaultState(),
                 Block.NOTIFY_LISTENERS);
-        SlabAnchorAttachment.addAnchor(world, PLACED_FULL,
+        com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, PLACED_FULL,
                 world.getBlockState(PLACED_FULL));
     }
 

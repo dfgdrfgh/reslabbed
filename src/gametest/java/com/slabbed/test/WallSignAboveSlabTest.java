@@ -89,7 +89,7 @@ public final class WallSignAboveSlabTest {
         double b = seatOf(world, signB);
         double c = seatOf(world, signC);
         double aRead = SlabSupport.getYOffset(world, signA, world.getBlockState(signA));
-        double aLive = SlabSupport.getUnstoredYOffset(world, signA, world.getBlockState(signA));
+        double aLive = SlabSupport.getYOffset(world, signA, world.getBlockState(signA));
         String report = "stored A(slab below, flush wall)=" + a + " B(control)=" + b + " C(lowered wall)=" + c
                 + " | read A=" + aRead + " live-lane A=" + aLive;
         System.out.println("[WALL_SIGN_ABOVE_SLAB] " + report);

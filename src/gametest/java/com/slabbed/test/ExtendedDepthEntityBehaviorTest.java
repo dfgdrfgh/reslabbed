@@ -57,42 +57,12 @@ public final class ExtendedDepthEntityBehaviorTest {
     private static final ChunkTicketType<Long> ENTITY_TEST_TICKET =
             ChunkTicketType.create("slabbed_gametest_entity_ticking", Long::compareTo);
     private static final AtomicLong ENTITY_TICKET_IDS = new AtomicLong();
-    private static boolean frozenBeforeBatch;
-    private static boolean frozenBeforeBoatBatch;
-    private static boolean frozenBeforeArmorStandBatch;
 
-    @BeforeBatch(batchId = BATCH)
-    public static void enableFrozenDyForBatch(ServerWorld world) {
-        frozenBeforeBatch = SlabAnchorAttachment.FROZEN_DY_ENABLED;
-        SlabAnchorAttachment.FROZEN_DY_ENABLED = true;
-    }
 
-    @AfterBatch(batchId = BATCH)
-    public static void restoreFrozenDyAfterBatch(ServerWorld world) {
-        SlabAnchorAttachment.FROZEN_DY_ENABLED = frozenBeforeBatch;
-    }
 
-    @BeforeBatch(batchId = BOAT_BATCH)
-    public static void enableFrozenDyForBoatBatch(ServerWorld world) {
-        frozenBeforeBoatBatch = SlabAnchorAttachment.FROZEN_DY_ENABLED;
-        SlabAnchorAttachment.FROZEN_DY_ENABLED = true;
-    }
 
-    @AfterBatch(batchId = BOAT_BATCH)
-    public static void restoreFrozenDyAfterBoatBatch(ServerWorld world) {
-        SlabAnchorAttachment.FROZEN_DY_ENABLED = frozenBeforeBoatBatch;
-    }
 
-    @BeforeBatch(batchId = ARMOR_STAND_BATCH)
-    public static void enableFrozenDyForArmorStandBatch(ServerWorld world) {
-        frozenBeforeArmorStandBatch = SlabAnchorAttachment.FROZEN_DY_ENABLED;
-        SlabAnchorAttachment.FROZEN_DY_ENABLED = true;
-    }
 
-    @AfterBatch(batchId = ARMOR_STAND_BATCH)
-    public static void restoreFrozenDyAfterArmorStandBatch(ServerWorld world) {
-        SlabAnchorAttachment.FROZEN_DY_ENABLED = frozenBeforeArmorStandBatch;
-    }
 
     @BeforeBatch(batchId = RAIL_BATCH)
     public static void enableRailCoordinates(ServerWorld world) {

@@ -63,9 +63,7 @@ public final class OffsetRaycastTargetingTest {
     }
 
     private static void checkStoredSideOwner(TestContext ctx, double depth) {
-        boolean previous = SlabAnchorAttachment.FROZEN_DY_ENABLED;
-        SlabAnchorAttachment.FROZEN_DY_ENABLED = true;
-        try {
+        {
             ServerWorld world = ctx.getWorld();
             BlockPos owner = ctx.getAbsolutePos(new BlockPos(4, 5, 4));
             world.setBlockState(owner, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
@@ -87,8 +85,6 @@ public final class OffsetRaycastTargetingTest {
                                     + hit.getType() + "/" + hit.getBlockPos() + "/" + hit.getSide());
                 }
             }
-        } finally {
-            SlabAnchorAttachment.FROZEN_DY_ENABLED = previous;
         }
     }
 

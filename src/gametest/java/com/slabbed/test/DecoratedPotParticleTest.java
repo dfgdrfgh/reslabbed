@@ -28,8 +28,6 @@ public final class DecoratedPotParticleTest {
 
     @GameTest(templateName = "fabric-gametest-api-v1:empty")
     public void insertionBurstFollowsStoredDepth(TestContext context) {
-        boolean previousFrozen = SlabAnchorAttachment.FROZEN_DY_ENABLED;
-        SlabAnchorAttachment.FROZEN_DY_ENABLED = true;
         try {
             ServerWorld world = context.getWorld();
             BlockPos relative = new BlockPos(4, 4, 4);
@@ -58,7 +56,6 @@ public final class DecoratedPotParticleTest {
                             + " deepY=" + deep.y());
         } finally {
             ServerParticleCapture.reset();
-            SlabAnchorAttachment.FROZEN_DY_ENABLED = previousFrozen;
         }
         context.complete();
     }

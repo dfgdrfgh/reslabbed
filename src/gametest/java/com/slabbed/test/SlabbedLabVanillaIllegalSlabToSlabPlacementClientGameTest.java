@@ -248,7 +248,7 @@ public final class SlabbedLabVanillaIllegalSlabToSlabPlacementClientGameTest imp
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                     Block.NOTIFY_LISTENERS);
             world.setBlockState(fullPos, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, fullPos, world.getBlockState(fullPos));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, fullPos, world.getBlockState(fullPos));
             world.setBlockState(targetSlabPos,
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                     Block.NOTIFY_LISTENERS);

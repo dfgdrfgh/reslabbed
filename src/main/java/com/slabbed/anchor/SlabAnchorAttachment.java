@@ -363,18 +363,6 @@ public final class SlabAnchorAttachment {
         return heights;
     }
 
-    private static Long2IntOpenHashMap dyMapFromStreams(
-            java.util.stream.LongStream positions, java.util.stream.IntStream heights) {
-        long[] p = positions.toArray();
-        int[] h = heights.toArray();
-        Long2IntOpenHashMap map = newDyMap();
-        int n = Math.min(p.length, h.length);
-        for (int i = 0; i < n; i++) {
-            map.put(p[i], h[i]);
-        }
-        return map;
-    }
-
     static Codec<Long2IntOpenHashMap> dyMapCodecForTesting() {
         return DY_MAP_CODEC;
     }
@@ -393,24 +381,6 @@ public final class SlabAnchorAttachment {
                     .persistent(DY_MAP_CODEC)
                     .syncWith(DY_MAP_PACKET_CODEC, AttachmentSyncPredicate.all())
             );
-
-    /**
-     * Whole-world override for the stored-height reader (LAW.md restoration): when true, EVERY cell
-     * reads its stored placement height and a missing fact resolves stable-flat, regardless of
-     * provenance. Shipped default false.
-     *
-     * <p>The shipped mode is per-cell provenance — see {@link #usesFrozenPlacementHeight}: a cell
-     * placed by an item under this line's placement policy carries a modern marker and reads its
-     * stored height; a cell without one (blocks from before this version, worldgen, structures,
-     * {@code /setblock}) keeps the live read lanes, so upgrading a world moves nothing. There is no
-     * retro-migration on this line: a legacy cell never acquires a stored value from its live geometry.
-     *
-     * <p>{@code -Dslabbed.frozenDy=true} remains the opt-in for whole-world frozen reads. Deliberately
-     * MUTABLE: fixtures and law rows flip it in-process to run a single scenario under whole-world
-     * frozen reads while the rest of the suite stays on the shipped configuration.
-     */
-    public static boolean FROZEN_DY_ENABLED =
-            Boolean.parseBoolean(System.getProperty("slabbed.frozenDy", "false"));
 
     /**
      * Attachment reads and removal callbacks must never request chunk generation or wait on a
@@ -576,10 +546,7 @@ public final class SlabAnchorAttachment {
         return set != null && set.contains(pos.asLong());
     }
 
-    /**
-     * Selects the frozen reader for a cell: every cell under the whole-world override; otherwise a
-     * cell with modern provenance, or — on the client only — a cell the prediction overlay owns.
-     */
+    /** Compatibility query for views allowed to read the shared geometry store (LAW.md). */
     public static boolean usesFrozenPlacementHeight(BlockView world, BlockPos pos) {
         return pos != null && !SlabSupport.isUnsafeGeometryView(world);
     }
@@ -670,135 +637,6 @@ public final class SlabAnchorAttachment {
     // ── server-side mutation ──────────────────────────────────────────
 
     /**
-     * Records an anchor at {@code pos}. Server-side only; no-op on client world or
-     * if {@code pos} does not qualify under {@link #qualifiesForAnchor}.
-     */
-    public static void addAnchor(World world, BlockPos pos, BlockState state) {
-        if (world == null || world.isClient()) {
-            return;
-        }
-        boolean qualifies = qualifiesForAnchor(world, pos, state);
-        if (TRACE) {
-            Slabbed.LOGGER.info("[ANCHOR] add attempt side=SERVER pos={} state={} qualifies={}",
-                    pos.toShortString(), state, qualifies);
-        }
-        if (!qualifies) {
-            return;
-        }
-        addAnchorUnchecked(world, pos);
-    }
-
-    public static void addSideAdjacentLoweredFullAnchor(
-            World world,
-            BlockPos pos,
-            BlockState state,
-            BlockPos sourcePos,
-            BlockState sourceState
-    ) {
-        if (world == null) {
-            return;
-        }
-        if (!qualifiesForSideAdjacentLoweredFullAnchor(world, pos, state, sourcePos, sourceState)) {
-            return;
-        }
-        addAnchorUnchecked(world, pos);
-        if (qualifiesForSideAdjacentCompoundFullAnchor(world, pos, state, sourcePos, sourceState)) {
-            addToAttachment(world, pos, COMPOUND_FULL_BLOCK_ANCHOR_TYPE, "compound_full_block_anchor");
-        }
-    }
-
-    public static void addTopOfCompoundFullAnchor(
-            World world,
-            BlockPos pos,
-            BlockState state,
-            BlockPos sourcePos,
-            BlockState sourceState
-    ) {
-        if (world == null) {
-            return;
-        }
-        if (!qualifiesForTopOfCompoundFullAnchor(world, pos, state, sourcePos, sourceState)) {
-            return;
-        }
-        addAnchorUnchecked(world, pos);
-        addToAttachment(world, pos, COMPOUND_FULL_BLOCK_ANCHOR_TYPE, "compound_full_block_anchor");
-    }
-
-    private static void addAnchorUnchecked(World world, BlockPos pos) {
-        boolean added = addToAttachment(world, pos, ANCHOR_TYPE, "anchor");
-        if (added && RuntimeDiagnostics.isBsFbLiveTraceEnabled()) {
-            BlockPos supportPos = pos.down();
-            RuntimeDiagnostics.captureBsFbLiveTrace(world, supportPos, pos, "ANCHOR_ADDED");
-        }
-        // Beta4 sidecar: if the position currently satisfies the compound full-block
-        // condition (anchored ordinary full block above a lowered bottom slab carrier),
-        // also record the authored dy=-1.0 lane so it survives source slab removal.
-        BlockState state = world.getBlockState(pos);
-        if (qualifiesForCompoundFullBlockAnchor(world, pos, state)) {
-            addToAttachment(world, pos, COMPOUND_FULL_BLOCK_ANCHOR_TYPE, "compound_full_block_anchor");
-        }
-    }
-
-    /**
-     * FREEZE-ON-PLACE: locks a piece's lowered height at the moment it is placed so it
-     * NEVER autonomously moves afterwards. LAW 1 (the placement law) — "a placed block must stay in
-     * that spot and not autonomously pop." Once a piece is recorded here, the lowered
-     * dy is read from the persistent anchor and {@code getYOffsetInner} never recomputes
-     * it, so breaking a neighbour / source can no longer un-lower it (the pop) and the
-     * value can no longer drift from the rendered mesh (the render-lag).
-     *
-     * <p>Server-side only. No-op if the piece is not lowered (so a block placed on solid
-     * ground or in mid-air stays at 0) or is already anchored by the direct-support /
-     * compound paths (so this only fills the previously-unfrozen cases: cantilevered full
-     * blocks and adjacent-side-merged slabs). The live geometric paths still compute the
-     * value used here and act as the first-frame fallback before the anchor syncs.
-     */
-    public static void freezeLoweredOnPlace(World world, BlockPos pos, BlockState state) {
-        if (world == null || world.isClient() || pos == null || state == null
-                || state.isAir() || !state.getFluidState().isEmpty()) {
-            return;
-        }
-        if (isAnchored(world, pos) || isFrozenFlat(world, pos)) {
-            return;
-        }
-        // SUBJECT reading: the placement fact for THIS cell is published only after
-        // {@code BlockItem.place} returns, so at {@code onPlaced} time the public read still answers
-        // with the stable-flat stand-in and every genuinely lowered placement would classify as FLAT.
-        // Take the explicit placement-time reading instead — the documented read-only entry for
-        // exactly this seam. Under frozen-OFF the two entries are provably the same code, so this is
-        // byte-identical there. SUPPORT / neighbour terms below stay on the public read: those are
-        // different cells whose facts already exist, or fact-less scenery that must keep reading
-        // exactly as it is drawn.
-        double dy = SlabSupport.getUnstoredYOffset(world, pos, state);
-        // Only STRUCTURAL pieces (ordinary full blocks and slabs) freeze. Decorative followers
-        // (lanterns, torches, hangers, signs, the crafting-table/BE "objects", …) must stay fully
-        // GEOMETRIC so they always track their support's current surface — exactly the anchor
-        // system's documented scope ("ordinary full-block vertical slab chains … No torch
-        // interaction"). Applies to BOTH the lowered (dy<0) and flat (dy≈0) cases: freezing a
-        // follower's lowered state pins it with a persistent anchor that goes STALE when the
-        // support surface later changes (e.g. a Terrain-Slabs / vanilla BOTTOM slab retyped to a
-        // flush TOP surface), leaving the follower smooshed -0.5 into it instead of recomputing
-        // to flush. Structural cantilevered full blocks and adjacent-side-merged slabs still
-        // freeze via this gate (both are full-height / SlabBlock candidates).
-        boolean structural = isOrdinaryFullBlockAnchorCandidate(world, pos, state)
-                || state.getBlock() instanceof SlabBlock;
-        if (!structural) {
-            return;
-        }
-        if (dy < -1.0e-6) {
-            // addAnchorUnchecked records ANCHOR_TYPE (read as -0.5) and adds the compound
-            // sidecar (-1.0) when the piece qualifies, so both lowered lanes freeze.
-            addAnchorUnchecked(world, pos);
-            return;
-        }
-        // dy ≈ 0: lock the FLAT height of a structural piece so a slab / lowered carrier placed
-        // under or beside it later can no longer pull it down (the maintainer's "placed slab under a
-        // floating block must not lower it"). Natural (terrain / setBlockState, which never calls
-        // onPlaced) pieces stay fully geometric.
-        addToAttachment(world, pos, FROZEN_FLAT_TYPE, "frozen_flat");
-    }
-
-    /**
      * Returns true if {@code pos} carries a freeze-on-place FLAT marker — a structural
      * piece whose height was locked at 0 when placed. Safe on server and client (client
      * mirror via {@link #clientFrozenFlatLookup}); false for non-{@link World} views.
@@ -819,123 +657,10 @@ public final class SlabAnchorAttachment {
     }
 
     /**
-     * Records a beta4 compound full-block anchor at {@code pos}. Server-side only.
-     * Idempotent; no-op if {@code pos} does not satisfy
-     * {@link #qualifiesForCompoundFullBlockAnchor}.
-     */
-    public static void addCompoundFullBlockAnchor(World world, BlockPos pos, BlockState state) {
-        if (world == null || world.isClient()) {
-            return;
-        }
-        if (!qualifiesForCompoundFullBlockAnchor(world, pos, state)) {
-            return;
-        }
-        addToAttachment(world, pos, COMPOUND_FULL_BLOCK_ANCHOR_TYPE, "compound_full_block_anchor");
-    }
-
-    /**
      * Clears any beta4 compound full-block anchor at {@code pos}. Server-side only.
      */
     public static void removeCompoundFullBlockAnchor(World world, BlockPos pos) {
         removeFromAttachment(world, pos, COMPOUND_FULL_BLOCK_ANCHOR_TYPE, "compound_full_block_anchor");
-    }
-
-    public static void addCompoundVisibleSideLowerSlab(
-            World world,
-            BlockPos pos,
-            BlockState state,
-            BlockPos sourcePos,
-            BlockState sourceState
-    ) {
-        if (world == null || world.isClient()) {
-            return;
-        }
-        if (!qualifiesForCompoundVisibleSideLowerSlab(world, pos, state, sourcePos, sourceState)) {
-            return;
-        }
-        boolean added = addToAttachment(world, pos, COMPOUND_VISIBLE_SIDE_LOWER_SLAB_TYPE,
-                "compound_visible_side_lower_slab");
-        if (added) {
-            // Trigger getStateForNeighborUpdate(DOWN) on the block above so any stale floor
-            // torch that was placed before this compound mark is written gets revalidated and
-            // removed by TorchBlockMixin.getStateForNeighborUpdate.
-            world.replaceWithStateForNeighborUpdate(Direction.DOWN, state, pos.up(), pos, Block.NOTIFY_ALL, 512);
-        }
-    }
-
-    public static void addCompoundVisibleSideUpperSlab(
-            World world,
-            BlockPos pos,
-            BlockState state,
-            BlockPos sourcePos,
-            BlockState sourceState
-    ) {
-        if (world == null || world.isClient()) {
-            return;
-        }
-        if (!qualifiesForCompoundVisibleSideUpperSlab(world, pos, state, sourcePos, sourceState)) {
-            return;
-        }
-        addToAttachment(world, pos, COMPOUND_VISIBLE_SIDE_UPPER_SLAB_TYPE,
-                "compound_visible_side_upper_slab");
-    }
-
-    public static void addCompoundVisibleSideDoubleSlab(
-            World world,
-            BlockPos pos,
-            BlockState state,
-            BlockPos sourcePos,
-            BlockState sourceState
-    ) {
-        if (world == null || world.isClient()) {
-            return;
-        }
-        if (!qualifiesForCompoundVisibleSideDoubleSlab(world, pos, state, sourcePos, sourceState)) {
-            return;
-        }
-        removeFromAttachment(world, pos, COMPOUND_VISIBLE_SIDE_LOWER_SLAB_TYPE,
-                "compound_visible_side_lower_slab");
-        removeFromAttachment(world, pos, COMPOUND_VISIBLE_SIDE_UPPER_SLAB_TYPE,
-                "compound_visible_side_upper_slab");
-        addToAttachment(world, pos, COMPOUND_VISIBLE_SIDE_DOUBLE_SLAB_TYPE,
-                "compound_visible_side_double_slab");
-    }
-
-    public static void addCompoundVisibleOwnerTopSlab(
-            World world,
-            BlockPos pos,
-            BlockState state,
-            BlockPos sourcePos,
-            BlockState sourceState
-    ) {
-        if (world == null || world.isClient()) {
-            return;
-        }
-        if (!qualifiesForCompoundVisibleOwnerTopSlab(world, pos, state, sourcePos, sourceState)) {
-            return;
-        }
-        boolean added = addToAttachment(world, pos, COMPOUND_VISIBLE_OWNER_TOP_SLAB_TYPE,
-                "compound_visible_owner_top_slab");
-        if (added) {
-            world.replaceWithStateForNeighborUpdate(Direction.DOWN, state, pos.up(), pos, Block.NOTIFY_ALL, 512);
-        }
-    }
-
-    public static void updatePersistentLoweredSlabCarrier(World world, BlockPos pos, BlockState state) {
-        if (world == null || world.isClient()) {
-            return;
-        }
-        boolean qualifies = qualifiesForPersistentLoweredSlabCarrier(world, pos, state);
-        if (TRACE) {
-            Slabbed.LOGGER.info("[ANCHOR] lowered slab carrier update side=SERVER pos={} state={} qualifies={}",
-                    pos.toShortString(), state, qualifies);
-        }
-        if (qualifies) {
-            addToAttachment(world, pos, LOWERED_SLAB_CARRIER_TYPE, "lowered_slab_carrier");
-        } else if (state != null && state.getBlock() instanceof SlabBlock) {
-            removeFromAttachment(world, pos, LOWERED_SLAB_CARRIER_TYPE, "lowered_slab_carrier");
-        }
-        logCompoundVisibleRenderTraceSupportUpdate(world, pos, state, qualifies);
     }
 
     private static boolean addToAttachment(
@@ -1115,23 +840,6 @@ public final class SlabAnchorAttachment {
                 compoundVisibleAttachmentLabel(type),
                 label,
                 serverMarker,
-                dy);
-    }
-
-    private static void logCompoundVisibleRenderTraceSupportUpdate(
-            World world,
-            BlockPos pos,
-            BlockState state,
-            boolean qualifies
-    ) {
-        if (!beta4CompoundVisibleRenderTraceEnabled()) {
-            return;
-        }
-        double dy = state == null ? 0.0d : SlabSupport.getYOffset(world, pos, state);
-        Slabbed.LOGGER.info(
-                "[MAINTAINER_BETA4_COMPOUND_VISIBLE_RENDER_TRACE_SUPPORT_UPDATE] pos={} marker=lowered_slab_carrier serverMarker={} clientMarker=n/a modelViewType=World slabSupportDy={} clientDy=n/a candidateRerenderScheduled=false neighborRerenderScheduled=false",
-                pos.toShortString(),
-                qualifies,
                 dy);
     }
 
@@ -1428,120 +1136,6 @@ public final class SlabAnchorAttachment {
         return SlabSupport.isLoweredCompoundSourceSlab(world, belowPos, belowSlab);
     }
 
-    private static boolean qualifiesForTopOfCompoundFullAnchor(
-            BlockView world,
-            BlockPos pos,
-            BlockState state,
-            BlockPos sourcePos,
-            BlockState sourceState
-    ) {
-        if (!isOrdinaryFullBlockAnchorCandidate(world, pos, state)) {
-            return false;
-        }
-        if (world == null || pos == null || sourcePos == null || sourceState == null) {
-            return false;
-        }
-        if (!sourcePos.equals(pos.down())) {
-            return false;
-        }
-        if (sourceState.getBlock() instanceof SlabBlock) {
-            return false;
-        }
-        if (!isCompoundFullBlockAnchor(world, sourcePos)) {
-            return false;
-        }
-        double sourceDy = SlabSupport.getYOffset(world, sourcePos, sourceState);
-        return Math.abs(sourceDy + 1.0d) <= 1.0e-6d;
-    }
-
-    private static boolean qualifiesForCompoundVisibleSideLowerSlab(
-            BlockView world,
-            BlockPos pos,
-            BlockState state,
-            BlockPos sourcePos,
-            BlockState sourceState
-    ) {
-        if (!isCompoundVisibleSideLowerSlabState(state)
-                || world == null
-                || pos == null
-                || sourcePos == null
-                || sourceState == null) {
-            return false;
-        }
-        if (!isCompoundVisibleSideSource(world, sourcePos, sourceState)) {
-            return false;
-        }
-        int dx = Math.abs(pos.getX() - sourcePos.getX());
-        int dy = Math.abs(pos.getY() - sourcePos.getY());
-        int dz = Math.abs(pos.getZ() - sourcePos.getZ());
-        return dy == 0 && dx + dz == 1;
-    }
-
-    private static boolean qualifiesForCompoundVisibleSideUpperSlab(
-            BlockView world,
-            BlockPos pos,
-            BlockState state,
-            BlockPos sourcePos,
-            BlockState sourceState
-    ) {
-        if (!isCompoundVisibleSideUpperSlabState(state)
-                || world == null
-                || pos == null
-                || sourcePos == null
-                || sourceState == null) {
-            return false;
-        }
-        if (!isCompoundVisibleSideSource(world, sourcePos, sourceState)) {
-            return false;
-        }
-        int dx = Math.abs(pos.getX() - sourcePos.getX());
-        int dy = Math.abs(pos.getY() - sourcePos.getY());
-        int dz = Math.abs(pos.getZ() - sourcePos.getZ());
-        return dy == 0 && dx + dz == 1;
-    }
-
-    private static boolean qualifiesForCompoundVisibleSideDoubleSlab(
-            BlockView world,
-            BlockPos pos,
-            BlockState state,
-            BlockPos sourcePos,
-            BlockState sourceState
-    ) {
-        if (!isCompoundVisibleSideDoubleSlabState(state)
-                || world == null
-                || pos == null
-                || sourcePos == null
-                || sourceState == null) {
-            return false;
-        }
-        if (!isCompoundVisibleSideSource(world, sourcePos, sourceState)) {
-            return false;
-        }
-        int dx = Math.abs(pos.getX() - sourcePos.getX());
-        int dy = Math.abs(pos.getY() - sourcePos.getY());
-        int dz = Math.abs(pos.getZ() - sourcePos.getZ());
-        return dy == 0 && dx + dz == 1;
-    }
-
-    private static boolean isCompoundVisibleSideSource(
-            BlockView world,
-            BlockPos sourcePos,
-            BlockState sourceState
-    ) {
-        if (world == null || sourcePos == null || sourceState == null) {
-            return false;
-        }
-        double sourceDy = SlabSupport.getYOffset(world, sourcePos, sourceState);
-        if (Math.abs(sourceDy + 1.0d) > 1.0e-6d) {
-            return false;
-        }
-        if (sourceState.getBlock() instanceof SlabBlock) {
-            return SlabSupport.isCompoundVisibleSlabLaneOwner(world, sourcePos, sourceState);
-        }
-        return isOrdinaryFullBlockAnchorCandidate(world, sourcePos, sourceState)
-                && isCompoundFullBlockAnchor(world, sourcePos);
-    }
-
     public static boolean qualifiesForPersistentLoweredSlabCarrier(BlockView world, BlockPos pos, BlockState state) {
         return isPersistentLoweredSlabCarrierState(state)
                 && !isCompoundVisibleOwnerTopSlab(world, pos, state)
@@ -1559,34 +1153,6 @@ public final class SlabAnchorAttachment {
             return false;
         }
         return isFullHeightNonSlabCarrierSupport(world, pos, state, dy);
-    }
-
-    private static boolean qualifiesForCompoundVisibleOwnerTopSlab(
-            BlockView world,
-            BlockPos pos,
-            BlockState state,
-            BlockPos sourcePos,
-            BlockState sourceState
-    ) {
-        if (!isCompoundVisibleOwnerTopSlabState(state)
-                || world == null
-                || pos == null
-                || sourcePos == null
-                || sourceState == null) {
-            return false;
-        }
-        if (!pos.equals(sourcePos.up())) {
-            return false;
-        }
-        if (!isOrdinaryFullBlockAnchorCandidate(world, sourcePos, sourceState)
-                || !(isCompoundFullBlockAnchor(world, sourcePos) || isAnchored(world, sourcePos))) {
-            return false;
-        }
-        double sourceDy = SlabSupport.getYOffset(world, sourcePos, sourceState);
-        if (isCompoundFullBlockAnchor(world, sourcePos)) {
-            return Math.abs(sourceDy + 1.0d) <= 1.0e-6d;
-        }
-        return Math.abs(sourceDy + 0.5d) <= 1.0e-6d;
     }
 
     private static boolean isPersistentLoweredSlabCarrierState(BlockState state) {
@@ -1648,7 +1214,7 @@ public final class SlabAnchorAttachment {
                 || !state.contains(SlabBlock.TYPE)
                 || state.get(SlabBlock.TYPE) != SlabType.BOTTOM
                 || !state.getFluidState().isEmpty()
-                || SlabSupport.getUnstoredYOffset(world, pos, state) != -0.5) {
+                || SlabSupport.getYOffset(world, pos, state) != -0.5) {
             return false;
         }
         BlockPos belowPos = pos.down();
@@ -1818,72 +1384,4 @@ public final class SlabAnchorAttachment {
         return SlabSupport.isFullHeightLoweredCarrier(world, pos, state);
     }
 
-    private static boolean qualifiesForSideAdjacentLoweredFullAnchor(
-            BlockView world,
-            BlockPos pos,
-            BlockState state,
-            BlockPos sourcePos,
-            BlockState sourceState
-    ) {
-        // A full block must NOT inherit lowering from a horizontal neighbour. Side-adjacent
-        // anchoring lowered a freestanding full block purely because the block beside it was
-        // lowered, with no slab/lowered support of its own — a persistent anchor that then
-        // (a) sank the block into the ground/air, (b) went stale (it stayed lowered after the
-        // source carrier was removed, since the anchor never recomputes), and (c) spread the
-        // lowering further to ITS neighbours. Live-confirmed 2026-06-11: this is the "blocks
-        // inheriting states from neighbours" / tree-canopy contagion. Lowering for full blocks
-        // now comes only from genuine support directly below (a slab, or a lowered full-block
-        // column down to a slab) via qualifiesForAnchor — never sideways.
-        if (true) {
-            return false;
-        }
-        if (!isOrdinaryFullBlockAnchorCandidate(world, pos, state)
-                || !qualifiesAsSideAdjacentLoweredFullAnchorSource(world, sourcePos, sourceState)) {
-            return false;
-        }
-        int dx = Math.abs(pos.getX() - sourcePos.getX());
-        int dy = Math.abs(pos.getY() - sourcePos.getY());
-        int dz = Math.abs(pos.getZ() - sourcePos.getZ());
-        if (dy != 0 || dx + dz != 1) {
-            return false;
-        }
-        double sourceDy = SlabSupport.getYOffset(world, sourcePos, sourceState);
-        return sourceDy < 0.0d;
-    }
-
-    private static boolean qualifiesForSideAdjacentCompoundFullAnchor(
-            BlockView world,
-            BlockPos pos,
-            BlockState state,
-            BlockPos sourcePos,
-            BlockState sourceState
-    ) {
-        if (world == null || pos == null || sourcePos == null) {
-            return false;
-        }
-        if (!isOrdinaryFullBlockAnchorCandidate(world, pos, state)
-                || !isOrdinaryFullBlockAnchorCandidate(world, sourcePos, sourceState)) {
-            return false;
-        }
-        if (!isCompoundFullBlockAnchor(world, sourcePos)) {
-            return false;
-        }
-        if (SlabSupport.getYOffset(world, sourcePos, sourceState) != -1.0d) {
-            return false;
-        }
-        int dx = Math.abs(pos.getX() - sourcePos.getX());
-        int dy = Math.abs(pos.getY() - sourcePos.getY());
-        int dz = Math.abs(pos.getZ() - sourcePos.getZ());
-        return dy == 0 && dx + dz == 1;
-    }
-
-    private static boolean qualifiesAsSideAdjacentLoweredFullAnchorSource(
-            BlockView world,
-            BlockPos sourcePos,
-            BlockState sourceState
-    ) {
-        return SlabSupport.isFullHeightLoweredCarrier(world, sourcePos, sourceState)
-                || SlabSupport.isLoweredSideLaneSlabCarrier(world, sourcePos, sourceState)
-                || SlabSupport.isBottomSlabLoweredByCarrierBelow(world, sourcePos, sourceState);
-    }
 }

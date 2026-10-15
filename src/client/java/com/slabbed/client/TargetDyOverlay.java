@@ -94,7 +94,7 @@ public final class TargetDyOverlay {
         boolean predicted = Double.isFinite(stored)
                 && (!backing.present()
                         || Double.doubleToRawLongBits(raw) != Double.doubleToRawLongBits(stored));
-        double live = SlabSupport.getUnstoredYOffset(client.world, pos, state);
+        double live = SlabSupport.getYOffset(client.world, pos, state);
         boolean diverged = Double.isFinite(stored)
                 ? Math.abs(stored - live) > EPS
                 : (live < -EPS || live > EPS);
@@ -109,8 +109,7 @@ public final class TargetDyOverlay {
         boolean meshSplit = Double.isFinite(raw) != Double.isFinite(mesh)
                 || (Double.isFinite(raw)
                         && Double.doubleToRawLongBits(raw) != Double.doubleToRawLongBits(mesh));
-        String line5 = "  frozen=" + (SlabAnchorAttachment.FROZEN_DY_ENABLED ? "ALL"
-                        : SlabAnchorAttachment.isModernPlacement(client.world, pos) ? "cell" : "legacy")
+        String line5 = "  height=stored"
                 + " stored=" + (Double.isFinite(stored) ? format(stored) : "none")
                 + " raw=" + (backing.present() ? format(raw) : "none")
                 + " live=" + format(live)

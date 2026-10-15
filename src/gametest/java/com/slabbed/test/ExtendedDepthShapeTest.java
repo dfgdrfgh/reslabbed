@@ -43,9 +43,7 @@ public final class ExtendedDepthShapeTest {
     }
     @GameTest(templateName = "fabric-gametest-api-v1:empty")
     public void carpetClientHeightReadsStoredDepth(TestContext ctx) {
-        boolean previous = SlabAnchorAttachment.FROZEN_DY_ENABLED;
-        SlabAnchorAttachment.FROZEN_DY_ENABLED = true;
-        try {
+        {
             var world = ctx.getWorld();
             BlockPos pos = ctx.getAbsolutePos(new BlockPos(4, 5, 4));
             var carpet = Blocks.WHITE_CARPET.getDefaultState();
@@ -55,8 +53,6 @@ public final class ExtendedDepthShapeTest {
             ctx.assertTrue(com.slabbed.client.ClientDy.dyFor(world, pos, carpet) == -3.0d,
                     "carpet client model height must read its stored -3 depth");
             ctx.complete();
-        } finally {
-            SlabAnchorAttachment.FROZEN_DY_ENABLED = previous;
         }
     }
 
@@ -77,9 +73,7 @@ public final class ExtendedDepthShapeTest {
 
     @GameTest(templateName = "fabric-gametest-api-v1:empty")
     public void movementFindsMinusThreeOwnerAndLeavesItsOldCellEmpty(TestContext ctx) {
-        boolean previous = SlabAnchorAttachment.FROZEN_DY_ENABLED;
-        SlabAnchorAttachment.FROZEN_DY_ENABLED = true;
-        try {
+        {
             var world = ctx.getWorld();
             BlockPos pos = ctx.getAbsolutePos(new BlockPos(4, 6, 4));
             world.setBlockState(pos, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
@@ -92,15 +86,11 @@ public final class ExtendedDepthShapeTest {
             ctx.assertTrue(world.isSpaceEmpty(null, nativeCell),
                     "the old unshifted owner cell must not retain an invisible collision");
             ctx.complete();
-        } finally {
-            SlabAnchorAttachment.FROZEN_DY_ENABLED = previous;
         }
     }
 
     private static void checkShapes(TestContext ctx, boolean collision, boolean cached) {
-        boolean previous = SlabAnchorAttachment.FROZEN_DY_ENABLED;
-        SlabAnchorAttachment.FROZEN_DY_ENABLED = true;
-        try {
+        {
             var world = ctx.getWorld();
             BlockPos pos = ctx.getAbsolutePos(new BlockPos(4, 5, 4));
             List<String> failures = new ArrayList<>();
@@ -137,8 +127,6 @@ public final class ExtendedDepthShapeTest {
             com.slabbed.Slabbed.LOGGER.info("EXTENDED_DEPTH_SHAPES component={} checked={} PASS",
                     collision ? "collision" : "outline", checked);
             ctx.complete();
-        } finally {
-            SlabAnchorAttachment.FROZEN_DY_ENABLED = previous;
         }
     }
 

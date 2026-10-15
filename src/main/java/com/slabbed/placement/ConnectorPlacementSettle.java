@@ -9,38 +9,7 @@ import net.minecraft.world.World;
 
 import java.util.Collection;
 
-/**
- * Settles connector arms (fence / wall / iron-bars / glass-pane) immediately AFTER C3 publishes a
- * placement's frozen height, so the stepped-connection rule decides from the published height rather
- * than from the absent-fact stand-in.
- *
- * <p><b>Why this exists.</b> {@link SlabSupport#isSteppedConnectingNeighbor} compares the two cells'
- * frozen heights. Both of its decision points run BEFORE the placement fact exists:
- * {@code getPlacementState} runs before the block is even set, and the existing neighbour's
- * {@code getStateForNeighborUpdate} is fired by the {@code setBlockState} inside the same vanilla
- * {@code place} call — while C3 publishes the fact only after {@code place} returns. So the new cell
- * read the stable-flat {@code 0.0} while its already-placed neighbour read its true {@code -0.5}, the
- * pair looked stepped to both ends, and the cut arms were baked into the persisted blockstate with
- * nothing to revisit them. This pass IS that revisit. It is what keeps this line from reproducing the
- * donor's live "two same-height fences on two bottom slabs refuse to join" report through its own
- * {@code FencePaneSlabConnectionMixin} / {@code WallSlabConnectionMixin} height-aware arms.
- *
- * <p><b>Why the height read was left alone.</b> Teaching the connector read to fall back to an
- * unstored placement-time height would also change the answer for cells that legitimately have no
- * fact — legacy cells (there is no retro-migration; see
- * {@code SlabAnchorAttachment#FROZEN_DY_ENABLED}), worldgen, structures, {@code /setblock}. Those
- * cells DRAW at the height the model reads for them — stable-flat under the whole-world override,
- * their live lane otherwise — and the connector reads that same authority. A connector reading
- * anything else would cut arms between posts that visibly sit at the same height. Changing WHEN the
- * decision runs keeps the connector and the model in exact agreement for every cell, and corrects
- * only real player placements — the ones that do get a fact.
- *
- * <p><b>LAW.md.</b> Nothing here reads, writes, or re-derives a height. The store is untouched; only
- * vanilla's own connection properties are re-derived, through vanilla's own
- * {@link Block#postProcessState} entry point, which is the specific vanilla gameplay mechanism that
- * owns fence / wall / pane arms. The rewrite is refused unless the block at the cell is unchanged, so
- * this can never remove, replace, or relocate a placed block.
- */
+
 public final class ConnectorPlacementSettle {
 
     /**

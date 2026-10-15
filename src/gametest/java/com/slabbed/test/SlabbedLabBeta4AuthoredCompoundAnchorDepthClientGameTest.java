@@ -263,17 +263,17 @@ public final class SlabbedLabBeta4AuthoredCompoundAnchorDepthClientGameTest
                     Block.NOTIFY_LISTENERS);
             world.setBlockState(BASE_FULL, Blocks.STONE.getDefaultState(),
                     Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, BASE_FULL, world.getBlockState(BASE_FULL));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, BASE_FULL, world.getBlockState(BASE_FULL));
 
             world.setBlockState(LOWERED_BOTTOM_SLAB,
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                     Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(world, LOWERED_BOTTOM_SLAB,
+            com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(world, LOWERED_BOTTOM_SLAB,
                     world.getBlockState(LOWERED_BOTTOM_SLAB));
 
             world.setBlockState(COMPOUND, Blocks.STONE.getDefaultState(),
                     Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, COMPOUND, world.getBlockState(COMPOUND));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, COMPOUND, world.getBlockState(COMPOUND));
         });
         for (int i = 0; i < 5; i++) {
             ctx.waitTick();

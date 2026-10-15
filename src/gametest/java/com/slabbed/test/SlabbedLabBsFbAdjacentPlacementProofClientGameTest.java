@@ -93,12 +93,12 @@ public final class SlabbedLabBsFbAdjacentPlacementProofClientGameTest implements
                     FULL_POS,
                     Blocks.STONE.getDefaultState(),
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, FULL_POS, world.getBlockState(FULL_POS));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, FULL_POS, world.getBlockState(FULL_POS));
             world.setBlockState(
                     ADJACENT_FULL_POS,
                     Blocks.STONE.getDefaultState(),
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addSideAdjacentLoweredFullAnchor(
+            com.slabbed.dev.LegacyPlacementFixtures.addSideAdjacentLoweredFullAnchor(
                     world,
                     ADJACENT_FULL_POS,
                     world.getBlockState(ADJACENT_FULL_POS),
@@ -492,7 +492,7 @@ public final class SlabbedLabBsFbAdjacentPlacementProofClientGameTest implements
                     persistentDependentPos,
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE),
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(
+            com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(
                     world,
                     persistentDependentPos,
                     world.getBlockState(persistentDependentPos));
@@ -795,7 +795,7 @@ public final class SlabbedLabBsFbAdjacentPlacementProofClientGameTest implements
                     liveCarrierPos.down(),
                     Blocks.AIR.getDefaultState(),
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, liveAnchorPos, world.getBlockState(liveAnchorPos));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, liveAnchorPos, world.getBlockState(liveAnchorPos));
         });
         waitForPlacementSync(ctx);
         singleplayer.getClientWorld().waitForChunksRender();
@@ -907,7 +907,7 @@ public final class SlabbedLabBsFbAdjacentPlacementProofClientGameTest implements
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
             world.setBlockState(candidateSupport, Blocks.STONE.getDefaultState(),
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, candidateSupport, world.getBlockState(candidateSupport));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, candidateSupport, world.getBlockState(candidateSupport));
             forceAddPersistentLoweredSlabCarrierForTest(
                     world, dangerousCandidate, proofName);
         });
@@ -1005,7 +1005,7 @@ public final class SlabbedLabBsFbAdjacentPlacementProofClientGameTest implements
             BlockPos aTarget = aCarrier.east();
             seedAnchoredFullCarrier(world, aSupport, aCarrier);
             world.setBlockState(aTarget, Blocks.STONE.getDefaultState(), net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addSideAdjacentLoweredFullAnchor(
+            com.slabbed.dev.LegacyPlacementFixtures.addSideAdjacentLoweredFullAnchor(
                     world,
                     aTarget,
                     world.getBlockState(aTarget),
@@ -1020,7 +1020,7 @@ public final class SlabbedLabBsFbAdjacentPlacementProofClientGameTest implements
             seedAnchoredFullCarrier(world, bSupport, bFullCarrier);
             seedLoweredDoubleCarrier(world, bDoubleCarrier);
             world.setBlockState(bTarget, Blocks.STONE.getDefaultState(), net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addSideAdjacentLoweredFullAnchor(
+            com.slabbed.dev.LegacyPlacementFixtures.addSideAdjacentLoweredFullAnchor(
                     world,
                     bTarget,
                     world.getBlockState(bTarget),
@@ -1038,7 +1038,7 @@ public final class SlabbedLabBsFbAdjacentPlacementProofClientGameTest implements
             seedLoweredDoubleCarrier(world, cFirstDouble);
             seedLoweredDoubleCarrier(world, cSecondDouble);
             world.setBlockState(cTarget, Blocks.STONE.getDefaultState(), net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addSideAdjacentLoweredFullAnchor(
+            com.slabbed.dev.LegacyPlacementFixtures.addSideAdjacentLoweredFullAnchor(
                     world,
                     cTarget,
                     world.getBlockState(cTarget),
@@ -1068,7 +1068,7 @@ public final class SlabbedLabBsFbAdjacentPlacementProofClientGameTest implements
                 Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                 net.minecraft.block.Block.NOTIFY_LISTENERS);
         world.setBlockState(carrierPos, Blocks.STONE.getDefaultState(), net.minecraft.block.Block.NOTIFY_LISTENERS);
-        SlabAnchorAttachment.addAnchor(world, carrierPos, world.getBlockState(carrierPos));
+        com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, carrierPos, world.getBlockState(carrierPos));
     }
 
     private static void seedLoweredDoubleCarrier(World world, BlockPos carrierPos) {
@@ -1076,7 +1076,7 @@ public final class SlabbedLabBsFbAdjacentPlacementProofClientGameTest implements
                 carrierPos,
                 Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE),
                 net.minecraft.block.Block.NOTIFY_LISTENERS);
-        SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(world, carrierPos, world.getBlockState(carrierPos));
+        com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(world, carrierPos, world.getBlockState(carrierPos));
     }
 
     private static void forceAddPersistentLoweredSlabCarrierForTest(
@@ -1086,7 +1086,7 @@ public final class SlabbedLabBsFbAdjacentPlacementProofClientGameTest implements
     ) {
         BlockState state = world.getBlockState(carrierPos);
         if (!state.getBlock().equals(Blocks.AIR)) {
-            SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(world, carrierPos, state);
+            com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(world, carrierPos, state);
         }
         if (!SlabAnchorAttachment.isPersistentLoweredSlabCarrier(world, carrierPos, state)) {
             throw new RuntimeException("RED: " + proofName

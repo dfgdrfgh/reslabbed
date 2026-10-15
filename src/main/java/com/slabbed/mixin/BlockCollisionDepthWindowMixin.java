@@ -25,9 +25,7 @@ public abstract class BlockCollisionDepthWindowMixin {
     private void slabbed$includeDeepCollisionOwners(Args args, CollisionView collisionView,
                                                      Entity entity, Box box, boolean forEntity,
                                                      BiFunction<BlockPos.Mutable, VoxelShape, ?> resultFunction) {
-        if (SlabAnchorAttachment.FROZEN_DY_ENABLED
-                || collisionView instanceof World world
-                && WorldUpgradeRuntimePolicy.authorsModernPlacements(world)) {
+        {
             int maxY = args.get(4);
             int radius = com.slabbed.util.StoredGeometry.queryRadius(collisionView, box);
             int minY = args.get(1);

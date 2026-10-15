@@ -24,8 +24,6 @@ public final class ParticleUtilParticleTest {
 
     @GameTest(templateName = "fabric-gametest-api-v1:empty")
     public void turtleEggParticlesStayInsideTranslatedHeight(TestContext context) {
-        boolean previousFrozen = SlabAnchorAttachment.FROZEN_DY_ENABLED;
-        SlabAnchorAttachment.FROZEN_DY_ENABLED = true;
         try {
             ServerWorld world = context.getWorld();
             BlockPos pos = context.getAbsolutePos(new BlockPos(4, 4, 4));
@@ -48,7 +46,6 @@ public final class ParticleUtilParticleTest {
                     "deep egg");
         } finally {
             ParticleCapture.reset();
-            SlabAnchorAttachment.FROZEN_DY_ENABLED = previousFrozen;
         }
         context.complete();
     }

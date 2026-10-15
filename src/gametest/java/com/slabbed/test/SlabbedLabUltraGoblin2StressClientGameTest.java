@@ -63,12 +63,12 @@ public final class SlabbedLabUltraGoblin2StressClientGameTest implements FabricC
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                     Block.NOTIFY_LISTENERS);
             world.setBlockState(SOURCE, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, SOURCE, world.getBlockState(SOURCE));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, SOURCE, world.getBlockState(SOURCE));
             world.setBlockState(
                     UPPER_DOUBLE,
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE),
                     Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(world, UPPER_DOUBLE, world.getBlockState(UPPER_DOUBLE));
+            com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(world, UPPER_DOUBLE, world.getBlockState(UPPER_DOUBLE));
         });
         waitForPlacementSync(ctx);
         singleplayer.getClientWorld().waitForChunksRender();
@@ -163,9 +163,9 @@ public final class SlabbedLabUltraGoblin2StressClientGameTest implements FabricC
                     supportBase,
                     Blocks.STONE.getDefaultState(),
                     net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, supportBase, world.getBlockState(supportBase));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, supportBase, world.getBlockState(supportBase));
             world.setBlockState(supportPos, Blocks.STONE.getDefaultState(), net.minecraft.block.Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, supportPos, world.getBlockState(supportPos));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, supportPos, world.getBlockState(supportPos));
             world.setBlockState(
                     targetPos,
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
@@ -300,9 +300,9 @@ public final class SlabbedLabUltraGoblin2StressClientGameTest implements FabricC
             world.setBlockState(companionSlab, Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM), Block.NOTIFY_LISTENERS);
             world.setBlockState(slabOwner, Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM), Block.NOTIFY_LISTENERS);
             world.setBlockState(anchoredFullBlock, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, anchoredFullBlock, world.getBlockState(anchoredFullBlock));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, anchoredFullBlock, world.getBlockState(anchoredFullBlock));
             world.setBlockState(loweredDoubleOwner, Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE), Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(world, loweredDoubleOwner, world.getBlockState(loweredDoubleOwner));
+            com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(world, loweredDoubleOwner, world.getBlockState(loweredDoubleOwner));
         });
 
         waitForPlacementSync(ctx);
@@ -884,7 +884,7 @@ public final class SlabbedLabUltraGoblin2StressClientGameTest implements FabricC
                 Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                 Block.NOTIFY_LISTENERS);
         world.setBlockState(loweredStonePos, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
-        SlabAnchorAttachment.addAnchor(world, loweredStonePos, world.getBlockState(loweredStonePos));
+        com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, loweredStonePos, world.getBlockState(loweredStonePos));
     }
 
     private static String attemptReason(

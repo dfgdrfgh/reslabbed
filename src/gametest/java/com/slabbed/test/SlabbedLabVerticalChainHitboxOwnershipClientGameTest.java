@@ -168,15 +168,15 @@ public final class SlabbedLabVerticalChainHitboxOwnershipClientGameTest implemen
                     Block.NOTIFY_LISTENERS);
             if (includeB1) {
                 world.setBlockState(b1Pos, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
-                SlabAnchorAttachment.addAnchor(world, b1Pos, world.getBlockState(b1Pos));
+                com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, b1Pos, world.getBlockState(b1Pos));
             } else {
                 world.setBlockState(b1Pos, Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
                 SlabAnchorAttachment.removeAnchor(world, b1Pos);
             }
             world.setBlockState(b2Pos, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
             world.setBlockState(b3Pos, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, b2Pos, world.getBlockState(b2Pos));
-            SlabAnchorAttachment.addAnchor(world, b3Pos, world.getBlockState(b3Pos));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, b2Pos, world.getBlockState(b2Pos));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, b3Pos, world.getBlockState(b3Pos));
             if (server.getPlayerManager().getPlayerList().isEmpty()) {
                 throw new RuntimeException("singleplayer server player list empty for vertical chain ownership proof");
             }

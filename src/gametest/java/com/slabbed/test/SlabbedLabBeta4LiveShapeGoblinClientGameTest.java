@@ -1970,23 +1970,23 @@ public final class SlabbedLabBeta4LiveShapeGoblinClientGameTest implements Fabri
             World world = server.getOverworld();
             clearArea(world);
             world.setBlockState(BOTTOM_SLAB_A, bottomSlab(), Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(world, BOTTOM_SLAB_A, world.getBlockState(BOTTOM_SLAB_A));
+            com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(world, BOTTOM_SLAB_A, world.getBlockState(BOTTOM_SLAB_A));
             world.setBlockState(BOTTOM_SLAB_B, bottomSlab(), Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(world, BOTTOM_SLAB_B, world.getBlockState(BOTTOM_SLAB_B));
+            com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(world, BOTTOM_SLAB_B, world.getBlockState(BOTTOM_SLAB_B));
 
             world.setBlockState(BRIDGE_FULL_A, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, BRIDGE_FULL_A, world.getBlockState(BRIDGE_FULL_A));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, BRIDGE_FULL_A, world.getBlockState(BRIDGE_FULL_A));
             world.setBlockState(BRIDGE_FULL_B, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, BRIDGE_FULL_B, world.getBlockState(BRIDGE_FULL_B));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, BRIDGE_FULL_B, world.getBlockState(BRIDGE_FULL_B));
 
             world.setBlockState(TOP_SLAB_A, topSlab(), Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(world, TOP_SLAB_A, world.getBlockState(TOP_SLAB_A));
+            com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(world, TOP_SLAB_A, world.getBlockState(TOP_SLAB_A));
             world.setBlockState(TOP_SLAB_B, topSlab(), Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(world, TOP_SLAB_B, world.getBlockState(TOP_SLAB_B));
+            com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(world, TOP_SLAB_B, world.getBlockState(TOP_SLAB_B));
 
             world.setBlockState(UPPER_FULL, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, UPPER_FULL, world.getBlockState(UPPER_FULL));
-            SlabAnchorAttachment.addCompoundFullBlockAnchor(world, UPPER_FULL, world.getBlockState(UPPER_FULL));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, UPPER_FULL, world.getBlockState(UPPER_FULL));
+            com.slabbed.dev.LegacyPlacementFixtures.addCompoundFullBlockAnchor(world, UPPER_FULL, world.getBlockState(UPPER_FULL));
 
             if (!server.getPlayerManager().getPlayerList().isEmpty()) {
                 server.getPlayerManager().getPlayerList().get(0)

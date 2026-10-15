@@ -53,12 +53,8 @@ public final class RailSlopeProfileTest {
 
     /** Reads with the store ON, the way a player-placed rail reads. */
     private static void withFrozen(FrozenBody body) {
-        boolean previous = SlabAnchorAttachment.FROZEN_DY_ENABLED;
-        SlabAnchorAttachment.FROZEN_DY_ENABLED = true;
-        try {
+        {
             body.run();
-        } finally {
-            SlabAnchorAttachment.FROZEN_DY_ENABLED = previous;
         }
     }
 

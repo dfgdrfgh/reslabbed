@@ -236,9 +236,9 @@ public final class SlabbedLabB2UpperHalfGhostWindowClientGameTest implements Fab
             world.setBlockState(sbPos,
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                     Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, b1Pos, world.getBlockState(b1Pos));
-            SlabAnchorAttachment.addAnchor(world, b2Pos, world.getBlockState(b2Pos));
-            SlabAnchorAttachment.addAnchor(world, b3Pos, world.getBlockState(b3Pos));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, b1Pos, world.getBlockState(b1Pos));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, b2Pos, world.getBlockState(b2Pos));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, b3Pos, world.getBlockState(b3Pos));
             if (server.getPlayerManager().getPlayerList().isEmpty()) {
                 throw new RuntimeException("singleplayer server player list empty for " + testId);
             }

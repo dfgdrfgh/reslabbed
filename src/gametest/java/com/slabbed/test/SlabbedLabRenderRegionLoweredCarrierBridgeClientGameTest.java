@@ -149,21 +149,21 @@ public final class SlabbedLabRenderRegionLoweredCarrierBridgeClientGameTest impl
                 net.minecraft.block.Block.NOTIFY_LISTENERS);
         world.setBlockState(carrierPos, Blocks.STONE.getDefaultState(),
                 net.minecraft.block.Block.NOTIFY_LISTENERS);
-        SlabAnchorAttachment.addAnchor(world, carrierPos, world.getBlockState(carrierPos));
+        com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, carrierPos, world.getBlockState(carrierPos));
     }
 
     private static void seedLoweredBottomCarrier(World world, BlockPos carrierPos) {
         world.setBlockState(carrierPos,
                 Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                 net.minecraft.block.Block.NOTIFY_LISTENERS);
-        SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(world, carrierPos, world.getBlockState(carrierPos));
+        com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(world, carrierPos, world.getBlockState(carrierPos));
     }
 
     private static void seedLoweredDoubleCarrier(World world, BlockPos carrierPos) {
         world.setBlockState(carrierPos,
                 Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.DOUBLE),
                 net.minecraft.block.Block.NOTIFY_LISTENERS);
-        SlabAnchorAttachment.updatePersistentLoweredSlabCarrier(world, carrierPos, world.getBlockState(carrierPos));
+        com.slabbed.dev.LegacyPlacementFixtures.updatePersistentLoweredSlabCarrier(world, carrierPos, world.getBlockState(carrierPos));
     }
 
     private static void clearArea(World world, BlockPos supportOrigin, int width) {

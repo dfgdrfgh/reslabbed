@@ -9,8 +9,6 @@
     "ClientPlayerInteractionManagerPredictionSequenceMixin",
     "ClientWorldPlacementDyAckMixin",
     "GameRendererPickOffsetRaycastMixin",
-    "ItemFrameRenderOffsetMixin",
-    "MinecartRenderOffsetMixin",
     "PistonBlockEntityRenderScopeMixin",
     "RedstoneBurnoutParticleMixin"
   ],

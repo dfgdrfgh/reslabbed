@@ -1962,7 +1962,7 @@ public final class SlabbedLabClientGameTest implements FabricClientGameTest {
             world.setBlockState(fullPos, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
             world.setBlockState(placePos, Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
             world.setBlockState(placePos.up(), Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, fullPos, world.getBlockState(fullPos));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, fullPos, world.getBlockState(fullPos));
             fbAnchored.set(Boolean.toString(SlabAnchorAttachment.isAnchored(world, fullPos)));
             if (server.getPlayerManager().getPlayerList().isEmpty()) {
                 throw new RuntimeException("singleplayer server player list empty for " + testId);
@@ -2387,7 +2387,7 @@ public final class SlabbedLabClientGameTest implements FabricClientGameTest {
             world.setBlockState(slabPos, Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
             world.setBlockState(slabPos.up(), Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
             // Mimic Block.onPlaced → BlockOnPlacedAnchorMixin → addAnchor.
-            SlabAnchorAttachment.addAnchor(world, fullPos, world.getBlockState(fullPos));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, fullPos, world.getBlockState(fullPos));
         });
         ctx.waitTick();
         singleplayer.getClientWorld().waitForChunksRender();
@@ -2783,7 +2783,7 @@ public final class SlabbedLabClientGameTest implements FabricClientGameTest {
             world.setBlockState(fullPos, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
             world.setBlockState(topPos, Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
             // Mimic Block.onPlaced → BlockOnPlacedAnchorMixin → addAnchor.
-            SlabAnchorAttachment.addAnchor(world, fullPos, world.getBlockState(fullPos));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, fullPos, world.getBlockState(fullPos));
         });
         for (int i = 0; i < 4; i++) {
             ctx.waitTick();
@@ -2891,7 +2891,7 @@ public final class SlabbedLabClientGameTest implements FabricClientGameTest {
                     Block.NOTIFY_LISTENERS);
             world.setBlockState(fullPos, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
             world.setBlockState(topPos, Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, fullPos, world.getBlockState(fullPos));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, fullPos, world.getBlockState(fullPos));
         });
         for (int i = 0; i < 4; i++) {
             ctx.waitTick();
@@ -3106,7 +3106,7 @@ public final class SlabbedLabClientGameTest implements FabricClientGameTest {
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP),
                     Block.NOTIFY_LISTENERS);
             world.setBlockState(topPos,  Blocks.AIR.getDefaultState(),   Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, fbPos, world.getBlockState(fbPos));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, fbPos, world.getBlockState(fbPos));
         });
         for (int i = 0; i < 4; i++) {
             ctx.waitTick();
@@ -3219,7 +3219,7 @@ public final class SlabbedLabClientGameTest implements FabricClientGameTest {
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP),
                     Block.NOTIFY_LISTENERS);
             world.setBlockState(topPos,  Blocks.AIR.getDefaultState(),   Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, fbPos, world.getBlockState(fbPos));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, fbPos, world.getBlockState(fbPos));
         });
         for (int i = 0; i < 4; i++) {
             ctx.waitTick();
@@ -3310,7 +3310,7 @@ public final class SlabbedLabClientGameTest implements FabricClientGameTest {
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.TOP),
                     Block.NOTIFY_LISTENERS);
             world.setBlockState(topPos,  Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, fbPos, world.getBlockState(fbPos));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, fbPos, world.getBlockState(fbPos));
         });
         for (int i = 0; i < 4; i++) ctx.waitTick();
         singleplayer.getClientWorld().waitForChunksRender();
@@ -3376,7 +3376,7 @@ public final class SlabbedLabClientGameTest implements FabricClientGameTest {
                     Block.NOTIFY_LISTENERS);
             world.setBlockState(topPos,      Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
             world.setBlockState(stackTopPos, Blocks.AIR.getDefaultState(),   Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, fbPos, world.getBlockState(fbPos));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, fbPos, world.getBlockState(fbPos));
         });
         for (int i = 0; i < 4; i++) ctx.waitTick();
         singleplayer.getClientWorld().waitForChunksRender();
@@ -3464,7 +3464,7 @@ public final class SlabbedLabClientGameTest implements FabricClientGameTest {
             world.setBlockState(eFbLowPos,  Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
             world.setBlockState(eFbHighPos, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
             world.setBlockState(eChainPos,  Blocks.AIR.getDefaultState(),   Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, eFbLowPos, world.getBlockState(eFbLowPos));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, eFbLowPos, world.getBlockState(eFbLowPos));
         });
         for (int i = 0; i < 4; i++) ctx.waitTick();
         singleplayer.getClientWorld().waitForChunksRender();
@@ -3683,7 +3683,7 @@ public final class SlabbedLabClientGameTest implements FabricClientGameTest {
                     Blocks.STONE_SLAB.getDefaultState().with(SlabBlock.TYPE, SlabType.BOTTOM),
                     Block.NOTIFY_LISTENERS);
             world.setBlockState(topPos,  Blocks.AIR.getDefaultState(),   Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, fbPos, world.getBlockState(fbPos));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, fbPos, world.getBlockState(fbPos));
         });
 
         // Helper to capture pre/post readings for a single case.
@@ -3911,7 +3911,7 @@ public final class SlabbedLabClientGameTest implements FabricClientGameTest {
             world.setBlockState(fbPos, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
             world.setBlockState(slabPos, Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
             world.setBlockState(chainPos, Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, fbPos, world.getBlockState(fbPos));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, fbPos, world.getBlockState(fbPos));
             if (server.getPlayerManager().getPlayerList().isEmpty()) {
                 throw new RuntimeException("singleplayer server player list empty for " + testId);
             }
@@ -4191,7 +4191,7 @@ public final class SlabbedLabClientGameTest implements FabricClientGameTest {
             world.setBlockState(slabPos, Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
             world.setBlockState(firstPos, Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
             world.setBlockState(secondPos, Blocks.AIR.getDefaultState(), Block.NOTIFY_LISTENERS);
-            SlabAnchorAttachment.addAnchor(world, fbPos, world.getBlockState(fbPos));
+            com.slabbed.dev.LegacyPlacementFixtures.addAnchor(world, fbPos, world.getBlockState(fbPos));
             if (server.getPlayerManager().getPlayerList().isEmpty()) {
                 throw new RuntimeException("singleplayer server player list empty for " + testId);
             }

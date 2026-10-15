@@ -39,8 +39,6 @@ public final class ExtendedDepthOperationTest {
     private static final double DEEP_DY = -3.0d;
     private static final String BATCH = "slabbed_extended_depth_operations";
     private static final String KEEP_BATCH = "slabbed_keep_piston_transfer";
-    private static boolean frozenBeforeBatch;
-    private static boolean keepFrozenBeforeBatch;
 
     private record ToggleCase(String id, Item item, Block expected, boolean openProperty) {
     }
@@ -60,28 +58,16 @@ public final class ExtendedDepthOperationTest {
             new ToggleCase("lever", Items.LEVER, Blocks.LEVER, false)
     };
 
-    @BeforeBatch(batchId = BATCH)
-    public static void enableFrozenDyForBatch(ServerWorld world) {
-        frozenBeforeBatch = SlabAnchorAttachment.FROZEN_DY_ENABLED;
-        SlabAnchorAttachment.FROZEN_DY_ENABLED = true;
-    }
 
-    @AfterBatch(batchId = BATCH)
-    public static void restoreFrozenDyAfterBatch(ServerWorld world) {
-        SlabAnchorAttachment.FROZEN_DY_ENABLED = frozenBeforeBatch;
-    }
 
     @BeforeBatch(batchId = KEEP_BATCH)
     public static void enableKeepPolicyForBatch(ServerWorld world) {
-        keepFrozenBeforeBatch = SlabAnchorAttachment.FROZEN_DY_ENABLED;
-        SlabAnchorAttachment.FROZEN_DY_ENABLED = false;
         WorldUpgradeRuntimePolicy.activate(world, WorldUpgradeDecision.Mode.KEEP_EXISTING);
     }
 
     @AfterBatch(batchId = KEEP_BATCH)
     public static void restorePolicyAfterKeepBatch(ServerWorld world) {
         WorldUpgradeRuntimePolicy.deactivate(world);
-        SlabAnchorAttachment.FROZEN_DY_ENABLED = keepFrozenBeforeBatch;
     }
 
     @GameTest(templateName = "fabric-gametest-api-v1:empty", batchId = BATCH)

@@ -20,21 +20,6 @@ import net.minecraft.world.chunk.WorldChunk;
 public final class PlacementOccupancy {
     private PlacementOccupancy() {}
 
-    public static boolean intersectsDisplacedBody(World world, BlockPos target, BlockState state,
-                                                   LandingResolver.PlacementAim aim) {
-        LandingResolver.PlacementResolution resolution = LandingResolver.resolve(
-                world, aim, target, state, LandingResolver.classify(state));
-        double candidateDy = resolution == null
-                ? SlabSupport.getUnstoredYOffset(world, target, state) : resolution.landingDy();
-        BlockState current = world.getBlockState(target);
-        // A same-cell second slab retains the first slab's seat, including the factless legacy lane.
-        if (state.getBlock() instanceof SlabBlock && state.get(SlabBlock.TYPE) == SlabType.DOUBLE
-                && current.isOf(state.getBlock()) && current.get(SlabBlock.TYPE) != SlabType.DOUBLE) {
-            candidateDy = LandingResolver.visibleOwnerDy(world, target, current);
-        }
-        return intersectsDisplacedBody(world, target, state, candidateDy);
-    }
-
     public static boolean intersectsDisplacedBody(World world, BlockPos target, BlockState state, double candidateDy) {
         return intersectsDisplacedBody(world, target, state, candidateDy, java.util.Set.of(target));
     }

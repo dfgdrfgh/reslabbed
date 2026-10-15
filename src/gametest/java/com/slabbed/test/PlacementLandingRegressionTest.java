@@ -40,7 +40,7 @@ public final class PlacementLandingRegressionTest {
         var fact = SlabAnchorAttachment.rawPlacementDyFact(world, pos);
         return pos.toShortString() + " state=" + state.getBlock()
                 + " getYOffset=" + SlabSupport.getYOffset(world, pos, state)
-                + " unstored=" + SlabSupport.getUnstoredYOffset(world, pos, state)
+                + " unstored=" + SlabSupport.getYOffset(world, pos, state)
                 + " fact=" + (fact.present() ? fact.valueOrNaN() : "none")
                 + " modern=" + SlabAnchorAttachment.isModernPlacement(world, pos);
     }
@@ -49,9 +49,7 @@ public final class PlacementLandingRegressionTest {
     @GameTest(templateName = "fabric-gametest-api-v1:empty")
     public void fullCubeOnPlacedTerrainSlabBottomLandsLowered(TestContext h) {
         ServerWorld world = h.getWorld();
-        boolean previousFrozen = SlabAnchorAttachment.FROZEN_DY_ENABLED;
-        SlabAnchorAttachment.FROZEN_DY_ENABLED = false;
-        try {
+        {
             BlockPos ground = h.getAbsolutePos(new BlockPos(2, 1, 2));
             BlockPos ts = ground.up();
             BlockPos placed = ts.up();
@@ -68,8 +66,6 @@ public final class PlacementLandingRegressionTest {
             double dy = SlabSupport.getYOffset(world, placed, world.getBlockState(placed));
             h.assertTrue(Math.abs(dy - (-0.5d)) < 1.0e-6,
                     "TS-VB landing: full cube on placed TS bottom slab reads " + dy + " (live rule -0.5): " + report);
-        } finally {
-            SlabAnchorAttachment.FROZEN_DY_ENABLED = previousFrozen;
         }
         h.complete();
     }
@@ -83,9 +79,7 @@ public final class PlacementLandingRegressionTest {
     @GameTest(templateName = "slabbed:empty_16")
     public void terrainSlabsStackMatrix(TestContext h) {
         ServerWorld world = h.getWorld();
-        boolean previousFrozen = SlabAnchorAttachment.FROZEN_DY_ENABLED;
-        SlabAnchorAttachment.FROZEN_DY_ENABLED = false;
-        try {
+        {
             PlayerEntity player = h.createMockPlayer(GameMode.SURVIVAL);
             // Column A: TS slab -> log placed on it (lowered) -> TS slab placed on the log's top face.
             BlockPos gA = h.getAbsolutePos(new BlockPos(1, 1, 1));
@@ -174,8 +168,6 @@ public final class PlacementLandingRegressionTest {
             h.assertTrue(same(world, logG, -0.5d) && same(world, logG.east(), 0.0d) && !SlabAnchorAttachment.isModernPlacement(world, logG.east())
                             && same(world, logG.up(), 0.0d),
                     "G: placement="+cell(world,logG)+"; legacy and natural Terrain Slabs slabs stay un-offset: " + cell(world, logG.east()) + " / " + cell(world, logG.up()));
-        } finally {
-            SlabAnchorAttachment.FROZEN_DY_ENABLED = previousFrozen;
         }
         h.complete();
     }
@@ -193,9 +185,7 @@ public final class PlacementLandingRegressionTest {
     @GameTest(templateName = "fabric-gametest-api-v1:empty")
     public void naturalTerrainSlabsKeepTheWorldHoleGuard(TestContext h) {
         ServerWorld world = h.getWorld();
-        boolean previousFrozen = SlabAnchorAttachment.FROZEN_DY_ENABLED;
-        SlabAnchorAttachment.FROZEN_DY_ENABLED = false;
-        try {
+        {
             PlayerEntity player = h.createMockPlayer(GameMode.SURVIVAL);
             Object[][] cases = {
                 {"cube_on_generated_bottom", ts(SlabType.BOTTOM, true), Items.DIRT, 0.0d},
@@ -224,15 +214,13 @@ public final class PlacementLandingRegressionTest {
                         new ItemStack((net.minecraft.item.Item) c[2]), g.up(), Direction.UP);
                 BlockPos placed = g.up(2);
                 double expected = (Double) c[3];
-                double live = SlabSupport.getUnstoredYOffset(world, placed, world.getBlockState(placed));
+                double live = SlabSupport.getYOffset(world, placed, world.getBlockState(placed));
                 String report = c[0] + " r=" + r + " | owner " + cell(world, g.up()) + " | placed " + cell(world, placed);
                 System.out.println("[LANDING_REGRESSION] " + report);
                 h.assertTrue(r.isAccepted() && !world.getBlockState(placed).isAir(), "premise: " + report);
                 h.assertTrue(same(world, placed, expected) && Math.abs(live - expected) < 1.0e-6,
                         c[0] + ": expected " + expected + " (stored read must equal the live rule): " + report);
             }
-        } finally {
-            SlabAnchorAttachment.FROZEN_DY_ENABLED = previousFrozen;
         }
         h.complete();
     }
@@ -244,9 +232,7 @@ public final class PlacementLandingRegressionTest {
     @GameTest(templateName = "fabric-gametest-api-v1:empty")
     public void replacingTheOwnerCellLandsAtItsOwnHeight(TestContext h) {
         ServerWorld world = h.getWorld();
-        boolean previousFrozen = SlabAnchorAttachment.FROZEN_DY_ENABLED;
-        SlabAnchorAttachment.FROZEN_DY_ENABLED = false;
-        try {
+        {
             PlayerEntity player = h.createMockPlayer(GameMode.SURVIVAL);
             // {name, pedestal (null = a real dirt placement onto a bottom slab, -0.5), cell content, item, expected}
             Object[][] cases = {
@@ -278,15 +264,13 @@ public final class PlacementLandingRegressionTest {
                 player.setPosition(g.getX() + 3.5d, g.getY(), g.getZ() + 0.5d);
                 ActionResult r = PlacementCaptureBoundaryGameTest.useOn(player, new ItemStack((net.minecraft.item.Item) c[3]), target, Direction.UP);
                 double expected = (Double) c[4];
-                double live = SlabSupport.getUnstoredYOffset(world, target, world.getBlockState(target));
+                double live = SlabSupport.getYOffset(world, target, world.getBlockState(target));
                 String report = c[0] + " r=" + r + " | pedestal " + cell(world, pedestal) + " | cell " + cell(world, target);
                 System.out.println("[LANDING_REGRESSION] " + report);
                 h.assertTrue(r.isAccepted() && world.getBlockState(target.up()).isAir(), "premise: " + report);
                 h.assertTrue(same(world, target, expected) && Math.abs(live - expected) < 1.0e-6,
                         c[0] + ": expected " + expected + " (stored read must equal the live rule): " + report);
             }
-        } finally {
-            SlabAnchorAttachment.FROZEN_DY_ENABLED = previousFrozen;
         }
         h.complete();
     }
@@ -295,9 +279,7 @@ public final class PlacementLandingRegressionTest {
     @GameTest(templateName = "fabric-gametest-api-v1:empty")
     public void loweredScaffoldingIsStoodOnAtItsRealTop(TestContext h) {
         ServerWorld world = h.getWorld();
-        boolean previousFrozen = SlabAnchorAttachment.FROZEN_DY_ENABLED;
-        SlabAnchorAttachment.FROZEN_DY_ENABLED = false;
-        try {
+        {
             PlayerEntity player = h.createMockPlayer(GameMode.SURVIVAL);
             BlockPos g = h.getAbsolutePos(new BlockPos(2, 1, 2));
             world.setBlockState(g, Blocks.STONE.getDefaultState(), Block.NOTIFY_ALL);
@@ -331,8 +313,6 @@ public final class PlacementLandingRegressionTest {
                     "lowered scaffolding is not stood on at its real top: " + report);
             h.assertTrue(!flatStanding.isEmpty() && Math.abs(flatStanding.getMax(Direction.Axis.Y) - 1.0d) < 1.0e-6 && flatInside.isEmpty(),
                     "control: flush scaffolding changed: " + report);
-        } finally {
-            SlabAnchorAttachment.FROZEN_DY_ENABLED = previousFrozen;
         }
         h.complete();
     }
@@ -341,9 +321,7 @@ public final class PlacementLandingRegressionTest {
     @GameTest(templateName = "fabric-gametest-api-v1:empty")
     public void scaffoldingStacksUpwardOnSlab(TestContext h) {
         ServerWorld world = h.getWorld();
-        boolean previousFrozen = SlabAnchorAttachment.FROZEN_DY_ENABLED;
-        SlabAnchorAttachment.FROZEN_DY_ENABLED = false;
-        try {
+        {
             BlockPos ground = h.getAbsolutePos(new BlockPos(2, 1, 2));
             BlockPos slab = ground.up();
             BlockPos first = slab.up();
@@ -387,8 +365,6 @@ public final class PlacementLandingRegressionTest {
             String control = "c1=" + c1 + " c2=" + c2 + " | " + cell(world, flat.up()) + " | " + cell(world, flat.up(2));
             System.out.println("[LANDING_REGRESSION] scaffold_control " + control);
             h.assertTrue(world.getBlockState(flat.up(2)).isOf(Blocks.SCAFFOLDING), "control: scaffolding did not stack on flat stone: " + control);
-        } finally {
-            SlabAnchorAttachment.FROZEN_DY_ENABLED = previousFrozen;
         }
         h.complete();
     }

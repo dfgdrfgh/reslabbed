@@ -32,59 +32,7 @@ import net.minecraft.world.chunk.WorldChunk;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * THE LAW GATE (post-mortem safeguard S-2), Fabric 1.21.1 translation. The absolute Slabbed law:
- * <b>where a block is placed is where it goes and STAYS — a neighbor update must never change its
- * height (dy). No exceptions except a genuine vanilla mechanic (the block itself being removed).</b>
- * See LAW.md — the test IS the law.
- *
- * <p>For each SUBJECT (placed via the REAL {@code useOnBlock} path — never {@code setBlockState}
- * + a hand-rolled onPlaced) it records the placement height as an exact value, then applies each
- * NEIGHBOR MUTATION <em>without touching the subject's cell</em> and asserts the height is
- * byte-identical afterward.
- *
- * <p><b>CORRECTED 2026-09-03 — the two claims below were stale and contradicted by this file's own
- * code.</b> They read "required = false on every row" and "the two store-corruption fixtures are
- * omitted because the store they corrupt does not exist" — both false as soon as the placement-dy
- * store landed (Slice 2b onward) and were never updated. The actual, current, traced state:
- *
- * <p><b>9 of 16 rows are still {@code required = false} (census, non-blocking)</b> — every row
- * that calls bare {@link #runSubject}: {@code torchOnMarkedSlab}, {@code fullBlockOnLoweredStack},
- * {@code flatFullBlockControl}, {@code flatSlabControl}, {@code cantileverSlab},
- * {@code slabOnLoweredFullBlock}, {@code candlePlacedFlat}, {@code c3_pair_door_toggle_and_neighbor_invariance},
- * {@code c3_pair_bed_neighbor_invariance}. Bare {@link #runSubject} runs under whatever
- * {@link SlabAnchorAttachment#FROZEN_DY_ENABLED} currently defaults to — today, {@code false} — so
- * <b>these 9 rows are the ones actually exercising the shipped configuration, and none of them
- * blocks the build.</b> A LAW 1 violation in exactly the configuration players run today would not
- * fail {@code runGameTest}.
- *
- * <p><b>7 of 16 rows are {@code required} (blocking)</b>: {@code fenceGateOnMarkedSlab},
- * {@code fenceOnMarkedSlab}, {@code slabOnDeepLoweredFullBlock},
- * {@code missingPlacementDyResolvesStableFlatAcrossNeighborEdit},
- * {@code offGridHeightIsDeclinedNeverRounded},
- * {@code aimedCarpetOnMinusOneOwner}, {@code aimedPowderSnowOnMinusOneOwner}. Every one calls
- * {@link #runSubjectWithFrozenStore}, which force-enables the store for that row only — so these 7
- * gate a configuration this line does not yet ship by default, not the shipped one.
- *
- * <p><b>Reachability (standing rule): a subject whose OWN state vanilla rewrites on a neighbour
- * edit is a different class from every other subject here.</b> Every other subject keeps its exact
- * state across the whole mutation catalogue; the mutations only ever change the cells around it.
- * A connecting block — fence, wall, pane, and their kin — is rewritten IN PLACE by vanilla's
- * neighbour update when something it connects to appears beside it (same block, new shape).
- * That rewrite is the one path by which a "neighbour edit" reaches the subject's own cell, and
- * it was unrepresented until {@code fence_on_marked_slab}, whose named reaching mutations are
- * {@code add_connecting_fence_east} and {@code add_full_block_north} (a full block is a fence
- * connection too).
- *
- * <p><b>Follow-up owed once the store's default flips to on (the plan's Phase 3):</b> promote the
- * 9 census rows above to required (or fold them into the frozen-store path, whichever the store
- * port's own rig-building needs), then run the measured reachability audit — build each subject,
- * strip its protection, apply every {@link #MUTATIONS} entry, and record which one actually moves
- * the resolver's answer — before trusting a green run here as proof (see the project standing rule
- * on S-2 reachability). That audit is deliberately NOT done in this pass: doing it against subjects
- * whose rigs will likely change shape when the store lands risks measuring a scene that gets
- * rebuilt anyway. Height authority here is {@link SlabSupport#getYOffset}.
- */
+/** Every real placement keeps its exact height across neighbor edits (LAW.md). */
 public final class NeighborUpdateInvarianceTest {
 
     // ── real-useOnBlock placement ───────────────────────────────────────────
@@ -111,15 +59,7 @@ public final class NeighborUpdateInvarianceTest {
         return SlabSupport.getYOffset(w, p, w.getBlockState(p));
     }
 
-    /**
-     * The height a real {@code useOnBlock} placement actually landed at, read from the placement fact
-     * itself rather than from {@link #dy}.
-     *
-     * <p>Rig builders run inside {@link FrozenDySceneFixture#authored}, which forces the store OFF so
-     * that {@code setBlockState} terrain and its marker authors behave; {@link #dy} therefore answers
-     * from the live lanes in there, which is not what a store-backed row is about. A premise that wants
-     * to name where the player's aim put a block must read the fact.
-     */
+    /** Creation fixtures publish explicit known heights; reads obey LAW.md. */
     private static double landedDy(ServerWorld w, BlockPos p) {
         return SlabAnchorAttachment.storedPlacementDy(w, p);
     }
@@ -203,13 +143,15 @@ public final class NeighborUpdateInvarianceTest {
         bslab(w, base.up(3));
         BlockPos fb = base.up(4);
         w.setBlockState(fb, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
-        SlabAnchorAttachment.addAnchor(w, fb, w.getBlockState(fb));
-        SlabAnchorAttachment.addCompoundFullBlockAnchor(w, fb, w.getBlockState(fb));
+        com.slabbed.dev.LegacyPlacementFixtures.addAnchor(w, fb, w.getBlockState(fb));
+        com.slabbed.dev.LegacyPlacementFixtures.addCompoundFullBlockAnchor(w, fb, w.getBlockState(fb));
         BlockPos support = fb.west();
         bslab(w, support);
-        SlabAnchorAttachment.addCompoundVisibleSideLowerSlab(w, support, w.getBlockState(support),
+        com.slabbed.dev.LegacyPlacementFixtures.addCompoundVisibleSideLowerSlab(w, support, w.getBlockState(support),
                 fb, w.getBlockState(fb));
-        return support; // the marked slab; subjects place ON it
+        PlacementCaptureBoundaryGameTest.forceStore(w, fb, -1.0d);
+        PlacementCaptureBoundaryGameTest.forceStore(w, support, -1.0d);
+        return support;
     }
 
     private static BlockPos loweredStackRig(TestContext h, ServerWorld w) {
@@ -218,6 +160,8 @@ public final class NeighborUpdateInvarianceTest {
         bslab(w, base.up(1));
         w.setBlockState(base.up(2), Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
         bslab(w, base.up(3)); // reads -0.5 via carrier-below
+        PlacementCaptureBoundaryGameTest.forceStore(w, base.up(2), -0.5d);
+        PlacementCaptureBoundaryGameTest.forceStore(w, base.up(3), -0.5d);
         return base.up(3);
     }
 
@@ -265,6 +209,7 @@ public final class NeighborUpdateInvarianceTest {
         bslab(w, base.up(1));
         BlockPos fb = base.up(2);
         w.setBlockState(fb, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS); // lowered FB (-0.5), west air
+        PlacementCaptureBoundaryGameTest.forceStore(w, fb, -0.5d);
         return fb;
     }
 
@@ -401,9 +346,7 @@ public final class NeighborUpdateInvarianceTest {
         List<String> violations = new ArrayList<>();
         for (NamedMutation m : MUTATIONS) {
             clearArena(h, w);
-            BlockPos subj = authorSceneFacts
-                    ? FrozenDySceneFixture.authored(h, () -> subject.builder().build(h, w))
-                    : subject.builder().build(h, w);
+            BlockPos subj = subject.builder().build(h, w);
             h.assertTrue(!w.getBlockState(subj).isAir(),
                     "premise: subject '" + subject.name() + "' failed to place");
             double before = dy(w, subj);
@@ -425,21 +368,10 @@ public final class NeighborUpdateInvarianceTest {
         h.complete();
     }
 
-    /**
-     * Runs a law row under the shipped frozen-store mode while the suite's compatibility floor stays
-     * OFF. The rig is built inside a forced-OFF window and then has its facts authored
-     * ({@link FrozenDySceneFixture#authored}), because the rig's own {@code setBlockState} terrain
-     * carries no placement facts and would otherwise all read the stable-flat stand-in; the real
-     * {@code useOnBlock} placement that creates the SUBJECT runs outside that window, under the store,
-     * since it is the shipped path under test.
-     */
+    /** Creation fixtures publish explicit known heights; reads obey LAW.md. */
     private void runSubjectWithFrozenStore(TestContext h, NamedSubject subject) {
-        boolean previous = SlabAnchorAttachment.FROZEN_DY_ENABLED;
-        SlabAnchorAttachment.FROZEN_DY_ENABLED = true;
-        try {
+        {
             runSubject(h, subject, true);
-        } finally {
-            SlabAnchorAttachment.FROZEN_DY_ENABLED = previous;
         }
     }
 
@@ -524,9 +456,7 @@ public final class NeighborUpdateInvarianceTest {
     @GameTest(templateName = "fabric-gametest-api-v1:empty")
     public void missingPlacementDyResolvesStableFlatAcrossNeighborEdit(TestContext h) {
         ServerWorld world = h.getWorld();
-        boolean previous = SlabAnchorAttachment.FROZEN_DY_ENABLED;
-        SlabAnchorAttachment.FROZEN_DY_ENABLED = true;
-        try {
+        {
             clearArena(h, world);
             BlockPos subject = frozenLoweredSubject(h, world);
 
@@ -555,8 +485,6 @@ public final class NeighborUpdateInvarianceTest {
                     "missing PLACEMENT_DY must resolve raw positive 0.0 before/after neighbor edit; "
                             + "observed fallbackBefore=" + fallbackBefore
                             + ", fallbackAfter=" + fallbackAfter);
-        } finally {
-            SlabAnchorAttachment.FROZEN_DY_ENABLED = previous;
         }
         h.complete();
     }
@@ -615,8 +543,7 @@ public final class NeighborUpdateInvarianceTest {
      */
     private static BlockPos frozenLoweredSubject(TestContext h, ServerWorld world) {
         BlockPos ground = h.getAbsolutePos(new BlockPos(3, 1, 3));
-        FrozenDySceneFixture.authored(h, () ->
-                world.setBlockState(ground, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS));
+        world.setBlockState(ground, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
         place(h, Items.STONE_SLAB, ground, Direction.UP, 0.0d);
         place(h, Items.STONE, ground.up(), Direction.UP, 0.0d);
         BlockPos subject = ground.up(2);

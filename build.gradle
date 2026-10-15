@@ -109,7 +109,6 @@ loom {
             source sourceSets.gametest
             runDir "build/run/fence-client-probe"
             property "slabbed.fenceCeilingProbe", "true"
-            property "slabbed.frozenDy", "true"
         }
         attachmentClientProbe {
             client()
@@ -319,13 +318,7 @@ java {
     targetCompatibility = JavaVersion.VERSION_21
 }
 
-// Every `-Dslabbed.*` on the Gradle command line is forwarded verbatim into the forked game JVM
-// (client, server, gametest). Without this, a `-D` on the Gradle line lands on Gradle's own JVM and
-// the game never sees it — the launch LOOKS armed and silently is not. This must stay a PREFIX
-// match, never an allowlist: an allowlist here (`slabbed.mc1211.*` plus one literal, until
-// 2026-09-03) let a dev-client pass launched with `-Dslabbed.frozenDy=true` run with the store OFF.
-// Do not re-narrow it. The /slabdy overlay's `frozen=` field reads the live flag and is the
-// discriminator for whether a switch actually arrived.
+// Forward supplied Slabbed properties into each game JVM, including client probes.
 def slabbedForwardedRunPropertyArgs = {
     System.properties.findAll { key, value ->
         key instanceof String
@@ -337,20 +330,6 @@ def slabbedForwardedRunPropertyArgs = {
 tasks.withType(JavaExec).configureEach {
     doFirst {
         jvmArgs slabbedForwardedRunPropertyArgs()
-    }
-}
-
-// Slice 2b: the gametest suite is pinned to the LEGACY (frozen-dy OFF) configuration. The shipped
-// default is ALSO off on this line today (SlabAnchorAttachment.FROZEN_DY_ENABLED's own initializer
-// reads "false" — corrected 2026-09-03; an earlier comment here claimed the shipped default was
-// ON, which the code did not support). The placed-height store lands in a later slice; until then
-// the suite's compatibility floor is OFF and the frozen-specific rows opt in per-test by flipping
-// SlabAnchorAttachment.FROZEN_DY_ENABLED in-process.
-tasks.matching { it.name == "runGameTest" }.configureEach {
-    if (it instanceof JavaExec) {
-        it.doFirst {
-            it.jvmArgs "-Dslabbed.frozenDy=false"
-        }
     }
 }
 
