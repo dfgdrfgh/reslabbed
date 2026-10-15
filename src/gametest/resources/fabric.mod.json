@@ -58,7 +58,8 @@
       "com.slabbed.test.TerrainSlabsVegetationTest",
       "com.slabbed.test.VerticalStepFaceTest",
       "com.slabbed.test.RepeatedStackingTest",
-      "com.slabbed.anchor.PlacementCoreOverhaulTest"
+      "com.slabbed.anchor.PlacementCoreOverhaulTest",
+      "com.slabbed.test.NoRecordGeometryTest"
     ]
   },
   "depends": {
