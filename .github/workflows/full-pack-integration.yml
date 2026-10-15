@@ -1,0 +1,37 @@
+name: Full pack slab integration
+on:
+  push:
+    branches: ["port/fabric-1.21.1-full-pack-verification"]
+permissions:
+  contents: read
+  actions: read
+jobs:
+  verify:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          persist-credentials: false
+      - name: Stage matching public builds and pack settings
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 tools/stage-full-pack.py
+      - name: Reproduce the old overhead-block behavior
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: python3 tools/full-pack-client.py --control
+      - name: Verify the fixed build with the same pack
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: python3 tools/full-pack-client.py
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
+        if: always()
+        with:
+          name: full-pack-client-checks
+          path: |
+            ghost-fullpack-control/production-launch.log
+            ghost-fullpack-fixed/production-launch.log
+            ghost-fullpack-fixed/vertical-step-pass.txt
+            ghost-fullpack-fixed/vertical-step.png
+          retention-days: 7
