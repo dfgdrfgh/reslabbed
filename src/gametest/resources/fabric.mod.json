@@ -59,7 +59,8 @@
       "com.slabbed.test.VerticalStepFaceTest",
       "com.slabbed.test.RepeatedStackingTest",
       "com.slabbed.anchor.PlacementCoreOverhaulTest",
-      "com.slabbed.test.NoRecordGeometryTest"
+      "com.slabbed.test.NoRecordGeometryTest",
+      "com.slabbed.anchor.PlacementGeometryTest"
     ]
   },
   "depends": {
