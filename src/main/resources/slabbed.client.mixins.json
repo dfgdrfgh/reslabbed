@@ -3,7 +3,9 @@
   "package": "com.slabbed.mixin.client",
   "compatibilityLevel": "JAVA_21",
   "client": [
-    "ClientBreakMixin"
+    "ClientBreakMixin",
+    "CellOutlineMixin",
+    "CellPickMixin"
   ],
   "injectors": {
     "defaultRequire": 1

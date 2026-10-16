@@ -30,7 +30,7 @@ for f in $STAGED; do
 done
 
 # ── Behavior-touching change? (the height engine + placement path) ───────────────────────────
-BEHAVIOR="$(echo "$STAGED" | grep -E 'src/main/.*(SlabSupport|SlabAnchorAttachment|PlacementIntent|OnPlacedAnchor|OnStateReplaced|OffsetRaycast)' || true)"
+BEHAVIOR="$(echo "$STAGED" | grep -E 'src/main/.*(SlabSupport|SlabAnchorAttachment|PlacementIntent|OnPlacedAnchor|OnStateReplaced|OffsetRaycast|CellWorld|CellPlacement|PieceSupport|PieceTarget|CellBlock)' || true)"
 SRC_MAIN="$(echo "$STAGED" | grep -E '^src/main/' || true)"
 
 # ── S-4: preflight trailer required for any src/main change ──────────────────────────────────
@@ -60,7 +60,7 @@ if [ -n "$BEHAVIOR" ]; then
   LAST_BEHAVIOR_TS="$(git log -1 --format=%ct -- \
       'src/main/**/SlabSupport.java' 'src/main/**/SlabAnchorAttachment.java' \
       'src/main/**/*PlacementIntent*' 'src/main/**/*OnPlacedAnchor*' \
-      'src/main/**/*OnStateReplaced*' 'src/main/**/*OffsetRaycast*' 2>/dev/null || true)"
+      'src/main/**/*OnStateReplaced*' 'src/main/**/*OffsetRaycast*' 'src/main/**/Cell*.java' 'src/main/**/Piece*.java' 2>/dev/null || true)"
   LEDGER_TS="$(stat -f %m "$LEDGER_FILE" 2>/dev/null || stat -c %Y "$LEDGER_FILE" 2>/dev/null || echo 0)"
   if [ -n "$LAST_BEHAVIOR_TS" ] && [ "$LAST_BEHAVIOR_TS" -gt "$LEDGER_TS" ]; then
     fail "S-5: a behavior-changing commit already landed since the ledger was last updated, and this

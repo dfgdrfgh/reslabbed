@@ -2,32 +2,25 @@ package com.slabbed.test;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumer;
-import org.joml.Matrix4f;
-import org.joml.Vector3f;
-import java.lang.reflect.Proxy;
 
-/** Observes the vertices handed to the actual entity buffer, only in the test mod. */
+/** Records primitive vertices forwarded into the live render buffer by the test mod. */
 public final class CellRenderAudit {
-    private static volatile double minY=Double.POSITIVE_INFINITY,maxY=Double.NEGATIVE_INFINITY;
-    private static volatile int count;
-    public static volatile int minimumCell=Integer.MAX_VALUE;
+    private static double minY,maxY;
+    private static int count;
+    public static int minimumCell=Integer.MAX_VALUE;
     public static void begin(int minCell) { minimumCell=minCell;count=0;minY=Double.POSITIVE_INFINITY;maxY=Double.NEGATIVE_INFINITY; }
-    public static VertexConsumer watch(VertexConsumer delegate) {
-        return (VertexConsumer)Proxy.newProxyInstance(VertexConsumer.class.getClassLoader(),new Class<?>[]{VertexConsumer.class},(proxy,method,args)->{
-            if(method.getName().equals("vertex") && args!=null) {
-                double y=Double.NaN;
-                if(args.length==3 && args[0] instanceof Float) y=((Float)args[1]).doubleValue();
-                if(args.length==4 && args[0] instanceof Matrix4f matrix) {
-                    var p=matrix.transformPosition(new Vector3f((float)args[1],(float)args[2],(float)args[3]));y=p.y;
-                }
-                if(Double.isFinite(y)) {
-                    y+=MinecraftClient.getInstance().gameRenderer.getCamera().getPos().y;
-                    minY=Math.min(minY,y);maxY=Math.max(maxY,y);count++;
-                }
-            }
-            try { var result=method.invoke(delegate,args);return result==delegate?proxy:result; }
-            catch(java.lang.reflect.InvocationTargetException e) { throw e.getCause(); }
-        });
+    public static VertexConsumer watch(VertexConsumer target) { return new AuditedVertices(target); }
+    private record AuditedVertices(VertexConsumer target) implements VertexConsumer {
+        @Override public VertexConsumer vertex(float x,float y,float z) {
+            double worldY=y+MinecraftClient.getInstance().gameRenderer.getCamera().getPos().y;
+            minY=Math.min(minY,worldY);maxY=Math.max(maxY,worldY);count++;
+            target.vertex(x,y,z);return this;
+        }
+        @Override public VertexConsumer color(int red,int green,int blue,int alpha) { target.color(red,green,blue,alpha);return this; }
+        @Override public VertexConsumer texture(float u,float v) { target.texture(u,v);return this; }
+        @Override public VertexConsumer overlay(int u,int v) { target.overlay(u,v);return this; }
+        @Override public VertexConsumer light(int u,int v) { target.light(u,v);return this; }
+        @Override public VertexConsumer normal(float x,float y,float z) { target.normal(x,y,z);return this; }
     }
     public static void verify(double top) {
         if(count<4 || Math.abs(maxY-top)>1e-3 || minY<minimumCell-.001 || maxY-minY>2.001)

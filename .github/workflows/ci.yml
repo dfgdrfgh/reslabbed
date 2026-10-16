@@ -11,6 +11,11 @@ concurrency:
   cancel-in-progress: true
 jobs:
   verify:
+    name: Server and ${{ matrix.variant }} client
+    strategy:
+      fail-fast: false
+      matrix:
+        variant: [indigo, sodium, pack]
     runs-on: ubuntu-22.04
     timeout-minutes: 40
     steps:
@@ -29,14 +34,24 @@ jobs:
           rm -rf build/run/gameTest
           bash gradlew --no-daemon --console=plain build runGameTest writeProbeRuntime
           python3 tools/verify-test-count.py
+      - name: Stage complete latest pack
+        if: matrix.variant == 'pack'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 tools/stage-full-pack.py
       - name: Production clients
         env:
+          VARIANT: ${{ matrix.variant }}
           LIBGL_ALWAYS_SOFTWARE: '1'
           GH_TOKEN: ${{ github.token }}
         run: |
-          python3 tools/stage-full-pack.py
-          timeout 20m xvfb-run -a python3 tools/client-runtime.py --pack
+          if [ "$VARIANT" = "indigo" ]; then
+            timeout 20m xvfb-run -a python3 tools/client-runtime.py
+          else
+            timeout 20m xvfb-run -a python3 tools/client-runtime.py --"$VARIANT"
+          fi
       - name: Upload tested production JAR
+        if: matrix.variant == 'pack'
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         with:
           name: slabbed-physical-rewrite-mc1.21.1-fabric

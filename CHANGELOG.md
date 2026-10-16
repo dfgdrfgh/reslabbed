@@ -1,3 +1,11 @@
+# 0.9.0 rewrite alpha — Fabric 1.21.1
+
+Fresh physical-cell implementation of the Slabbed concept. Pieces occupy the cells intersected by their actual shapes rather than distant logical cells. Placement origins remain permanent; see LAW.md.
+
+Adds bounded half-cell storage, atomic occupancy checks, clipped local collision, vanilla physical raycasts, selected-piece breaking, cached geometry and vanilla block-entity synchronization. Decorations have support checks; flower pots have planting and unpotting adapters. Mining and explosion properties come from the underlying material.
+
+This is an experimental fresh-world format with a limited adapter set. It does not migrate old offset saves, emulate inventories or other unadapted stateful blocks, or move carrier cells with pistons.
+
 ## [0.6.1-alpha+1.21.1-fabric]
 
 See LAW.md — this changelog does not redefine the law.
