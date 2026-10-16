@@ -69,7 +69,7 @@ public final class PhysicalClientProbe implements ClientModInitializer {
         if(client.currentScreen!=null) client.setScreen(null);
         client.player.getAbilities().flying=true;
         client.player.setVelocity(Vec3d.ZERO);
-        if(reopen && stage==0) { top=BASE.getY()+.5+COUNT*.75; step=COUNT; stage=4; started=ticks; teleport(client); return; }
+        if(reopen && stage==0) { top=BASE.getY()+.5+COUNT*.75; step=COUNT; stage=4; started=ticks; CellRenderAudit.begin((int)Math.floor(top-2)); teleport(client); return; }
         if(stage==0) {
             stage=1;
             server(client,()->{
@@ -115,12 +115,13 @@ public final class PhysicalClientProbe implements ClientModInitializer {
             top=expectedTop;step++;
             if(step%32==0) System.out.println("PHYSICAL_PACKET_STACK_CONFIRMED "+step+" top="+top);
             if(step<COUNT) { stage=1; return; }
-            stage=4;started=ticks;client.worldRenderer.reload();
+            stage=4;started=ticks;CellRenderAudit.begin((int)Math.floor(top-2));client.worldRenderer.reload();
             client.reloadResources().exceptionally(e->{failure=e;return null;});
             System.out.println("PHYSICAL_NETWORK_PLACEMENTS_PASS count=258");return;
         }
         if(stage==4) {
             if(ticks-started<100) return;
+            CellRenderAudit.verify(top);
             aim(client);
             var ray=client.player.raycast(client.player.getBlockInteractionRange(),1,false);
             check(ray instanceof BlockHitResult h && h.getType()==HitResult.Type.BLOCK && Math.abs(h.getPos().y-top)<1e-5,"reload or reopen lost physical target");

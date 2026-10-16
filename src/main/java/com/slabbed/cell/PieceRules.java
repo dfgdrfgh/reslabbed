@@ -14,6 +14,7 @@ public final class PieceRules {
         return state.getBlock() instanceof SlabBlock || state.isFullCube(EmptyBlockView.INSTANCE,BlockPos.ORIGIN);
     }
     public static boolean accepts(BlockState state) {
+        if(state.getBlock() instanceof RedstoneTorchBlock) return false;
         if(state.hasBlockEntity() || !state.getFluidState().isEmpty()) return false;
         var block=state.getBlock();
         if(block instanceof SlabBlock) return state.get(SlabBlock.TYPE)!=SlabType.DOUBLE;

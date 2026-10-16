@@ -15,5 +15,11 @@
   "depends": {
     "slabbed": "*",
     "fabric-gametest-api-v1": "*"
-  }
+  },
+  "mixins": [
+    {
+      "config": "physical-test.mixins.json",
+      "environment": "client"
+    }
+  ]
 }

@@ -75,9 +75,30 @@ public final class PhysicalCellTest {
             t.assertTrue(result.isAccepted(),"item use step "+n);
             top+=n%2==0?1:.5;
             var ray=w.raycast(new RaycastContext(new Vec3d(p.getX()+.5,top+2,p.getZ()+.5),new Vec3d(p.getX()+.5,top-.25,p.getZ()+.5),RaycastContext.ShapeType.OUTLINE,RaycastContext.FluidHandling.NONE,player));
-            t.assertTrue(ray.getType()==HitResult.Type.BLOCK && Math.abs(ray.getPos().y-top)<1e-6,"vanilla ray hit physical top "+n);
+            t.assertTrue(ray.getType()==HitResult.Type.BLOCK && Math.abs(ray.getPos().y-top)<1e-6,"vanilla ray hit physical top "+n+" expected="+top+" hit="+ray+" state="+w.getBlockState(pos.up())+" below="+w.getBlockState(pos)+" cells="+CellWorld.contents(w,pos));
             t.assertTrue(!w.isSpaceEmpty(new Box(p.getX()+.2,top-.2,p.getZ()+.2,p.getX()+.8,top-.01,p.getZ()+.8)),"standing collision "+n);
         }
         t.complete();
     }
+    @GameTest(templateName="fabric-gametest-api-v1:empty")
+    public void externalRemovalClearsTheOtherFragment(TestContext t) {
+        var p=t.getAbsolutePos(new BlockPos(2,2,2)); var w=t.getWorld();
+        w.setBlockState(p,Blocks.OAK_SLAB.getDefaultState());
+        CellWorld.place(w,p.getX(),p.getZ(),p.getY()*2+1,Blocks.STONE.getDefaultState());
+        w.setBlockState(p.up(),Blocks.AIR.getDefaultState(),Block.NOTIFY_ALL);
+        t.assertTrue(w.getBlockState(p).isOf(Blocks.OAK_SLAB),"external cap removal restored native support");
+        t.assertTrue(w.getBlockState(p.up()).isAir(),"external removal stayed removed");t.complete();
+    }
+    @GameTest(templateName="fabric-gametest-api-v1:empty")
+    public void physicalCellNbtRoundTrip(TestContext t) {
+        var p=t.getAbsolutePos(new BlockPos(2,2,2)); var w=t.getWorld();
+        w.setBlockState(p,Blocks.OAK_SLAB.getDefaultState());
+        CellWorld.place(w,p.getX(),p.getZ(),p.getY()*2+1,Blocks.STONE.getDefaultState());
+        var original=(CellBlockEntity)w.getBlockEntity(p);
+        var copy=new CellBlockEntity(p,w.getBlockState(p));
+        copy.read(original.createNbt(w.getRegistryManager()),w.getRegistryManager());
+        t.assertTrue(original.contents().equals(copy.contents()),"NBT retained exact physical fragments");
+        t.assertTrue(original.outline().getBoundingBox().equals(copy.outline().getBoundingBox()),"NBT retained outline");t.complete();
+    }
+
 }
