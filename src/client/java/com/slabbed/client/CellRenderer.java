@@ -12,9 +12,14 @@ import net.minecraft.util.math.random.Random;
 /** Pieces render once, with bounded offsets and the world's original model colors. */
 public final class CellRenderer implements BlockEntityRenderer<CellBlockEntity> {
     private final Random random=Random.create();
+    static net.minecraft.client.render.Frustum frustum;
+    @Override public int getRenderDistance() { return Math.max(512,MinecraftClient.getInstance().options.getViewDistance().getValue()*32); }
+    @Override public boolean rendersOutsideBoundingBox(CellBlockEntity cell) {
+        var bounds=cell.renderBounds();return bounds!=null && bounds.maxY>cell.getPos().getY()+1.01;
+    }
     public CellRenderer(BlockEntityRendererFactory.Context context) {}
     @Override public void render(CellBlockEntity cell,float tickDelta,MatrixStack matrices,VertexConsumerProvider vertices,int light,int overlay) {
-        if(cell.getWorld()==null)return;
+        if(cell.getWorld()==null || cell.renderBounds()==null || (frustum!=null && !frustum.isVisible(cell.renderBounds())))return;
         var renderer=MinecraftClient.getInstance().getBlockRenderManager();
         for(var part:cell.contents().fragments()) {
             if(part.offset()<0) continue;

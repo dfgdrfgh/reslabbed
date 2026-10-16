@@ -61,7 +61,11 @@ if [ -n "$BEHAVIOR" ]; then
       'src/main/**/SlabSupport.java' 'src/main/**/SlabAnchorAttachment.java' \
       'src/main/**/*PlacementIntent*' 'src/main/**/*OnPlacedAnchor*' \
       'src/main/**/*OnStateReplaced*' 'src/main/**/*OffsetRaycast*' 'src/main/**/Cell*.java' 'src/main/**/Piece*.java' 2>/dev/null || true)"
-  LEDGER_TS="$(stat -f %m "$LEDGER_FILE" 2>/dev/null || stat -c %Y "$LEDGER_FILE" 2>/dev/null || echo 0)"
+  if stat --version >/dev/null 2>&1; then
+    LEDGER_TS="$(stat -c %Y "$LEDGER_FILE")"
+  else
+    LEDGER_TS="$(stat -f %m "$LEDGER_FILE")"
+  fi
   if [ -n "$LAST_BEHAVIOR_TS" ] && [ "$LAST_BEHAVIOR_TS" -gt "$LEDGER_TS" ]; then
     fail "S-5: a behavior-changing commit already landed since the ledger was last updated, and this
        is another one without a recorded live result. Do NOT stack. Get a live A/B first, record it

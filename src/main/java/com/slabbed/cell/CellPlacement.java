@@ -47,9 +47,9 @@ public final class CellPlacement {
         // Matching vanilla slabs retain vanilla's single-cell double-slab behavior.
         if(!clickedState.isOf(Slabbed.CELL) && item.getBlock()==clickedState.getBlock()
                 && face.getAxis().isVertical() && clickedState.get(SlabBlock.TYPE)!=SlabType.DOUBLE) return null;
-        var base=new BlockPos(x,Math.floorDiv(origin,2),z);
+        var base=new BlockPos(x,com.slabbed.core.HalfGrid.at(origin).cellY(),z);
         if(!player.getAbilities().allowModifyWorld || !world.canPlayerModifyAt(player,base)
-                || !world.canPlayerModifyAt(player,new BlockPos(x,Math.floorDiv(origin+length-1,2),z))) return ActionResult.FAIL;
+                || !world.canPlayerModifyAt(player,new BlockPos(x,com.slabbed.core.HalfGrid.at(origin+length-1).cellY(),z))) return ActionResult.FAIL;
         var shape=state.getCollisionShape(world,base).offset(x,origin*.5,z);
         if(!world.doesNotIntersectEntities(null,shape)) return ActionResult.FAIL;
         if(!PieceSupport.supported(world,base,new com.slabbed.core.CellContents.Fragment<>(origin-base.getY()*2,length,state))) return ActionResult.FAIL;

@@ -23,6 +23,7 @@ public final class CellWorld {
         if (!world.isChunkLoaded(pos)) return null;
         var state=world.getBlockState(pos);
         if (state.isOf(Slabbed.CELL)) return world.getBlockEntity(pos) instanceof CellBlockEntity cell?cell.contents():null;
+        if (state.hasBlockEntity()) return null;
         if (state.isAir() || state.isReplaceable()) return CellContents.empty();
         if (state.getBlock() instanceof SlabBlock && state.get(SlabBlock.TYPE)!=SlabType.DOUBLE
                 && !state.get(SlabBlock.WATERLOGGED)) {
@@ -32,8 +33,9 @@ public final class CellWorld {
         return null;
     }
     public static boolean place(World world,int x,int z,int origin,BlockState state) {
+        if (!PieceRules.accepts(state)) return false;
         if (state.getBlock() instanceof SlabBlock) state=state.with(SlabBlock.TYPE,SlabType.BOTTOM);
-        int length=length(state); int low=Math.floorDiv(origin,2),high=Math.floorDiv(origin+length-1,2);
+        int length=length(state); int low=HalfGrid.at(origin).cellY(),high=HalfGrid.at(origin+length-1).cellY();
         Map<BlockPos,CellContents<BlockState>> changes=new LinkedHashMap<>();
         for (int y=low;y<=high;y++) {
             var pos=new BlockPos(x,y,z);
@@ -51,7 +53,7 @@ public final class CellWorld {
         if(fragment==null) return;
         int origin=cellPos.getY()*2+offset;
         Map<BlockPos,CellContents<BlockState>> changes=new LinkedHashMap<>();
-        for(int y=Math.floorDiv(origin,2);y<=Math.floorDiv(origin+fragment.length()-1,2);y++) {
+        for(int y=HalfGrid.at(origin).cellY();y<=HalfGrid.at(origin+fragment.length()-1).cellY();y++) {
             var pos=new BlockPos(cellPos.getX(),y,cellPos.getZ()); var before=contents(world,pos);
             if(before==null) return;
             changes.put(pos,before.remove(origin-y*2));
@@ -95,12 +97,13 @@ public final class CellWorld {
         return null;
     }
     public static boolean replacePiece(World world,BlockPos cellPos,int offset,BlockState next) {
+        if(!PieceRules.accepts(next))return false;
         var old=contents(world,cellPos);if(old==null)return false;
         var part=old.fragments().stream().filter(p->p.offset()==offset).findFirst().orElse(null);
         if(part==null || length(next)!=part.length())return false;
         int origin=cellPos.getY()*2+offset;
         Map<BlockPos,CellContents<BlockState>> changes=new LinkedHashMap<>();
-        for(int y=Math.floorDiv(origin,2);y<=Math.floorDiv(origin+part.length()-1,2);y++) {
+        for(int y=HalfGrid.at(origin).cellY();y<=HalfGrid.at(origin+part.length()-1).cellY();y++) {
             var pos=new BlockPos(cellPos.getX(),y,cellPos.getZ());var before=contents(world,pos);if(before==null)return false;
             int local=origin-y*2;
             changes.put(pos,before.remove(local).add(new CellContents.Fragment<>(local,part.length(),next)));
@@ -111,7 +114,7 @@ public final class CellWorld {
         Map<BlockPos,CellContents<BlockState>> changes=new LinkedHashMap<>();
         for(var part:snapshot.fragments()) {
             int origin=removed.getY()*2+part.offset();
-            for(int y=Math.floorDiv(origin,2);y<=Math.floorDiv(origin+part.length()-1,2);y++) {
+            for(int y=HalfGrid.at(origin).cellY();y<=HalfGrid.at(origin+part.length()-1).cellY();y++) {
                 var pos=new BlockPos(removed.getX(),y,removed.getZ());
                 if(pos.equals(removed)) continue;
                 var before=changes.containsKey(pos)?changes.get(pos):contents(world,pos);

@@ -126,10 +126,23 @@ public final class PhysicalClientProbe implements ClientModInitializer {
             var ray=client.player.raycast(client.player.getBlockInteractionRange(),1,false);
             check(ray instanceof BlockHitResult h && h.getType()==HitResult.Type.BLOCK && Math.abs(h.getPos().y-top)<1e-5,"reload or reopen lost physical target");
             if(!reopen) {
-                server(client,()->{client.getServer().saveAll(false,true,true);saved=true;}); stage=5;return;
+                stage=7;started=ticks;
+                server(client,()->client.getServer().getPlayerManager().getPlayer(client.player.getUuid()).networkHandler
+                        .requestTeleport(BASE.getX()+80.5,top+1,BASE.getZ()+.5,90,0));
+                return;
             }
             client.interactionManager.attackBlock(((BlockHitResult)ray).getBlockPos(),Direction.UP);
             stage=6;started=ticks;return;
+        }
+        if(stage==7) {
+            if(client.player.getX()<BASE.getX()+79)return;
+            aim(client);CellRenderAudit.begin((int)Math.floor(top-2));stage=8;started=ticks;return;
+        }
+        if(stage==8) {
+            aim(client);
+            if(ticks-started<100 || pending)return;
+            CellRenderAudit.verify(top);System.out.println("PHYSICAL_FAR_RENDER_PASS distance=80");
+            server(client,()->{client.getServer().saveAll(false,true,true);saved=true;});stage=5;return;
         }
         if(stage==5 && saved) { finish(client,"PHYSICAL_SAVE_PASS 258 pieces");return; }
         if(stage==6) {

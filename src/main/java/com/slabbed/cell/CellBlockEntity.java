@@ -21,10 +21,12 @@ public final class CellBlockEntity extends BlockEntity {
     private CellContents<BlockState> contents = CellContents.empty();
     private VoxelShape collision = VoxelShapes.empty();
     private VoxelShape outline = VoxelShapes.empty();
+    private net.minecraft.util.math.Box renderBounds;
     public CellBlockEntity(BlockPos pos, BlockState state) { super(Slabbed.CELL_ENTITY, pos, state); }
     public CellContents<BlockState> contents() { return contents; }
     public VoxelShape collision() { return collision; }
     public VoxelShape outline() { return outline; }
+    public net.minecraft.util.math.Box renderBounds() { return renderBounds; }
     public void setContents(CellContents<BlockState> next) {
         contents = next;
         rebuild();
@@ -39,12 +41,15 @@ public final class CellBlockEntity extends BlockEntity {
     }
     private void rebuild() {
         outline = VoxelShapes.empty(); collision = VoxelShapes.empty();
+        VoxelShape rendered=VoxelShapes.empty();
         var view = world == null ? net.minecraft.world.EmptyBlockView.INSTANCE : world;
         for (var part : contents.fragments()) {
             var state = part.value();
+            if(part.offset()>=0) rendered=VoxelShapes.union(rendered,state.getOutlineShape(view,pos).offset(0,part.offset()*.5,0));
             outline = VoxelShapes.union(outline, clip(state.getOutlineShape(view,pos).offset(0,part.offset()*.5,0)));
             collision = VoxelShapes.union(collision, clip(state.getCollisionShape(view,pos).offset(0,part.offset()*.5,0)));
         }
+        renderBounds=rendered.isEmpty()?null:rendered.getBoundingBox().offset(pos).expand(.001);
     }
     private static VoxelShape clip(VoxelShape shape) {
         return VoxelShapes.combineAndSimplify(shape,VoxelShapes.fullCube(),BooleanBiFunction.AND);
@@ -65,10 +70,13 @@ public final class CellBlockEntity extends BlockEntity {
             var tag=(NbtCompound)element;
             var state=NbtHelper.toBlockState(lookup.getWrapperOrThrow(RegistryKeys.BLOCK),tag.getCompound("state"));
             if (state.isAir() || state.isOf(Slabbed.CELL)) continue;
-            try { next=next.add(new CellContents.Fragment<>(tag.getInt("offset"),tag.getInt("length"),state)); }
+            try {
+                if(tag.getInt("length")!=CellWorld.length(state) || !PieceRules.accepts(state)) throw new IllegalArgumentException("unsupported stored piece");
+                next=next.add(new CellContents.Fragment<>(tag.getInt("offset"),tag.getInt("length"),state)); }
             catch (IllegalArgumentException malformed) { throw new IllegalStateException("Invalid Slabbed physical cell at "+pos,malformed); }
         }
         contents=next; rebuild();
+        if(world!=null && world.isClient) world.updateListeners(pos,getCachedState(),getCachedState(),Block.NOTIFY_ALL);
     }
     @Override public NbtCompound toInitialChunkDataNbt(RegistryWrapper.WrapperLookup lookup) { return createNbt(lookup); }
     @Override public BlockEntityUpdateS2CPacket toUpdatePacket() { return BlockEntityUpdateS2CPacket.create(this); }

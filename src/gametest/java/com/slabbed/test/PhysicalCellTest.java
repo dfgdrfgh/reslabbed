@@ -154,4 +154,25 @@ public final class PhysicalCellTest {
         t.assertTrue(actual==Blocks.OBSIDIAN.getBlastResistance(),"obsidian kept blast resistance");t.complete();
     }
 
+    @GameTest(templateName="fabric-gametest-api-v1:empty")
+    public void externalBreakDropsThePieceOnce(TestContext t) {
+        var p=t.getAbsolutePos(new BlockPos(2,2,2));var w=t.getWorld();
+        w.setBlockState(p,Blocks.OAK_SLAB.getDefaultState());
+        CellWorld.place(w,p.getX(),p.getZ(),p.getY()*2+1,Blocks.IRON_BLOCK.getDefaultState());
+        int expected=Block.getDroppedStacks(Blocks.IRON_BLOCK.getDefaultState(),w,p,null).stream().mapToInt(ItemStack::getCount).sum();
+        w.breakBlock(p.up(),true);
+        int dropped=w.getEntitiesByClass(net.minecraft.entity.ItemEntity.class,new Box(p).expand(3),e->true).stream().mapToInt(e->e.getStack().getCount()).sum();
+        t.assertTrue(expected>0 && dropped==expected,"external break dropped once: "+dropped+" expected="+expected);
+        t.assertTrue(w.getBlockState(p).isOf(Blocks.OAK_SLAB) && w.getBlockState(p.up()).isAir(),"external break left no cap or ghost piece");t.complete();
+    }
+    @GameTest(templateName="fabric-gametest-api-v1:empty")
+    public void blockedPlacementPreservesInventory(TestContext t) {
+        var p=t.getAbsolutePos(new BlockPos(2,2,2));var w=t.getWorld();
+        w.setBlockState(p,Blocks.OAK_SLAB.getDefaultState());w.setBlockState(p.up(),Blocks.CHEST.getDefaultState());
+        var inventory=(net.minecraft.inventory.Inventory)w.getBlockEntity(p.up());inventory.setStack(0,new ItemStack(Items.DIAMOND,3));
+        t.assertFalse(CellWorld.place(w,p.getX(),p.getZ(),p.getY()*2+1,Blocks.STONE.getDefaultState()),"occupied inventory cell rejected");
+        t.assertTrue(w.getBlockEntity(p.up())==inventory && inventory.getStack(0).getCount()==3,"inventory preserved");
+        t.assertTrue(w.getBlockState(p).isOf(Blocks.OAK_SLAB),"slab preserved");t.complete();
+    }
+
 }
