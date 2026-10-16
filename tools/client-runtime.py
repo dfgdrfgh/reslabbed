@@ -66,6 +66,7 @@ print('PHYSICAL_JAR_SHA256',hashlib.sha256(release[0].read_bytes()).hexdigest(),
 for phase in ['fresh','reopen']:
     marker=game/'physical-pass.txt';marker.unlink(missing_ok=True)
     command=[str(Path(os.environ['JAVA_HOME'])/'bin/java'),'-Xmx4G','-Dfabric.development=false','-Dslabbed.physicalProbe=true',
+             '-Dslabbed.controlProbe='+str(args.control).lower(),
              '-Dslabbed.reopenProbe='+str(phase=='reopen').lower(),'-Dslabbed.packManifest='+str(game/'expected-mods.json'),
              '-cp',os.pathsep.join(map(str,classpath)),'net.fabricmc.loader.impl.launch.knot.KnotClient',
              '--gameDir',str(game),'--assetsDir',str(index.parent.parent),'--assetIndex',index.stem,'--username','SlabProbe','--version','1.21.1','--accessToken','0']

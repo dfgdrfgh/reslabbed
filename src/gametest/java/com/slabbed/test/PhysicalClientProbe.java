@@ -36,6 +36,7 @@ public final class PhysicalClientProbe implements ClientModInitializer {
     private volatile int confirmed=-1;
     private volatile boolean broken,saved;
     private boolean reopen;
+    private int clearanceStage;
     private double top=BASE.getY()+.5;
     @Override public void onInitializeClient() {
         if(!Boolean.getBoolean("slabbed.physicalProbe")) return;
@@ -76,10 +77,28 @@ public final class PhysicalClientProbe implements ClientModInitializer {
             server(client,()->{
                 var w=client.getServer().getOverworld();
                 for(int y=BASE.getY();y<BASE.getY()+COUNT;y++) w.setBlockState(new BlockPos(BASE.getX(),y,BASE.getZ()),Blocks.AIR.getDefaultState(),Block.NOTIFY_ALL);
-                w.setBlockState(BASE,Blocks.STONE_SLAB.getDefaultState(),Block.NOTIFY_ALL); ready=true;
+                w.setBlockState(BASE,Blocks.STONE_SLAB.getDefaultState(),Block.NOTIFY_ALL);
+                w.setBlockState(BASE.up(),Blocks.STONE.getDefaultState(),Block.NOTIFY_ALL);ready=true;
             }); return;
         }
         if(!reopen && !ready) return;
+        if(!reopen && clearanceStage<3) {
+            if(clearanceStage==0) { if(pending)return;teleport(client);clearanceStage=1;started=ticks;return; }
+            if(clearanceStage==1) {
+                if(ticks-started<10 || !client.world.getBlockState(BASE.up()).isOf(Blocks.STONE))return;
+                var stack=new ItemStack(Items.STONE,64);client.player.setStackInHand(Hand.MAIN_HAND,stack);
+                client.interactionManager.clickCreativeStack(stack.copy(),36+client.player.getInventory().selectedSlot);
+                var hit=new BlockHitResult(new Vec3d(BASE.getX()+.5,BASE.getY()+.5,BASE.getZ()+.5),Direction.UP,BASE,false);
+                var result=client.interactionManager.interactBlock(client.player,Hand.MAIN_HAND,hit);
+                boolean control=Boolean.getBoolean("slabbed.controlProbe");
+                System.out.println("PHYSICAL_CLEARANCE_OBSERVED accepted="+result.isAccepted()+" control="+control);
+                check(result.isAccepted()==control,"client accepted placement into an occupied upper half");
+                server(client,()->client.getServer().getOverworld().setBlockState(BASE.up(),Blocks.AIR.getDefaultState(),Block.NOTIFY_ALL));
+                clearanceStage=2;return;
+            }
+            if(pending || !client.world.getBlockState(BASE.up()).isAir())return;
+            clearanceStage=3;System.out.println("PHYSICAL_CLEARANCE_PASS");
+        }
         if(stage==1) { if(pending)return; started=ticks; stage=2; teleport(client); return; }
         if(stage==2) {
             if(ticks-started<5 || client.player.getPos().squaredDistanceTo(new Vec3d(BASE.getX()+2.5,top+1,BASE.getZ()+.5))>.02) return;
