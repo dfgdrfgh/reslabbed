@@ -131,4 +131,27 @@ public final class PhysicalCellTest {
         t.assertTrue(Math.abs(vanilla-shifted)<1e-7,"carrier used vanilla material mining speed: "+vanilla+" vs "+shifted);t.complete();
     }
 
+    @GameTest(templateName="fabric-gametest-api-v1:empty")
+    public void shiftedPotCanBePlantedAndEmptied(TestContext t) {
+        var p=t.getAbsolutePos(new BlockPos(2,2,2));var w=t.getWorld();
+        w.setBlockState(p,Blocks.OAK_SLAB.getDefaultState());
+        CellWorld.place(w,p.getX(),p.getZ(),p.getY()*2+1,Blocks.FLOWER_POT.getDefaultState());
+        var player=t.createMockPlayer(GameMode.SURVIVAL);player.setStackInHand(Hand.MAIN_HAND,new ItemStack(Items.DANDELION));
+        var hit=new BlockHitResult(new Vec3d(p.getX()+.5,p.getY()+.875,p.getZ()+.5),Direction.UP,p,false);
+        t.assertTrue(com.slabbed.cell.CellInteractions.use(player,w,Hand.MAIN_HAND,hit).isAccepted(),"pot planted");
+        t.assertTrue(player.getMainHandStack().isEmpty(),"plant consumed once");
+        t.assertTrue(CellWorld.contents(w,p).fragments().stream().anyMatch(f->f.value().isOf(Blocks.POTTED_DANDELION)),"potted state saved");
+        t.assertTrue(com.slabbed.cell.CellInteractions.use(player,w,Hand.MAIN_HAND,hit).isAccepted(),"pot emptied");
+        t.assertTrue(player.getMainHandStack().isOf(Items.DANDELION) && player.getMainHandStack().getCount()==1,"one plant returned");
+        t.assertTrue(CellWorld.contents(w,p).fragments().stream().anyMatch(f->f.value().isOf(Blocks.FLOWER_POT)),"empty state saved");t.complete();
+    }
+    @GameTest(templateName="fabric-gametest-api-v1:empty")
+    public void carrierPreservesMaterialExplosionResistance(TestContext t) {
+        var p=t.getAbsolutePos(new BlockPos(2,2,2));var w=t.getWorld();
+        w.setBlockState(p,Blocks.OAK_SLAB.getDefaultState());
+        CellWorld.place(w,p.getX(),p.getZ(),p.getY()*2+1,Blocks.OBSIDIAN.getDefaultState());
+        float actual=new net.minecraft.world.explosion.ExplosionBehavior().getBlastResistance(null,w,p,w.getBlockState(p),w.getFluidState(p)).orElseThrow();
+        t.assertTrue(actual==Blocks.OBSIDIAN.getBlastResistance(),"obsidian kept blast resistance");t.complete();
+    }
+
 }

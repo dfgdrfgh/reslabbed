@@ -4,7 +4,8 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [
     "BlockItemMixin",
-    "ServerBreakMixin"
+    "ServerBreakMixin",
+    "ExplosionResistanceMixin"
   ],
   "injectors": {
     "defaultRequire": 1

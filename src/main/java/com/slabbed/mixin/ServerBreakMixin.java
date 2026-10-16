@@ -22,12 +22,18 @@ public abstract class ServerBreakMixin {
     private void slabbed$breakPiece(BlockPos pos,CallbackInfoReturnable<Boolean> cir) {
         if(!world.getBlockState(pos).isOf(Slabbed.CELL)) return;
         if(!world.canPlayerModifyAt(player,pos) || player.isBlockBreakingRestricted(world,pos,player.interactionManager.getGameMode())) { cir.setReturnValue(false); return; }
-        var hit=player.raycast(player.getBlockInteractionRange(),1,false);
-        if(!(hit instanceof BlockHitResult blockHit) || !blockHit.getBlockPos().equals(pos)) { cir.setReturnValue(false); return; }
-        var part=CellWorld.pick(world,pos,blockHit);
+        var part=com.slabbed.cell.PieceTarget.selected(player,pos);
         if(part==null) { cir.setReturnValue(false); return; }
-        CellWorld.remove(world,pos,part.offset(),player,!player.isCreative());
-        if(!player.isCreative()) player.getMainHandStack().postMine(world,part.value(),pos,player);
+        var tool=player.getMainHandStack();
+        if(!tool.getItem().canMine(part.value(),world,pos,player)) { cir.setReturnValue(false); return; }
+        boolean harvest=player.canHarvest(part.value());
+        var usedTool=tool.copy();
+        part.value().getBlock().onBreak(world,pos,part.value(),player);
+        CellWorld.remove(world,pos,part.offset(),player,false);
+        if(!player.isCreative()) {
+            tool.postMine(world,part.value(),pos,player);
+            if(harvest) part.value().getBlock().afterBreak(world,player,pos,part.value(),null,usedTool);
+        }
         cir.setReturnValue(true);
     }
 }

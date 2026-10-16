@@ -79,7 +79,7 @@ public final class PhysicalClientProbe implements ClientModInitializer {
             }); return;
         }
         if(!reopen && !ready) return;
-        if(stage==1) { started=ticks; stage=2; teleport(client); return; }
+        if(stage==1) { if(pending)return; started=ticks; stage=2; teleport(client); return; }
         if(stage==2) {
             if(ticks-started<5 || client.player.getPos().squaredDistanceTo(new Vec3d(BASE.getX()+2.5,top+1,BASE.getZ()+.5))>.02) return;
             aim(client);
@@ -120,7 +120,7 @@ public final class PhysicalClientProbe implements ClientModInitializer {
             System.out.println("PHYSICAL_NETWORK_PLACEMENTS_PASS count=258");return;
         }
         if(stage==4) {
-            if(ticks-started<100) return;
+            if(ticks-started<100 || pending) return;
             CellRenderAudit.verify(top);
             aim(client);
             var ray=client.player.raycast(client.player.getBlockInteractionRange(),1,false);

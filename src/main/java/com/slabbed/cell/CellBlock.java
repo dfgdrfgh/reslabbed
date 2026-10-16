@@ -32,7 +32,24 @@ public final class CellBlock extends BlockWithEntity {
         var p=world instanceof World w?CellWorld.pick(w,pos,null):null; return p==null?ItemStack.EMPTY:new ItemStack(p.value().getBlock());
     }
     @Override protected void onStateReplaced(BlockState state,World world,BlockPos pos,BlockState next,boolean moved) {
-        if (!next.isOf(this) && !CellWorld.mutating()) CellWorld.clearCell(world,pos);
+        if (!world.isClient && !next.isOf(this) && !CellWorld.mutating() && world.getBlockEntity(pos) instanceof CellBlockEntity cell)
+            CellWorld.clearOutsideCell(world,pos,cell.contents());
         super.onStateReplaced(state,world,pos,next,moved);
     }
+    @Override protected float calcBlockBreakingDelta(BlockState state,PlayerEntity player,BlockView view,BlockPos pos) {
+        if(!(view instanceof World world)) return 0;
+        var hit=player.raycast(player.getBlockInteractionRange(),1,false);
+        var part=CellWorld.pick(world,pos,hit instanceof BlockHitResult h && h.getBlockPos().equals(pos)?h:null);
+        return part==null?0:part.value().calcBlockBreakingDelta(player,view,pos);
+    }
+    @Override protected java.util.List<ItemStack> getDroppedStacks(BlockState state,net.minecraft.loot.context.LootContextParameterSet.Builder builder) {
+        if(!(builder.getOptional(net.minecraft.loot.context.LootContextParameters.BLOCK_ENTITY) instanceof CellBlockEntity cell)) return java.util.List.of();
+        var drops=new java.util.ArrayList<ItemStack>();
+        for(var part:cell.contents().fragments()) drops.addAll(part.value().getDroppedStacks(builder));
+        return drops;
+    }
+    @Override protected void neighborUpdate(BlockState state,World world,BlockPos pos,Block source,BlockPos sourcePos,boolean notify) {
+        if(!world.isClient && !CellWorld.mutating()) PieceSupport.revalidate(world,pos);
+    }
+
 }

@@ -16,4 +16,12 @@ public abstract class ClientBreakMixin {
         var world=MinecraftClient.getInstance().world;
         if(world!=null && world.getBlockState(pos).isOf(Slabbed.CELL)) cir.setReturnValue(true);
     }
+    @Inject(method={"attackBlock","updateBlockBreakingProgress"},at=@At("HEAD"))
+    private void slabbed$sendSelectedPiece(BlockPos pos,net.minecraft.util.math.Direction direction,CallbackInfoReturnable<Boolean> cir) {
+        var client=MinecraftClient.getInstance();
+        if(client.world==null || !client.world.getBlockState(pos).isOf(Slabbed.CELL))return;
+        if(client.crosshairTarget instanceof net.minecraft.util.hit.BlockHitResult hit && hit.getBlockPos().equals(pos))
+            net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.send(new com.slabbed.cell.PieceTarget(pos,hit.getPos()));
+    }
+
 }

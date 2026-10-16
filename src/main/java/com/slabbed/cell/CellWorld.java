@@ -81,6 +81,7 @@ public final class CellWorld {
         for(var pos:changes.keySet()) {
             world.updateNeighbors(pos,world.getBlockState(pos).getBlock());
             world.updateListeners(pos,world.getBlockState(pos),world.getBlockState(pos),Block.NOTIFY_ALL);
+            if(!world.isClient) PieceSupport.revalidate(world,pos);
         }
     }
     public static CellContents.Fragment<BlockState> pick(World world,BlockPos pos,BlockHitResult hit) {
@@ -93,8 +94,30 @@ public final class CellWorld {
         }
         return null;
     }
-    public static void clearCell(World world,BlockPos pos) {
-        var contents=contents(world,pos); if(contents==null) return;
-        for(var part:contents.fragments()) remove(world,pos,part.offset(),null,!world.isClient);
+    public static boolean replacePiece(World world,BlockPos cellPos,int offset,BlockState next) {
+        var old=contents(world,cellPos);if(old==null)return false;
+        var part=old.fragments().stream().filter(p->p.offset()==offset).findFirst().orElse(null);
+        if(part==null || length(next)!=part.length())return false;
+        int origin=cellPos.getY()*2+offset;
+        Map<BlockPos,CellContents<BlockState>> changes=new LinkedHashMap<>();
+        for(int y=Math.floorDiv(origin,2);y<=Math.floorDiv(origin+part.length()-1,2);y++) {
+            var pos=new BlockPos(cellPos.getX(),y,cellPos.getZ());var before=contents(world,pos);if(before==null)return false;
+            int local=origin-y*2;
+            changes.put(pos,before.remove(local).add(new CellContents.Fragment<>(local,part.length(),next)));
+        }
+        commit(world,changes);return true;
+    }
+    public static void clearOutsideCell(World world,BlockPos removed,CellContents<BlockState> snapshot) {
+        Map<BlockPos,CellContents<BlockState>> changes=new LinkedHashMap<>();
+        for(var part:snapshot.fragments()) {
+            int origin=removed.getY()*2+part.offset();
+            for(int y=Math.floorDiv(origin,2);y<=Math.floorDiv(origin+part.length()-1,2);y++) {
+                var pos=new BlockPos(removed.getX(),y,removed.getZ());
+                if(pos.equals(removed)) continue;
+                var before=changes.containsKey(pos)?changes.get(pos):contents(world,pos);
+                if(before!=null) changes.put(pos,before.remove(origin-y*2));
+            }
+        }
+        commit(world,changes);
     }
 }

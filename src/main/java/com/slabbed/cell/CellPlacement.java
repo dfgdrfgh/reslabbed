@@ -52,6 +52,7 @@ public final class CellPlacement {
                 || !world.canPlayerModifyAt(player,new BlockPos(x,Math.floorDiv(origin+length-1,2),z))) return ActionResult.FAIL;
         var shape=state.getCollisionShape(world,base).offset(x,origin*.5,z);
         if(!world.doesNotIntersectEntities(null,shape)) return ActionResult.FAIL;
+        if(!PieceSupport.supported(world,base,new com.slabbed.core.CellContents.Fragment<>(origin-base.getY()*2,length,state))) return ActionResult.FAIL;
         if(world.isClient) return ActionResult.SUCCESS;
         if(!CellWorld.place(world,x,z,origin,state)) return ActionResult.FAIL;
         var sounds=state.getSoundGroup();
