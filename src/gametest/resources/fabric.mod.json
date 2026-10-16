@@ -6,7 +6,8 @@
   "environment": "*",
   "entrypoints": {
     "fabric-gametest": [
-      "com.slabbed.test.PhysicalCellTest"
+      "com.slabbed.test.PhysicalCellTest",
+      "com.slabbed.test.NativeSeatTest"
     ],
     "client": [
       "com.slabbed.test.PhysicalClientProbe"

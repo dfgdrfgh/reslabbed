@@ -4,6 +4,9 @@
   "compatibilityLevel": "JAVA_21",
   "client": [
     "CellRenderCaptureMixin",
+    "CellLifecycleRenderCaptureMixin",
+    "CellDustCaptureMixin",
+    "CellPendingUpdateAccess",
     "CellParticleCaptureMixin",
     "CellUpdateCaptureMixin",
     "CellSoundCaptureMixin",

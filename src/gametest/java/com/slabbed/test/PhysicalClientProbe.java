@@ -37,6 +37,7 @@ public final class PhysicalClientProbe implements ClientModInitializer {
     private volatile boolean broken,saved;
     private boolean reopen;
     private int clearanceStage;
+    private boolean hitParticlesChecked;
     private double top=BASE.getY()+.5;
     @Override public void onInitializeClient() {
         if(!Boolean.getBoolean("slabbed.physicalProbe")) return;
@@ -141,6 +142,11 @@ public final class PhysicalClientProbe implements ClientModInitializer {
         }
         if(stage==4) {
             if(ticks-started<100 || pending) return;
+            if(!reopen && !Boolean.getBoolean("slabbed.controlProbe")) {
+                var fixture=new BlockPos(BASE.getX()+1,(int)Math.floor(top)-1,BASE.getZ());
+                aimAt(client,Vec3d.ofCenter(fixture));
+                if(!CellClientLifecycleRegression.transition(client,fixture))return;
+            }
             CellRenderAudit.verify(top);
             aim(client);
             var ray=client.player.raycast(client.player.getBlockInteractionRange(),1,false);
@@ -151,9 +157,35 @@ public final class PhysicalClientProbe implements ClientModInitializer {
                         .requestTeleport(BASE.getX()+80.5,top+1,BASE.getZ()+.5,90,0));
                 return;
             }
+            if(!hitParticlesChecked && !Boolean.getBoolean("slabbed.controlProbe")) {
+                server(client,()->{
+                    var p=client.getServer().getPlayerManager().getPlayer(client.player.getUuid());
+                    p.changeGameMode(GameMode.SURVIVAL);p.getAbilities().allowFlying=true;p.getAbilities().flying=true;p.sendAbilitiesUpdate();
+                });
+                stage=10;started=ticks;return;
+            }
             CellFeedbackAudit.reset();
             client.interactionManager.attackBlock(((BlockHitResult)ray).getBlockPos(),Direction.UP);
             stage=6;started=ticks;return;
+        }
+        if(stage==10) {
+            check(ticks-started<120,"survival mode not confirmed");
+            if(pending || client.interactionManager.getCurrentGameMode()!=GameMode.SURVIVAL)return;
+            aim(client);
+            CellClientLifecycleRegression.beginHits(Blocks.OAK_SLAB.getDefaultState(),top-.5,top);
+            client.options.attackKey.setPressed(true);stage=11;started=ticks;return;
+        }
+        if(stage==11) {
+            aim(client);
+            if(ticks-started<8)return;
+            client.options.attackKey.setPressed(false);client.interactionManager.cancelBlockBreaking();
+            CellClientLifecycleRegression.verifyHits();
+            server(client,()->client.getServer().getPlayerManager().getPlayer(client.player.getUuid()).changeGameMode(GameMode.CREATIVE));
+            stage=12;return;
+        }
+        if(stage==12) {
+            if(pending || client.interactionManager.getCurrentGameMode()!=GameMode.CREATIVE)return;
+            hitParticlesChecked=true;stage=4;started=ticks-100;return;
         }
         if(stage==7) {
             if(client.player.getX()<BASE.getX()+79)return;
@@ -229,7 +261,10 @@ public final class PhysicalClientProbe implements ClientModInitializer {
         });
     }
     private void aim(MinecraftClient client) {
-        var d=new Vec3d(BASE.getX()+.5,top,BASE.getZ()+.5).subtract(client.player.getEyePos());
+        aimAt(client,new Vec3d(BASE.getX()+.5,top,BASE.getZ()+.5));
+    }
+    private void aimAt(MinecraftClient client,Vec3d target) {
+        var d=target.subtract(client.player.getEyePos());
         client.player.setYaw((float)Math.toDegrees(Math.atan2(-d.x,d.z)));
         client.player.setPitch((float)-Math.toDegrees(Math.atan2(d.y,Math.hypot(d.x,d.z))));
         client.gameRenderer.updateCrosshairTarget(1);
