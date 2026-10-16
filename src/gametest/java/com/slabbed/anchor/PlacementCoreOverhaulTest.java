@@ -14,6 +14,21 @@ import java.util.Map;
 /** Storage and query refactoring must preserve visible geometry and published facts (LAW.md). */
 public final class PlacementCoreOverhaulTest {
     @GameTest(templateName = "fabric-gametest-api-v1:empty")
+    public void interactionReachDoesNotLoadADistantUnloadedChunk(TestContext h) {
+        var world = h.getWorld();
+        BlockPos distant = h.getAbsolutePos(new BlockPos(32768, 80, 32768));
+        h.assertTrue(SlabAnchorAttachment.loadedAttachmentChunk(world, distant) == null,
+                "Unloaded interaction fixture unexpectedly contains a loaded chunk");
+        var player = h.createMockPlayer(net.minecraft.world.GameMode.SURVIVAL);
+        BlockPos near = h.getAbsolutePos(BlockPos.ORIGIN);
+        player.setPosition(near.getX(), near.getY() + 1, near.getZ());
+        h.assertTrue(!player.canInteractWithBlockAt(distant, 1), "Distant interaction was accepted");
+        h.assertTrue(SlabAnchorAttachment.loadedAttachmentChunk(world, distant) == null,
+                "REACH_CHECK_LOADED_DISTANT_CHUNK: interaction validation must never generate its target");
+        h.complete();
+    }
+
+    @GameTest(templateName = "fabric-gametest-api-v1:empty")
     public void interactionReachUsesTheStoredBodyAtEveryDepth(TestContext h) {
         var world = h.getWorld();
         BlockPos owner = h.getAbsolutePos(new BlockPos(3, 120, 3));
