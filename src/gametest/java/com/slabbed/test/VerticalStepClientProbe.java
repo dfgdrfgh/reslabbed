@@ -56,7 +56,7 @@ import net.minecraft.world.level.LevelInfo;
 public final class VerticalStepClientProbe implements ClientModInitializer {
     private static final BlockPos GROUND = new BlockPos(8, 198, 8);
     private static final BlockPos PACKET_BASE = new BlockPos(40, 32, 12);
-    private static final int PACKET_STEPS = 96;
+    private static final int PACKET_STEPS = 256;
     private static double[] worldVertexBounds;
     public static boolean watchesWorldVertices(BlockPos pos) { return pos.equals(PACKET_BASE.up(PACKET_STEPS)); }
     public static void recordWorldVertices(int count, double minY, double maxY) {
@@ -64,7 +64,7 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
     }
     private static final Map<String, MeshFace> MESH_FACES = new ConcurrentHashMap<>();
     private record MeshFace(float minY, float maxY, Direction cull, boolean visible, String view,
-                            float encodedMinY, float encodedMaxY) {}
+                            float encodedMinY, float encodedMaxY, boolean worldBuffer) {}
     public static void recordMeshedQuad(BlockRenderView view, BlockPos pos, MutableQuadView quad, RenderContext context) {
         boolean packetColumn = pos.getX() == PACKET_BASE.getX() && pos.getZ() == PACKET_BASE.getZ()
                 && pos.getY() > PACKET_BASE.getY() && pos.getY() <= PACKET_BASE.getY() + PACKET_STEPS;
@@ -90,13 +90,14 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
             encodedMinY = Math.min(encodedMinY, encoded); encodedMaxY = Math.max(encodedMaxY, encoded);
         }
         MESH_FACES.put(pos.asLong() + ":" + quad.nominalFace(), new MeshFace(minY, maxY,
-                quad.cullFace(), !context.isFaceCulled(quad.cullFace()), view.getClass().getName(), encodedMinY, encodedMaxY));
+                quad.cullFace(), !context.isFaceCulled(quad.cullFace()), view.getClass().getName(), encodedMinY, encodedMaxY,
+                view instanceof net.minecraft.client.world.ClientWorld));
     }
     private static void checkMeshedFace(BlockPos pos, Direction face, double plane, boolean exposed) {
         MeshFace actual = MESH_FACES.get(pos.asLong() + ":" + face);
         System.out.println("SECTION_MESH_FACE pos=" + pos + " face=" + face + " actual=" + actual);
         require(actual != null, "Actual section mesh omitted watched face " + pos + " " + face);
-        if (Math.abs(plane) < 7) require(!actual.view.contains("ClientWorld"), "Expected a real section render view");
+        if (Math.abs(plane) < 7) require(!actual.worldBuffer, "Expected a real section render view");
         require(Math.abs(actual.minY - plane) < 1.0e-6 && Math.abs(actual.maxY - plane) < 1.0e-6,
                 "Section mesh used stale height: " + actual);
         require(Math.abs(actual.encodedMinY - plane) < 1.0e-6 && Math.abs(actual.encodedMaxY - plane) < 1.0e-6,
@@ -388,7 +389,7 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
             try (var screenshot = ScreenshotRecorder.takeScreenshot(client.getFramebuffer())) {
                 screenshot.writeTo(client.runDirectory.toPath().resolve("vertical-step.png"));
             }
-            Files.writeString(Path.of("vertical-step-pass.txt"), "Native geometry and 96 network stack placements passed\n");
+            Files.writeString(Path.of("vertical-step-pass.txt"), "Native geometry and 256 network stack placements passed\n");
             System.out.println("VERTICAL_STEP_CLIENT_PASS renderer=" + RendererAccess.INSTANCE.getRenderer().getClass().getName());
             phase = 99;
             client.scheduleStop();
