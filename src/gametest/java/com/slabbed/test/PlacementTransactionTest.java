@@ -17,6 +17,64 @@ import java.util.Map;
 
 /** Refused storage must refuse the real placement before block or item mutation (LAW.md). */
 public final class PlacementTransactionTest {
+    @GameTest(templateName = "fabric-gametest-api-v1:empty")
+    public void absorbingSpongeConsumesOneItemAndKeepsItsPlacementSeat(TestContext h) {
+        var world = h.getWorld();
+        BlockPos support = h.getAbsolutePos(new BlockPos(3, 40, 3));
+        BlockPos target = support.up();
+        world.setBlockState(support, Blocks.STONE_SLAB.getDefaultState(), Block.NOTIFY_ALL);
+        world.setBlockState(target, Blocks.AIR.getDefaultState(), Block.NOTIFY_ALL);
+        world.setBlockState(target.east(), Blocks.WATER.getDefaultState(), Block.NOTIFY_ALL);
+        var player = h.createMockPlayer(GameMode.SURVIVAL);
+        player.setPosition(support.getX() + 3.5, support.getY(), support.getZ() + .5);
+        var stack = new ItemStack(Items.SPONGE, 2);
+        var result = PlacementCaptureBoundaryGameTest.useOn(player, stack, support, Direction.UP);
+        var fact = SlabAnchorAttachment.rawPlacementDyFact(world, target);
+        h.assertTrue(result.isAccepted() && stack.getCount() == 1
+                        && world.getBlockState(target).isOf(Blocks.WET_SPONGE)
+                        && world.getBlockState(target.east()).isAir()
+                        && fact.present() && fact.valueOrNaN() == -.5d,
+                "SPONGE_TRANSFORM_LOST_TRANSACTION: result=" + result + " items=" + stack.getCount()
+                        + " block=" + world.getBlockState(target) + " seat=" + fact.valueOrNaN());
+        h.complete();
+    }
+
+    @GameTest(templateName = "fabric-gametest-api-v1:empty")
+    public void netherDryingSpongeConsumesOneItemAndKeepsItsPlacementSeat(TestContext h) {
+        var world = h.getWorld().getServer().getWorld(net.minecraft.world.World.NETHER);
+        h.assertTrue(world != null, "Missing vanilla Nether test dimension");
+        BlockPos support = new BlockPos(h.getAbsolutePos(BlockPos.ORIGIN).getX(), 100,
+                h.getAbsolutePos(BlockPos.ORIGIN).getZ());
+        world.getChunk(support);
+        BlockPos target = support.up();
+        var beforeSupport = world.getBlockState(support);
+        var beforeTarget = world.getBlockState(target);
+        var beforeFact = SlabAnchorAttachment.rawPlacementDyFact(world, target);
+        try {
+            world.setBlockState(support, Blocks.STONE_SLAB.getDefaultState(), Block.NOTIFY_ALL);
+            world.setBlockState(target, Blocks.AIR.getDefaultState(), Block.NOTIFY_ALL);
+            var stack = new ItemStack(Items.WET_SPONGE, 2);
+            var hit = new net.minecraft.util.hit.BlockHitResult(new net.minecraft.util.math.Vec3d(
+                    support.getX() + .5, support.getY() + .5, support.getZ() + .5), Direction.UP, support, false);
+            var usage = new net.minecraft.item.ItemUsageContext(world, null, net.minecraft.util.Hand.MAIN_HAND,
+                    stack, hit) {};
+            var result = ((net.minecraft.item.BlockItem) Items.WET_SPONGE).useOnBlock(usage);
+            var fact = SlabAnchorAttachment.rawPlacementDyFact(world, target);
+            h.assertTrue(result.isAccepted() && stack.getCount() == 1
+                            && world.getBlockState(target).isOf(Blocks.SPONGE)
+                            && fact.present() && fact.valueOrNaN() == -.5d,
+                    "NETHER_SPONGE_TRANSFORM_LOST_TRANSACTION: result=" + result + " items=" + stack.getCount()
+                            + " block=" + world.getBlockState(target) + " seat=" + fact.valueOrNaN());
+        } finally {
+            world.setBlockState(target, beforeTarget, Block.NOTIFY_ALL);
+            world.setBlockState(support, beforeSupport, Block.NOTIFY_ALL);
+            SlabAnchorAttachment.removeAnchor(world, target);
+            if (beforeFact.present()) SlabAnchorAttachment.writePlacementDyBatch(world,
+                    Map.of(target, beforeFact.rawBits()));
+        }
+        h.complete();
+    }
+
     @GameTest(templateName="fabric-gametest-api-v1:empty",batchId="slabbed_piston_capacity_isolated")
     public void pistonRefusesAnUnsavableDestinationBeforeMovingTheBody(TestContext h) {
         var world=h.getWorld();BlockPos base=h.getAbsolutePos(new BlockPos(3,30,3));

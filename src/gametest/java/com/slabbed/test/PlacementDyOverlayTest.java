@@ -35,6 +35,56 @@ import java.util.Map;
  * global overlay state in a {@code finally}, so concurrently batched rows cannot observe each other.
  */
 public final class PlacementDyOverlayTest {
+    @GameTest(templateName = "fabric-gametest-api-v1:empty")
+    public void acknowledgedReplacementWaitsForItsMatchingBackingHeight(TestContext h) {
+        Object level = new Object();
+        BlockPos cell = new BlockPos(15, 70, 3);
+        var backing = new java.util.HashMap<Long, Long>();
+        backing.put(cell.asLong(), raw(-.5));
+        try {
+            PlacementDyOverlay.resetForTests();
+            PlacementDyOverlay.installClientHooks(key -> backing.containsKey(key)
+                    ? new SlabAnchorAttachment.PlacementDyFact(true, backing.get(key))
+                    : SlabAnchorAttachment.PlacementDyFact.absent(), null);
+            PlacementDyOverlay.installPredictedPlacement(level, cell.down(), Direction.UP, 12, bits(cell, -1));
+            PlacementDyOverlay.onVanillaAcknowledgement(level, 12);
+            h.assertTrue(dy(level, cell) == -1 && PlacementDyOverlay.liveGroupCount() == 1,
+                    "STALE_BACKING_RETIRED_NEW_HEIGHT: an acknowledgment exposed the previous occupant's seat");
+            backing.put(cell.asLong(), raw(-1));
+            PlacementDyOverlay.clientTick(level);
+            h.assertTrue(PlacementDyOverlay.overlayFact(level, cell.asLong()) == null,
+                    "Matching authoritative height must retire the acknowledged prediction");
+        } finally { PlacementDyOverlay.resetForTests(); }
+        h.complete();
+    }
+
+    @GameTest(templateName = "fabric-gametest-api-v1:empty")
+    public void acknowledgedPairWaitsForBothMatchingBackingHeights(TestContext h) {
+        Object level = new Object();
+        BlockPos first = new BlockPos(15, 70, 3), second = first.east();
+        var backing = new java.util.HashMap<Long, Long>();
+        backing.put(first.asLong(), raw(-1));
+        backing.put(second.asLong(), raw(-.5));
+        try {
+            PlacementDyOverlay.resetForTests();
+            PlacementDyOverlay.installClientHooks(key -> backing.containsKey(key)
+                    ? new SlabAnchorAttachment.PlacementDyFact(true, backing.get(key))
+                    : SlabAnchorAttachment.PlacementDyFact.absent(), null);
+            PlacementDyOverlay.installPredictedPlacement(level, first.down(), Direction.UP, 12,
+                    Map.of(first, raw(-1), second, raw(-1)));
+            PlacementDyOverlay.onVanillaAcknowledgement(level, 12);
+            h.assertTrue(dy(level, first) == -1 && dy(level, second) == -1
+                            && PlacementDyOverlay.liveGroupCount() == 1,
+                    "STALE_PAIR_BACKING_RETIRED_NEW_HEIGHT: one matching member must not release the whole pair");
+            backing.put(second.asLong(), raw(-1));
+            PlacementDyOverlay.clientTick(level);
+            h.assertTrue(PlacementDyOverlay.overlayFact(level, first.asLong()) == null
+                            && PlacementDyOverlay.overlayFact(level, second.asLong()) == null,
+                    "Both matching members must release together");
+        } finally { PlacementDyOverlay.resetForTests(); }
+        h.complete();
+    }
+
 
     @GameTest(templateName="fabric-gametest-api-v1:empty")
     public void breakBeforeAcknowledgmentRetiresTheWholePairAndRejectsReplay(TestContext h) {

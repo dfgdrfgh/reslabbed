@@ -42,7 +42,7 @@ for jar in list(mods.glob('*.jar')):
 shutil.copy2(release,mods/release.name)
 with zipfile.ZipFile(release) as archive:metadata=json.loads(archive.read('fabric.mod.json'))
 expected.append({'id':metadata['id'],'version':metadata['version']})
-assert len(expected)==61
+assert len(expected)==fixture['modCount']
 (game/'expected-mods.json').write_text(json.dumps(expected))
 with zipfile.ZipFile(root/'build/vertical-step-runtime/vertical-step-probe.jar') as archive:
     probe={i.filename:archive.read(i.filename) for i in archive.infolist()}
@@ -93,7 +93,7 @@ if core_phase:
                   '-Dslabbed.keepProbe.controls='+str(controls_file),
                   '-Dslabbed.keepProbe.world=slabbed-stored-core']
 print('SLABBED_JAR_SHA256',hashlib.sha256(release.read_bytes()).hexdigest(),release.name,flush=True)
-print('Launching updated 61-mod pack:',release.name,'loader',fixture['dependencies']['fabric-loader'],flush=True)
+print('Launching updated pack:',len(expected),'mods',release.name,'loader',fixture['dependencies']['fabric-loader'],flush=True)
 with (game/'production-launch.log').open('w') as log:
     result=subprocess.run(command,cwd=game,stdout=log,stderr=subprocess.STDOUT,timeout=360)
 lines=(game/'production-launch.log').read_text(errors='replace').splitlines()
