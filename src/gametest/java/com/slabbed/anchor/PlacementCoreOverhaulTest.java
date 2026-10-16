@@ -14,6 +14,28 @@ import java.util.Map;
 /** Storage and query refactoring must preserve visible geometry and published facts (LAW.md). */
 public final class PlacementCoreOverhaulTest {
     @GameTest(templateName = "fabric-gametest-api-v1:empty")
+    public void interactionReachUsesTheStoredBodyAtEveryDepth(TestContext h) {
+        var world = h.getWorld();
+        BlockPos owner = h.getAbsolutePos(new BlockPos(3, 120, 3));
+        world.setBlockState(owner, net.minecraft.block.Blocks.STONE.getDefaultState(),
+                net.minecraft.block.Block.NOTIFY_ALL);
+        var player = h.createMockPlayer(net.minecraft.world.GameMode.SURVIVAL);
+        for (double dy : new double[]{-12, -32, -64, 32}) {
+            SlabAnchorAttachment.writePlacementDyBatch(world,
+                    Map.of(owner, Double.doubleToRawLongBits(dy)));
+            player.setPosition(owner.getX() + 2.5, owner.getY() + dy + 1, owner.getZ() + .5);
+            h.assertTrue(player.canInteractWithBlockAt(owner, 1),
+                    "STORED_BODY_REACH_REJECTED: the visible body is nearby but its logical cell is distant: dy=" + dy);
+            player.setPosition(owner.getX() + .5, owner.getY() + 1, owner.getZ() + .5);
+            h.assertTrue(!player.canInteractWithBlockAt(owner, 1),
+                    "STORED_BODY_REACH_WIDENED: a nearby logical cell must not make a distant visible body reachable");
+        }
+        SlabAnchorAttachment.removeAnchor(world, owner);
+        h.assertTrue(player.canInteractWithBlockAt(owner, 1), "Unshifted vanilla interaction became unreachable");
+        h.complete();
+    }
+
+    @GameTest(templateName = "fabric-gametest-api-v1:empty")
     public void deepStackDoesNotExpandUnrelatedColumns(TestContext h) {
         withMap(h, (origin, map) -> {
             BlockPos deep = origin.add(2, 0, 2);
