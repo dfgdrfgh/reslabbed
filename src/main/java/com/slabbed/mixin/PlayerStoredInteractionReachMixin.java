@@ -2,6 +2,7 @@ package com.slabbed.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.slabbed.anchor.PlacementGeometry;
+import com.slabbed.anchor.SlabAnchorAttachment;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
@@ -15,7 +16,9 @@ public abstract class PlayerStoredInteractionReachMixin {
             target = "net/minecraft/util/math/Box"))
     private Box slabbed$storedInteractionBody(Box bounds, BlockPos pos, double additionalRange) {
         var world = ((PlayerEntity) (Object) this).getWorld();
-        double dy = PlacementGeometry.offsetY(world, pos, world.getBlockState(pos));
+        var chunk = SlabAnchorAttachment.loadedAttachmentChunk(world, pos);
+        if (chunk == null) return bounds;
+        double dy = PlacementGeometry.offsetY(world, pos, chunk.getBlockState(pos));
         return dy == 0.0d ? bounds : bounds.offset(0.0d, dy, 0.0d);
     }
 }

@@ -58,16 +58,34 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
     private static final BlockPos PACKET_BASE = new BlockPos(40, 32, 12);
     private static final int PACKET_STEPS = 96;
     private static final Map<String, MeshFace> MESH_FACES = new ConcurrentHashMap<>();
-    private record MeshFace(float minY, float maxY, Direction cull, boolean visible, String view) {}
+    private record MeshFace(float minY, float maxY, Direction cull, boolean visible, String view,
+                            float encodedMinY, float encodedMaxY) {}
     public static void recordMeshedQuad(BlockRenderView view, BlockPos pos, MutableQuadView quad, RenderContext context) {
         boolean packetColumn = pos.getX() == PACKET_BASE.getX() && pos.getZ() == PACKET_BASE.getZ()
                 && pos.getY() > PACKET_BASE.getY() && pos.getY() <= PACKET_BASE.getY() + PACKET_STEPS;
         if (!packetColumn && (Math.abs(pos.getX() - GROUND.getX()) > 12 || Math.abs(pos.getZ() - GROUND.getZ()) > 12
                 || pos.getY() < 198 || pos.getY() > 262)) return;
         float minY = Float.POSITIVE_INFINITY, maxY = Float.NEGATIVE_INFINITY;
-        for (int i = 0; i < 4; i++) { minY = Math.min(minY, quad.y(i)); maxY = Math.max(maxY, quad.y(i)); }
+        float encodedMinY = Float.POSITIVE_INFINITY, encodedMaxY = Float.NEGATIVE_INFINITY;
+        boolean compact = !(view instanceof net.minecraft.client.world.ClientWorld)
+                && net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("sodium");
+        for (int i = 0; i < 4; i++) {
+            float y = quad.y(i);
+            minY = Math.min(minY, y); maxY = Math.max(maxY, y);
+            float encoded = y;
+            if (compact) {
+                try {
+                    var method = Class.forName("net.caffeinemc.mods.sodium.client.render.chunk.vertex.format.impl.CompactChunkVertex")
+                            .getDeclaredMethod("quantizePosition", float.class);
+                    method.setAccessible(true);
+                    int bits = (int) method.invoke(null, (pos.getY() & 15) + y);
+                    encoded = bits * (32.0f / (1 << 20)) - 8 - (pos.getY() & 15);
+                } catch (ReflectiveOperationException error) { throw new AssertionError("Cannot inspect native Sodium position encoder", error); }
+            }
+            encodedMinY = Math.min(encodedMinY, encoded); encodedMaxY = Math.max(encodedMaxY, encoded);
+        }
         MESH_FACES.put(pos.asLong() + ":" + quad.nominalFace(), new MeshFace(minY, maxY,
-                quad.cullFace(), !context.isFaceCulled(quad.cullFace()), view.getClass().getName()));
+                quad.cullFace(), !context.isFaceCulled(quad.cullFace()), view.getClass().getName(), encodedMinY, encodedMaxY));
     }
     private static void checkMeshedFace(BlockPos pos, Direction face, double plane, boolean exposed) {
         MeshFace actual = MESH_FACES.get(pos.asLong() + ":" + face);
@@ -76,6 +94,8 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
         require(!actual.view.contains("ClientWorld"), "Expected a real section render view");
         require(Math.abs(actual.minY - plane) < 1.0e-6 && Math.abs(actual.maxY - plane) < 1.0e-6,
                 "Section mesh used stale height: " + actual);
+        require(Math.abs(actual.encodedMinY - plane) < 1.0e-6 && Math.abs(actual.encodedMaxY - plane) < 1.0e-6,
+                "Native vertex encoder moved stored geometry: " + actual);
         if (exposed) require(actual.visible && actual.cull == null, "Actual section mesh hid exposed face: " + actual);
     }
     private static final BlockPos EDGE = new BlockPos(15, 205, 8);
@@ -442,6 +462,9 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
         require(!client.world.isSpaceEmpty(null, interior), "NETWORK_STACK_CLIENT_COLLISION_MISSED step=" + step);
         if (step % 16 == 0) System.out.println("NETWORK_STACK_CONFIRMED pieces=" + step + " dy=" + expectedDy);
         if (++packetStep > PACKET_STEPS) {
+            var id = client.player.getUuid();
+            client.getServer().execute(() -> client.getServer().getPlayerManager().getPlayer(id).networkHandler
+                    .requestTeleport(PACKET_BASE.getX() + 32.5, expectedTop + 1, PACKET_BASE.getZ() + .5, 90, -10));
             MESH_FACES.clear();
             client.worldRenderer.reload();
             packetStage = 4;
