@@ -64,7 +64,14 @@ public final class NativeSeatTest {
         t.assertTrue(world.getBlockState(foot).isOf(Blocks.RED_BED) && world.getBlockState(head).isOf(Blocks.RED_BED),"both native bed halves exist");
         var seat=com.slabbed.nativeblock.NativeSeats.seat(world,foot);
         t.assertTrue(seat!=null && seat.halfOffset()==-1 && seat.equals(com.slabbed.nativeblock.NativeSeats.seat(world,head)),"bed halves share frozen seat");
-        t.assertFalse(world.isSpaceEmpty(new net.minecraft.util.math.Box(base.getX()+.3,base.getY()+.65,base.getZ()+.3,base.getX()+.7,base.getY()+.8,base.getZ()+.7)),"bed collision lives above slab");
+        var mattress=new net.minecraft.util.math.Box(base.getX()+.3,base.getY()+.65,base.getZ()+.3,base.getX()+.7,base.getY()+.8,base.getZ()+.7);
+        var bedState=world.getBlockState(foot);
+        System.out.println("PHYSICAL_NATIVE_BED_COLLISION_DIAG owner="+foot+" fringe="+bedState.exceedsCube()
+                +" raw="+com.slabbed.nativeblock.NativeShapes.collision(world,foot,bedState).getBoundingBox()
+                +" outline="+bedState.getOutlineShape(world,foot).getBoundingBox()
+                +" collision="+bedState.getCollisionShape(world,foot).getBoundingBox()+" view="+world.getClass());
+        for(var collision:world.getBlockCollisions(null,mattress))System.out.println("PHYSICAL_NATIVE_BED_COLLIDER "+collision.getBoundingBox());
+        t.assertFalse(world.isSpaceEmpty(mattress),"bed collision lives above slab");
         t.assertTrue(world.isSpaceEmpty(new net.minecraft.util.math.Box(base.getX()+.3,base.getY()+1.2,base.getZ()+.3,base.getX()+.7,base.getY()+1.4,base.getZ()+.7)),"native bed cell has no ghost mattress");
         player.sleep(head);
         t.assertTrue(Math.abs(player.getY()-(head.getY()+.1875))<1e-7,"sleeper rests on physical bed: "+player.getY());
@@ -206,4 +213,19 @@ public final class NativeSeatTest {
         t.assertTrue(world.getBlockState(target).isOf(Blocks.WATER) && world.getBlockState(target.up()).isAir() && player.getMainHandStack().getCount()==2,"water rejection left no partial placement or consumption");t.complete();
     }
 
+    @GameTest(templateName="fabric-gametest-api-v1:empty")
+    public void fillingWallSupportSlabPreservesNativeSign(TestContext t) {
+        var world=t.getWorld();var base=t.getAbsolutePos(new BlockPos(3,3,3));
+        var top=Blocks.OAK_SLAB.getDefaultState().with(net.minecraft.block.SlabBlock.TYPE,net.minecraft.block.enums.SlabType.TOP);
+        world.setBlockState(base,top);
+        var player=builder(t,base,Items.OAK_SIGN,1);
+        var hit=new BlockHitResult(new Vec3d(base.getX()+1,base.getY()+.75,base.getZ()+.5),Direction.EAST,base,false);
+        t.assertTrue(player.getMainHandStack().useOnBlock(new ItemUsageContext(player,Hand.MAIN_HAND,hit)).isAccepted(),"wall sign placed against top slab");
+        var owner=base.east().up();var entity=world.getBlockEntity(owner);
+        var seat=com.slabbed.nativeblock.NativeSeats.seat(world,owner);
+        t.assertTrue(entity instanceof SignBlockEntity && seat!=null && seat.halfOffset()==-1,"sign uses fixed native wall seat");
+        world.setBlockState(base,top.with(net.minecraft.block.SlabBlock.TYPE,net.minecraft.block.enums.SlabType.DOUBLE),Block.NOTIFY_ALL);
+        t.assertTrue(world.getBlockEntity(owner)==entity && seat.equals(com.slabbed.nativeblock.NativeSeats.seat(world,owner)),"filling support retains sign entity and fixed seat");
+        t.complete();
+    }
 }

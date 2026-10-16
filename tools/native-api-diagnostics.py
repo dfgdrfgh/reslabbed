@@ -1,6 +1,10 @@
 """Inspect native adapter APIs from Loom's generated sources during a regression run."""
 import os,pathlib,zipfile
 targets={
+ 'AbstractBlock.java':{'getCollisionShape','getOutlineShape','getRaycastShape'},
+ 'BedBlockEntityRenderer.java':{'rendersOutsideBoundingBox'},
+ 'BlockEntityRenderer.java':{'rendersOutsideBoundingBox'},
+ 'WorldRenderer.java':{'renderBlockEntities'},
  'BedBlock.java':{'onUse','onPlaced','getPlacementState'},
  'AbstractSignBlock.java':{'onUse','onUseWithItem','getStateForNeighborUpdate'},
  'SignBlock.java':{'getPlacementState','canPlaceAt'},
