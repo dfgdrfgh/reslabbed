@@ -63,7 +63,7 @@ public final class PhysicalCellTest {
     }
     @GameTest(templateName="fabric-gametest-api-v1:empty")
     public void normalItemUseBuildsDeepPhysicalStack(TestContext t) {
-        var p=t.getAbsolutePos(new BlockPos(2,2,2)); var w=t.getWorld();
+        var p=t.getAbsolutePos(new BlockPos(2,24,2)); var w=t.getWorld();
         w.setBlockState(p,Blocks.STONE_SLAB.getDefaultState());
         var player=t.createMockPlayer(GameMode.CREATIVE); double top=p.getY()+.5;
         for(int n=0;n<128;n++) {
@@ -75,7 +75,7 @@ public final class PhysicalCellTest {
             t.assertTrue(result.isAccepted(),"item use step "+n);
             top+=n%2==0?1:.5;
             var ray=w.raycast(new RaycastContext(new Vec3d(p.getX()+.5,top+2,p.getZ()+.5),new Vec3d(p.getX()+.5,top-.25,p.getZ()+.5),RaycastContext.ShapeType.OUTLINE,RaycastContext.FluidHandling.NONE,player));
-            t.assertTrue(ray.getType()==HitResult.Type.BLOCK && Math.abs(ray.getPos().y-top)<1e-6,"vanilla ray hit physical top "+n+" expected="+top+" hit="+ray+" state="+w.getBlockState(pos.up())+" below="+w.getBlockState(pos)+" cells="+CellWorld.contents(w,pos));
+            t.assertTrue(ray.getType()==HitResult.Type.BLOCK && Math.abs(ray.getPos().y-top)<1e-6,"vanilla ray hit physical top "+n+" expected="+top+" hit="+ray.getPos()+" state="+w.getBlockState(pos.up())+" below="+w.getBlockState(pos)+" cells="+CellWorld.contents(w,pos));
             t.assertTrue(!w.isSpaceEmpty(new Box(p.getX()+.2,top-.2,p.getZ()+.2,p.getX()+.8,top-.01,p.getZ()+.8)),"standing collision "+n);
         }
         t.complete();
@@ -99,6 +99,36 @@ public final class PhysicalCellTest {
         copy.read(original.createNbt(w.getRegistryManager()),w.getRegistryManager());
         t.assertTrue(original.contents().equals(copy.contents()),"NBT retained exact physical fragments");
         t.assertTrue(original.outline().getBoundingBox().equals(copy.outline().getBoundingBox()),"NBT retained outline");t.complete();
+    }
+
+    @GameTest(templateName="fabric-gametest-api-v1:empty")
+    public void shiftedTorchLosesRemovedSupport(TestContext t) {
+        var p=t.getAbsolutePos(new BlockPos(2,2,2));var w=t.getWorld();
+        w.setBlockState(p,Blocks.OAK_SLAB.getDefaultState());
+        CellWorld.place(w,p.getX(),p.getZ(),p.getY()*2+1,Blocks.TORCH.getDefaultState());
+        CellWorld.remove(w,p,0,null,false);
+        t.assertTrue(w.getBlockState(p).isAir() && w.getBlockState(p.up()).isAir(),"unsupported torch removed both fragments");t.complete();
+    }
+    @GameTest(templateName="fabric-gametest-api-v1:empty")
+    public void externalReplacementDoesNotDeleteReplacement(TestContext t) {
+        var p=t.getAbsolutePos(new BlockPos(2,2,2));var w=t.getWorld();
+        w.setBlockState(p,Blocks.OAK_SLAB.getDefaultState());
+        CellWorld.place(w,p.getX(),p.getZ(),p.getY()*2+1,Blocks.STONE.getDefaultState());
+        w.setBlockState(p,Blocks.BRICK_SLAB.getDefaultState(),Block.NOTIFY_ALL);
+        t.assertTrue(w.getBlockState(p).isOf(Blocks.BRICK_SLAB),"replacement remained intact");
+        t.assertTrue(w.getBlockState(p.up()).isAir(),"old cap cleared");t.complete();
+    }
+
+    @GameTest(templateName="fabric-gametest-api-v1:empty")
+    public void shiftedMaterialKeepsVanillaMiningSpeed(TestContext t) {
+        var p=t.getAbsolutePos(new BlockPos(2,2,2));var w=t.getWorld();
+        w.setBlockState(p,Blocks.OAK_SLAB.getDefaultState());
+        CellWorld.place(w,p.getX(),p.getZ(),p.getY()*2+1,Blocks.IRON_BLOCK.getDefaultState());
+        var player=t.createMockPlayer(GameMode.SURVIVAL);
+        player.setPosition(p.getX()+.5,p.getY()+2,p.getZ()-2);
+        float vanilla=Blocks.IRON_BLOCK.getDefaultState().calcBlockBreakingDelta(player,w,p);
+        float shifted=w.getBlockState(p).calcBlockBreakingDelta(player,w,p);
+        t.assertTrue(Math.abs(vanilla-shifted)<1e-7,"carrier used vanilla material mining speed: "+vanilla+" vs "+shifted);t.complete();
     }
 
 }
