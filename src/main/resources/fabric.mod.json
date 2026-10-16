@@ -3,6 +3,7 @@
   "id": "slabbed",
   "version": "${version}",
   "name": "Slabbed",
+  "description": "Places supported blocks directly on slab surfaces using physical half-block cells.",
   "icon": "assets/slabbed/icon.png",
   "license": "GPL-3.0-only",
   "environment": "*",
@@ -15,17 +16,16 @@
     ]
   },
   "mixins": [
-    {
-      "config": "slabbed.mixins.json"
-    },
+    "slabbed.mixins.json",
     {
       "config": "slabbed.client.mixins.json",
       "environment": "client"
     }
   ],
   "depends": {
-    "fabricloader": "*",
+    "fabricloader": ">=0.16.0",
     "fabric-api": "*",
-    "minecraft": "1.21.1"
+    "minecraft": "1.21.1",
+    "java": ">=21"
   }
 }

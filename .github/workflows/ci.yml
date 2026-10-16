@@ -1,110 +1,45 @@
-name: Slabbed CI
-
+name: Physical-cell rewrite validation
 on:
-  pull_request:
   push:
-    branches:
-      - "port/fabric-1.21.1-**"
+    branches: ['port/fabric-1.21.1-physical-rewrite']
   workflow_dispatch:
-
 permissions:
   contents: read
-
+  actions: read
 concurrency:
-  group: slabbed-ci-${{ github.event.pull_request.number || github.ref }}
+  group: physical-rewrite-${{ github.ref }}
   cancel-in-progress: true
-
 jobs:
   verify:
-    name: Build and server GameTests
-    if: github.ref != 'refs/heads/port/fabric-1.21.1-full-pack-verification' && github.ref != 'refs/heads/port/fabric-1.21.1-stacking-repair' && github.ref != 'refs/heads/port/fabric-1.21.1-core-overhaul'
-    runs-on: ubuntu-24.04
-    timeout-minutes: 30
-
+    runs-on: ubuntu-22.04
+    timeout-minutes: 40
     steps:
-      - name: Check out source
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
         with:
           persist-credentials: false
-
-      - name: Set up Java 21
-        uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95 # v5.6.0
+      - uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95
         with:
           distribution: temurin
-          java-version: "21"
-
-      - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92 # v6.2.0
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92
         with:
           cache-provider: basic
-          cache-read-only: ${{ github.event_name == 'pull_request' }}
-
-      # This line's dev client is staged with real player mods (Sodium, Lithium, Terrain
-      # Slabs, C2ME, ...) under run/mods for local testing. A jar left there must never reach
-      # the canonical CI server-test environment.
-      - name: Reject local runtime jars
-        shell: bash
-        run: |
-          if [ -d run/mods ] && find run/mods -type f -name '*.jar' -print -quit | grep -q .; then
-            echo "Unexpected run/mods jar would contaminate the canonical server test environment."
-            exit 1
-          fi
-
-      # Finalizes with :verifyGameTestCount (build.gradle), which fails the build if the
-      # reported test count differs from tools/expected-gametest-count.py — the stale-run-dir
-      # false-green class is machine-gated, not a manual step.
-      - name: Build and run server GameTests
+      - name: Compile and server-test the fresh implementation
         run: |
           rm -rf build/run/gameTest
-          ./gradlew --no-daemon --stacktrace --console=plain build runGameTest
-
-      - name: Verify packaged mod icon
-        run: |
-          python3 - <<'PYCODE'
-          import json, pathlib, struct, zipfile
-          jars = [p for p in pathlib.Path('build/libs').glob('*.jar')
-                  if not p.name.endswith(('-sources.jar', '-dev.jar'))]
-          assert len(jars) == 1, f'Expected one release jar, found {len(jars)}'
-          with zipfile.ZipFile(jars[0]) as jar:
-              metadata = json.loads(jar.read('fabric.mod.json'))
-              icon_path = metadata['icon']
-              icon = jar.read(icon_path)
-              assert icon[:8] == b'\x89PNG\r\n\x1a\n', 'Mod icon is not a PNG'
-              width, height = struct.unpack('>II', icon[16:24])
-              assert width > 0 and height > 0, 'Mod icon has invalid dimensions'
-              print(f'{jars[0].name}: {icon_path} packaged ({width}x{height})')
-          PYCODE
-
-      - name: Check vertical faces in Indigo and Sodium clients
+          bash gradlew --no-daemon --console=plain build runGameTest writeProbeRuntime
+          python3 tools/verify-test-count.py
+      - name: Production clients
         env:
           LIBGL_ALWAYS_SOFTWARE: '1'
+          GH_TOKEN: ${{ github.token }}
         run: |
-          rm -rf build/run/vertical-step-client
-          ./gradlew --no-daemon --console=plain writeVerticalStepRuntime
-          timeout 10m xvfb-run -a python3 tools/vertical-step-runtime.py
-          test -f build/run/vertical-step-client/vertical-step-pass.txt
-          mv build/run/vertical-step-client build/vertical-step-indigo
-          mkdir -p build/run/vertical-step-client/mods
-          python3 - <<'PYCODE'
-          import hashlib, pathlib, urllib.request
-          url = 'https://cdn.modrinth.com/data/AANobbMI/versions/SMxNOGZ6/sodium-fabric-0.8.13%2Bmc1.21.1.jar'
-          data = urllib.request.urlopen(url).read()
-          expected = '8614a374593698069a80ac74de8cd9c28f3928d16819a0e0d6320b538e823f7e54e8be06d5ea5a9c268beb0e02073209d1f831a02dede851588b972367680853'
-          assert hashlib.sha512(data).hexdigest() == expected, 'Sodium test dependency hash mismatch'
-          pathlib.Path('build/run/vertical-step-client/mods/sodium.jar').write_bytes(data)
-          PYCODE
-          timeout 10m xvfb-run -a python3 tools/vertical-step-runtime.py
-          test -f build/run/vertical-step-client/vertical-step-pass.txt
-
-      - name: Upload Fabric release jar
-        if: github.ref != 'refs/heads/port/fabric-1.21.1-stored-core-cleanup'
-        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+          python3 tools/stage-full-pack.py
+          timeout 12m xvfb-run -a python3 tools/client-runtime.py --pack
+      - name: Upload tested production JAR
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         with:
-          name: slabbed-mc1.21.1-fabric
-          path: |
-            build/libs/*.jar
-            !build/libs/*-sources.jar
-            !build/libs/*-dev.jar
+          name: slabbed-physical-rewrite-mc1.21.1-fabric
+          path: build/libs/slabbed-0.9.0-rewrite-alpha+1.21.1-fabric.jar
           if-no-files-found: error
           retention-days: 30
-

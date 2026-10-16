@@ -1,0 +1,112 @@
+"""Launch the remapped test mod and release JAR in Fabric's production namespace."""
+import json
+import os
+from pathlib import Path
+import subprocess
+import shutil
+import zipfile
+
+project = Path.cwd()
+metadata = json.loads((project / 'build/probe/dependencies.json').read_text())
+home = Path(metadata['gradleHome'])
+modules = home / 'caches/modules-2/files-2.1'
+classpath = []
+
+def add(path):
+    path = Path(path).resolve()
+    if path not in classpath:
+        classpath.append(path)
+
+def module_jars(group, name, version=None):
+    root = modules / group / name
+    if version is not None:
+        root /= version
+    return sorted(p for p in root.rglob('*.jar') if not p.name.endswith(('-sources.jar', '-javadoc.jar')))
+
+intermediary = module_jars('net.fabricmc', 'intermediary', '1.21.1')
+assert intermediary, 'Production intermediary mappings are missing'
+add(intermediary[-1])
+api = module_jars('net.fabricmc.fabric-api', 'fabric-api', metadata['fabricVersion'])
+assert api, 'Original Fabric API bundle is missing'
+gametest_api = module_jars('net.fabricmc.fabric-api', 'fabric-gametest-api-v1')
+assert gametest_api, 'Original Fabric GameTest API is missing'
+for artifact in metadata['artifacts']:
+    if artifact['group'] == 'net.minecraft':
+        continue
+    # Fabric discovers the original API's nested modules itself. Loom's generated named
+    # module coordinates are not production artifacts and must never enter this classpath.
+    if 'remapped_mods' in artifact['path']:
+        continue
+    originals = module_jars(artifact['group'], artifact['name'], artifact['version'])
+    classifier = artifact.get('classifier')
+    if classifier:
+        originals = [p for p in originals if p.name.endswith('-' + classifier + '.jar')]
+    else:
+        originals = [p for p in originals if '-natives-' not in p.name]
+    if originals:
+        add(originals[0])
+    else:
+        candidate = Path(artifact['path'])
+        if candidate.suffix == '.jar':
+            add(candidate)
+
+# Fabric remaps the ordinary official game JAR to intermediary at production startup.
+games = []
+for path in (home / 'caches/fabric-loom').rglob('minecraft-client.jar'):
+    with zipfile.ZipFile(path) as jar:
+        if 'fzf.class' in jar.namelist() and json.loads(jar.read('version.json'))['id'] == '1.21.1':
+            games.append(path)
+assert games, 'Official Minecraft 1.21.1 client is missing'
+add(games[0])
+for name in ['tiny-remapper', 'mapping-io']:
+    jars = module_jars('net.fabricmc', name)
+    assert jars, 'Fabric remapping dependency is missing: ' + name
+    add(jars[-1])
+
+# Include native library resources independently of Loom's named development launcher.
+for root in (modules / 'org.lwjgl').iterdir():
+    if root.is_dir():
+        for path in root.rglob('*3.3.3-natives-linux.jar'):
+            add(path)
+
+release = [p for p in (project / 'build/libs').glob('*.jar')
+           if not p.name.endswith(('-sources.jar', '-dev.jar'))]
+assert len(release) == 1, 'Expected one release mod'
+game = project / 'build/run/physical-client'
+mods = game / 'mods'
+mods.mkdir(parents=True, exist_ok=True)
+for path in [api[0], gametest_api[-1], release[0], project / 'build/probe/physical-probe.jar']:
+    shutil.copy2(path, mods / path.name)
+real_terrain = os.environ.get('SLABBED_REAL_TERRAIN') == '1'
+if real_terrain:
+    # The headless shim's alias otherwise satisfies the real mod ID during resolution.
+    probe = mods / 'physical-probe.jar'
+    with zipfile.ZipFile(probe) as archive:
+        contents = {entry.filename: archive.read(entry.filename) for entry in archive.infolist()}
+    config = json.loads(contents['fabric.mod.json'])
+    config.pop('provides', None)
+    contents['fabric.mod.json'] = json.dumps(config).encode()
+    with zipfile.ZipFile(probe, 'w', zipfile.ZIP_DEFLATED) as archive:
+        for name, data in contents.items():
+            archive.writestr(name, data)
+(game / 'options.txt').write_text('renderClouds:false\nrenderDistance:8\nmaxFps:60\n')
+indexes = sorted((home / 'caches/fabric-loom').rglob('indexes/*17*.json'))
+assert len(indexes) == 1, 'Expected one downloaded 1.21.1 asset index: ' + str(indexes)
+asset_index = indexes[0]
+assets = asset_index.parent.parent
+java = str(Path(os.environ['JAVA_HOME']) / 'bin/java')
+command = [java, '-Xmx2G', '-Dfabric.development=false', '-Dslabbed.physicalProbe=true',
+           '-Dslabbed.realTerrainProbe=' + str(real_terrain).lower(),
+           '-cp', os.pathsep.join(map(str, classpath)), 'net.fabricmc.loader.impl.launch.knot.KnotClient',
+           '--gameDir', str(game), '--assetsDir', str(assets), '--assetIndex', asset_index.stem,
+           '--username', 'FaceProbe', '--version', '1.21.1', '--accessToken', '0']
+with (game / 'production-launch.log').open('w') as log:
+    try:
+        result = subprocess.run(command, cwd=game, stdout=log, stderr=subprocess.STDOUT, timeout=300)
+    except subprocess.TimeoutExpired:
+        raise AssertionError('Production client timed out; see production-launch.log') from None
+if result.returncode != 0:
+    print('\n'.join((game / 'production-launch.log').read_text(errors='replace').splitlines()[-100:]), flush=True)
+assert result.returncode == 0, 'Production client failed; see production-launch.log'
+assert (game / 'physical-pass.txt').exists(), 'Production client did not complete the face checks'
+print((game / 'physical-pass.txt').read_text().strip())

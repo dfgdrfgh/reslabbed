@@ -1,73 +1,16 @@
 {
   "schemaVersion": 1,
-  "id": "slabbed_gametest",
-  "version": "1.0.0",
-  "name": "Slabbed GameTest",
+  "id": "slabbed_test",
+  "version": "1",
+  "name": "Slabbed physical cell tests",
   "environment": "*",
-  "mixins": [
-    "slabbed-gametest.mixins.json"
-  ],
-  "provides": [
-    "terrain_slabs",
-    "terrainslabs"
-  ],
   "entrypoints": {
-    "main": [
-      "com.slabbed.test.TerrainSlabsTestShim"
-    ],
-    "client": [
-      "com.slabbed.test.AttachmentRemeshProbe",
-      "com.slabbed.test.ExtendedDepthClientProbe",
-      "com.slabbed.test.Mc1211GoblinRouteClientEntrypoint",
-      "com.slabbed.test.KeepOnlyReopenProbe",
-      "com.slabbed.test.VerticalStepClientProbe"
-    ],
     "fabric-gametest": [
-      "com.slabbed.test.PlacementOccupancyTest",
-      "com.slabbed.test.Mc1211GoblinRouteCanaryGameTest",
-      "com.slabbed.test.SlabbedLabFixtureTest",
-      "com.slabbed.test.ChainSurvivalReproTest",
-      "com.slabbed.test.OffsetRaycastTargetingTest",
-      "com.slabbed.test.ExtendedDepthEntityBehaviorTest",
-      "com.slabbed.test.HangingSeatRememberedTest",
-      "com.slabbed.test.StateChangeAnchorTest",
-      "com.slabbed.test.WallSignAboveSlabTest",
-      "com.slabbed.test.ExtendedDepthShapeTest",
-      "com.slabbed.test.ExtendedDepthPlacementTest",
-      "com.slabbed.test.ExtendedDepthChainContactTest",
-      "com.slabbed.test.ExtendedDepthOperationTest",
-      "com.slabbed.test.ParticleDisplayCoverageTest",
-      "com.slabbed.test.DecoratedPotParticleTest",
-      "com.slabbed.test.ParticleUtilParticleTest",
-      "com.slabbed.test.RedstoneWireConnectionTest",
-      "com.slabbed.test.BottomSlabSpawnProofTest",
-      "com.slabbed.test.NeighborUpdateInvarianceTest",
-      "com.slabbed.test.LandingRuleLawTest",
-      "com.slabbed.test.PlacementCaptureBoundaryGameTest",
-      "com.slabbed.test.SameCellDoubleUpgradeKeepsLegacySeatTest",
-      "com.slabbed.test.PlacementDyOverlayTest",
-      "com.slabbed.anchor.FrozenFlatAttachmentCapacityTest",
-      "com.slabbed.anchor.PlacementDyAttachmentCapacityTest",
-      "com.slabbed.test.PlacementLandingRegressionTest",
-      "com.slabbed.test.HangingLoadDeferralTest",
-      "com.slabbed.test.RailSlopeProfileTest",
-      "com.slabbed.test.FenceCeilingConnectionTest",
-      "com.slabbed.test.RailVisualSignalTest",
-      "com.slabbed.test.RedstoneWireVisualStepTest",
-      "com.slabbed.test.ChunkAccessSafetyTest",
-      "com.slabbed.test.TerrainSlabsVegetationTest",
-      "com.slabbed.test.VerticalStepFaceTest",
-      "com.slabbed.test.RepeatedStackingTest",
-      "com.slabbed.anchor.PlacementCoreOverhaulTest",
-      "com.slabbed.test.NoRecordGeometryTest",
-      "com.slabbed.anchor.PlacementGeometryTest",
-      "com.slabbed.anchor.LegacyPlacementImportTest",
-      "com.slabbed.test.PlacementTransactionTest"
+      "com.slabbed.test.PhysicalCellTest"
     ]
   },
   "depends": {
-    "fabricloader": ">=0.17.3",
-    "fabric-gametest-api-v1": "*",
-    "slabbed": "*"
+    "slabbed": "*",
+    "fabric-gametest-api-v1": "*"
   }
 }

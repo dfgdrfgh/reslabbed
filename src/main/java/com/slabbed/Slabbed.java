@@ -1,38 +1,21 @@
 package com.slabbed;
 
+import com.slabbed.cell.CellBlock;
+import com.slabbed.cell.CellBlockEntity;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.loader.api.FabricLoader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
+import net.minecraft.block.AbstractBlock;
+import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.util.Identifier;
 
-import java.lang.reflect.InvocationTargetException;
-
-public class Slabbed implements ModInitializer {
-    public static final String MOD_ID = "slabbed";
-    public static final Logger LOGGER = LoggerFactory.getLogger(Slabbed.class);
-
-    @Override
-    public void onInitialize() {
-        LOGGER.info("Slabbed initialized");
-        com.slabbed.anchor.SlabAnchorAttachment.register();
-        if (FabricLoader.getInstance().isDevelopmentEnvironment()) {
-            initDevFeatures();
-        }
-    }
-
-    private static void initDevFeatures() {
-        registerDevHook("com.slabbed.dev.SlabbedDevCommands", "register");
-        registerDevHook("com.slabbed.dev.SlabbedLab", "register");
-    }
-
-    private static void registerDevHook(String className, String methodName) {
-        try {
-            Class<?> hookClass = Class.forName(className);
-            hookClass.getMethod(methodName).invoke(null);
-        } catch (ClassNotFoundException e) {
-            LOGGER.warn("Dev hook {} is unavailable in this environment", className);
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | LinkageError e) {
-            LOGGER.warn("Failed to initialize dev hook {}", className, e);
-        }
+public final class Slabbed implements ModInitializer {
+    public static final CellBlock CELL = new CellBlock(AbstractBlock.Settings.create().strength(2).nonOpaque().dynamicBounds()
+            .luminance(state -> state.get(CellBlock.LIGHT)));
+    public static final BlockEntityType<CellBlockEntity> CELL_ENTITY = FabricBlockEntityTypeBuilder.create(CellBlockEntity::new, CELL).build();
+    @Override public void onInitialize() {
+        Registry.register(Registries.BLOCK, Identifier.of("slabbed", "cell"), CELL);
+        Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of("slabbed", "cell"), CELL_ENTITY);
     }
 }
