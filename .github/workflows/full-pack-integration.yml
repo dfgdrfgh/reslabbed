@@ -56,6 +56,6 @@ jobs:
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         with:
           name: slabbed-mc1.21.1-fabric-stored-core-candidate
-          path: build/libs/slabbed-0.8.0-alpha+1.21.1-fabric.jar
+          path: build/libs/slabbed-0.8.1-alpha+1.21.1-fabric.jar
           if-no-files-found: error
           retention-days: 30

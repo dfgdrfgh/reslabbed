@@ -372,8 +372,12 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
             packetTick = ticks;
             packetStage = 2;
             var id = client.player.getUuid();
-            client.getServer().execute(() -> client.getServer().getPlayerManager().getPlayer(id)
-                    .networkHandler.requestTeleport(feetX, feetY, feetZ, 90, 50));
+            client.getServer().execute(() -> {
+                var player = client.getServer().getPlayerManager().getPlayer(id);
+                player.getAbilities().flying = true;
+                player.sendAbilitiesUpdate();
+                player.networkHandler.requestTeleport(feetX, feetY, feetZ, 90, 50);
+            });
             return;
         }
         require(ticks - packetTick < 100, "NETWORK_STACK_REJECTED step=" + packetStep

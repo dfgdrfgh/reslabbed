@@ -141,6 +141,7 @@ Every row below is declared in `slabbed.mixins.json`. Inactive, unregistered mix
 | `com/slabbed/mixin/RedstoneWireBlockMixin` | Redstone wire connection and support over lowered slabs. |
 | `com/slabbed/mixin/RedstoneWireVisualStepMixin` | A wire beside a lowered half-step also reads the wire drawn on the slab next to it, in the wire's incoming-signal read (maintainer ruling, 2026-09-28). |
 | `com/slabbed/mixin/ServerInteractBlockHitToleranceMixin` | Server-side hit tolerance for offset targeting. |
+| `com/slabbed/mixin/PlayerStoredInteractionReachMixin` | Native interaction range measures the stored physical block position. |
 | `com/slabbed/mixin/SlabSupportBlockMixin` | Slab support surface. |
 | `com/slabbed/mixin/SlabSupportStateMixin` | Slab support state. |
 | `com/slabbed/mixin/TerrainSlabsVegetationOffsetMixin` | Prevents Terrain Slabs and Slabbed from translating vegetation vertically twice while retaining horizontal model jitter. |

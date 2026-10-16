@@ -35,6 +35,7 @@
     "RedstoneWireVisualStepMixin",
     "BlockItemPlacementIntentMixin",
     "ServerInteractBlockHitToleranceMixin",
+    "PlayerStoredInteractionReachMixin",
     "BlockOnStateReplacedAnchorMixin",
     "WorldChunkPredictionLifecycleMixin",
     "FencePaneSlabConnectionMixin",
