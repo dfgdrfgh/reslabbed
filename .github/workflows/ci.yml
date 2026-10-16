@@ -34,6 +34,11 @@ jobs:
           rm -rf build/run/gameTest
           bash gradlew --no-daemon --console=plain build runGameTest writeProbeRuntime
           python3 tools/verify-test-count.py
+      - name: Inspect vanilla client behavior
+        if: matrix.variant == 'indigo'
+        run: |
+          bash gradlew --no-daemon --console=plain genSources
+          python3 tools/inspect-client-source.py
       - name: Stage complete latest pack
         if: matrix.variant == 'pack'
         env:

@@ -131,6 +131,7 @@ public final class PhysicalClientProbe implements ClientModInitializer {
                         .requestTeleport(BASE.getX()+80.5,top+1,BASE.getZ()+.5,90,0));
                 return;
             }
+            CellFeedbackAudit.reset();
             client.interactionManager.attackBlock(((BlockHitResult)ray).getBlockPos(),Direction.UP);
             stage=6;started=ticks;return;
         }
@@ -152,7 +153,13 @@ public final class PhysicalClientProbe implements ClientModInitializer {
                 var ray=w.raycast(new RaycastContext(new Vec3d(BASE.getX()+.5,top+1,BASE.getZ()+.5),new Vec3d(BASE.getX()+.5,top-1,BASE.getZ()+.5),RaycastContext.ShapeType.OUTLINE,RaycastContext.FluidHandling.NONE,p));
                 broken=ray.getType()==HitResult.Type.BLOCK && Math.abs(ray.getPos().y-(top-.5))<1e-5;
             });
-            if(broken) finish(client,"PHYSICAL_REOPEN_RELOAD_BREAK_PASS 258 pieces");
+            if(broken) {
+                System.out.println("PHYSICAL_FEEDBACK_OBSERVED terrainLighting="+CellRenderAudit.terrainLighting
+                        +" breakParticles="+CellFeedbackAudit.breaks+" material="+CellFeedbackAudit.material);
+                check(CellRenderAudit.terrainLighting,"cell faces use entity lighting in addition to terrain shading");
+                check(CellFeedbackAudit.breaks==1 && CellFeedbackAudit.material.isOf(Blocks.OAK_SLAB),"missing or wrong material break particles");
+                finish(client,"PHYSICAL_REOPEN_RELOAD_BREAK_PASS 258 pieces");
+            }
         }
     }
     private void server(MinecraftClient c,Runnable task) {

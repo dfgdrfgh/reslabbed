@@ -3,7 +3,8 @@
   "package": "com.slabbed.test.mixin",
   "compatibilityLevel": "JAVA_21",
   "client": [
-    "CellRenderCaptureMixin"
+    "CellRenderCaptureMixin",
+    "CellParticleCaptureMixin"
   ],
   "injectors": {
     "defaultRequire": 1

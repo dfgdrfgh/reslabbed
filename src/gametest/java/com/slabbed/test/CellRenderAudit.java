@@ -7,6 +7,7 @@ import net.minecraft.client.render.VertexConsumer;
 public final class CellRenderAudit {
     private static double minY,maxY;
     private static int count;
+    public static boolean terrainLighting=true;
     public static int minimumCell=Integer.MAX_VALUE;
     public static void begin(int minCell) { minimumCell=minCell;count=0;minY=Double.POSITIVE_INFINITY;maxY=Double.NEGATIVE_INFINITY; }
     public static VertexConsumer watch(VertexConsumer target) { return new AuditedVertices(target); }
