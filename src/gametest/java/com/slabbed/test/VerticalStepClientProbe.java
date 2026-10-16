@@ -55,11 +55,15 @@ import net.minecraft.world.level.LevelInfo;
 /** Uses real item placement, synced heights and client-baked renderer quads (LAW.md). */
 public final class VerticalStepClientProbe implements ClientModInitializer {
     private static final BlockPos GROUND = new BlockPos(8, 198, 8);
+    private static final BlockPos PACKET_BASE = new BlockPos(40, 32, 12);
+    private static final int PACKET_STEPS = 96;
     private static final Map<String, MeshFace> MESH_FACES = new ConcurrentHashMap<>();
     private record MeshFace(float minY, float maxY, Direction cull, boolean visible, String view) {}
     public static void recordMeshedQuad(BlockRenderView view, BlockPos pos, MutableQuadView quad, RenderContext context) {
-        if (Math.abs(pos.getX() - GROUND.getX()) > 12 || Math.abs(pos.getZ() - GROUND.getZ()) > 12
-                || pos.getY() < 198 || pos.getY() > 262) return;
+        boolean packetColumn = pos.getX() == PACKET_BASE.getX() && pos.getZ() == PACKET_BASE.getZ()
+                && pos.getY() > PACKET_BASE.getY() && pos.getY() <= PACKET_BASE.getY() + PACKET_STEPS;
+        if (!packetColumn && (Math.abs(pos.getX() - GROUND.getX()) > 12 || Math.abs(pos.getZ() - GROUND.getZ()) > 12
+                || pos.getY() < 198 || pos.getY() > 262)) return;
         float minY = Float.POSITIVE_INFINITY, maxY = Float.NEGATIVE_INFINITY;
         for (int i = 0; i < 4; i++) { minY = Math.min(minY, quad.y(i)); maxY = Math.max(maxY, quad.y(i)); }
         MESH_FACES.put(pos.asLong() + ":" + quad.nominalFace(), new MeshFace(minY, maxY,
@@ -87,6 +91,10 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
     private boolean requested;
     private volatile boolean prepared;
     private volatile Throwable failure;
+    private int packetStep = 1, packetStage, packetTick;
+    private volatile boolean packetReady, packetPending;
+    private volatile PacketObservation packetObservation;
+    private record PacketObservation(int step, boolean block, boolean fact, double dy, double standingY) {}
 
     @Override public void onInitializeClient() {
         if (!Boolean.getBoolean("slabbed.verticalStepProbe")) return;
@@ -124,7 +132,7 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
 
     private void tick(MinecraftClient client) throws Exception {
         if (phase == 99) return;
-        require(++ticks < 2400, "Client face proof timed out");
+        require(++ticks < 4800, "Client face and network stack proof timed out");
         if (failure != null) throw new AssertionError("Server scene failed", failure);
         if (!requested && client.isFinishedLoading()) {
             require(client.world == null, "Client probe requires an unopened world");
@@ -143,6 +151,7 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
         if (client.currentScreen != null) client.setScreen(null);
         client.player.getAbilities().flying = true;
         client.player.setVelocity(Vec3d.ZERO);
+        if (phase == 10) { tickPacketStack(client); return; }
         if (phase == 9) {
             client.player.refreshPositionAndAngles(18.5, 236.0 - client.player.getStandingEyeHeight(), 6.0, 0, 20);
         } else {
@@ -221,13 +230,7 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
         if (ticks - started < 80) return;
         if (phase == 9) {
             checkRepeatedStack(client, true);
-            try (var screenshot = ScreenshotRecorder.takeScreenshot(client.getFramebuffer())) {
-                screenshot.writeTo(client.runDirectory.toPath().resolve("vertical-step.png"));
-            }
-            Files.writeString(Path.of("vertical-step-pass.txt"), "Native geometry and repeated stacking passed\n");
-            System.out.println("VERTICAL_STEP_CLIENT_PASS renderer=" + RendererAccess.INSTANCE.getRenderer().getClass().getName());
-            phase = 99;
-            client.scheduleStop();
+            phase = 10;
             return;
         }
         if (phase == 2) {
@@ -331,6 +334,115 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
         started = ticks;
         MESH_FACES.clear();
         client.worldRenderer.reload();
+    }
+
+    private void tickPacketStack(MinecraftClient client) throws Exception {
+        if (packetStage == 0) {
+            packetStage = 1;
+            client.getServer().execute(() -> {
+                var world = client.getServer().getOverworld();
+                world.setBlockState(PACKET_BASE, Blocks.STONE.getDefaultState(), Block.NOTIFY_ALL);
+                for (int y = 1; y <= PACKET_STEPS; y++) {
+                    world.setBlockState(PACKET_BASE.up(y), Blocks.AIR.getDefaultState(), Block.NOTIFY_ALL);
+                }
+                packetReady = true;
+            });
+            return;
+        }
+        if (!packetReady || !client.world.getBlockState(PACKET_BASE).isOf(Blocks.STONE)) return;
+        if (packetStage == 4) {
+            if (ticks - packetTick < 100) return;
+            checkMeshedFace(PACKET_BASE.up(PACKET_STEPS), Direction.UP, 1 - PACKET_STEPS / 4.0, true);
+            System.out.println("NETWORK_STACK_MESH_RELOAD_PASS pieces=" + PACKET_STEPS);
+            try (var screenshot = ScreenshotRecorder.takeScreenshot(client.getFramebuffer())) {
+                screenshot.writeTo(client.runDirectory.toPath().resolve("vertical-step.png"));
+            }
+            Files.writeString(Path.of("vertical-step-pass.txt"), "Native geometry and 96 network stack placements passed\n");
+            System.out.println("VERTICAL_STEP_CLIENT_PASS renderer=" + RendererAccess.INSTANCE.getRenderer().getClass().getName());
+            phase = 99;
+            client.scheduleStop();
+            return;
+        }
+        int previous = packetStep - 1;
+        double previousTop = PACKET_BASE.getY() + 1 + (previous / 2) * 1.5 + ((previous & 1) == 1 ? .5 : 0);
+        double feetX = PACKET_BASE.getX() + 2.5, feetY = previousTop + 1, feetZ = PACKET_BASE.getZ() + .5;
+        if (packetStage == 1) {
+            packetObservation = null;
+            packetPending = false;
+            packetTick = ticks;
+            packetStage = 2;
+            var id = client.player.getUuid();
+            client.getServer().execute(() -> client.getServer().getPlayerManager().getPlayer(id)
+                    .networkHandler.requestTeleport(feetX, feetY, feetZ, 90, 50));
+            return;
+        }
+        require(ticks - packetTick < 100, "NETWORK_STACK_REJECTED step=" + packetStep
+                + " expectedDy=" + -(packetStep / 2) * .5 + " observed=" + packetObservation);
+        BlockPos owner = PACKET_BASE.up(previous), target = owner.up();
+        if (packetStage == 2) {
+            if (ticks - packetTick < 4 || client.player.getPos().squaredDistanceTo(new Vec3d(feetX, feetY, feetZ)) > .01) return;
+            Vec3d aim = new Vec3d(owner.getX() + .5, previousTop, owner.getZ() + .5);
+            Vec3d delta = aim.subtract(client.player.getEyePos());
+            client.player.setYaw((float) Math.toDegrees(Math.atan2(-delta.x, delta.z)));
+            client.player.setPitch((float) -Math.toDegrees(Math.atan2(delta.y, Math.hypot(delta.x, delta.z))));
+            client.gameRenderer.updateCrosshairTarget(1.0f);
+            require(client.crosshairTarget instanceof BlockHitResult hit
+                            && hit.getType() == net.minecraft.util.hit.HitResult.Type.BLOCK && hit.getBlockPos().equals(owner)
+                            && hit.getSide() == Direction.UP,
+                    "NETWORK_STACK_CROSSHAIR_MISSED step=" + packetStep + " hit=" + client.crosshairTarget);
+            var stack = new ItemStack((packetStep & 1) == 1 ? Items.STONE_SLAB : Items.STONE, 64);
+            client.player.setStackInHand(Hand.MAIN_HAND, stack);
+            client.interactionManager.clickCreativeStack(stack.copy(), 36 + client.player.getInventory().selectedSlot);
+            var result = client.interactionManager.interactBlock(client.player, Hand.MAIN_HAND,
+                    (BlockHitResult) client.crosshairTarget);
+            require(result.isAccepted(), "NETWORK_STACK_PREDICTION_REFUSED step=" + packetStep + " result=" + result);
+            packetStage = 3;
+            return;
+        }
+        int step = packetStep;
+        double expectedDy = -(step / 2) * .5;
+        double expectedTop = PACKET_BASE.getY() + 1 + (step / 2) * 1.5 + ((step & 1) == 1 ? .5 : 0);
+        if (!packetPending) {
+            packetPending = true;
+            client.getServer().execute(() -> {
+                try {
+                    var world = client.getServer().getOverworld();
+                    var state = world.getBlockState(target);
+                    var fact = SlabAnchorAttachment.rawPlacementDyFact(world, target);
+                    double standingY = Double.NaN;
+                    boolean correct = state.isOf((step & 1) == 1 ? Blocks.STONE_SLAB : Blocks.STONE);
+                    if (correct && fact.present() && fact.valueOrNaN() == expectedDy) {
+                        var player = world.getPlayers().getFirst();
+                        Vec3d before = player.getPos(), velocity = player.getVelocity();
+                        try {
+                            player.setPosition(target.getX() + .5, expectedTop + .4, target.getZ() + .5);
+                            player.move(net.minecraft.entity.MovementType.SELF, new Vec3d(0, -.8, 0));
+                            standingY = player.getY();
+                        } finally { player.setPosition(before); player.setVelocity(velocity); }
+                    }
+                    packetObservation = new PacketObservation(step, correct, fact.present(), fact.valueOrNaN(), standingY);
+                } catch (Throwable error) { failure = error; }
+                finally { packetPending = false; }
+            });
+        }
+        var observation = packetObservation;
+        if (observation == null || observation.step() != step || !observation.block() || !observation.fact()
+                || observation.dy() != expectedDy) return;
+        var state = client.world.getBlockState(target);
+        if (!state.isOf((step & 1) == 1 ? Blocks.STONE_SLAB : Blocks.STONE)
+                || SlabSupport.getYOffset(client.world, target, state) != expectedDy) return;
+        require(Math.abs(observation.standingY() - expectedTop) < 1.0e-6,
+                "NETWORK_STACK_STANDING_MISSED step=" + step + " observed=" + observation);
+        var interior = new net.minecraft.util.math.Box(target.getX() + .3, expectedTop - .4, target.getZ() + .3,
+                target.getX() + .7, expectedTop - .1, target.getZ() + .7);
+        require(!client.world.isSpaceEmpty(null, interior), "NETWORK_STACK_CLIENT_COLLISION_MISSED step=" + step);
+        if (step % 16 == 0) System.out.println("NETWORK_STACK_CONFIRMED pieces=" + step + " dy=" + expectedDy);
+        if (++packetStep > PACKET_STEPS) {
+            MESH_FACES.clear();
+            client.worldRenderer.reload();
+            packetStage = 4;
+            packetTick = ticks;
+        } else packetStage = 1;
     }
 
     private static void checkAuthorityWithoutProvenance(MinecraftClient client) throws Exception {

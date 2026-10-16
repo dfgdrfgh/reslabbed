@@ -15,6 +15,16 @@ import java.util.Map;
 public final class PlacementCoreOverhaulTest {
     @GameTest(templateName = "fabric-gametest-api-v1:empty")
     public void interactionReachUsesTheStoredBodyAtEveryDepth(TestContext h) {
+        try {
+            var source = net.minecraft.entity.player.PlayerEntity.class.getProtectionDomain().getCodeSource().getLocation();
+            var process = new ProcessBuilder(java.nio.file.Path.of(System.getProperty("java.home"), "bin", "javap").toString(),
+                    "-classpath", java.nio.file.Path.of(source.toURI()).toString(), "-c",
+                    "net.minecraft.entity.player.PlayerEntity").redirectErrorStream(true).start();
+            String output = new String(process.getInputStream().readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
+            process.waitFor();
+            int from = output.indexOf("boolean canInteractWithBlockAt(");
+            if (from >= 0) System.out.println("NATIVE_BLOCK_REACH_BYTECODE " + output.substring(from, Math.min(output.length(), from + 1600)));
+        } catch (Exception exception) { System.out.println("Native block reach inspection unavailable: " + exception); }
         var world = h.getWorld();
         BlockPos owner = h.getAbsolutePos(new BlockPos(3, 120, 3));
         world.setBlockState(owner, net.minecraft.block.Blocks.STONE.getDefaultState(),
