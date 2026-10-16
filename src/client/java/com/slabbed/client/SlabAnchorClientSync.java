@@ -190,6 +190,7 @@ public final class SlabAnchorClientSync {
             }
         }
         DY_SNAPSHOTS.put(chunk.getPos().toLong(), initialDy);
+        FarPlacementRenderer.updateChunk(chunk);
     }
 
     private static void onChunkUnload(ClientWorld world, WorldChunk chunk) {
@@ -197,6 +198,7 @@ public final class SlabAnchorClientSync {
         TRACKED_CHUNKS.remove(chunkPos);
         ATTACHMENT_SNAPSHOTS.remove(chunkPos);
         DY_SNAPSHOTS.remove(chunkPos);
+        FarPlacementRenderer.removeChunk(chunkPos);
     }
 
     private static LongOpenHashSet clientAttachmentSet(
@@ -216,6 +218,7 @@ public final class SlabAnchorClientSync {
             TRACKED_CHUNKS.clear();
             ATTACHMENT_SNAPSHOTS.clear();
             DY_SNAPSHOTS.clear();
+            FarPlacementRenderer.clear();
             return;
         }
         if (mc.worldRenderer == null) {
@@ -272,6 +275,7 @@ public final class SlabAnchorClientSync {
         if (oldMap == newMap) {
             return;
         }
+        FarPlacementRenderer.updateChunk(chunk);
         boolean oldEmpty = oldMap == null || oldMap.isEmpty();
         boolean newEmpty = newMap == null || newMap.isEmpty();
         if ((oldEmpty && newEmpty) || (!oldEmpty && !newEmpty && oldMap.equals(newMap))) {

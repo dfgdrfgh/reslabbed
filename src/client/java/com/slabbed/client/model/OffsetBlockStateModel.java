@@ -2,6 +2,7 @@ package com.slabbed.client.model;
 import com.slabbed.Slabbed;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import com.slabbed.client.ClientDy;
+import com.slabbed.client.FarPlacementRenderer;
 import com.slabbed.client.runtime.PistonMovingRenderScope;
 import com.slabbed.util.RuntimeDiagnostics;
 import com.slabbed.util.SlabSupport;
@@ -195,6 +196,8 @@ public final class OffsetBlockStateModel extends ForwardingBakedModel {
     @Override
     public void emitBlockQuads(BlockRenderView view, BlockState state, BlockPos pos, Supplier<Random> randomSupplier,
                                RenderContext context) {
+        if (!(view instanceof World)
+                && FarPlacementRenderer.requiresWorldPass(ClientDy.dyFor(view, pos, state))) return;
         // A vertical chain hanging directly under a slab ceiling support renders the elongated
         // 0..24 (1.5-block) chain model at dy=0 so render == outline/hitbox, physically bridging
         // the half-block gap above a hanging lantern. Supersedes the standard dy=+0.5 chain branch.

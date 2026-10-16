@@ -14,7 +14,8 @@
     "MinecartRenderMatrixCaptureMixin",
     "BlockEntityRenderCaptureMixin",
     "ClientParticleSinkCaptureMixin",
-    "VerticalStepMeshCaptureMixin"
+    "VerticalStepMeshCaptureMixin",
+    "StoredBodyVertexCaptureMixin"
   ],
   "injectors": {
     "defaultRequire": 1

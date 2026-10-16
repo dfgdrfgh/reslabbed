@@ -176,6 +176,7 @@ Every row below is declared in `slabbed.mixins.json`. Inactive, unregistered mix
 | `com/slabbed/client/ClientDy` | Client-only dy policy for visual alignment of thin carpet layers on bottom slabs. |
 | `com/slabbed/client/PlacementDyPredictionClient` | Thin client wiring for `PlacementDyOverlay`: level identity, the raw backing read, targeted rerenders, and lifecycle events. Never writes the chunk's placement-dy attachment itself. |
 | `com/slabbed/client/SlabAnchorClientSync` | Receives anchor sync from the server. |
+| `com/slabbed/client/FarPlacementRenderer` | Draws displaced stored bodies beyond chunk vertex and visibility bounds through native floating-point world buffers. |
 | `com/slabbed/client/SlabbedModelLoadingPlugin` | Installs the offset block-state model and the alternate chain-ceiling geometry. |
 | `com/slabbed/client/SlabbedClientFlags` | Sole members are `GAP_FILL` and `TARGET_DY_OVERLAY`, read by shipped client code via `getstatic`. Two constants and a private constructor; both default off (`Boolean.getBoolean`). |
 | `com/slabbed/client/TargetDyOverlay` | The client debug overlay. Passive; reads `SlabbedClientFlags.TARGET_DY_OVERLAY`, default off. |

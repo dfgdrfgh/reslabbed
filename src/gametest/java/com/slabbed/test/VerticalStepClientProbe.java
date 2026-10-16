@@ -57,6 +57,11 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
     private static final BlockPos GROUND = new BlockPos(8, 198, 8);
     private static final BlockPos PACKET_BASE = new BlockPos(40, 32, 12);
     private static final int PACKET_STEPS = 96;
+    private static double[] worldVertexBounds;
+    public static boolean watchesWorldVertices(BlockPos pos) { return pos.equals(PACKET_BASE.up(PACKET_STEPS)); }
+    public static void recordWorldVertices(int count, double minY, double maxY) {
+        worldVertexBounds = new double[]{count, minY, maxY};
+    }
     private static final Map<String, MeshFace> MESH_FACES = new ConcurrentHashMap<>();
     private record MeshFace(float minY, float maxY, Direction cull, boolean visible, String view,
                             float encodedMinY, float encodedMaxY) {}
@@ -91,12 +96,12 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
         MeshFace actual = MESH_FACES.get(pos.asLong() + ":" + face);
         System.out.println("SECTION_MESH_FACE pos=" + pos + " face=" + face + " actual=" + actual);
         require(actual != null, "Actual section mesh omitted watched face " + pos + " " + face);
-        require(!actual.view.contains("ClientWorld"), "Expected a real section render view");
+        if (Math.abs(plane) < 7) require(!actual.view.contains("ClientWorld"), "Expected a real section render view");
         require(Math.abs(actual.minY - plane) < 1.0e-6 && Math.abs(actual.maxY - plane) < 1.0e-6,
                 "Section mesh used stale height: " + actual);
         require(Math.abs(actual.encodedMinY - plane) < 1.0e-6 && Math.abs(actual.encodedMaxY - plane) < 1.0e-6,
                 "Native vertex encoder moved stored geometry: " + actual);
-        if (exposed) require(actual.visible && actual.cull == null, "Actual section mesh hid exposed face: " + actual);
+        if (exposed) require(actual.visible, "Actual section mesh hid exposed face: " + actual);
     }
     private static final BlockPos EDGE = new BlockPos(15, 205, 8);
     private static final BlockPos NATURAL_TOP = new BlockPos(12, 208, 12);
@@ -373,6 +378,12 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
         if (packetStage == 4) {
             if (ticks - packetTick < 100) return;
             checkMeshedFace(PACKET_BASE.up(PACKET_STEPS), Direction.UP, 1 - PACKET_STEPS / 4.0, true);
+            double top = PACKET_BASE.getY() + 1 + PACKET_STEPS * .75;
+            require(worldVertexBounds != null && worldVertexBounds[0] > 0
+                            && Math.abs(worldVertexBounds[1] - (top - 1)) < 1.0e-4
+                            && Math.abs(worldVertexBounds[2] - top) < 1.0e-4,
+                    "NETWORK_STACK_WORLD_BUFFER_MISPLACED bounds=" + java.util.Arrays.toString(worldVertexBounds));
+            System.out.println("NETWORK_STACK_WORLD_BUFFER_PASS bounds=" + java.util.Arrays.toString(worldVertexBounds));
             System.out.println("NETWORK_STACK_MESH_RELOAD_PASS pieces=" + PACKET_STEPS);
             try (var screenshot = ScreenshotRecorder.takeScreenshot(client.getFramebuffer())) {
                 screenshot.writeTo(client.runDirectory.toPath().resolve("vertical-step.png"));

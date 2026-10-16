@@ -93,6 +93,7 @@ public final class PlacementDyPredictionClient {
         var state = mc.world.getBlockState(pos);
         if (state != null) {
             // Retiring a prediction changes geometry even when the block state is identical.
+            FarPlacementRenderer.refreshPosition(pos);
             SlabAnchorClientSync.scheduleHeightRefresh(mc, pos);
         }
     }
