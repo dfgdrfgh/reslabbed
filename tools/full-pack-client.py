@@ -1,6 +1,6 @@
 """Run the same updated-pack scene with the control and fixed release JARs."""
 from pathlib import Path
-import argparse,json,os,shutil,subprocess,sys,zipfile
+import argparse,hashlib,json,os,shutil,subprocess,sys,zipfile
 
 root=Path.cwd()
 parser=argparse.ArgumentParser()
@@ -92,12 +92,13 @@ if core_phase:
                   '-Dslabbed.keepProbe.evidenceDir='+str(game/'core-evidence'),
                   '-Dslabbed.keepProbe.controls='+str(controls_file),
                   '-Dslabbed.keepProbe.world=slabbed-stored-core']
+print('SLABBED_JAR_SHA256',hashlib.sha256(release.read_bytes()).hexdigest(),release.name,flush=True)
 print('Launching updated 61-mod pack:',release.name,'loader',fixture['dependencies']['fabric-loader'],flush=True)
 with (game/'production-launch.log').open('w') as log:
     result=subprocess.run(command,cwd=game,stdout=log,stderr=subprocess.STDOUT,timeout=360)
 lines=(game/'production-launch.log').read_text(errors='replace').splitlines()
 for line in lines:
-    if any(s in line for s in ['FULL_PACK','REPEATED_STACK','OVERHEAD','VERTICAL_STEP_CLIENT_PASS','Caused by:','AssertionError','CORE_SAVED_WORLD','KEEP_REOPEN_PROBE_SUMMARY']):print(line[:650])
+    if any(s in line for s in ['FULL_PACK','REPEATED_STACK','OVERHEAD','VERTICAL_STEP_CLIENT_PASS','Caused by:','AssertionError','CORE_SAVED_WORLD','KEEP_REOPEN_PROBE_SUMMARY','[KEEP_REOPEN_PROBE]']):print(line[:1200])
 if core_phase:
     assert result.returncode==0 and any('verdict=GREEN' in line and 'KEEP_REOPEN_PROBE_SUMMARY' in line for line in lines), 'Saved-world probe failed'
     if args.phase=='baseline-save':

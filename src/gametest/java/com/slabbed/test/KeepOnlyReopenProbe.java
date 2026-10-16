@@ -376,9 +376,21 @@ public final class KeepOnlyReopenProbe implements ClientModInitializer {
 
     private static void beginControl(MinecraftClient client) {
         Control control = CONTROLS.get(controlIndex);
+        // Every measured body must be in the actual camera frustum, including deeply displaced rows.
+        // Arming a sample after a section was built is not enough: force a fresh native mesh pass.
+        Vec3d eye = new Vec3d(control.pos().getX()+0.5d,
+                control.pos().getY()+control.expected()+3.0d,control.pos().getZ()-3.5d);
+        float pitch = (float)Math.toDegrees(Math.atan2(2.5d,4.0d));
+        var playerId = client.player.getUuid();
+        client.getServer().execute(() -> {
+            var player = client.getServer().getPlayerManager().getPlayer(playerId);
+            if (player!=null) player.networkHandler.requestTeleport(eye.x,eye.y-1.62d,eye.z,0.0f,pitch);
+        });
+        client.player.refreshPositionAndAngles(eye.x,eye.y-1.62d,eye.z,0.0f,pitch);
+        client.player.setVelocity(Vec3d.ZERO);
+        client.player.getAbilities().flying=true;
         OffsetBlockStateModel.resetFullMeshBoundsSample(control.pos());
-        client.worldRenderer.scheduleBlockRenders(control.pos().getX(), control.pos().getY(), control.pos().getZ(),
-                control.pos().getX(), control.pos().getY(), control.pos().getZ());
+        client.worldRenderer.reload();
         SERVER.remove(control.name());
         requestServer(client, control.name(), control.pos());
         phaseTick = ticks;
@@ -469,7 +481,13 @@ public final class KeepOnlyReopenProbe implements ClientModInitializer {
                 savedDataOk &= same(server.collisionMin(),expected)
                         && same(clientState.getCollisionShape(client.world,pos).getMin(Direction.Axis.Y),expected);
             savedDataOk &= mesh.seen() && same(mesh.minAfterY()-mesh.minBeforeY(),expected);
-            System.out.println("CORE_SAVED_WORLD_ROW name="+name+" phase="+corePhase+" dy="+server.dy()+" dataAndGeometry="+savedDataOk);
+            System.out.println("CORE_SAVED_WORLD_ROW name="+name+" phase="+corePhase+" dy="+server.dy()+" dataAndGeometry="+savedDataOk
+                    +" clientDy="+clientDy+" serverCollision="+server.collisionMin()
+                    +" clientCollision="+clientState.getCollisionShape(client.world,pos).getMin(Direction.Axis.Y)
+                    +" serverFact="+server.fact()+":"+server.factValue()+" clientFact="+clientFact
+                    +" meshSeen="+mesh.seen()+" meshDy="+mesh.dy()+" vertices="+mesh.verticesVisited()
+                    +" beforeMin="+mesh.minBeforeY()+" afterMin="+mesh.minAfterY()
+                    +" camera="+client.gameRenderer.getCamera().getPos());
         }
         boolean green = serverOk && clientOk && meshOk && mesh.seen() && savedDataOk;
         if (green) greenRows++; else redRows++;
