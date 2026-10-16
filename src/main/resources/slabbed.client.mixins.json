@@ -4,10 +4,14 @@
   "compatibilityLevel": "JAVA_21",
   "client": [
     "ClientBreakMixin",
+    "CellHitParticlesMixin",
+    "CellPacketWorldMixin",
+    "CellPacketDataMixin",
     "CellUpdatesMixin",
     "SodiumCellUpdatesMixin",
     "CellOutlineMixin",
-    "CellPickMixin"
+    "CellPickMixin",
+    "NativeBlockEntityRenderMixin"
   ],
   "injectors": {
     "defaultRequire": 1

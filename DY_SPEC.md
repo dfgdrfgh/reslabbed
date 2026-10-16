@@ -14,9 +14,13 @@ The `slabbed:cell` block entity stores `format=1` and a `parts` compound list. E
 
 NBT loading validates local occupancy. The old placement-offset attachment is not read. This format requires fresh worlds until an explicit migration exists.
 
+Native functional objects retain their ordinary block states, block entities and vanilla data. The persistent synchronized chunk attachment `slabbed:native_seats` records their owner position, block identity and fixed half-block offset. The offset is -1, 0 or 1 half steps and never accumulates. The owner cell remains reserved; any projected geometry must fit without overlapping adjacent pieces. Paired beds record the same offset for both native members.
+
 ## Placement and changes
 
 Placement validates every intersected cell before committing any change. The origin is permanent. A piece fitting one native cell returns to its native block state; cells sharing pieces retain the carrier block entity. Canonicalization preserves physical position exactly.
+
+The client uses the same nonmutating clearance preparation as the server. A carrier state packet cannot replace native client geometry until its matching contents are available. Complete publication retains vanilla prediction acknowledgements and discards pending data on replacement, chunk resnapshot, unload and disconnect.
 
 Neighbors may remove a decoration under its vanilla support rules. They cannot move a piece. Transformations such as planting a flower pot replace the piece's state across both fragments while retaining its origin. External replacement snapshots the outgoing cell's block entity and clears only companion fragments outside the replaced cell.
 
@@ -29,3 +33,5 @@ Vanilla placement packets carry normal physical hit positions. Vanilla breaking 
 ## Adapters
 
 Static building cubes, slabs, logs, glass, glazed terracotta, persistent leaves, ordinary and soul torches, chains, lanterns, flower pots and carpets have explicit handling. Unsupported stateful mechanics remain on vanilla placement rather than being stored with incomplete behavior. Carrier cells are block entities and are consequently immovable by vanilla pistons.
+
+Signs, hanging signs, beds, banners, skulls and supported workstations use the native placement lifecycle, including item data, editing, menus and paired block callbacks. Their shapes, target projection, model or block-entity rendering and sleeping position use the stored seat. Native queries examine only adjacent cells. Removing a native block removes its seat; changing properties of the same block preserves it. Support checks may remove an unsupported decoration, but cannot revise its seat.

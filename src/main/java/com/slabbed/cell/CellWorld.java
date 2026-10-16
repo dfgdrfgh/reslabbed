@@ -32,20 +32,29 @@ public final class CellWorld {
         }
         return null;
     }
+    public static boolean canPlace(World world,int x,int z,int origin,BlockState state) {
+        return prepare(world,x,z,origin,state)!=null;
+    }
     public static boolean place(World world,int x,int z,int origin,BlockState state) {
-        if (!PieceRules.accepts(state)) return false;
+        var changes=prepare(world,x,z,origin,state);
+        if(changes==null)return false;
+        commit(world,changes);
+        return true;
+    }
+    private static Map<BlockPos,CellContents<BlockState>> prepare(World world,int x,int z,int origin,BlockState state) {
+        if (!PieceRules.accepts(state)) return null;
         if (state.getBlock() instanceof SlabBlock) state=state.with(SlabBlock.TYPE,SlabType.BOTTOM);
+        if(com.slabbed.nativeblock.NativeShapes.intersects(world,x,z,origin,state))return null;
         int length=length(state); int low=HalfGrid.at(origin).cellY(),high=HalfGrid.at(origin+length-1).cellY();
         Map<BlockPos,CellContents<BlockState>> changes=new LinkedHashMap<>();
         for (int y=low;y<=high;y++) {
             var pos=new BlockPos(x,y,z);
-            if (!world.isInBuildLimit(pos) || !world.getWorldBorder().contains(pos)) return false;
-            var before=contents(world,pos); if(before==null) return false;
+            if (!world.isInBuildLimit(pos) || !world.getWorldBorder().contains(pos)) return null;
+            var before=contents(world,pos); if(before==null) return null;
             try { changes.put(pos,before.add(new CellContents.Fragment<>(origin-y*2,length,state))); }
-            catch(IllegalArgumentException overlap) { return false; }
+            catch(IllegalArgumentException overlap) { return null; }
         }
-        commit(world,changes);
-        return true;
+        return changes;
     }
     public static void remove(World world,BlockPos cellPos,int offset,PlayerEntity player,boolean drop) {
         var cell=contents(world,cellPos); if(cell==null) return;
@@ -84,6 +93,7 @@ public final class CellWorld {
             world.updateNeighbors(pos,world.getBlockState(pos).getBlock());
             world.updateListeners(pos,world.getBlockState(pos),world.getBlockState(pos),Block.NOTIFY_ALL);
             if(!world.isClient) PieceSupport.revalidate(world,pos);
+            if(!world.isClient) com.slabbed.nativeblock.NativeSupport.revalidateNear(world,pos);
         }
     }
     public static CellContents.Fragment<BlockState> pick(World world,BlockPos pos,BlockHitResult hit) {

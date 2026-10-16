@@ -19,9 +19,24 @@ public final class CellPlacement {
         var hit=context.getHitPos(); var face=context.getSide();
         var clicked=BlockPos.ofFloored(hit.subtract(Vec3d.of(face.getVector()).multiply(1e-5)));
         var clickedState=world.getBlockState(clicked);
-        if(!clickedState.isOf(Slabbed.CELL) && !(clickedState.getBlock() instanceof SlabBlock)) return null;
-        if(clickedState.getBlock() instanceof SlabBlock && clickedState.get(SlabBlock.WATERLOGGED)) return null;
-        var fragment=CellWorld.pick(world,clicked,new net.minecraft.util.hit.BlockHitResult(hit,face,clicked,false));
+        com.slabbed.core.CellContents.Fragment<BlockState> fragment=null;
+        if(clickedState.isOf(Slabbed.CELL) || clickedState.getBlock() instanceof SlabBlock) {
+            if(clickedState.getBlock() instanceof SlabBlock && clickedState.get(SlabBlock.WATERLOGGED)) return null;
+            fragment=CellWorld.pick(world,clicked,new net.minecraft.util.hit.BlockHitResult(hit,face,clicked,false));
+        }
+        if(fragment==null) {
+            // A bounded native seat can project into either adjacent physical cell.
+            for(int n=-1;n<=1;n++) {
+                var owner=clicked.up(n);var seat=com.slabbed.nativeblock.NativeSeats.seat(world,owner);
+                var nativeState=world.getBlockState(owner);
+                if(seat==null || !PieceRules.supports(nativeState))continue;
+                var local=hit.subtract(Vec3d.of(face.getVector()).multiply(1e-5)).subtract(Vec3d.of(owner));
+                var shape=com.slabbed.nativeblock.NativeShapes.occupied(world,owner,nativeState,seat.halfOffset());
+                if(shape.getBoundingBoxes().stream().noneMatch(box->box.expand(1e-6).contains(local)))continue;
+                clicked=owner;clickedState=nativeState;
+                fragment=new com.slabbed.core.CellContents.Fragment<>(seat.halfOffset(),2,nativeState);break;
+            }
+        }
         if(fragment==null) return null;
         var support=fragment.value();
         if(!PieceRules.supports(support)) return null;
@@ -45,7 +60,7 @@ public final class CellPlacement {
         else if(face==Direction.DOWN) origin-=length;
         else { x+=face.getOffsetX(); z+=face.getOffsetZ(); }
         // Matching vanilla slabs retain vanilla's single-cell double-slab behavior.
-        if(!clickedState.isOf(Slabbed.CELL) && item.getBlock()==clickedState.getBlock()
+        if(clickedState.getBlock() instanceof SlabBlock && item.getBlock()==clickedState.getBlock()
                 && face.getAxis().isVertical() && clickedState.get(SlabBlock.TYPE)!=SlabType.DOUBLE) return null;
         var base=new BlockPos(x,com.slabbed.core.HalfGrid.at(origin).cellY(),z);
         if(!player.getAbilities().allowModifyWorld || !world.canPlayerModifyAt(player,base)
@@ -53,6 +68,7 @@ public final class CellPlacement {
         var shape=state.getCollisionShape(world,base).offset(x,origin*.5,z);
         if(!world.doesNotIntersectEntities(null,shape)) return ActionResult.FAIL;
         if(!PieceSupport.supported(world,base,new com.slabbed.core.CellContents.Fragment<>(origin-base.getY()*2,length,state))) return ActionResult.FAIL;
+        if(!CellWorld.canPlace(world,x,z,origin,state)) return ActionResult.FAIL;
         if(world.isClient) return ActionResult.SUCCESS;
         if(!CellWorld.place(world,x,z,origin,state)) return ActionResult.FAIL;
         var sounds=state.getSoundGroup();

@@ -10,7 +10,9 @@
     "CellParticleCaptureMixin",
     "CellUpdateCaptureMixin",
     "CellSoundCaptureMixin",
-    "SodiumCellQueueCaptureMixin"
+    "SodiumCellQueueCaptureMixin",
+    "NativeBlockEntityVertexCaptureMixin",
+    "NativeModelQuadCaptureMixin"
   ],
   "injectors": {
     "defaultRequire": 1

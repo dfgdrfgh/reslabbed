@@ -5,7 +5,14 @@
   "mixins": [
     "BlockItemMixin",
     "ServerBreakMixin",
-    "ExplosionResistanceMixin"
+    "ExplosionResistanceMixin",
+    "NativeBlockItemAccess",
+    "NativeBlockItemMixin",
+    "NativeStateShapesMixin",
+    "NativeRaycastMixin",
+    "NativeSeatLifecycleMixin",
+    "NativeBedSleepMixin",
+    "NativeSupportUpdateMixin"
   ],
   "injectors": {
     "defaultRequire": 1

@@ -14,6 +14,24 @@ import net.minecraft.util.math.Vec3d;
 /** Material feedback uses the entire selected piece at its permanent physical origin. */
 public final class CellBreakEffects {
     private CellBreakEffects() {}
+    public static void hit(ClientWorld world,BlockPos pos,CellContents.Fragment<BlockState> piece,net.minecraft.util.math.Direction side) {
+        var state=piece.value();var shape=state.getOutlineShape(world,pos);
+        if(shape.isEmpty() || state.getRenderType()==net.minecraft.block.BlockRenderType.INVISIBLE)return;
+        var box=shape.getBoundingBox().offset(pos.getX(),pos.getY()+piece.offset()*.5,pos.getZ());
+        double x=box.minX+.1+world.random.nextDouble()*(box.maxX-box.minX-.2);
+        double y=box.minY+.1+world.random.nextDouble()*(box.maxY-box.minY-.2);
+        double z=box.minZ+.1+world.random.nextDouble()*(box.maxZ-box.minZ-.2);
+        switch(side) {
+            case DOWN -> y=box.minY-.1;
+            case UP -> y=box.maxY+.1;
+            case NORTH -> z=box.minZ-.1;
+            case SOUTH -> z=box.maxZ+.1;
+            case WEST -> x=box.minX-.1;
+            case EAST -> x=box.maxX+.1;
+        }
+        MinecraftClient.getInstance().particleManager.addParticle(new net.minecraft.client.particle.BlockDustParticle(
+                world,x,y,z,0,0,0,state,pos).move(.2f).scale(.6f));
+    }
     public static void play(ClientWorld world,BlockPos pos,CellContents.Fragment<BlockState> piece) {
         var state=piece.value();var shape=state.getOutlineShape(world,pos);
         var center=shape.isEmpty()?new Vec3d(.5,.5,.5):shape.getBoundingBox().getCenter();
