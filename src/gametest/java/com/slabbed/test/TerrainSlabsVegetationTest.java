@@ -131,11 +131,11 @@ public final class TerrainSlabsVegetationTest {
                 "Missing placement facts must add zero Slabbed translation");
         ctx.assertTrue(plant.getModelOffset(view,pos).y==nativeOffset,
                 "NATIVE_COMPAT_OFFSET_DISCARDED: an unowned plant must retain its native model offset");
-        double baseMin=plant.getOutlineShape(EmptyBlockView.INSTANCE,pos,ShapeContext.absent()).getMin(Direction.Axis.Y);
-        ctx.assertTrue(plant.getOutlineShape(view,pos,ShapeContext.absent()).getMin(Direction.Axis.Y)==baseMin+nativeOffset,
-                "Native plant outline differs from the unchanged native model: plant=" + plant
-                        + " actual=" + plant.getOutlineShape(view,pos,ShapeContext.absent()).getMin(Direction.Axis.Y)
-                        + " base=" + baseMin + " nativeOffset=" + nativeOffset);
+        var nativeOutline = plant.getBlock().getOutlineShape(plant, view, pos, ShapeContext.absent());
+        var actualOutline = plant.getOutlineShape(view, pos, ShapeContext.absent());
+        ctx.assertTrue(!net.minecraft.util.shape.VoxelShapes.matchesAnywhere(nativeOutline, actualOutline,
+                        net.minecraft.util.function.BooleanBiFunction.NOT_SAME),
+                "An unowned plant must retain its complete native outline: " + plant);
         ctx.assertTrue(plant.getCollisionShape(view,pos).isEmpty(),"Native empty plant collision acquired a ghost body");
     }
 
