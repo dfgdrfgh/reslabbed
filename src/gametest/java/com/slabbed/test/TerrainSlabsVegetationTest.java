@@ -133,7 +133,9 @@ public final class TerrainSlabsVegetationTest {
                 "NATIVE_COMPAT_OFFSET_DISCARDED: an unowned plant must retain its native model offset");
         double baseMin=plant.getOutlineShape(EmptyBlockView.INSTANCE,pos,ShapeContext.absent()).getMin(Direction.Axis.Y);
         ctx.assertTrue(plant.getOutlineShape(view,pos,ShapeContext.absent()).getMin(Direction.Axis.Y)==baseMin+nativeOffset,
-                "Native plant outline differs from the unchanged native model");
+                "Native plant outline differs from the unchanged native model: plant=" + plant
+                        + " actual=" + plant.getOutlineShape(view,pos,ShapeContext.absent()).getMin(Direction.Axis.Y)
+                        + " base=" + baseMin + " nativeOffset=" + nativeOffset);
         ctx.assertTrue(plant.getCollisionShape(view,pos).isEmpty(),"Native empty plant collision acquired a ghost body");
     }
 
