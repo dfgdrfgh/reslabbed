@@ -22,7 +22,7 @@ public abstract class ClientBreakMixin {
             cir.setReturnValue(false);return;
         }
         // The server's onBreak event excludes this player, as vanilla expects local feedback.
-        world.syncWorldEvent(net.minecraft.world.WorldEvents.BLOCK_BROKEN,pos,net.minecraft.block.Block.getRawIdFromState(piece.value()));
+        com.slabbed.client.CellBreakEffects.play(world,pos,piece);
         cir.setReturnValue(true);
     }
     @Inject(method={"attackBlock","updateBlockBreakingProgress"},at=@At("HEAD"))

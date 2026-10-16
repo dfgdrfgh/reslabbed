@@ -167,7 +167,8 @@ public final class PhysicalClientProbe implements ClientModInitializer {
                         +" updates="+CellFeedbackAudit.cellUpdates+" queued="+CellFeedbackAudit.queuedCellSections
                         +" delayed="+CellFeedbackAudit.delayedCellSections+" deferred="+CellFeedbackAudit.deferredCellUpdates);
                 check(CellRenderAudit.terrainLighting,"cell faces use entity lighting in addition to terrain shading");
-                check(CellFeedbackAudit.breaks==1 && CellFeedbackAudit.material.isOf(Blocks.OAK_SLAB),"missing or wrong material break particles");
+                check(CellFeedbackAudit.breaks>0 && CellFeedbackAudit.material.isOf(Blocks.OAK_SLAB),"missing or wrong material break particles");
+                check(CellFeedbackAudit.minParticleY>=top-.5 && CellFeedbackAudit.maxParticleY<=top,"slab debris escaped the physical piece");
                 check(CellFeedbackAudit.sounds==1 && Blocks.OAK_SLAB.getDefaultState().getSoundGroup().getBreakSound().getId().equals(CellFeedbackAudit.sound),"missing or wrong material break sound");
                 check(CellFeedbackAudit.cellUpdates>0 && CellFeedbackAudit.deferredCellUpdates==0,"native chunk mesh lags immediate cell renderer");
                 if(FabricLoader.getInstance().isModLoaded("sodium"))
@@ -187,11 +188,12 @@ public final class PhysicalClientProbe implements ClientModInitializer {
                 broken=ray.getType()==HitResult.Type.BLOCK && Math.abs(ray.getPos().y-(top-1))<1e-5;
             });
             if(!broken || ticks-started<15)return;
-            check(CellFeedbackAudit.breaks==1 && CellFeedbackAudit.material.isOf(Blocks.STONE),"full-block particles used the carrier material");
+            check(CellFeedbackAudit.breaks>0 && CellFeedbackAudit.material.isOf(Blocks.STONE),"full-block particles used the carrier material");
+            check(CellFeedbackAudit.minParticleY>=top-1 && CellFeedbackAudit.maxParticleY<=top,"full-block debris escaped the physical piece");
             check(CellFeedbackAudit.sounds==1 && Blocks.STONE.getDefaultState().getSoundGroup().getBreakSound().getId().equals(CellFeedbackAudit.sound),"full-block break sound missing or duplicated");
-            aim(client);
+            top-=1;aim(client);
             check(client.crosshairTarget instanceof BlockHitResult hit && hit.getType()==HitResult.Type.BLOCK
-                    && Math.abs(hit.getPos().y-(top-1))<1e-5,"client retained ghost geometry after full-block break");
+                    && Math.abs(hit.getPos().y-top)<1e-5,"client retained ghost geometry after full-block break");
             System.out.println("PHYSICAL_MATERIAL_BREAK_EFFECTS_PASS oak_slab stone");
             finish(client,"PHYSICAL_REOPEN_RELOAD_BREAK_PASS 258 pieces");
         }
