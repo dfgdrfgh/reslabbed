@@ -6,7 +6,8 @@
     "ServerParticleCaptureMixin",
     "WorldParticleCaptureMixin",
     "PendingHangChunkMixin",
-    "TerrainSlabsVegetationTestMixin"
+    "TerrainSlabsVegetationTestMixin",
+    "NativeOutlineTestAccess"
   ],
   "client": [
     "ItemFrameRenderMatrixCaptureMixin",
