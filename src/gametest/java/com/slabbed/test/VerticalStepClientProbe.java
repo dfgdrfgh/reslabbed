@@ -360,14 +360,24 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
         try {
             client.world.setBlockState(first,Blocks.STONE.getDefaultState(),Block.NOTIFY_LISTENERS);
             client.world.setBlockState(second,Blocks.STONE.getDefaultState(),Block.NOTIFY_LISTENERS);
+            int sequence = Math.max(1_000_000, 1 + Math.max(
+                    com.slabbed.anchor.PlacementDyOverlay.highWaterSequence(first.asLong()),
+                    com.slabbed.anchor.PlacementDyOverlay.highWaterSequence(second.asLong())));
+            var predicted = Map.of(first,Double.doubleToRawLongBits(-.5),second,Double.doubleToRawLongBits(-.5));
             com.slabbed.anchor.PlacementDyOverlay.installPredictedPlacement(client.world,first.down(),Direction.UP,
-                    1_000_000,Map.of(first,Double.doubleToRawLongBits(-.5),second,Double.doubleToRawLongBits(-.5)));
+                    sequence,predicted);
             require(com.slabbed.anchor.PlacementDyOverlay.overlayFact(client.world,first.asLong())!=null,
                     "Client removal fixture did not install a prediction");
             client.world.getWorldChunk(first).setBlockState(first,Blocks.AIR.getDefaultState(),false);
             require(com.slabbed.anchor.PlacementDyOverlay.overlayFact(client.world,first.asLong())==null
                             && com.slabbed.anchor.PlacementDyOverlay.overlayFact(client.world,second.asLong())==null,
                     "Actual client chunk removal left a predicted ghost body");
+            com.slabbed.anchor.PlacementDyOverlay.onVanillaAcknowledgement(client.world, sequence);
+            com.slabbed.anchor.PlacementDyOverlay.installPredictedPlacement(client.world,first.down(),Direction.UP,
+                    sequence,predicted);
+            require(com.slabbed.anchor.PlacementDyOverlay.overlayFact(client.world,first.asLong())==null
+                            && com.slabbed.anchor.PlacementDyOverlay.overlayFact(client.world,second.asLong())==null,
+                    "An old acknowledgment or equal-sequence replay resurrected a removed body");
         } finally {
             client.world.setBlockState(first,oldFirst,Block.NOTIFY_LISTENERS);
             client.world.setBlockState(second,oldSecond,Block.NOTIFY_LISTENERS);
