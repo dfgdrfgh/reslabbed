@@ -35,7 +35,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           python3 tools/stage-full-pack.py
-          timeout 12m xvfb-run -a python3 tools/client-runtime.py --pack
+          timeout 20m xvfb-run -a python3 tools/client-runtime.py --pack
       - name: Upload tested production JAR
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         with:

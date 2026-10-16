@@ -28,8 +28,8 @@ public final class CellBlock extends BlockWithEntity {
     @Override public VoxelShape getCollisionShape(BlockState state,BlockView world,BlockPos pos,ShapeContext context) {
         return world.getBlockEntity(pos) instanceof CellBlockEntity cell ? cell.collision() : VoxelShapes.empty();
     }
-    @Override public ItemStack getPickStack(World world,BlockPos pos,BlockState state) {
-        var p=CellWorld.pick(world,pos,null); return p==null?ItemStack.EMPTY:new ItemStack(p.value().getBlock());
+    @Override public ItemStack getPickStack(net.minecraft.world.WorldView world,BlockPos pos,BlockState state) {
+        var p=world instanceof World w?CellWorld.pick(w,pos,null):null; return p==null?ItemStack.EMPTY:new ItemStack(p.value().getBlock());
     }
     @Override protected void onStateReplaced(BlockState state,World world,BlockPos pos,BlockState next,boolean moved) {
         if (!next.isOf(this) && !CellWorld.mutating()) CellWorld.clearCell(world,pos);

@@ -27,3 +27,7 @@ AGENTS.md
 Gallery/
 src/main/Gallery/
 tmp/
+
+# Python cache
+__pycache__/
+*.pyc

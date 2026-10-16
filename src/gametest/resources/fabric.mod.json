@@ -7,6 +7,9 @@
   "entrypoints": {
     "fabric-gametest": [
       "com.slabbed.test.PhysicalCellTest"
+    ],
+    "client": [
+      "com.slabbed.test.PhysicalClientProbe"
     ]
   },
   "depends": {

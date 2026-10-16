@@ -22,7 +22,7 @@ public final class PieceRules {
         if(block instanceof FallingBlock || block instanceof PistonBlock || block instanceof TntBlock
                 || block instanceof RedstoneBlock || block instanceof ObserverBlock || block instanceof CommandBlock) return false;
         // Stateful and ticking blocks require their own adapter rather than silently losing gameplay.
-        return block.getClass()==Block.class || block instanceof PillarBlock || block instanceof GlassBlock
+        return block.getClass()==Block.class || block instanceof PillarBlock || block==Blocks.GLASS
                 || block instanceof StainedGlassBlock || block instanceof GlazedTerracottaBlock
                 || block instanceof LeavesBlock;
     }
