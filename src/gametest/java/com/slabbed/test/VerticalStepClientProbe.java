@@ -120,6 +120,7 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
     private int packetStep = 1, packetStage, packetTick;
     private volatile boolean packetReady, packetPending;
     private volatile PacketObservation packetObservation;
+    private volatile boolean packetBroken;
     private record PacketObservation(int step, boolean block, boolean fact, double dy, double standingY) {}
 
     @Override public void onInitializeClient() {
@@ -376,23 +377,67 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
             return;
         }
         if (!packetReady || !client.world.getBlockState(PACKET_BASE).isOf(Blocks.STONE)) return;
+        double finalTop = PACKET_BASE.getY() + 1 + PACKET_STEPS * .75;
+        BlockPos finalOwner = PACKET_BASE.up(PACKET_STEPS);
+        if (packetStage == 5 || packetStage == 6) {
+            require(ticks - packetTick < 100, "NETWORK_STACK_BREAK_REJECTED");
+            if (packetStage == 5) {
+                if (ticks - packetTick < 4 || client.player.getPos().squaredDistanceTo(
+                        new Vec3d(PACKET_BASE.getX() + 2.5, finalTop + 1, PACKET_BASE.getZ() + .5)) > .01) return;
+                Vec3d delta = new Vec3d(finalOwner.getX() + .5, finalTop, finalOwner.getZ() + .5)
+                        .subtract(client.player.getEyePos());
+                client.player.setYaw((float) Math.toDegrees(Math.atan2(-delta.x, delta.z)));
+                client.player.setPitch((float) -Math.toDegrees(Math.atan2(delta.y, Math.hypot(delta.x, delta.z))));
+                client.gameRenderer.updateCrosshairTarget(1.0f);
+                require(client.crosshairTarget instanceof BlockHitResult hit && hit.getBlockPos().equals(finalOwner)
+                                && hit.getType() == net.minecraft.util.hit.HitResult.Type.BLOCK,
+                        "NETWORK_STACK_BREAK_TARGET_MISSED");
+                require(client.interactionManager.attackBlock(finalOwner, Direction.UP), "NETWORK_STACK_BREAK_REFUSED");
+                packetStage = 6;
+                return;
+            }
+            if (!packetPending) {
+                packetPending = true;
+                client.getServer().execute(() -> {
+                    try {
+                        var world = client.getServer().getOverworld();
+                        if (world.getBlockState(finalOwner).isAir()
+                                && !SlabAnchorAttachment.rawPlacementDyFact(world, finalOwner).present()) {
+                            require(SlabAnchorAttachment.rawPlacementDyFact(world, finalOwner.down()).valueOrNaN()
+                                            == -((PACKET_STEPS - 1) / 2) * .5,
+                                    "NETWORK_STACK_BREAK_MOVED_NEIGHBOR");
+                            packetBroken = true;
+                        }
+                    } catch (Throwable error) { failure = error; }
+                    finally { packetPending = false; }
+                });
+            }
+            if (!packetBroken || !client.world.getBlockState(finalOwner).isAir()
+                    || SlabAnchorAttachment.rawPlacementDyFact(client.world, finalOwner).present()) return;
+            System.out.println("NETWORK_STACK_BREAK_PASS pieces=" + PACKET_STEPS);
+            Files.writeString(Path.of("vertical-step-pass.txt"), "Native geometry, 256 network placements, reload and break passed\n");
+            System.out.println("VERTICAL_STEP_CLIENT_PASS renderer=" + RendererAccess.INSTANCE.getRenderer().getClass().getName());
+            phase = 99;
+            client.scheduleStop();
+            return;
+        }
         if (packetStage == 4) {
             if (ticks - packetTick < 100) return;
             checkMeshedFace(PACKET_BASE.up(PACKET_STEPS), Direction.UP, 1 - PACKET_STEPS / 4.0, true);
-            double top = PACKET_BASE.getY() + 1 + PACKET_STEPS * .75;
             require(worldVertexBounds != null && worldVertexBounds[0] > 0
-                            && Math.abs(worldVertexBounds[1] - (top - 1)) < 1.0e-4
-                            && Math.abs(worldVertexBounds[2] - top) < 1.0e-4,
+                            && Math.abs(worldVertexBounds[1] - (finalTop - 1)) < 1.0e-4
+                            && Math.abs(worldVertexBounds[2] - finalTop) < 1.0e-4,
                     "NETWORK_STACK_WORLD_BUFFER_MISPLACED bounds=" + java.util.Arrays.toString(worldVertexBounds));
             System.out.println("NETWORK_STACK_WORLD_BUFFER_PASS bounds=" + java.util.Arrays.toString(worldVertexBounds));
             System.out.println("NETWORK_STACK_MESH_RELOAD_PASS pieces=" + PACKET_STEPS);
             try (var screenshot = ScreenshotRecorder.takeScreenshot(client.getFramebuffer())) {
                 screenshot.writeTo(client.runDirectory.toPath().resolve("vertical-step.png"));
             }
-            Files.writeString(Path.of("vertical-step-pass.txt"), "Native geometry and 256 network stack placements passed\n");
-            System.out.println("VERTICAL_STEP_CLIENT_PASS renderer=" + RendererAccess.INSTANCE.getRenderer().getClass().getName());
-            phase = 99;
-            client.scheduleStop();
+            var id = client.player.getUuid();
+            client.getServer().execute(() -> client.getServer().getPlayerManager().getPlayer(id).networkHandler
+                    .requestTeleport(PACKET_BASE.getX() + 2.5, finalTop + 1, PACKET_BASE.getZ() + .5, 90, 50));
+            packetStage = 5;
+            packetTick = ticks;
             return;
         }
         int previous = packetStep - 1;

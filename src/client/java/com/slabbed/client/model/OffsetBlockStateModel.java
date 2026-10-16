@@ -196,8 +196,9 @@ public final class OffsetBlockStateModel extends ForwardingBakedModel {
     @Override
     public void emitBlockQuads(BlockRenderView view, BlockState state, BlockPos pos, Supplier<Random> randomSupplier,
                                RenderContext context) {
-        if (!(view instanceof World)
-                && FarPlacementRenderer.requiresWorldPass(ClientDy.dyFor(view, pos, state))) return;
+        boolean suppressNestedDy = PistonMovingRenderScope.suppressNestedDy();
+        float storedDy = suppressNestedDy ? 0.0f : (float) ClientDy.dyFor(view, pos, state);
+        if (!(view instanceof World) && FarPlacementRenderer.requiresWorldPass(storedDy)) return;
         // A vertical chain hanging directly under a slab ceiling support renders the elongated
         // 0..24 (1.5-block) chain model at dy=0 so render == outline/hitbox, physically bridging
         // the half-block gap above a hanging lantern. Supersedes the standard dy=+0.5 chain branch.
@@ -212,16 +213,16 @@ public final class OffsetBlockStateModel extends ForwardingBakedModel {
         float sourceDy;
         String dySourcePath;
         float dy;
-        if (PistonMovingRenderScope.suppressNestedDy()) {
+        if (suppressNestedDy) {
             sourceDy = 0.0f;
             dySourcePath = "fabricEmitBlockQuads:pistonMovingDestinationOwned";
             dy = 0.0f;
         } else if (state.getBlock() instanceof CarpetBlock) {
-            sourceDy = (float) ClientDy.dyFor(view, pos, state);
+            sourceDy = storedDy;
             dySourcePath = "fabricEmitBlockQuads:ClientDy:carpet";
             dy = sourceDy;
         } else {
-            sourceDy = (float) SlabSupport.getYOffset(view, pos, state);
+            sourceDy = storedDy;
             dySourcePath = "fabricEmitBlockQuads:SlabSupport";
             dy = sourceDy;
 
