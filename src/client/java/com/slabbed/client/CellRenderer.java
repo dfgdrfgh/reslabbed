@@ -27,7 +27,7 @@ public final class CellRenderer implements BlockEntityRenderer<CellBlockEntity> 
             try {
                 matrices.translate(0,part.offset()*.5,0);
                 renderer.renderBlock(part.value(),cell.getPos(),cell.getWorld(),matrices,
-                        vertices.getBuffer(RenderLayers.getEntityBlockLayer(part.value(),false)),false,random);
+                        vertices.getBuffer(RenderLayers.getBlockLayer(part.value())),false,random);
             } finally { matrices.pop(); }
         }
     }

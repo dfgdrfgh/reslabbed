@@ -2,10 +2,11 @@
 from pathlib import Path
 import argparse,hashlib,json,os,shutil,subprocess,zipfile,urllib.request
 
-parser=argparse.ArgumentParser();parser.add_argument('--pack',action='store_true');parser.add_argument('--sodium',action='store_true');args=parser.parse_args()
+parser=argparse.ArgumentParser();parser.add_argument('--pack',action='store_true');parser.add_argument('--sodium',action='store_true');parser.add_argument('--control',action='store_true');args=parser.parse_args()
 root=Path.cwd();runtime=json.loads((root/'build/probe/dependencies.json').read_text())
 home=Path(runtime['gradleHome']);modules=home/'caches/modules-2/files-2.1'
 game=root/('build/run/physical-pack' if args.pack else 'build/run/physical-sodium' if args.sodium else 'build/run/physical-indigo')
+if args.control: game=root/'build/run/physical-control'
 assert not game.exists(),'Client requires a fresh run directory'
 game.mkdir(parents=True);mods=game/'mods';mods.mkdir()
 classpath=[]
@@ -17,6 +18,9 @@ def add(p):
     p=p.resolve()
     if p not in classpath:classpath.append(p)
 release=[p for p in (root/'build/libs').glob('*.jar') if not p.name.endswith(('-sources.jar','-dev.jar'))];assert len(release)==1
+if args.control:
+    assert args.pack,'Control requires the complete pack'
+    release=[root/'build/feedback-control.jar']
 if args.pack:
     fixture=json.loads((root/'tools/full-pack-fixture.json').read_text())
     for source in (root/'build/full-pack-baseline').rglob('*'):
@@ -73,6 +77,25 @@ for phase in ['fresh','reopen']:
     lines=output.read_text(errors='replace').splitlines()
     for line in lines:
         if any(s in line for s in ['PHYSICAL_','Caused by:','AssertionError','Exception']):print(line[:1200])
+    if args.control and phase=='reopen':
+        rows=[line for line in lines if 'PHYSICAL_FEEDBACK_OBSERVED' in line]
+        assert result.returncode!=0 and rows,'Control did not reproduce the feedback regression'
+        row=rows[-1]
+        assert 'terrainLighting=false breakParticles=0 material=null sounds=0 sound=null' in row,row
+        assert int(row.rsplit('deferred=',1)[1])>0,row
+        assert int(row.split('delayed=',1)[1].split()[0])>0,row
+        print('PHYSICAL_CONTROL_REPRODUCED_LIGHTING_BREAK_EFFECTS_AND_DEFERRED_MESH',flush=True)
+        continue
     if result.returncode!=0 or not marker.exists():print('\n'.join(lines[-100:]));raise AssertionError('Physical client failed '+phase)
+    if phase=='fresh':
+        row=next(line for line in reversed(lines) if 'PHYSICAL_TRANSITION_OBSERVED' in line)
+        assert ('terrainLighting=false' if args.control else 'terrainLighting=true') in row,row
+        deferred=int(row.rsplit('deferred=',1)[1])
+        assert (deferred>0 if args.control else deferred==0),row
+        if args.pack or args.sodium:
+            assert int(row.split('queued=',1)[1].split()[0])>0,row
+            delayed=int(row.split('delayed=',1)[1].split()[0])
+            assert (delayed>0 if args.control else delayed==0),row
+        print('PHYSICAL_TRANSITION_CHECK_PASS control='+str(args.control),flush=True)
     print(marker.read_text().strip(),flush=True)
-print('PHYSICAL_CLIENT_PHASES_PASS pack='+str(args.pack)+' sodium='+str(args.sodium),flush=True)
+print('PHYSICAL_CLIENT_PHASES_PASS pack='+str(args.pack)+' sodium='+str(args.sodium)+' control='+str(args.control),flush=True)

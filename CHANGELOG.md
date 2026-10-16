@@ -1,3 +1,7 @@
+# 0.9.1 rewrite alpha — Fabric 1.21.1
+
+Cell models use terrain lighting without a second entity-lighting pass. Native/cell mesh transitions request immediate redraws; Sodium queues only affected sections for the same frame. Breaking a cell plays the selected material's normal local sound and particles while removal remains server-confirmed. Placement origins and the physical-cell format are unchanged; see LAW.md.
+
 # 0.9.0 rewrite alpha — Fabric 1.21.1
 
 Fresh physical-cell implementation of the Slabbed concept. Pieces occupy the cells intersected by their actual shapes rather than distant logical cells. Placement origins remain permanent; see LAW.md.

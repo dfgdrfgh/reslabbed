@@ -1005,5 +1005,11 @@
     "sha256": "74b52986d6f208d6a79f717279fa3322ee6bf067d49cb891541f72946abef7f0"
   },
   "sourcePackSha256": "2517e93bc59bc3c50abcd04843bd9c55214430187b69044cb82cd010c9a0995c",
-  "modCount": 60
+  "modCount": 60,
+  "feedbackBaseline": {
+    "repo": "dfgdrfgh/reslabbed",
+    "artifact": 12062694726,
+    "file": "slabbed-0.9.0-rewrite-alpha+1.21.1-fabric.jar",
+    "sha256": "079da6b9d5d14ad9e2bb300f010ff187120b1fbc199b0923fc1fb5f42a456e7b"
+  }
 }

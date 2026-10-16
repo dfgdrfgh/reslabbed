@@ -13,8 +13,17 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class ClientBreakMixin {
     @Inject(method="breakBlock",at=@At("HEAD"),cancellable=true)
     private void slabbed$awaitConfirmedPieceBreak(BlockPos pos,CallbackInfoReturnable<Boolean> cir) {
-        var world=MinecraftClient.getInstance().world;
-        if(world!=null && world.getBlockState(pos).isOf(Slabbed.CELL)) cir.setReturnValue(true);
+        var client=MinecraftClient.getInstance();var world=client.world;
+        if(world==null || !world.getBlockState(pos).isOf(Slabbed.CELL))return;
+        var hit=client.crosshairTarget instanceof net.minecraft.util.hit.BlockHitResult h && h.getBlockPos().equals(pos)?h:null;
+        var piece=com.slabbed.cell.CellWorld.pick(world,pos,hit);
+        if(piece==null || client.player==null || client.player.isBlockBreakingRestricted(world,pos,client.interactionManager.getCurrentGameMode())
+                || !client.player.getMainHandStack().getItem().canMine(piece.value(),world,pos,client.player)) {
+            cir.setReturnValue(false);return;
+        }
+        // The server's onBreak event excludes this player, as vanilla expects local feedback.
+        world.syncWorldEvent(net.minecraft.world.WorldEvents.BLOCK_BROKEN,pos,net.minecraft.block.Block.getRawIdFromState(piece.value()));
+        cir.setReturnValue(true);
     }
     @Inject(method={"attackBlock","updateBlockBreakingProgress"},at=@At("HEAD"))
     private void slabbed$sendSelectedPiece(BlockPos pos,net.minecraft.util.math.Direction direction,CallbackInfoReturnable<Boolean> cir) {

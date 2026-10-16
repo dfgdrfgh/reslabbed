@@ -52,6 +52,7 @@ public final class PhysicalClientProbe implements ClientModInitializer {
             } catch(Exception e) { throw new IllegalStateException("Pack verification failed",e); }
         }
         ClientTickEvents.END_CLIENT_TICK.register(client->{ try { tick(client); } catch(Throwable e) { e.printStackTrace(); System.exit(1); } });
+        net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents.END.register(context->CellFeedbackAudit.changedSections.clear());
     }
     private void tick(MinecraftClient client) throws Exception {
         check(++ticks<10000,"physical client timeout stage="+stage+" step="+step);
@@ -145,7 +146,12 @@ public final class PhysicalClientProbe implements ClientModInitializer {
             CellRenderAudit.verify(top);System.out.println("PHYSICAL_FAR_RENDER_PASS distance=80");
             server(client,()->{client.getServer().saveAll(false,true,true);saved=true;});stage=5;return;
         }
-        if(stage==5 && saved) { finish(client,"PHYSICAL_SAVE_PASS 258 pieces");return; }
+        if(stage==5 && saved) {
+            System.out.println("PHYSICAL_TRANSITION_OBSERVED terrainLighting="+CellRenderAudit.terrainLighting
+                    +" updates="+CellFeedbackAudit.cellUpdates+" queued="+CellFeedbackAudit.queuedCellSections
+                    +" delayed="+CellFeedbackAudit.delayedCellSections+" deferred="+CellFeedbackAudit.deferredCellUpdates);
+            finish(client,"PHYSICAL_SAVE_PASS 258 pieces");return;
+        }
         if(stage==6) {
             check(ticks-started<120,"break not confirmed");
             if(!pending) server(client,()->{
@@ -154,12 +160,40 @@ public final class PhysicalClientProbe implements ClientModInitializer {
                 broken=ray.getType()==HitResult.Type.BLOCK && Math.abs(ray.getPos().y-(top-.5))<1e-5;
             });
             if(broken) {
+                if(ticks-started<15)return;
                 System.out.println("PHYSICAL_FEEDBACK_OBSERVED terrainLighting="+CellRenderAudit.terrainLighting
-                        +" breakParticles="+CellFeedbackAudit.breaks+" material="+CellFeedbackAudit.material);
+                        +" breakParticles="+CellFeedbackAudit.breaks+" material="+CellFeedbackAudit.material
+                        +" sounds="+CellFeedbackAudit.sounds+" sound="+CellFeedbackAudit.sound
+                        +" updates="+CellFeedbackAudit.cellUpdates+" queued="+CellFeedbackAudit.queuedCellSections
+                        +" delayed="+CellFeedbackAudit.delayedCellSections+" deferred="+CellFeedbackAudit.deferredCellUpdates);
                 check(CellRenderAudit.terrainLighting,"cell faces use entity lighting in addition to terrain shading");
                 check(CellFeedbackAudit.breaks==1 && CellFeedbackAudit.material.isOf(Blocks.OAK_SLAB),"missing or wrong material break particles");
-                finish(client,"PHYSICAL_REOPEN_RELOAD_BREAK_PASS 258 pieces");
+                check(CellFeedbackAudit.sounds==1 && Blocks.OAK_SLAB.getDefaultState().getSoundGroup().getBreakSound().getId().equals(CellFeedbackAudit.sound),"missing or wrong material break sound");
+                check(CellFeedbackAudit.cellUpdates>0 && CellFeedbackAudit.deferredCellUpdates==0,"native chunk mesh lags immediate cell renderer");
+                if(FabricLoader.getInstance().isModLoaded("sodium"))
+                    check(CellFeedbackAudit.queuedCellSections>0 && CellFeedbackAudit.delayedCellSections==0,"Sodium defers cell geometry across render frames");
+                top-=.5;aim(client);CellFeedbackAudit.reset();broken=false;
+                check(client.crosshairTarget instanceof BlockHitResult hit && hit.getType()==HitResult.Type.BLOCK
+                        && Math.abs(hit.getPos().y-top)<1e-5,"client retained ghost geometry after slab break");
+                client.interactionManager.attackBlock(((BlockHitResult)client.crosshairTarget).getBlockPos(),Direction.UP);
+                stage=9;started=ticks;
             }
+        }
+        if(stage==9) {
+            check(ticks-started<120,"full-block break not confirmed");
+            if(!pending) server(client,()->{
+                var w=client.getServer().getOverworld();var p=w.getPlayers().getFirst();
+                var ray=w.raycast(new RaycastContext(new Vec3d(BASE.getX()+.5,top+1,BASE.getZ()+.5),new Vec3d(BASE.getX()+.5,top-1.2,BASE.getZ()+.5),RaycastContext.ShapeType.OUTLINE,RaycastContext.FluidHandling.NONE,p));
+                broken=ray.getType()==HitResult.Type.BLOCK && Math.abs(ray.getPos().y-(top-1))<1e-5;
+            });
+            if(!broken || ticks-started<15)return;
+            check(CellFeedbackAudit.breaks==1 && CellFeedbackAudit.material.isOf(Blocks.STONE),"full-block particles used the carrier material");
+            check(CellFeedbackAudit.sounds==1 && Blocks.STONE.getDefaultState().getSoundGroup().getBreakSound().getId().equals(CellFeedbackAudit.sound),"full-block break sound missing or duplicated");
+            aim(client);
+            check(client.crosshairTarget instanceof BlockHitResult hit && hit.getType()==HitResult.Type.BLOCK
+                    && Math.abs(hit.getPos().y-(top-1))<1e-5,"client retained ghost geometry after full-block break");
+            System.out.println("PHYSICAL_MATERIAL_BREAK_EFFECTS_PASS oak_slab stone");
+            finish(client,"PHYSICAL_REOPEN_RELOAD_BREAK_PASS 258 pieces");
         }
     }
     private void server(MinecraftClient c,Runnable task) {

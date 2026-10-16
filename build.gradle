@@ -6,13 +6,14 @@ group = project.maven_group
 base { archivesName = project.archives_base_name }
 loom { splitEnvironmentSourceSets() }
 fabricApi { configureTests { createSourceSet = true } }
-repositories { mavenCentral() }
+repositories { mavenCentral(); maven { url 'https://api.modrinth.com/maven' } }
 dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
     modClientImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    modCompileOnly 'maven.modrinth:sodium:SMxNOGZ6'
 }
 processResources {
     inputs.property 'version', project.version

@@ -4,7 +4,10 @@
   "compatibilityLevel": "JAVA_21",
   "client": [
     "CellRenderCaptureMixin",
-    "CellParticleCaptureMixin"
+    "CellParticleCaptureMixin",
+    "CellUpdateCaptureMixin",
+    "CellSoundCaptureMixin",
+    "SodiumCellQueueCaptureMixin"
   ],
   "injectors": {
     "defaultRequire": 1
