@@ -589,6 +589,7 @@ public final class KeepOnlyReopenProbe implements ClientModInitializer {
         if ("reopen".equals(mode)) {
             ServerObservation legacyAfter = SERVER.get("legacy_after");
             if (legacyAfter == null) {
+                requestServer(client, "legacy_after", CONTROLS.get(0).pos());
                 if (ticks - phaseTick > MESH_TIMEOUT) finish(client, "RED_LEGACY_RECHECK_TIMEOUT");
                 return;
             }

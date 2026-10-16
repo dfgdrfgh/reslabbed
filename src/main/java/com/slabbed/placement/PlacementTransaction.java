@@ -3,6 +3,7 @@ package com.slabbed.placement;
 import com.slabbed.anchor.SlabAnchorAttachment;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
@@ -14,7 +15,7 @@ import java.util.stream.Collectors;
 
 /** Operation-local staging is published only after the complete placement validates (LAW.md). */
 public final class PlacementTransaction {
-    private static final ThreadLocal<ArrayDeque<Prepared>> ACTIVE = ThreadLocal.withInitial(ArrayDeque::new);
+    private static final ThreadLocal<ArrayDeque<Prepared>> ACTIVE = new ThreadLocal<>();
     private PlacementTransaction() {}
 
     public static Prepared prepare(World world, PlacementPlan plan) {
@@ -22,7 +23,9 @@ public final class PlacementTransaction {
     }
 
     public static SlabAnchorAttachment.PlacementDyFact stagedFact(BlockView view, BlockPos pos) {
-        for (Prepared prepared : ACTIVE.get()) {
+        var active = ACTIVE.get();
+        if (active == null) return null;
+        for (Prepared prepared : active) {
             if (prepared.world == view) {
                 Long bits = prepared.heights.get(pos);
                 if (bits != null) return new SlabAnchorAttachment.PlacementDyFact(true, bits);
@@ -63,7 +66,12 @@ public final class PlacementTransaction {
             }
             if (SlabAnchorAttachment.preparePlacementDyBatch(world, heights) == null) return;
             accepted = true;
-            ACTIVE.get().push(this);
+            var active = ACTIVE.get();
+            if (active == null) {
+                active = new ArrayDeque<>();
+                ACTIVE.set(active);
+            }
+            active.push(this);
         }
 
         public boolean accepted() { return accepted && !closed; }
@@ -79,7 +87,7 @@ public final class PlacementTransaction {
                         && cell.finalState().getBlock() instanceof net.minecraft.block.BedBlock
                         && cell.finalState().get(net.minecraft.state.property.Properties.BED_PART)
                         == net.minecraft.block.enums.BedPart.HEAD) continue;
-                if (!actual.isOf(cell.finalState().getBlock())) return false;
+                if (!isPlacementIdentity(cell.finalState(), actual)) return false;
                 if (actual.contains(net.minecraft.state.property.Properties.DOUBLE_BLOCK_HALF)
                         && actual.get(net.minecraft.state.property.Properties.DOUBLE_BLOCK_HALF)
                         != cell.finalState().get(net.minecraft.state.property.Properties.DOUBLE_BLOCK_HALF)) return false;
@@ -113,7 +121,7 @@ public final class PlacementTransaction {
                 if (chunk == null) continue;
                 BlockState current = chunk.getBlockState(cell.pos());
                 BlockState before = beforeStates.get(cell.pos());
-                if (before != null && current.isOf(cell.finalState().getBlock()) && current != before) {
+                if (before != null && isPlacementIdentity(cell.finalState(), current) && current != before) {
                     world.setBlockState(cell.pos(), before, Block.NOTIFY_LISTENERS | Block.FORCE_STATE);
                     if (!world.isClient()) SlabAnchorAttachment.removeAnchor(world, cell.pos());
                     Long old = beforeHeights.get(cell.pos());
@@ -127,8 +135,17 @@ public final class PlacementTransaction {
             if (closed) return;
             closed = true;
             var active = ACTIVE.get();
+            if (active == null) return;
             active.remove(this);
             if (active.isEmpty()) ACTIVE.remove();
+        }
+
+        private boolean isPlacementIdentity(BlockState expected, BlockState actual) {
+            // Absorption and ultrawarm drying happen synchronously inside vanilla placement.
+            return actual.isOf(expected.getBlock())
+                    || expected.isOf(Blocks.SPONGE) && actual.isOf(Blocks.WET_SPONGE)
+                    || expected.isOf(Blocks.WET_SPONGE) && actual.isOf(Blocks.SPONGE)
+                    && world.getDimension().ultrawarm();
         }
     }
 }

@@ -3,7 +3,6 @@ package com.slabbed.test;
 import com.slabbed.Slabbed;
 import com.slabbed.anchor.PlacementDyOverlay;
 import com.slabbed.anchor.SlabAnchorAttachment;
-import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.minecraft.test.GameTest;
 import net.minecraft.test.TestContext;
 import net.minecraft.util.math.BlockPos;
@@ -115,17 +114,17 @@ public final class PlacementDyOverlayTest {
 
     /** Mutable stand-in for the authoritative backing store the real probe reads from the chunk. */
     private static final class FakeBacking {
-        private final LongOpenHashSet present = new LongOpenHashSet();
+        private final Map<Long, Long> heights = new LinkedHashMap<>();
 
         SlabAnchorAttachment.PlacementDyFact backingFact(long packedPos) {
-            return present.contains(packedPos)
-                    ? new SlabAnchorAttachment.PlacementDyFact(true, Double.doubleToRawLongBits(0.25d))
+            return heights.containsKey(packedPos)
+                    ? new SlabAnchorAttachment.PlacementDyFact(true, heights.get(packedPos))
                     : SlabAnchorAttachment.PlacementDyFact.absent();
         }
 
-        void arrive(BlockPos... positions) {
+        void arrive(double height, BlockPos... positions) {
             for (BlockPos pos : positions) {
-                present.add(pos.asLong());
+                heights.put(pos.asLong(), raw(height));
             }
         }
     }
@@ -190,7 +189,7 @@ public final class PlacementDyOverlayTest {
 
             // ...and once the prediction is done the read path returns to the shared empty instance,
             // so a long session cannot leave a permanently non-empty snapshot behind.
-            backing.arrive(placed);
+            backing.arrive(PREDICTED_HALF, placed);
             PlacementDyOverlay.onVanillaAcknowledgement(level, 9);
             h.assertTrue(PlacementDyOverlay.publishedSnapshot() == PlacementDyOverlay.sharedEmptySnapshot(),
                     "after the last group retires the shared empty snapshot must be republished");
@@ -269,14 +268,14 @@ public final class PlacementDyOverlayTest {
             // Half the backing has arrived. Retiring now would leave the pair split across two
             // heights for a frame — the door's top half at the server value and its bottom half at
             // the predicted one — so the group must stay whole.
-            backing.arrive(lower);
+            backing.arrive(PREDICTED_DEEP, lower);
             PlacementDyOverlay.onVanillaAcknowledgement(level, 11);
             h.assertTrue(PlacementDyOverlay.liveGroupCount() == 1,
                     "a group must not retire while any of its cells still lacks a backing fact");
             h.assertTrue(dy(level, lower) == PREDICTED_DEEP && dy(level, upper) == PREDICTED_DEEP,
                     "a partially backed group must keep BOTH cells predicted, never one");
 
-            backing.arrive(upper);
+            backing.arrive(PREDICTED_DEEP, upper);
             PlacementDyOverlay.clientTick(level);
             h.assertTrue(PlacementDyOverlay.liveGroupCount() == 0,
                     "a fully backed acknowledged group must retire");
@@ -317,7 +316,7 @@ public final class PlacementDyOverlayTest {
                     "the prediction must survive right up to the timeout boundary");
 
             // (b) The fact arrives: retire on the next re-check.
-            backing.arrive(placed);
+            backing.arrive(PREDICTED_DEEP, placed);
             PlacementDyOverlay.clientTick(level);
             h.assertTrue(PlacementDyOverlay.liveGroupCount() == 0
                             && PlacementDyOverlay.overlayFact(level, placed.asLong()) == null,
@@ -406,7 +405,7 @@ public final class PlacementDyOverlayTest {
                     "install must publish the overlay BEFORE scheduling the rerender; saw " + seen);
 
             seen.clear();
-            backing.arrive(placed);
+            backing.arrive(PREDICTED_DEEP, placed);
             PlacementDyOverlay.onVanillaAcknowledgement(level, 44);
             h.assertTrue(seen.equals(List.of("false")),
                     "retirement must publish the retired overlay BEFORE scheduling the rerender; saw "

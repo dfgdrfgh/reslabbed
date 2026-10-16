@@ -429,7 +429,7 @@ public final class PlacementDyOverlay {
     }
 
     /**
-     * "Backing present" for the cells this group still owns. Cells another group has taken over are
+     * Matching backing for the cells this group still owns. Cells another group has taken over are
      * not this group's business; a group that owns nothing any more is ready immediately. With no
      * probe installed only the timeout can retire, which is the correct inert behaviour.
      */
@@ -438,13 +438,14 @@ public final class PlacementDyOverlay {
         if (probe == null) {
             return false;
         }
-        for (long cell : group.cells) {
+        for (int index = 0; index < group.cells.length; index++) {
+            long cell = group.cells[index];
             if (!group.key.equals(OVERLAY_OWNER.get(cell))
                     || HIGH_WATER.get(cell) != group.key.sequence()) {
                 continue;
             }
             SlabAnchorAttachment.PlacementDyFact fact = probe.backingFact(cell);
-            if (fact == null || !fact.present()) {
+            if (fact == null || !fact.present() || fact.rawBits() != group.rawBits[index]) {
                 return false;
             }
         }

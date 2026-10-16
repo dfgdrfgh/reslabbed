@@ -234,6 +234,7 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
             checkOverheadControls(client);
             checkAuthorityWithoutProvenance(client);
             checkBrokenPrediction(client);
+            checkStaleBackingAcknowledgment(client);
             checkRepeatedStack(client, false);
             checkMeshedFace(GROUND.up(2), Direction.UP, 0.5, true);
             BlockPos natural = GROUND.west(4);
@@ -383,6 +384,39 @@ public final class VerticalStepClientProbe implements ClientModInitializer {
             client.world.setBlockState(second,oldSecond,Block.NOTIFY_LISTENERS);
         }
         System.out.println("CLIENT_BREAK_BEFORE_ACK_PASS");
+    }
+
+    private static void checkStaleBackingAcknowledgment(MinecraftClient client) {
+        BlockPos pos = GROUND.west(6).up(12);
+        var chunk = client.world.getWorldChunk(pos);
+        var beforeState = chunk.getBlockState(pos);
+        var beforeFacts = chunk.getAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE);
+        try {
+            client.world.setBlockState(pos, Blocks.STONE.getDefaultState(), Block.NOTIFY_LISTENERS);
+            var stale = beforeFacts == null ? new Long2IntOpenHashMap() : new Long2IntOpenHashMap(beforeFacts);
+            stale.put(pos.asLong(), -8);
+            chunk.setAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE, stale);
+            int sequence = Math.max(1_000_000,
+                    1 + com.slabbed.anchor.PlacementDyOverlay.highWaterSequence(pos.asLong()));
+            com.slabbed.anchor.PlacementDyOverlay.installPredictedPlacement(client.world, pos.down(), Direction.UP,
+                    sequence, Map.of(pos, Double.doubleToRawLongBits(-1)));
+            com.slabbed.anchor.PlacementDyOverlay.onVanillaAcknowledgement(client.world, sequence);
+            require(SlabSupport.getYOffset(client.world, pos, chunk.getBlockState(pos)) == -1,
+                    "Client acknowledgment exposed the previous occupant's backing height");
+            var current = new Long2IntOpenHashMap(stale);
+            current.put(pos.asLong(), -16);
+            chunk.setAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE, current);
+            com.slabbed.anchor.PlacementDyOverlay.clientTick(client.world);
+            require(com.slabbed.anchor.PlacementDyOverlay.overlayFact(client.world, pos.asLong()) == null
+                            && SlabSupport.getYOffset(client.world, pos, chunk.getBlockState(pos)) == -1,
+                    "Matching authoritative client height did not complete prediction handoff");
+        } finally {
+            com.slabbed.anchor.PlacementDyOverlay.onBlockRemoved(client.world, pos);
+            client.world.setBlockState(pos, beforeState, Block.NOTIFY_LISTENERS);
+            if (beforeFacts == null) chunk.removeAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE);
+            else chunk.setAttached(SlabAnchorAttachment.PLACEMENT_DY_TYPE, beforeFacts);
+        }
+        System.out.println("CLIENT_STALE_BACKING_ACKNOWLEDGMENT_PASS");
     }
 
     private static final BlockPos TOWER_BASE = new BlockPos(18, 198, 12);

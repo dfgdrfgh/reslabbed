@@ -98,7 +98,7 @@ with (game/'production-launch.log').open('w') as log:
     result=subprocess.run(command,cwd=game,stdout=log,stderr=subprocess.STDOUT,timeout=360)
 lines=(game/'production-launch.log').read_text(errors='replace').splitlines()
 for line in lines:
-    if any(s in line for s in ['FULL_PACK','REPEATED_STACK','OVERHEAD','VERTICAL_STEP_CLIENT_PASS','Caused by:','AssertionError','CORE_SAVED_WORLD','KEEP_REOPEN_PROBE_SUMMARY','[KEEP_REOPEN_PROBE]']):print(line[:1200])
+    if any(s in line for s in ['FULL_PACK','REPEATED_STACK','OVERHEAD','CLIENT_STALE_BACKING','VERTICAL_STEP_CLIENT_PASS','Caused by:','AssertionError','CORE_SAVED_WORLD','KEEP_REOPEN_PROBE_SUMMARY','[KEEP_REOPEN_PROBE]']):print(line[:1200])
 if core_phase:
     assert result.returncode==0 and any('verdict=GREEN' in line and 'KEEP_REOPEN_PROBE_SUMMARY' in line for line in lines), 'Saved-world probe failed'
     if args.phase=='baseline-save':
