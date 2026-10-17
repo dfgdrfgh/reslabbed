@@ -35,6 +35,7 @@ public final class NativeFunctionalClientProbe {
     private static int stage,ticks,started;
     private static volatile boolean pending,observed;
     private static volatile Throwable failure;
+    private static boolean bedDiagnosed;
     private NativeFunctionalClientProbe() {}
 
     /** Call before the parent probe closes screens; false means this helper still owns the player. */
@@ -239,6 +240,8 @@ public final class NativeFunctionalClientProbe {
         client.interactionManager.clickCreativeStack(stack.copy(),36+client.player.getInventory().selectedSlot);
     }
     private static void place(MinecraftClient client,BlockPos base) {
+        if(base.equals(BED_BASE))System.out.println("PHYSICAL_NATIVE_BED_CLIENT_PLACEMENT yaw="+client.player.getYaw()
+                +" position="+client.player.getPos()+" support="+client.world.getBlockState(base));
         check(client.interactionManager.interactBlock(client.player,Hand.MAIN_HAND,new BlockHitResult(Vec3d.ofBottomCenter(base).add(0,.5,0),Direction.UP,base,false)).isAccepted(),"native placement refused at "+base);
     }
     private static void use(MinecraftClient client,BlockPos owner,Vec3d point) {
@@ -258,7 +261,18 @@ public final class NativeFunctionalClientProbe {
     }
     private static boolean nativeBed(MinecraftClient client) {
         var world=client.getServer().getOverworld();var foot=world.getBlockState(FOOT);var head=world.getBlockState(HEAD);
-        if(!foot.isOf(Blocks.RED_BED) || !head.isOf(Blocks.RED_BED))return false;
+        if(!foot.isOf(Blocks.RED_BED) || !head.isOf(Blocks.RED_BED)) {
+            if(!bedDiagnosed && ticks-started>20) {
+                bedDiagnosed=true;
+                var player=client.getServer().getPlayerManager().getPlayer(client.player.getUuid());
+                System.out.println("PHYSICAL_NATIVE_BED_SERVER_PLACEMENT foot="+foot+" head="+head
+                        +" north="+world.getBlockState(FOOT.north())+" east="+world.getBlockState(FOOT.east())
+                        +" west="+world.getBlockState(FOOT.west())+" support="+world.getBlockState(BED_BASE)
+                        +" seat="+com.slabbed.nativeblock.NativeSeats.seat(world,FOOT)
+                        +" yaw="+player.getYaw()+" held="+player.getMainHandStack()+" position="+player.getPos());
+            }
+            return false;
+        }
         for(var pos:new BlockPos[]{FOOT,HEAD}) {
             var shape=world.getBlockState(pos).getOutlineShape(world,pos).getBoundingBox();
             check(Math.abs(shape.minY+.5)<1e-5 && Math.abs(shape.maxY-.0625)<1e-5,"server bed outline lost physical seat at "+pos);
