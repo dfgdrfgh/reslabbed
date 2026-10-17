@@ -96,7 +96,7 @@ public final class NativeFunctionalClientProbe {
         }
         if(stage==7) {
             if(!arrived(client,24.5,65,8.5))return false;
-            equip(client,new ItemStack(Items.RED_BED,4));place(client,BED_BASE);next(8);return false;
+            equip(client,new ItemStack(Items.RED_BED,1));place(client,BED_BASE);next(8);return false;
         }
         if(stage==8) {
             if(!poll(client,()->nativeBed(client)))return false;
@@ -236,6 +236,7 @@ public final class NativeFunctionalClientProbe {
         return ticks-started>=10 && client.player.getPos().squaredDistanceTo(new Vec3d(x,y,z))<.05;
     }
     private static void equip(MinecraftClient client,ItemStack stack) {
+        check(stack.isEmpty() || stack.getCount()<=stack.getMaxCount(),"invalid creative test stack: "+stack);
         client.player.setStackInHand(Hand.MAIN_HAND,stack);
         client.interactionManager.clickCreativeStack(stack.copy(),36+client.player.getInventory().selectedSlot);
     }

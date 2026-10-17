@@ -1,21 +1,29 @@
 package com.slabbed.test;
 
+import com.slabbed.client.NativeSeatModel;
 import net.fabricmc.fabric.api.renderer.v1.mesh.QuadView;
+import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.random.Random;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-/** Compares live emitted geometry to independent unshifted vanilla renderer geometry. */
+/** Compares live emitted geometry to independent unshifted renderer or terrain model geometry. */
 public final class NativeRenderAudit {
     private static final Map<BlockPos,Observation> ENTITIES=new ConcurrentHashMap<>();
     private static final Map<BlockPos,Observation> MODELS=new ConcurrentHashMap<>();
+    private static final Set<BlockPos> TERRAIN_ENTITIES=ConcurrentHashMap.newKeySet();
     private static final class Observation {
         final double expectedMin,expectedMax;
         int vertices;
@@ -23,7 +31,8 @@ public final class NativeRenderAudit {
         Observation(double expectedMin,double expectedMax) {this.expectedMin=expectedMin;this.expectedMax=expectedMax;}
         synchronized void vertex(double y) {vertices++;min=Math.min(min,y);max=Math.max(max,y);}
         synchronized void verify(String name) {
-            if(vertices<4 || Math.abs(min-expectedMin)>.002 || Math.abs(max-expectedMax)>.002)
+            if(vertices<4 || !Double.isFinite(expectedMin) || !Double.isFinite(expectedMax)
+                    || Math.abs(min-expectedMin)>.002 || Math.abs(max-expectedMax)>.002)
                 throw new AssertionError(name+" emitted geometry mismatch: vertices="+vertices+" range="+min+".."+max+" expected="+expectedMin+".."+expectedMax);
             System.out.println("PHYSICAL_NATIVE_RENDER_VERTICES_PASS "+name+" vertices="+vertices+" min="+min+" max="+max);
         }
@@ -36,11 +45,24 @@ public final class NativeRenderAudit {
         if(entity==null)throw new AssertionError("native render fixture has no block entity at "+owner);
         var renderer=client.getBlockEntityRenderDispatcher().get(entity);
         if(renderer==null)throw new AssertionError("native render fixture has no renderer at "+owner);
+        // These fixtures are placed exactly half a block below their native owners.
+        double offset=-.5;
+        var terrain=optimizedModel(client,entity);
+        boolean terrainBody=terrain!=null && terrain.vertices>=4;
+        if(terrainBody) {
+            TERRAIN_ENTITIES.add(owner.toImmutable());
+            MODELS.put(owner.toImmutable(),new Observation(owner.getY()+offset+terrain.min,owner.getY()+offset+terrain.max));
+            remesh(client,owner);
+        }
         var raw=new Observation(0,0);
-        VertexConsumerProvider sink=layer->new Captured(null,raw,0);
-        renderer.render(entity,1,new MatrixStack(),sink,0x00F000F0,OverlayTexture.DEFAULT_UV);
-        if(raw.vertices<4)throw new AssertionError("unshifted vanilla renderer emitted no reference vertices at "+owner);
-        ENTITIES.put(owner.toImmutable(),new Observation(owner.getY()-.5+raw.min,owner.getY()-.5+raw.max));
+        var camera=client.gameRenderer.getCamera().getPos();
+        VertexConsumerProvider sink=layer->new Captured(null,raw,camera.y);
+        var matrices=new MatrixStack();
+        matrices.translate(owner.getX()-camera.x,owner.getY()-camera.y,owner.getZ()-camera.z);
+        renderer.render(entity,1,matrices,sink,0x00F000F0,OverlayTexture.DEFAULT_UV);
+        if(raw.vertices<4 && !terrainBody)throw new AssertionError("unshifted vanilla renderer emitted no reference vertices at "+owner);
+        ENTITIES.put(owner.toImmutable(),new Observation(raw.vertices==0?Double.NaN:offset+raw.min,
+                raw.vertices==0?Double.NaN:offset+raw.max));
     }
     public static VertexConsumerProvider watch(BlockEntity entity,VertexConsumerProvider target) {
         var observation=ENTITIES.get(entity.getPos());
@@ -51,10 +73,46 @@ public final class NativeRenderAudit {
     public static void verifyBlockEntity(BlockPos owner) {
         var observation=ENTITIES.remove(owner);
         if(observation==null)throw new AssertionError("native render fixture was not armed at "+owner);
+        if(TERRAIN_ENTITIES.remove(owner)) {
+            verifyModel(owner);
+            // OBE keeps sign text in the BER; camera-facing culling can legitimately omit it.
+            if(observation.vertices==0) {
+                System.out.println("PHYSICAL_NATIVE_RENDER_OVERLAY_CULLED block_entity="+owner);
+                return;
+            }
+        }
         observation.verify("block_entity="+owner);
+    }
+    /** OBE's model selector is shared by its actual Sodium, Indigo and vanilla meshing paths. */
+    private static Observation optimizedModel(MinecraftClient client,BlockEntity entity) {
+        if(!FabricLoader.getInstance().isModLoaded("obe"))return null;
+        try {
+            var state=entity.getCachedState();
+            var selector=Class.forName("fr.madu59.obe.client.util.meshing.SectionMeshingUtil")
+                    .getMethod("getCorrectedModel",BlockState.class,BlockEntity.class,BakedModel.class);
+            var model=(BakedModel)selector.invoke(null,state,entity,client.getBlockRenderManager().getModel(state));
+            if(model instanceof NativeSeatModel seated)model=seated.getWrappedModel();
+            if(model==null)return null;
+            if(!model.isVanillaAdapter())throw new AssertionError("OBE reference must expose its unshifted baked quads");
+            var raw=new Observation(0,0);
+            collectRawModel(model,state,null,raw);
+            for(var face:Direction.values())collectRawModel(model,state,face,raw);
+            return raw;
+        } catch(ReflectiveOperationException error) {
+            throw new AssertionError("cannot inspect the active OBE terrain model",error);
+        }
+    }
+    private static void collectRawModel(BakedModel model,BlockState state,Direction face,Observation raw) {
+        for(var quad:model.getQuads(state,face,Random.create(42))) {
+            var data=quad.getVertexData();int stride=data.length/4;
+            for(int n=0;n<4;n++)raw.vertex(Float.intBitsToFloat(data[n*stride+1]));
+        }
     }
     public static void beginModel(MinecraftClient client,BlockPos owner) {
         MODELS.put(owner.toImmutable(),new Observation(owner.getY()-.5,owner.getY()+.5));
+        remesh(client,owner);
+    }
+    private static void remesh(MinecraftClient client,BlockPos owner) {
         client.worldRenderer.scheduleBlockRenders(owner.getX()-1,owner.getY()-1,owner.getZ()-1,
                 owner.getX()+1,owner.getY()+1,owner.getZ()+1);
     }

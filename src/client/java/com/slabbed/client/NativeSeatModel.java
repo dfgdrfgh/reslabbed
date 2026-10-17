@@ -14,7 +14,7 @@ import net.minecraft.world.BlockRenderView;
 
 import java.util.function.Supplier;
 
-/** The native workstation model and native menu remain attached to the same owner. */
+/** Terrain geometry uses the same frozen seat as the native block entity and menu. */
 public final class NativeSeatModel extends ForwardingBakedModel {
     public NativeSeatModel(BakedModel wrapped) {this.wrapped=wrapped;}
     public static boolean workstationModel(Identifier id) {

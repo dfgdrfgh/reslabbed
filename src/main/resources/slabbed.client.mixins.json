@@ -11,7 +11,8 @@
     "SodiumCellUpdatesMixin",
     "CellOutlineMixin",
     "CellPickMixin",
-    "NativeBlockEntityRenderMixin"
+    "NativeBlockEntityRenderMixin",
+    "OptimizedNativeSeatModelMixin"
   ],
   "injectors": {
     "defaultRequire": 1
