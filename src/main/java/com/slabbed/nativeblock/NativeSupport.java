@@ -27,7 +27,20 @@ public final class NativeSupport {
             return side(world,owner,state.get(Properties.HORIZONTAL_FACING).getOpposite(),origin);
         if(block instanceof HangingSignBlock)return horizontal(world,owner,origin+2,Direction.UP);
         if(block instanceof SignBlock || block instanceof BannerBlock)return horizontal(world,owner,origin,Direction.DOWN);
+        if(block instanceof WallMountedBlock) {
+            var face=state.get(Properties.BLOCK_FACE);
+            if(face==net.minecraft.block.enums.BlockFace.WALL)
+                return side(world,owner,state.get(Properties.HORIZONTAL_FACING).getOpposite(),origin);
+            return horizontal(world,owner,face==net.minecraft.block.enums.BlockFace.CEILING?origin+2:origin,
+                    face==net.minecraft.block.enums.BlockFace.CEILING?Direction.UP:Direction.DOWN);
+        }
+        if(block instanceof DoorBlock && state.get(Properties.DOUBLE_BLOCK_HALF)==net.minecraft.block.enums.DoubleBlockHalf.UPPER)return null;
+        if(floorAttached(block))return horizontal(world,owner,origin,Direction.DOWN);
         return null;
+    }
+    private static boolean floorAttached(Block block) {
+        return block instanceof DoorBlock || block instanceof AbstractPressurePlateBlock || block instanceof RedstoneWireBlock
+                || block instanceof AbstractRedstoneGateBlock || block instanceof AbstractRailBlock || block instanceof RedstoneTorchBlock;
     }
     private static boolean physicalSupportNeeded(World world,BlockPos owner,BlockState state) {
         var block=state.getBlock();
@@ -39,6 +52,13 @@ public final class NativeSupport {
             return projected(world,owner.offset(state.get(Properties.HORIZONTAL_FACING).getOpposite()));
         if(block instanceof HangingSignBlock)return projected(world,owner.up());
         if(block instanceof SignBlock || block instanceof BannerBlock)return projected(world,owner.down());
+        if(block instanceof WallMountedBlock) {
+            var face=state.get(Properties.BLOCK_FACE);
+            return projected(world,face==net.minecraft.block.enums.BlockFace.WALL
+                    ?owner.offset(state.get(Properties.HORIZONTAL_FACING).getOpposite())
+                    :face==net.minecraft.block.enums.BlockFace.CEILING?owner.up():owner.down());
+        }
+        if(floorAttached(block))return projected(world,owner.down());
         return false;
     }
     private static boolean projected(World world,BlockPos cell) {

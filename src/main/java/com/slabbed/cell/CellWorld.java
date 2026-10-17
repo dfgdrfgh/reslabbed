@@ -22,6 +22,8 @@ public final class CellWorld {
     public static CellContents<BlockState> contents(World world,BlockPos pos) {
         if (!world.isChunkLoaded(pos)) return null;
         var state=world.getBlockState(pos);
+        var nativeSeat=com.slabbed.nativeblock.NativeSeats.seat(world,pos);
+        if(nativeSeat!=null && nativeSeat.halfOffset()!=0)return null;
         if (state.isOf(Slabbed.CELL)) return world.getBlockEntity(pos) instanceof CellBlockEntity cell?cell.contents():null;
         if (state.hasBlockEntity()) return null;
         if (state.isAir() || state.isReplaceable()) return CellContents.empty();

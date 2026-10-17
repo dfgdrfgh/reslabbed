@@ -7,8 +7,7 @@ public final class NativeRules {
     private NativeRules() {}
     public static boolean accepts(BlockState state) {
         var block=state.getBlock();
-        return block instanceof AbstractSignBlock || block instanceof BedBlock
-                || block instanceof AbstractBannerBlock || block instanceof AbstractSkullBlock || workstation(state);
+        return !state.isAir() && block!=com.slabbed.Slabbed.CELL && !(block instanceof FluidBlock);
     }
     public static boolean workstation(BlockState state) {
         var block=state.getBlock();

@@ -36,7 +36,7 @@ public final class NativeShapes {
         if(shape.isEmpty())return true;
         var box=shape.getBoundingBox();
         return box.minX>=-1e-7 && box.minY>=-1e-7 && box.minZ>=-1e-7
-                && box.maxX<=1+1e-7 && box.maxY<=1+1e-7 && box.maxZ<=1+1e-7;
+                && box.maxX<=1+1e-7 && box.maxY<=1.5+1e-7 && box.maxZ<=1+1e-7;
     }
     /** Candidate static geometry must not occupy any native object's physical volume. */
     public static boolean intersects(World world,int x,int z,int origin,BlockState state) {

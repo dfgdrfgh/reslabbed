@@ -12,7 +12,13 @@
     "NativeRaycastMixin",
     "NativeSeatLifecycleMixin",
     "NativeBedSleepMixin",
-    "NativeSupportUpdateMixin"
+    "NativeSupportUpdateMixin",
+    "NativeEntityContactMixin",
+    "NativePlateDetectionMixin",
+    "HangingDecorationItemMixin",
+    "HangingItemFrameMixin",
+    "HangingPaintingMixin",
+    "HangingSurvivalMixin"
   ],
   "injectors": {
     "defaultRequire": 1

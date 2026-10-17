@@ -18,11 +18,11 @@ import java.util.function.Supplier;
 public final class NativeSeatModel extends ForwardingBakedModel {
     public NativeSeatModel(BakedModel wrapped) {this.wrapped=wrapped;}
     public static boolean workstationModel(Identifier id) {
-        return Registries.BLOCK.containsId(id) && NativeRules.workstation(Registries.BLOCK.get(id).getDefaultState());
+        return Registries.BLOCK.containsId(id) && NativeRules.accepts(Registries.BLOCK.get(id).getDefaultState());
     }
     @Override public boolean isVanillaAdapter() {return false;}
     @Override public void emitBlockQuads(BlockRenderView view,BlockState state,BlockPos pos,Supplier<Random> random,RenderContext context) {
-        float offset=(float)NativeSeats.offset(view,pos);
+        float offset=(float)NativeSeats.offset(view,pos,state);
         if(offset==0) {super.emitBlockQuads(view,state,pos,random,context);return;}
         context.pushTransform(quad-> {
             quad.cullFace(null);

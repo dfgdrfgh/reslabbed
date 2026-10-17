@@ -82,6 +82,9 @@ public final class NativeSeats {
     public static double offset(BlockView view,BlockPos pos) {
         var seat=seat(view,pos);return seat==null?0:seat.offset();
     }
+    public static double offset(BlockView view,BlockPos pos,net.minecraft.block.BlockState state) {
+        return view.getBlockState(pos).getBlock()==state.getBlock()?offset(view,pos):0;
+    }
     public static void put(World world,BlockPos pos,Seat seat) {
         var chunk=world.getWorldChunk(pos);var next=new HashMap<>(snapshot(chunk));
         next.put(Long.toString(pos.asLong()),seat);chunk.setAttached(TYPE,Map.copyOf(next));

@@ -40,8 +40,12 @@ public final class NativePlacement {
     public static ActionResult place(BlockItem item,ItemPlacementContext original,Function<ItemPlacementContext,ActionResult> vanilla) {
         if(!NativeRules.accepts(item.getBlock().getDefaultState()) || original.getPlayer()==null)return vanilla.apply(original);
         var world=original.getWorld();var source=source(original);
+        if(PieceRules.accepts(item.getBlock().getDefaultState())
+                && !(item.getBlock() instanceof LeavesBlock) && !(item.getBlock() instanceof PillarBlock))return vanilla.apply(original);
         BlockPos owner=original.getBlockPos();int half=0;
-        if(source!=null) {
+        var existingSeat=NativeSeats.seat(world,owner);
+        if(existingSeat!=null && world.getBlockState(owner).canReplace(original))half=existingSeat.halfOffset();
+        else if(source!=null) {
             int origin=source.origin();var side=original.getSide();
             int x=source.pos().getX(),z=source.pos().getZ();
             if(side==Direction.UP)origin+=source.length();
@@ -82,25 +86,31 @@ public final class NativePlacement {
             var head=selected.with(BedBlock.PART,BedPart.HEAD);
             plan.states.put(other,head);plan.seats.put(other,seat(half,head));
         }
+        if(selected.contains(Properties.DOUBLE_BLOCK_HALF)) {
+            var upper=owner.up();var state=selected.with(Properties.DOUBLE_BLOCK_HALF,net.minecraft.block.enums.DoubleBlockHalf.UPPER);
+            plan.states.put(upper,state);plan.seats.put(upper,seat(half,state));
+        }
         return preflight(context,plan);
     }
     private static NativeSeats.Seat seat(int half,BlockState state) {
         return new NativeSeats.Seat(half,Registries.BLOCK.getId(state.getBlock()).toString());
     }
-    private record Source(BlockPos pos,int origin,int length) {}
+    private record Source(BlockPos pos,int origin,int length,boolean nativeOwner) {}
     private static Source source(ItemPlacementContext context) {
         var world=context.getWorld();var hit=context.getHitPos();var side=context.getSide();
         var physical=BlockPos.ofFloored(hit.subtract(Vec3d.of(side.getVector()).multiply(1e-5)));
         var part=CellWorld.pick(world,physical,new BlockHitResult(hit,side,physical,false));
-        if(part!=null && PieceRules.supports(part.value()))return new Source(physical,physical.getY()*2+part.offset(),part.length());
+        if(part!=null && PieceRules.supports(part.value()))return new Source(physical,physical.getY()*2+part.offset(),part.length(),false);
         // A projected native full cube can be hit in either physical cell it occupies.
         for(int n=-1;n<=1;n++) {
             var owner=physical.up(n);var stored=NativeSeats.seat(world,owner);
-            if(stored==null || !PieceRules.supports(world.getBlockState(owner)))continue;
+            var state=world.getBlockState(owner);
+            if(stored==null || (!PieceRules.supports(state) && !(state.getBlock() instanceof FarmlandBlock)))continue;
             var local=hit.subtract(Vec3d.of(side.getVector()).multiply(1e-5)).subtract(Vec3d.of(owner));
             var shape=NativeShapes.occupied(world,owner,world.getBlockState(owner),stored.halfOffset());
             if(shape.getBoundingBoxes().stream().anyMatch(box->box.expand(1e-6).contains(local)))
-                return new Source(owner,owner.getY()*2+stored.halfOffset(),2);
+                return new Source(owner,owner.getY()*2+stored.halfOffset(),
+                        state.getBlock() instanceof SlabBlock && state.get(SlabBlock.TYPE)!=net.minecraft.block.enums.SlabType.DOUBLE?1:2,true);
         }
         return null;
     }

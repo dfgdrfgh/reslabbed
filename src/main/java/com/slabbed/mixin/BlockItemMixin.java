@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class BlockItemMixin {
     @Inject(method="place(Lnet/minecraft/item/ItemPlacementContext;)Lnet/minecraft/util/ActionResult;",at=@At("HEAD"),cancellable=true)
     private void slabbed$physicalPlace(ItemPlacementContext context,CallbackInfoReturnable<ActionResult> cir) {
+        if(com.slabbed.nativeblock.NativePlacement.active(context.getWorld(),context.getBlockPos()))return;
         var result=CellPlacement.place((BlockItem)(Object)this,context);
         if(result!=null) cir.setReturnValue(result);
     }
