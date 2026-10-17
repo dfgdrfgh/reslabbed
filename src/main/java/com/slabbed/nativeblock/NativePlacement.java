@@ -50,8 +50,8 @@ public final class NativePlacement {
             int y=-Math.floorDiv(-origin,2);owner=new BlockPos(x,y,z);half=origin-y*2;
         }
         var plan=new Plan(world);var previous=ACTIVE.get();ACTIVE.set(plan);
-        var context=new SeatContext(original,owner);
         try {
+            var context=new SeatContext(original,owner);
             if(!prepare(item,context,plan,owner,half)) {
                 if(source==null || original.getSide()!=Direction.DOWN || half!=-1)return ActionResult.FAIL;
                 owner=owner.down();half=1;context=new SeatContext(original,owner);

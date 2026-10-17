@@ -66,6 +66,9 @@ public final class NativeSeatTest {
         t.assertTrue(seat!=null && seat.halfOffset()==-1 && seat.equals(com.slabbed.nativeblock.NativeSeats.seat(world,head)),"bed halves share frozen seat");
         var mattress=new net.minecraft.util.math.Box(base.getX()+.3,base.getY()+.65,base.getZ()+.3,base.getX()+.7,base.getY()+.8,base.getZ()+.7);
         var bedState=world.getBlockState(foot);
+        var expectedCollision=com.slabbed.nativeblock.NativeShapes.collision(world,foot,bedState).offset(0,-.5,0);
+        t.assertFalse(net.minecraft.util.shape.VoxelShapes.matchesAnywhere(expectedCollision,bedState.getCollisionShape(world,foot),net.minecraft.util.function.BooleanBiFunction.NOT_SAME),"cached bed collision applies seat exactly once");
+        t.assertFalse(net.minecraft.util.shape.VoxelShapes.matchesAnywhere(expectedCollision,bedState.getCollisionShape(world,foot,net.minecraft.block.ShapeContext.absent()),net.minecraft.util.function.BooleanBiFunction.NOT_SAME),"context bed collision applies seat exactly once");
         System.out.println("PHYSICAL_NATIVE_BED_COLLISION_DIAG owner="+foot+" fringe="+bedState.exceedsCube()
                 +" raw="+com.slabbed.nativeblock.NativeShapes.collision(world,foot,bedState).getBoundingBox()
                 +" outline="+bedState.getOutlineShape(world,foot).getBoundingBox()

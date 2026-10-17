@@ -78,7 +78,8 @@ public final class NativeSupport {
         }
         for(int n=-1;n<=1;n++) {
             var nativePos=pos.up(n);var state=world.getBlockState(nativePos);
-            if(state.getBlock() instanceof SlabBlock || !PieceRules.supports(state))continue;
+            if((state.getBlock() instanceof SlabBlock && state.get(SlabBlock.TYPE)!=net.minecraft.block.enums.SlabType.DOUBLE)
+                    || !PieceRules.supports(state))continue;
             int start=nativePos.getY()*2+(int)Math.round(NativeSeats.offset(world,nativePos)*2);
             if(direction==Direction.DOWN?start+2==contact:start==contact)return true;
         }
@@ -96,7 +97,8 @@ public final class NativeSupport {
         }
         for(int n=-1;n<=1;n++) {
             var nativePos=pos.up(n);var state=world.getBlockState(nativePos);
-            if(state.getBlock() instanceof SlabBlock || !PieceRules.supports(state))continue;
+            if((state.getBlock() instanceof SlabBlock && state.get(SlabBlock.TYPE)!=net.minecraft.block.enums.SlabType.DOUBLE)
+                    || !PieceRules.supports(state))continue;
             int start=nativePos.getY()*2+(int)Math.round(NativeSeats.offset(world,nativePos)*2);
             if(start<=origin && start+2>origin)return true;
         }

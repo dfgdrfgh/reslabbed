@@ -18,15 +18,16 @@ public final class NativeShapes {
     private static final ThreadLocal<Integer> RAW=ThreadLocal.withInitial(()->0);
     private NativeShapes() {}
     public static boolean raw() {return RAW.get()>0;}
-    public static VoxelShape outline(BlockView world,BlockPos pos,BlockState state) {
+    public static VoxelShape withRaw(java.util.function.Supplier<VoxelShape> query) {
         RAW.set(RAW.get()+1);
-        try {return state.getOutlineShape(world,pos,ShapeContext.absent());}
+        try {return query.get();}
         finally {RAW.set(RAW.get()-1);}
     }
+    public static VoxelShape outline(BlockView world,BlockPos pos,BlockState state) {
+        return withRaw(()->state.getOutlineShape(world,pos,ShapeContext.absent()));
+    }
     public static VoxelShape collision(BlockView world,BlockPos pos,BlockState state) {
-        RAW.set(RAW.get()+1);
-        try {return state.getCollisionShape(world,pos,ShapeContext.absent());}
-        finally {RAW.set(RAW.get()-1);}
+        return withRaw(()->state.getCollisionShape(world,pos,ShapeContext.absent()));
     }
     public static VoxelShape occupied(BlockView world,BlockPos owner,BlockState state,int halfOffset) {
         return VoxelShapes.union(outline(world,owner,state),collision(world,owner,state)).offset(0,halfOffset*.5,0);
