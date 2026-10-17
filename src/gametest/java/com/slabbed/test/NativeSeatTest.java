@@ -231,4 +231,20 @@ public final class NativeSeatTest {
         t.assertTrue(world.getBlockEntity(owner)==entity && seat.equals(com.slabbed.nativeblock.NativeSeats.seat(world,owner)),"filling support retains sign entity and fixed seat");
         t.complete();
     }
+
+    @GameTest(templateName="fabric-gametest-api-v1:empty")
+    public void fillingSlabUnderStandingSignRejectsOverlapWithoutConsumption(TestContext t) {
+        var world=t.getWorld();var base=t.getAbsolutePos(new BlockPos(3,3,3));
+        var slab=Blocks.OAK_SLAB.getDefaultState();world.setBlockState(base,slab);
+        var player=builder(t,base,Items.OAK_SIGN,1);
+        t.assertTrue(place(player,base,Direction.UP,base.getY()+.5).isAccepted(),"native standing sign placed");
+        var owner=base.up();var entity=world.getBlockEntity(owner);
+        var seat=com.slabbed.nativeblock.NativeSeats.seat(world,owner);
+        player.setStackInHand(Hand.MAIN_HAND,new ItemStack(Items.OAK_SLAB,2));
+        var hit=new BlockHitResult(new Vec3d(base.getX()+.1,base.getY()+.5,base.getZ()+.1),Direction.UP,base,false);
+        t.assertFalse(player.getMainHandStack().useOnBlock(new ItemUsageContext(player,Hand.MAIN_HAND,hit)).isAccepted(),"slab fill rejects projected sign overlap");
+        t.assertTrue(world.getBlockState(base)==slab && world.getBlockEntity(owner)==entity,"rejected fill preserves slab and native sign");
+        t.assertTrue(seat!=null && seat.equals(com.slabbed.nativeblock.NativeSeats.seat(world,owner)),"rejected fill preserves fixed sign seat");
+        t.assertTrue(player.getMainHandStack().getCount()==2,"rejected fill consumes no slab");t.complete();
+    }
 }
