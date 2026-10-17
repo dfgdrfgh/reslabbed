@@ -16,6 +16,8 @@ public final class CellClientLifecycleRegression {
     private static BlockPos watched;
     private static BlockState original;
     private static int phase,frames,vertices,completeFrames;
+    private static int rendererCalls;
+    private static String rendererState="not_called";
     private static boolean installed;
     private static boolean watchingHits;
     private static BlockState hitMaterial;
@@ -27,7 +29,7 @@ public final class CellClientLifecycleRegression {
     public static boolean transition(MinecraftClient client,BlockPos pos) {
         if(!installed) {
             installed=true;
-            net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents.START.register(context->vertices=0);
+            net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents.START.register(context->{vertices=0;rendererCalls=0;rendererState="not_called";});
             net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents.END.register(context->afterFrame(client));
         }
         if(phase==0) {
@@ -65,7 +67,10 @@ public final class CellClientLifecycleRegression {
         if(phase==3) {
             check(client.world.getBlockEntity(watched) instanceof CellBlockEntity cell && cell.contents().fragments().size()==2,
                     "rendered frame exposed partial carrier contents");
-            check(vertices>0,"carrier missing from live renderer in frame "+frames);
+            var entity=(CellBlockEntity)client.world.getBlockEntity(watched);
+            check(vertices>0,"carrier missing from live renderer in frame "+frames+" calls="+rendererCalls
+                    +" entry="+rendererState+" world="+entity.hasWorld()+" bounds="+entity.renderBounds()
+                    +" chunkContains="+client.world.getWorldChunk(watched).getBlockEntities().containsKey(watched));
             completeFrames++;
         }
     }
@@ -101,6 +106,10 @@ public final class CellClientLifecycleRegression {
     }
     public static boolean watches(BlockPos pos) { return watched!=null && watched.equals(pos); }
     public static void vertex() { vertices++; }
+    public static void renderer(CellBlockEntity cell,boolean visible) {
+        if(!watches(cell.getPos()))return;
+        rendererCalls++;rendererState="world="+cell.hasWorld()+",bounds="+cell.renderBounds()+",visible="+visible;
+    }
 
     /** Arm before holding the real attack key in survival; captures actual dust constructors, including vanilla's direct path. */
     public static void beginHits(BlockState material,double low,double high) {

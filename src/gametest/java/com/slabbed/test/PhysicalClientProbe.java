@@ -38,6 +38,7 @@ public final class PhysicalClientProbe implements ClientModInitializer {
     private boolean reopen;
     private int clearanceStage;
     private boolean hitParticlesChecked;
+    private boolean lifecycleChecked;
     private double top=BASE.getY()+.5;
     @Override public void onInitializeClient() {
         if(!Boolean.getBoolean("slabbed.physicalProbe")) return;
@@ -111,6 +112,12 @@ public final class PhysicalClientProbe implements ClientModInitializer {
             if(pending || !client.world.getBlockState(BASE.up()).isAir())return;
             clearanceStage=4;System.out.println("PHYSICAL_CLEARANCE_PASS");
         }
+        if(!reopen && !lifecycleChecked && !Boolean.getBoolean("slabbed.controlProbe")) {
+            var fixture=BASE.east().up();
+            aimAt(client,Vec3d.ofCenter(fixture));
+            if(!CellClientLifecycleRegression.transition(client,fixture))return;
+            lifecycleChecked=true;
+        }
         if(stage==1) { if(pending)return; started=ticks; stage=2; teleport(client); return; }
         if(stage==2) {
             if(ticks-started<5 || client.player.getPos().squaredDistanceTo(new Vec3d(BASE.getX()+2.5,top+1,BASE.getZ()+.5))>.02) return;
@@ -153,11 +160,6 @@ public final class PhysicalClientProbe implements ClientModInitializer {
         }
         if(stage==4) {
             if(ticks-started<100 || pending) return;
-            if(!reopen && !Boolean.getBoolean("slabbed.controlProbe")) {
-                var fixture=new BlockPos(BASE.getX()+1,(int)Math.floor(top)-1,BASE.getZ());
-                aimAt(client,Vec3d.ofCenter(fixture));
-                if(!CellClientLifecycleRegression.transition(client,fixture))return;
-            }
             CellRenderAudit.verify(top);
             aim(client);
             var ray=client.player.raycast(client.player.getBlockInteractionRange(),1,false);

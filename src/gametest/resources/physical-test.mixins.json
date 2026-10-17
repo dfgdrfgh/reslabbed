@@ -6,6 +6,7 @@
     "CellClearancePacketCaptureMixin",
     "CellRenderCaptureMixin",
     "CellLifecycleRenderCaptureMixin",
+    "CellFramePresenceMixin",
     "CellDustCaptureMixin",
     "CellPendingUpdateAccess",
     "CellParticleCaptureMixin",
