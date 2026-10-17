@@ -43,6 +43,7 @@ public final class NativeFunctionalClientProbe {
         if(Boolean.getBoolean("slabbed.controlProbe"))return true;
         if(failure!=null)throw new AssertionError("native functional server probe failed",failure);
         if(stage==99)return true;
+        NativeRenderAudit.tick(client);
         ticks++;
         check(ticks-started<240,"native functional timeout stage="+stage+" screen="+client.currentScreen);
         if(pending)return false;

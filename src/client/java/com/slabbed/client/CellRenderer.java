@@ -19,7 +19,9 @@ public final class CellRenderer implements BlockEntityRenderer<CellBlockEntity> 
     }
     public CellRenderer(BlockEntityRendererFactory.Context context) {}
     @Override public void render(CellBlockEntity cell,float tickDelta,MatrixStack matrices,VertexConsumerProvider vertices,int light,int overlay) {
+        CellRenderSync.registered(cell);
         if(cell.getWorld()==null || cell.renderBounds()==null || (frustum!=null && !frustum.isVisible(cell.renderBounds())))return;
+        if(!CellRenderSync.draw(cell))return;
         var renderer=MinecraftClient.getInstance().getBlockRenderManager();
         for(var part:cell.contents().fragments()) {
             if(part.offset()<0) continue;

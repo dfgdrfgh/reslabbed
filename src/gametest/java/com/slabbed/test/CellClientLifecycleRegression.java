@@ -71,6 +71,7 @@ public final class CellClientLifecycleRegression {
             check(vertices>0,"carrier missing from live renderer in frame "+frames+" calls="+rendererCalls
                     +" entry="+rendererState+" world="+entity.hasWorld()+" bounds="+entity.renderBounds()
                     +" chunkContains="+client.world.getWorldChunk(watched).getBlockEntities().containsKey(watched));
+            check(vertices==48,"two slab carrier submitted duplicate or incomplete geometry: "+vertices);
             completeFrames++;
         }
     }

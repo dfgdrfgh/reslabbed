@@ -24,6 +24,7 @@ public final class NativeRenderAudit {
     private static final Map<BlockPos,Observation> ENTITIES=new ConcurrentHashMap<>();
     private static final Map<BlockPos,Observation> MODELS=new ConcurrentHashMap<>();
     private static final Set<BlockPos> TERRAIN_ENTITIES=ConcurrentHashMap.newKeySet();
+    private static final Set<BlockPos> PENDING_REMESH=ConcurrentHashMap.newKeySet();
     private static final class Observation {
         final double expectedMin,expectedMax;
         int vertices;
@@ -124,7 +125,20 @@ public final class NativeRenderAudit {
         MODELS.put(owner.toImmutable(),new Observation(owner.getY()-.5,owner.getY()+.5));
         remesh(client,owner);
     }
+    /** Sodium ignores rebuild requests until the initial section mesh has been uploaded. */
+    public static void tick(MinecraftClient client) {
+        for(var owner:PENDING_REMESH)if(client.worldRenderer.isRenderingReady(owner)) {
+            PENDING_REMESH.remove(owner);
+            System.out.println("PHYSICAL_NATIVE_MODEL_REMESH_READY owner="+owner);
+            remesh(client,owner);
+        }
+    }
     private static void remesh(MinecraftClient client,BlockPos owner) {
+        if(!client.worldRenderer.isRenderingReady(owner)) {
+            PENDING_REMESH.add(owner.toImmutable());
+            System.out.println("PHYSICAL_NATIVE_MODEL_REMESH_DEFERRED owner="+owner);
+            return;
+        }
         client.worldRenderer.scheduleBlockRenders(owner.getX()-1,owner.getY()-1,owner.getZ()-1,
                 owner.getX()+1,owner.getY()+1,owner.getZ()+1);
     }
@@ -146,6 +160,7 @@ public final class NativeRenderAudit {
         if(observation!=null)observation.complete();
     }
     public static void verifyModel(BlockPos owner) {
+        PENDING_REMESH.remove(owner);
         var observation=MODELS.remove(owner);
         if(observation==null)throw new AssertionError("native model fixture was not armed at "+owner);
         observation.verify("model="+owner);
