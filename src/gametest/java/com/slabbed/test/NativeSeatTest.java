@@ -250,4 +250,17 @@ public final class NativeSeatTest {
         t.assertTrue(seat!=null && seat.equals(com.slabbed.nativeblock.NativeSeats.seat(world,owner)),"rejected fill preserves fixed sign seat");
         t.assertTrue(player.getMainHandStack().getCount()==2,"rejected fill consumes no slab");t.complete();
     }
+
+    @GameTest(templateName="fabric-gametest-api-v1:empty")
+    public void authoritativeNativeSeatSurvivesLaterMatchingBlockState(TestContext t) {
+        var world=t.getWorld();var owner=t.getAbsolutePos(new BlockPos(3,3,3));
+        var bed=Blocks.RED_BED.getDefaultState();
+        var seat=new com.slabbed.nativeblock.NativeSeats.Seat(-1,"minecraft:red_bed");
+        com.slabbed.nativeblock.NativeSeats.put(world,owner,seat);
+        world.setBlockState(owner,bed,Block.NOTIFY_LISTENERS);
+        t.assertTrue(seat.equals(com.slabbed.nativeblock.NativeSeats.seat(world,owner)),"matching block publication retains preceding native seat data");
+        world.setBlockState(owner,Blocks.STONE.getDefaultState(),Block.NOTIFY_LISTENERS);
+        t.assertFalse(com.slabbed.nativeblock.NativeSeats.snapshot(world.getWorldChunk(owner)).containsKey(Long.toString(owner.asLong())),"replacement clears mismatched native seat data");
+        t.complete();
+    }
 }
