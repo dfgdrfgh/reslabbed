@@ -227,7 +227,10 @@ public final class NativeSeatTest {
         var owner=base.east().up();var entity=world.getBlockEntity(owner);
         var seat=com.slabbed.nativeblock.NativeSeats.seat(world,owner);
         t.assertTrue(entity instanceof SignBlockEntity && seat!=null && seat.halfOffset()==-1,"sign uses fixed native wall seat");
-        world.setBlockState(base,top.with(net.minecraft.block.SlabBlock.TYPE,net.minecraft.block.enums.SlabType.DOUBLE),Block.NOTIFY_ALL);
+        player.setStackInHand(Hand.MAIN_HAND,new ItemStack(Items.OAK_SLAB,2));
+        t.assertTrue(place(player,base,Direction.DOWN,base.getY()+.5).isAccepted(),"slab item fills valid wall support");
+        t.assertTrue(world.getBlockState(base).get(net.minecraft.block.SlabBlock.TYPE)==net.minecraft.block.enums.SlabType.DOUBLE
+                && player.getMainHandStack().getCount()==1,"valid slab fill consumes once");
         t.assertTrue(world.getBlockEntity(owner)==entity && seat.equals(com.slabbed.nativeblock.NativeSeats.seat(world,owner)),"filling support retains sign entity and fixed seat");
         t.complete();
     }

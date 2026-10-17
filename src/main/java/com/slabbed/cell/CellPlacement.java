@@ -59,9 +59,10 @@ public final class CellPlacement {
         if(face==Direction.UP) origin+=fragment.length();
         else if(face==Direction.DOWN) origin-=length;
         else { x+=face.getOffsetX(); z+=face.getOffsetZ(); }
-        // Matching vanilla slabs retain vanilla's single-cell double-slab behavior.
+        // Vanilla slab merges still need clearance from native objects projecting into the added half.
         if(clickedState.getBlock() instanceof SlabBlock && item.getBlock()==clickedState.getBlock()
-                && face.getAxis().isVertical() && clickedState.get(SlabBlock.TYPE)!=SlabType.DOUBLE) return null;
+                && face.getAxis().isVertical() && clickedState.get(SlabBlock.TYPE)!=SlabType.DOUBLE)
+            return com.slabbed.nativeblock.NativeShapes.intersects(world,x,z,origin,state)?ActionResult.FAIL:null;
         var base=new BlockPos(x,com.slabbed.core.HalfGrid.at(origin).cellY(),z);
         if(!player.getAbilities().allowModifyWorld || !world.canPlayerModifyAt(player,base)
                 || !world.canPlayerModifyAt(player,new BlockPos(x,com.slabbed.core.HalfGrid.at(origin+length-1).cellY(),z))) return ActionResult.FAIL;

@@ -35,7 +35,7 @@ jobs:
           bash gradlew --no-daemon --console=plain build runGameTest writeProbeRuntime
           python3 tools/verify-test-count.py
       - name: Native adapter diagnosis
-        if: always() && matrix.variant == 'indigo'
+        if: failure() && matrix.variant == 'indigo'
         run: |
           bash gradlew --no-daemon --console=plain genSources
           python3 tools/native-api-diagnostics.py
