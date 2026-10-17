@@ -34,11 +34,6 @@ jobs:
           rm -rf build/run/gameTest
           bash gradlew --no-daemon --console=plain build runGameTest writeProbeRuntime
           python3 tools/verify-test-count.py
-      - name: Native adapter diagnosis
-        if: failure() && matrix.variant == 'indigo'
-        run: |
-          bash gradlew --no-daemon --console=plain genSources
-          python3 tools/native-api-diagnostics.py
       - name: Stage complete latest pack
         if: matrix.variant == 'pack' || matrix.variant == 'control'
         env:

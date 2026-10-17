@@ -91,7 +91,7 @@ public final class NativeFunctionalClientProbe {
             aim(client,new Vec3d(18.5,64.25,8.5));NativeRenderAudit.beginBlockEntity(client,SIGN);next(60);return false;
         }
         if(stage==60) {
-            if(ticks-started<8)return false;
+            if(ticks-started<8 || !NativeRenderAudit.readyBlockEntity(SIGN))return false;
             NativeRenderAudit.verifyBlockEntity(SIGN);move(client,24.5,65,8.5);next(7);return false;
         }
         if(stage==7) {
@@ -106,7 +106,7 @@ public final class NativeFunctionalClientProbe {
             NativeRenderAudit.beginBlockEntity(client,FOOT);NativeRenderAudit.beginBlockEntity(client,HEAD);next(61);return false;
         }
         if(stage==61) {
-            if(ticks-started<8)return false;
+            if(ticks-started<8 || !NativeRenderAudit.readyBlockEntity(FOOT) || !NativeRenderAudit.readyBlockEntity(HEAD))return false;
             NativeRenderAudit.verifyBlockEntity(FOOT);NativeRenderAudit.verifyBlockEntity(HEAD);
             equip(client,ItemStack.EMPTY);use(client,FOOT,new Vec3d(22.5,64.0625,8.5));next(9);return false;
         }
@@ -137,7 +137,7 @@ public final class NativeFunctionalClientProbe {
             aim(client,new Vec3d(26.5,64.5,8.5));NativeRenderAudit.beginModel(client,TABLE);next(62);return false;
         }
         if(stage==62) {
-            if(ticks-started<16)return false;
+            if(ticks-started<16 || !NativeRenderAudit.readyModel(TABLE))return false;
             NativeRenderAudit.verifyModel(TABLE);
             equip(client,ItemStack.EMPTY);use(client,TABLE,new Vec3d(26.5,64.5,8.5));next(13);return false;
         }
@@ -168,17 +168,17 @@ public final class NativeFunctionalClientProbe {
             aim(client,new Vec3d(18.5,64.25,8.5));NativeRenderAudit.beginBlockEntity(client,SIGN);next(63);return false;
         }
         if(stage==63) {
-            if(ticks-started<8)return false;
+            if(ticks-started<8 || !NativeRenderAudit.readyBlockEntity(SIGN))return false;
             NativeRenderAudit.verifyBlockEntity(SIGN);aim(client,new Vec3d(22.5,64.0625,9));
             NativeRenderAudit.beginBlockEntity(client,FOOT);NativeRenderAudit.beginBlockEntity(client,HEAD);next(64);return false;
         }
         if(stage==64) {
-            if(ticks-started<8)return false;
+            if(ticks-started<8 || !NativeRenderAudit.readyBlockEntity(FOOT) || !NativeRenderAudit.readyBlockEntity(HEAD))return false;
             NativeRenderAudit.verifyBlockEntity(FOOT);NativeRenderAudit.verifyBlockEntity(HEAD);
             aim(client,new Vec3d(26.5,64.5,8.5));NativeRenderAudit.beginModel(client,TABLE);next(65);return false;
         }
         if(stage==65) {
-            if(ticks-started<16)return false;
+            if(ticks-started<16 || !NativeRenderAudit.readyModel(TABLE))return false;
             NativeRenderAudit.verifyModel(TABLE);
             server(client,()->{
                 var player=client.getServer().getPlayerManager().getPlayer(client.player.getUuid());

@@ -84,22 +84,29 @@ public final class PhysicalClientProbe implements ClientModInitializer {
             }); return;
         }
         if(!reopen && !ready) return;
-        if(!reopen && clearanceStage<3) {
+        if(!reopen && clearanceStage<4) {
             if(clearanceStage==0) { if(pending)return;teleport(client);clearanceStage=1;started=ticks;return; }
             if(clearanceStage==1) {
                 if(ticks-started<10 || !client.world.getBlockState(BASE.up()).isOf(Blocks.STONE))return;
                 var stack=new ItemStack(Items.STONE,64);client.player.setStackInHand(Hand.MAIN_HAND,stack);
                 client.interactionManager.clickCreativeStack(stack.copy(),36+client.player.getInventory().selectedSlot);
                 var hit=new BlockHitResult(new Vec3d(BASE.getX()+.5,BASE.getY()+.5,BASE.getZ()+.5),Direction.UP,BASE,false);
+                CellClearancePacketAudit.arm(BASE);
                 var result=client.interactionManager.interactBlock(client.player,Hand.MAIN_HAND,hit);
                 boolean control=Boolean.getBoolean("slabbed.controlProbe");
                 System.out.println("PHYSICAL_CLEARANCE_OBSERVED accepted="+result.isAccepted()+" control="+control);
                 check(result.isAccepted()==control,"client accepted placement into an occupied upper half");
-                server(client,()->client.getServer().getOverworld().setBlockState(BASE.up(),Blocks.AIR.getDefaultState(),Block.NOTIFY_ALL));
                 clearanceStage=2;return;
             }
+            if(clearanceStage==2) {
+                if(!CellClearancePacketAudit.completed)return;
+                check(CellClearancePacketAudit.unchanged,"blocked placement changed the server fixture");
+                System.out.println("PHYSICAL_CLEARANCE_SERVER_PACKET_REJECTED");
+                server(client,()->client.getServer().getOverworld().setBlockState(BASE.up(),Blocks.AIR.getDefaultState(),Block.NOTIFY_ALL));
+                clearanceStage=3;return;
+            }
             if(pending || !client.world.getBlockState(BASE.up()).isAir())return;
-            clearanceStage=3;System.out.println("PHYSICAL_CLEARANCE_PASS");
+            clearanceStage=4;System.out.println("PHYSICAL_CLEARANCE_PASS");
         }
         if(stage==1) { if(pending)return; started=ticks; stage=2; teleport(client); return; }
         if(stage==2) {

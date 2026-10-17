@@ -27,9 +27,13 @@ public final class NativeRenderAudit {
     private static final class Observation {
         final double expectedMin,expectedMax;
         int vertices;
+        boolean completed;
         double min=Double.POSITIVE_INFINITY,max=Double.NEGATIVE_INFINITY;
         Observation(double expectedMin,double expectedMax) {this.expectedMin=expectedMin;this.expectedMax=expectedMax;}
         synchronized void vertex(double y) {vertices++;min=Math.min(min,y);max=Math.max(max,y);}
+        synchronized boolean ready() {return vertices>=4;}
+        synchronized void complete() {completed=true;}
+        synchronized boolean modelReady() {return completed && vertices>=4;}
         synchronized void verify(String name) {
             if(vertices<4 || !Double.isFinite(expectedMin) || !Double.isFinite(expectedMax)
                     || Math.abs(min-expectedMin)>.002 || Math.abs(max-expectedMax)>.002)
@@ -69,6 +73,12 @@ public final class NativeRenderAudit {
         if(observation==null)return target;
         double cameraY=MinecraftClient.getInstance().gameRenderer.getCamera().getPos().y;
         return layer->new Captured(target.getBuffer(layer),observation,cameraY);
+    }
+    /** Wait for the active body pipeline; terrain sign overlays may be culled independently. */
+    public static boolean readyBlockEntity(BlockPos owner) {
+        if(TERRAIN_ENTITIES.contains(owner))return readyModel(owner);
+        var observation=ENTITIES.get(owner);
+        return observation!=null && observation.ready();
     }
     public static void verifyBlockEntity(BlockPos owner) {
         var observation=ENTITIES.remove(owner);
@@ -126,6 +136,14 @@ public final class NativeRenderAudit {
     public static void quad(BlockPos owner,QuadView quad) {
         var observation=MODELS.get(owner);if(observation==null)return;
         for(int n=0;n<4;n++)observation.vertex(owner.getY()+quad.y(n));
+    }
+    public static boolean readyModel(BlockPos owner) {
+        var observation=MODELS.get(owner);
+        return observation!=null && observation.modelReady();
+    }
+    public static void modelComplete(BlockPos owner) {
+        var observation=MODELS.get(owner);
+        if(observation!=null)observation.complete();
     }
     public static void verifyModel(BlockPos owner) {
         var observation=MODELS.remove(owner);

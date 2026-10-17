@@ -28,5 +28,6 @@ public abstract class NativeModelQuadCaptureMixin {
     private void slabbed$finishEmittedQuads(BlockRenderView world,BlockState state,BlockPos pos,Supplier<Random> random,
                                            RenderContext context,CallbackInfo ci) {
         context.popTransform();
+        NativeRenderAudit.modelComplete(pos);
     }
 }
