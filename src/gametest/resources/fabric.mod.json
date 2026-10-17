@@ -9,7 +9,8 @@
       "com.slabbed.test.PhysicalCellTest",
       "com.slabbed.test.NativeSeatTest",
       "com.slabbed.test.NativeParityTest",
-      "com.slabbed.test.NativeHangingTest"
+      "com.slabbed.test.NativeHangingTest",
+      "com.slabbed.test.OriginalFamiliesTest"
     ],
     "client": [
       "com.slabbed.test.PhysicalClientProbe"
