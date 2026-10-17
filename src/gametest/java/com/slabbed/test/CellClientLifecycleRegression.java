@@ -40,6 +40,7 @@ public final class CellClientLifecycleRegression {
             phase=2;frames=0;
         } else if(phase==2 && frames>=5) {
             var data=new CellBlockEntity(watched,Slabbed.CELL.getDefaultState());
+            data.setWorld(client.world);
             data.setContents(CellContents.<BlockState>empty()
                     .add(new CellContents.Fragment<>(0,1,Blocks.OAK_SLAB.getDefaultState()))
                     .add(new CellContents.Fragment<>(1,1,Blocks.BIRCH_SLAB.getDefaultState())));
@@ -74,6 +75,7 @@ public final class CellClientLifecycleRegression {
         predictions.addPendingUpdate(watched,Blocks.OAK_SLAB.getDefaultState(),client.player);
         client.getNetworkHandler().onBlockUpdate(new BlockUpdateS2CPacket(watched,Slabbed.CELL.getDefaultState()));
         var data=new CellBlockEntity(watched,Slabbed.CELL.getDefaultState());
+        data.setWorld(client.world);
         data.setContents(CellContents.<BlockState>empty()
                 .add(new CellContents.Fragment<>(0,1,Blocks.OAK_SLAB.getDefaultState()))
                 .add(new CellContents.Fragment<>(1,1,Blocks.BIRCH_SLAB.getDefaultState())));
@@ -91,6 +93,7 @@ public final class CellClientLifecycleRegression {
         client.getNetworkHandler().onBlockUpdate(new BlockUpdateS2CPacket(watched,Slabbed.CELL.getDefaultState()));
         client.getNetworkHandler().onBlockUpdate(new BlockUpdateS2CPacket(watched,Blocks.STONE.getDefaultState()));
         var stale=new CellBlockEntity(watched,Slabbed.CELL.getDefaultState());
+        stale.setWorld(client.world);
         stale.setContents(CellContents.<BlockState>empty().add(new CellContents.Fragment<>(0,1,Blocks.OAK_SLAB.getDefaultState())));
         client.getNetworkHandler().onBlockEntityUpdate(BlockEntityUpdateS2CPacket.create(stale,
                 (entity,lookup)->entity.createNbt(client.world.getRegistryManager())));

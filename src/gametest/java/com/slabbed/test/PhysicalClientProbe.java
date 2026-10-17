@@ -102,6 +102,9 @@ public final class PhysicalClientProbe implements ClientModInitializer {
                 if(!CellClearancePacketAudit.completed)return;
                 check(CellClearancePacketAudit.unchanged,"blocked placement changed the server fixture");
                 System.out.println("PHYSICAL_CLEARANCE_SERVER_PACKET_REJECTED");
+                if(Boolean.getBoolean("slabbed.controlProbe")) {
+                    finish(client,"PHYSICAL_CONTROL_REPRODUCED_BLOCKED_PLACEMENT");return;
+                }
                 server(client,()->client.getServer().getOverworld().setBlockState(BASE.up(),Blocks.AIR.getDefaultState(),Block.NOTIFY_ALL));
                 clearanceStage=3;return;
             }

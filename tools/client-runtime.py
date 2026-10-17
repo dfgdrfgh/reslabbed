@@ -63,7 +63,7 @@ assert games;add(games[0])
 indexes=list((home/'caches/fabric-loom').rglob('indexes/*17*.json'));assert len(indexes)==1;index=indexes[0]
 (game/'options.txt').write_text('renderClouds:false\nrenderDistance:6\nmaxFps:60\n')
 print('PHYSICAL_JAR_SHA256',hashlib.sha256(release[0].read_bytes()).hexdigest(),flush=True)
-for phase in ['fresh','reopen']:
+for phase in (['fresh'] if args.control else ['fresh','reopen']):
     marker=game/'physical-pass.txt';marker.unlink(missing_ok=True)
     command=[str(Path(os.environ['JAVA_HOME'])/'bin/java'),'-Xmx4G','-Dfabric.development=false','-Dslabbed.physicalProbe=true',
              '-Dslabbed.controlProbe='+str(args.control).lower(),
@@ -78,14 +78,12 @@ for phase in ['fresh','reopen']:
     lines=output.read_text(errors='replace').splitlines()
     for line in lines:
         if any(s in line for s in ['PHYSICAL_','Caused by:','AssertionError','Exception']):print(line[:1200])
-    if args.control and phase=='reopen':
-        rows=[line for line in lines if 'PHYSICAL_FEEDBACK_OBSERVED' in line]
-        assert result.returncode!=0 and rows,'Control did not reproduce the feedback regression'
-        row=rows[-1]
-        assert 'terrainLighting=false breakParticles=0 material=null sounds=0 sound=null' in row,row
-        assert int(row.rsplit('deferred=',1)[1])>0,row
-        assert int(row.split('delayed=',1)[1].split()[0])>0,row
-        print('PHYSICAL_CONTROL_REPRODUCED_LIGHTING_BREAK_EFFECTS_AND_DEFERRED_MESH',flush=True)
+    if args.control:
+        assert result.returncode==0 and marker.exists(),'Control did not finish its blocked-placement check'
+        assert any('PHYSICAL_CLEARANCE_OBSERVED accepted=true control=true' in line for line in lines),'Control unexpectedly rejected the obstructed click'
+        assert any('PHYSICAL_CLEARANCE_SERVER_PACKET_REJECTED' in line for line in lines),'Control did not receive server rejection'
+        assert marker.read_text().strip()=='PHYSICAL_CONTROL_REPRODUCED_BLOCKED_PLACEMENT','Control marker mismatch'
+        print(marker.read_text().strip(),flush=True)
         continue
     if result.returncode!=0 or not marker.exists():print('\n'.join(lines[-100:]));raise AssertionError('Physical client failed '+phase)
     if phase=='fresh':
