@@ -101,6 +101,7 @@ public final class NativeFunctionalClientProbe {
         if(stage==8) {
             if(!poll(client,()->nativeBed(client)))return false;
             if(!client.world.getBlockState(FOOT).isOf(Blocks.RED_BED) || !client.world.getBlockState(HEAD).isOf(Blocks.RED_BED))return false;
+            for(var pos:new BlockPos[]{FOOT,HEAD})if(com.slabbed.nativeblock.NativeSeats.offset(client.world,pos)!=-.5)return false;
             verifyBedGeometry(client);aim(client,new Vec3d(22.5,64.0625,9));
             NativeRenderAudit.beginBlockEntity(client,FOOT);NativeRenderAudit.beginBlockEntity(client,HEAD);next(61);return false;
         }

@@ -3,6 +3,7 @@ package com.slabbed.test.mixin;
 import com.slabbed.test.NativeRenderAudit;
 import net.fabricmc.fabric.api.renderer.v1.render.RenderContext;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.render.model.BakedModel;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.BlockRenderView;
@@ -20,6 +21,7 @@ public abstract class NativeModelQuadCaptureMixin {
     @Inject(method="emitBlockQuads",at=@At("HEAD"),remap=false)
     private void slabbed$observeEmittedQuads(BlockRenderView world,BlockState state,BlockPos pos,Supplier<Random> random,
                                             RenderContext context,CallbackInfo ci) {
+        NativeRenderAudit.renderPath(pos,(BakedModel)(Object)this,"native_emit");
         context.pushTransform(quad->{NativeRenderAudit.quad(pos,quad);return true;});
     }
     @Inject(method="emitBlockQuads",at=@At("RETURN"),remap=false)

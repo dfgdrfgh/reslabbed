@@ -15,7 +15,9 @@ public abstract class NativeSeatLifecycleMixin {
     @Inject(method="setBlockState",at=@At("RETURN"))
     private void slabbed$clearRemovedSeat(BlockPos pos,BlockState next,boolean moved,CallbackInfoReturnable<BlockState> cir) {
         var before=cir.getReturnValue();var chunk=(WorldChunk)(Object)this;
-        if(before!=null && before.getBlock()!=next.getBlock() && !NativePlacement.active(chunk.getWorld(),pos))
+        // A matching synchronized pose can precede its block-state packet.
+        if(before!=null && before.getBlock()!=next.getBlock() && !NativePlacement.active(chunk.getWorld(),pos)
+                && NativeSeats.seat(chunk,pos)==null)
             NativeSeats.remove(chunk.getWorld(),pos);
     }
 }

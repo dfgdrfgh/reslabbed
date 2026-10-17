@@ -91,6 +91,8 @@ public final class NativeRenderAudit {
             var selector=Class.forName("fr.madu59.obe.client.util.meshing.SectionMeshingUtil")
                     .getMethod("getCorrectedModel",BlockState.class,BlockEntity.class,BakedModel.class);
             var model=(BakedModel)selector.invoke(null,state,entity,client.getBlockRenderManager().getModel(state));
+            System.out.println("PHYSICAL_NATIVE_MODEL_REFERENCE owner="+entity.getPos()+" selected="
+                    +(model==null?"null":model.getClass().getName())+" thread="+Thread.currentThread().getName());
             if(model instanceof NativeSeatModel seated)model=seated.getWrappedModel();
             if(model==null)return null;
             if(!model.isVanillaAdapter())throw new AssertionError("OBE reference must expose its unshifted baked quads");
@@ -115,6 +117,11 @@ public final class NativeRenderAudit {
     private static void remesh(MinecraftClient client,BlockPos owner) {
         client.worldRenderer.scheduleBlockRenders(owner.getX()-1,owner.getY()-1,owner.getZ()-1,
                 owner.getX()+1,owner.getY()+1,owner.getZ()+1);
+    }
+    public static void renderPath(BlockPos owner,BakedModel model,String stage) {
+        if(!MODELS.containsKey(owner))return;
+        System.out.println("PHYSICAL_NATIVE_MODEL_PATH owner="+owner+" stage="+stage+" model="
+                +(model==null?"null":model.getClass().getName())+" thread="+Thread.currentThread().getName());
     }
     public static void quad(BlockPos owner,QuadView quad) {
         var observation=MODELS.get(owner);if(observation==null)return;
