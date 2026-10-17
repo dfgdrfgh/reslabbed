@@ -8,7 +8,8 @@
     "fabric-gametest": [
       "com.slabbed.test.PhysicalCellTest",
       "com.slabbed.test.NativeSeatTest",
-      "com.slabbed.test.NativeParityTest"
+      "com.slabbed.test.NativeParityTest",
+      "com.slabbed.test.NativeHangingTest"
     ],
     "client": [
       "com.slabbed.test.PhysicalClientProbe"
