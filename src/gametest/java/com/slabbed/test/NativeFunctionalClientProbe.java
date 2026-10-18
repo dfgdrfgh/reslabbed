@@ -31,6 +31,7 @@ public final class NativeFunctionalClientProbe {
     private static final BlockPos SIGN_BASE=new BlockPos(18,63,8),SIGN=SIGN_BASE.up();
     private static final BlockPos BED_BASE=new BlockPos(22,63,8),FOOT=BED_BASE.up(),HEAD=FOOT.south();
     private static final BlockPos TABLE_BASE=new BlockPos(26,63,8),TABLE=TABLE_BASE.up();
+    private static final BlockPos LIGHT_OWNER=new BlockPos(30,64,8);
     private static final String MESSAGE="Physical seat";
     private static int stage,ticks,started;
     private static volatile boolean pending,observed;
@@ -59,6 +60,11 @@ public final class NativeFunctionalClientProbe {
                 for(var pos:new BlockPos[]{SIGN_BASE,BED_BASE,BED_BASE.south(),TABLE_BASE})
                     world.setBlockState(pos,Blocks.OAK_SLAB.getDefaultState(),Block.NOTIFY_ALL);
                 world.setBlockState(new BlockPos(24,64,8),Blocks.STONE.getDefaultState(),Block.NOTIFY_ALL);
+                for(int y=63;y<=66;y++)world.setBlockState(new BlockPos(30,y,8),Blocks.AIR.getDefaultState(),Block.NOTIFY_ALL);
+                world.setBlockState(LIGHT_OWNER,Blocks.BARREL.getDefaultState(),Block.NOTIFY_ALL);
+                com.slabbed.nativeblock.NativeSeats.put(world,LIGHT_OWNER,new com.slabbed.nativeblock.NativeSeats.Seat(-1,"minecraft:barrel"));
+                ((net.minecraft.block.entity.BarrelBlockEntity)world.getBlockEntity(LIGHT_OWNER)).setStack(0,new ItemStack(Items.DIAMOND,7));
+                check(com.slabbed.cell.CellWorld.place(world,30,8,129,Blocks.GLOWSTONE.getDefaultState()),"native light fixture has clear upper half");
                 world.setTimeOfDay(13000);
             });
             next(1);return false;
@@ -150,6 +156,8 @@ public final class NativeFunctionalClientProbe {
             server(client,()->client.getServer().getOverworld().setTimeOfDay(1000));next(14);return false;
         }
         if(stage==14) {
+            if(!poll(client,()->lightSource(client)) || client.world.getLightLevel(net.minecraft.world.LightType.BLOCK,LIGHT_OWNER)!=15)return false;
+            System.out.println("PHYSICAL_SUPPLEMENTAL_LIGHT_FRESH_PASS");
             System.out.println("PHYSICAL_NATIVE_FUNCTIONAL_PACKETS_PASS sign_text glow wax bed_sleep crafting_menu");
             stage=99;return true;
         }
@@ -164,7 +172,8 @@ public final class NativeFunctionalClientProbe {
                 verifyServerSignGeometry(client);
                 check(nativeBed(client),"saved bed lost native pair");
                 check(client.getServer().getOverworld().getBlockState(TABLE).isOf(Blocks.CRAFTING_TABLE),"saved workstation missing");
-                return true;
+                if(!lightSource(client))return false;
+                System.out.println("PHYSICAL_SUPPLEMENTAL_LIGHT_REOPEN_PASS");return true;
             }))return false;
             verifySignGeometry(client);verifyBedGeometry(client);
             aim(client,new Vec3d(18.5,64.25,8.5));NativeRenderAudit.beginBlockEntity(client,SIGN);next(63);return false;
@@ -215,11 +224,30 @@ public final class NativeFunctionalClientProbe {
         if(stage==23) {
             if(client.interactionManager.getCurrentGameMode()!=GameMode.CREATIVE)return false;
             System.out.println("PHYSICAL_NATIVE_REOPEN_PAIR_BREAK_PASS sign_text glow wax bed_pair one_drop");
-            stage=99;return true;
+            server(client,()->com.slabbed.cell.CellWorld.remove(client.getServer().getOverworld(),LIGHT_OWNER,1,null,false));
+            next(24);return false;
+        }
+        if(stage==24) {
+            if(!poll(client,()-> {
+                var world=client.getServer().getOverworld();
+                check(com.slabbed.cell.SupplementalCells.luminance(world,LIGHT_OWNER)==0,"removed light source attachment remains");
+                check(world.getBlockEntity(LIGHT_OWNER) instanceof net.minecraft.block.entity.BarrelBlockEntity barrel
+                        && barrel.getStack(0).getCount()==7,"source removal changed native inventory");
+                return world.getLightLevel(net.minecraft.world.LightType.BLOCK,LIGHT_OWNER)<15;
+            }) || client.world.getLightLevel(net.minecraft.world.LightType.BLOCK,LIGHT_OWNER)>=15)return false;
+            System.out.println("PHYSICAL_SUPPLEMENTAL_LIGHT_REMOVAL_PASS");stage=99;return true;
         }
         return false;
     }
 
+    private static boolean lightSource(MinecraftClient client) {
+        var world=client.getServer().getOverworld();
+        check(world.getBlockEntity(LIGHT_OWNER) instanceof net.minecraft.block.entity.BarrelBlockEntity barrel
+                && barrel.getStack(0).isOf(Items.DIAMOND) && barrel.getStack(0).getCount()==7,"light fixture native inventory missing");
+        check(com.slabbed.nativeblock.NativeSeats.offset(world,LIGHT_OWNER)==-.5,"light fixture native seat moved");
+        check(com.slabbed.cell.SupplementalCells.luminance(world,LIGHT_OWNER)==15,"saved supplemental source missing");
+        return world.getLightLevel(net.minecraft.world.LightType.BLOCK,LIGHT_OWNER)==15;
+    }
     private static void next(int value) {stage=value;started=ticks;observed=false;}
     private static void server(MinecraftClient client,Runnable task) {
         pending=true;client.getServer().execute(()->{try{task.run();}catch(Throwable error){failure=error;}finally{pending=false;}});

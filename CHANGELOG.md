@@ -1,3 +1,11 @@
+# 0.9.2 rewrite alpha — Fabric 1.21.1
+
+Restores native signs, beds, inventories, doors, workstations, connections, redstone components, rails, scaffolding and supported plant interactions at permanent half-block positions. Static pieces can share unused space beside native owners without replacing their data. See LAW.md and README.md for placement invariants and remaining limits.
+
+Fixes stationary pressure-plate contact, selected-material mining, native particle origins and supplemental light sources through lighting chunk wrappers. Adds atomic whole-piece piston push/pull handling and persistent source enumeration for relighting.
+
+The compatibility fixture now describes the exact supplied pack and refuses incomplete inputs. This remains a fresh-world alpha; static piston pieces relocate immediately, and physical adhesion and mixed native piston chains need further work.
+
 # 0.9.1 rewrite alpha — Fabric 1.21.1
 
 Cell models use terrain lighting without a second entity-lighting pass. Native/cell mesh transitions request immediate redraws; Sodium queues only affected sections for the same frame. Breaking a cell plays the selected material's normal local sound and particles while removal remains server-confirmed. Placement origins and the physical-cell format are unchanged; see LAW.md.

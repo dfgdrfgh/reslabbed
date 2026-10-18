@@ -14,7 +14,7 @@ The `slabbed:cell` block entity stores `format=1` and a `parts` compound list. E
 
 NBT loading validates local occupancy. The old placement-offset attachment is not read. This format requires fresh worlds until an explicit migration exists.
 
-Native functional objects retain their ordinary block states, block entities and vanilla data. The persistent synchronized chunk attachment `slabbed:native_seats` records their owner position, block identity and fixed half-block offset. The offset is -1, 0 or 1 half steps and never accumulates. The owner cell remains reserved; any projected geometry must fit without overlapping adjacent pieces. Paired beds record the same offset for both native members.
+Native functional objects retain their ordinary block states, block entities and vanilla data. The persistent synchronized chunk attachment `slabbed:native_seats` records their owner position, block identity and fixed half-block offset. The offset is -1, 0 or 1 half steps and never accumulates. The native owner keeps its ordinary cell identity; independent static fragments in unused physical volume are stored in the persistent synchronized `slabbed:supplemental_cells` attachment. Every projected shape must fit without overlap. Paired beds record the same offset for both native members.
 
 ## Placement and changes
 
@@ -32,6 +32,6 @@ Vanilla placement packets carry normal physical hit positions. Vanilla breaking 
 
 ## Adapters
 
-Static building cubes, slabs, logs, glass, glazed terracotta, persistent leaves, ordinary and soul torches, chains, lanterns, flower pots and carpets have explicit handling. Unsupported stateful mechanics remain on vanilla placement rather than being stored with incomplete behavior. Carrier cells are block entities and are consequently immovable by vanilla pistons.
+Static building cubes, slabs, logs, glass, glazed terracotta, persistent leaves, ordinary and soul torches, chains, lanterns, flower pots and carpets have explicit handling. Unsupported stateful mechanics remain on vanilla placement rather than being stored with incomplete behavior. The physical piston adapter plans movement over whole logical pieces, retaining the twelve-piece limit independently of companion count. It commits static fragments around the vanilla moving head and publishes support updates after final geometry exists; unsupported adhesion or mixed native chains reject without changing pieces.
 
 Signs, hanging signs, beds, banners, skulls and supported workstations use the native placement lifecycle, including item data, editing, menus and paired block callbacks. Their shapes, target projection, model or block-entity rendering and sleeping position use the stored seat. Native queries examine only adjacent cells. Removing a native block removes its seat; changing properties of the same block preserves it. Support checks may remove an unsupported decoration, but cannot revise its seat.

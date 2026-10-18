@@ -61,6 +61,49 @@ public final class NativeCellPistonTest {
         t.getWorld().setBlockState(piston.north(),(powered?Blocks.REDSTONE_BLOCK:Blocks.AIR).getDefaultState(),Block.NOTIFY_ALL);
     }
 
+    private static void stickyCycles(TestContext t,Direction facing) {
+        var owner=piston(t,5,5,3,true,facing);var world=t.getWorld();
+        if(facing==Direction.DOWN)world.setBlockState(owner.down(),Blocks.AIR.getDefaultState(),Block.NOTIFY_LISTENERS);
+        var source=owner.offset(facing);var destination=owner.offset(facing,2);
+        int half=owner.getY()*2-1+facing.getOffsetY()*2;
+        int movedHalf=half+facing.getOffsetY()*2;
+        place(t,source.getX(),source.getZ(),half,Blocks.STONE);
+        for(int cycle=0;cycle<3;cycle++) {
+            int start=2+cycle*24;
+            t.runAtTick(start,()->power(t,owner,true));
+            t.runAtTick(start+1,()->t.assertTrue(world.getBlockEntity(source) instanceof PistonBlockEntity,
+                    "each sticky cycle creates an actual vanilla moving head toward "+facing));
+            t.runAtTick(start+8,()-> {
+                t.assertTrue(world.getBlockState(owner).get(PistonBlock.EXTENDED),"sticky cycle reaches extension toward "+facing);
+                piece(t,source.getX(),source.getZ(),half,2,Blocks.STONE,false);
+                piece(t,destination.getX(),destination.getZ(),movedHalf,2,Blocks.STONE,true);
+                t.assertTrue(world.getBlockState(source).isOf(Blocks.PISTON_HEAD),"settled head retains native identity");
+                power(t,owner,false);
+            });
+            int completed=cycle;
+            t.runAtTick(start+18,()-> {
+                t.assertTrue(world.getBlockState(owner).isOf(Blocks.STICKY_PISTON)
+                        && !world.getBlockState(owner).get(PistonBlock.EXTENDED),"sticky cycle restores native retracted base");
+                t.assertTrue(NativeSeats.seat(world,owner)!=null && NativeSeats.seat(world,owner).halfOffset()==-1,
+                        "repeated cycles retain the original piston seat");
+                piece(t,source.getX(),source.getZ(),half,2,Blocks.STONE,true);
+                piece(t,destination.getX(),destination.getZ(),movedHalf,2,Blocks.STONE,false);
+                t.assertFalse(world.getBlockState(source).isOf(Blocks.PISTON_HEAD),"retraction leaves no native head residue");
+                if(completed==2)t.complete();
+            });
+        }
+    }
+
+    @GameTest(templateName="fabric-gametest-api-v1:empty",tickLimit=85)
+    public void westStickyPistonRepeatsThreePhysicalCycles(TestContext t) {
+        stickyCycles(t,Direction.WEST);
+    }
+
+    @GameTest(templateName="fabric-gametest-api-v1:empty",tickLimit=85)
+    public void downStickyPistonRepeatsThreePhysicalCycles(TestContext t) {
+        stickyCycles(t,Direction.DOWN);
+    }
+
     @GameTest(templateName="fabric-gametest-api-v1:empty",tickLimit=60)
     public void horizontalPistonPushesAndStickyPullsOneCrossingPiece(TestContext t) {
         var owner=piston(t,2,3,3,true,Direction.EAST);int half=owner.getY()*2-1;
@@ -131,8 +174,17 @@ public final class NativeCellPistonTest {
         // The empty template has a roof above the small fixture; the column extends beyond it.
         for(var base:new BlockPos[]{twelve,thirteen}) for(int y=base.getY()+1;y<=base.getY()+15;y++)
             t.getWorld().setBlockState(new BlockPos(base.getX(),y,base.getZ()),Blocks.AIR.getDefaultState(),Block.NOTIFY_LISTENERS);
+        var protectedPos=thirteen.up(14);var world=t.getWorld();
+        world.setBlockState(protectedPos,Blocks.BARREL.getDefaultState());
+        NativeSeats.put(world,protectedPos,new NativeSeats.Seat(1,"minecraft:barrel"));
+        var protectedBarrel=(BarrelBlockEntity)world.getBlockEntity(protectedPos);
+        protectedBarrel.setStack(0,new ItemStack(Items.DIAMOND,7));
+        var unchanged=new java.util.LinkedHashMap<BlockPos,com.slabbed.core.CellContents<net.minecraft.block.BlockState>>();
         for(int n=0;n<12;n++) place(t,twelve.getX(),twelve.getZ(),half+2*n,Blocks.STONE);
         for(int n=0;n<13;n++) place(t,thirteen.getX(),thirteen.getZ(),half+2*n,Blocks.STONE);
+        for(int y=thirteen.getY();y<=protectedPos.getY();y++) {
+            var pos=new BlockPos(thirteen.getX(),y,thirteen.getZ());unchanged.put(pos,CellWorld.contents(world,pos));
+        }
         t.runAtTick(2,()-> {power(t,twelve,true);power(t,thirteen,true);});
         t.runAtTick(12,()-> {
             t.assertTrue(t.getWorld().getBlockState(twelve).get(PistonBlock.EXTENDED),"twelve logical pieces extend despite thirteen occupied physical cells");
@@ -140,7 +192,14 @@ public final class NativeCellPistonTest {
             for(int n=0;n<12;n++) piece(t,twelve.getX(),twelve.getZ(),half+2+2*n,2,Blocks.STONE,true);
             t.assertFalse(t.getWorld().getBlockState(thirteen).get(PistonBlock.EXTENDED),"thirteenth logical piece rejects extension");
             for(int n=0;n<13;n++) piece(t,thirteen.getX(),thirteen.getZ(),half+2*n,2,Blocks.STONE,true);
-            piece(t,thirteen.getX(),thirteen.getZ(),half+26,2,Blocks.STONE,false);t.complete();
+            piece(t,thirteen.getX(),thirteen.getZ(),half+26,2,Blocks.STONE,false);
+            unchanged.forEach((pos,contents)->t.assertTrue(java.util.Objects.equals(contents,CellWorld.contents(world,pos)),
+                    "thirteen-piece refusal preserves every stored fragment at "+pos));
+            t.assertTrue(world.getBlockEntity(protectedPos)==protectedBarrel,"refusal retains the destination native barrel entity");
+            t.assertTrue(protectedBarrel.getStack(0).isOf(Items.DIAMOND) && protectedBarrel.getStack(0).getCount()==7,
+                    "refusal retains the destination barrel inventory");
+            t.assertTrue(NativeSeats.seat(world,protectedPos)!=null && NativeSeats.seat(world,protectedPos).halfOffset()==1,
+                    "refusal retains the destination barrel seat");t.complete();
         });
     }
 
@@ -169,4 +228,43 @@ public final class NativeCellPistonTest {
             t.assertTrue(NativeSeats.seat(world,a).halfOffset()==-1 && NativeSeats.seat(world,b).halfOffset()==-1,"both immovable native barrel seats remain frozen");t.complete();
         });
     }
+    @GameTest(templateName="fabric-gametest-api-v1:empty",tickLimit=45)
+    public void obstructedPhysicalPushPreservesFragmentsAndNativeInventories(TestContext t) {
+        var owner=piston(t,2,4,3,true,Direction.EAST);var world=t.getWorld();
+        var source=owner.east();var destination=owner.east(2);int half=owner.getY()*2-1;
+        var a=source.down();var b=destination;
+        for(var pos:new BlockPos[]{a,b}) {
+            world.setBlockState(pos,Blocks.BARREL.getDefaultState());
+            NativeSeats.put(world,pos,new NativeSeats.Seat(-1,"minecraft:barrel"));
+        }
+        var sourceBarrel=(BarrelBlockEntity)world.getBlockEntity(a);var blockerBarrel=(BarrelBlockEntity)world.getBlockEntity(b);
+        sourceBarrel.setStack(0,new ItemStack(Items.DIAMOND,7));blockerBarrel.setStack(0,new ItemStack(Items.EMERALD,5));
+        place(t,source.getX(),source.getZ(),half,Blocks.STONE);
+        place(t,destination.getX(),destination.getZ(),half-1,Blocks.BRICK_SLAB);
+        var unchanged=new java.util.LinkedHashMap<BlockPos,com.slabbed.core.CellContents<net.minecraft.block.BlockState>>();
+        for(var pos:new BlockPos[]{a,source,destination.down(),destination})unchanged.put(pos,CellWorld.contents(world,pos));
+        t.assertTrue(SupplementalCells.has(world,a),"blocked source has a real supplemental fragment beside its inventory");
+        t.runAtTick(2,()->power(t,owner,true));
+        t.runAtTick(12,()->power(t,owner,false));
+        t.runAtTick(22,()->power(t,owner,true));
+        t.runAtTick(34,()-> {
+            t.assertFalse(world.getBlockState(owner).get(PistonBlock.EXTENDED),"native obstruction rejects both physical attempts");
+            unchanged.forEach((pos,contents)->t.assertTrue(java.util.Objects.equals(contents,CellWorld.contents(world,pos)),
+                    "obstruction refusal preserves every stored fragment at "+pos));
+            piece(t,source.getX(),source.getZ(),half,2,Blocks.STONE,true);
+            piece(t,destination.getX(),destination.getZ(),half,2,Blocks.STONE,false);
+            piece(t,destination.getX(),destination.getZ(),half-1,1,Blocks.BRICK_SLAB,true);
+            t.assertTrue(world.getBlockEntity(a)==sourceBarrel && world.getBlockEntity(b)==blockerBarrel,
+                    "rejected physical attempts preserve both original native barrel entities");
+            t.assertTrue(sourceBarrel.getStack(0).isOf(Items.DIAMOND) && sourceBarrel.getStack(0).getCount()==7,
+                    "blocked source retains all seven diamonds");
+            t.assertTrue(blockerBarrel.getStack(0).isOf(Items.EMERALD) && blockerBarrel.getStack(0).getCount()==5,
+                    "native obstruction retains all five emeralds");
+            t.assertTrue(NativeSeats.seat(world,a)!=null && NativeSeats.seat(world,a).halfOffset()==-1
+                    && NativeSeats.seat(world,b)!=null && NativeSeats.seat(world,b).halfOffset()==-1,
+                    "both inventories retain their frozen seats after rejection");
+            t.complete();
+        });
+    }
+
 }
