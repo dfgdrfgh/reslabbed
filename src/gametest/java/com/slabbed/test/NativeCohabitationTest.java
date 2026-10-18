@@ -121,7 +121,7 @@ public final class NativeCohabitationTest {
     @GameTest(templateName="fabric-gametest-api-v1:empty")
     public void supplementalMiningUsesSelectedStoneHardness(TestContext t) {
         var f=barrel(t);var base=f.base();stack(t,f);var owner=base.up();var player=f.player();
-        player.setPosition(base.getX()+3.5,base.getY()+.13,base.getZ()+.5);player.setYaw(90);player.setPitch(0);
+        player.setPosition(base.getX()+.5,base.getY()+.13,base.getZ()-2.5);player.setYaw(0);player.setPitch(0);
         player.setStackInHand(Hand.MAIN_HAND,new ItemStack(Items.IRON_PICKAXE));
         var ray=player.raycast(player.getBlockInteractionRange(),1,false);
         System.out.println("SUPPLEMENTAL_MINING_RAY eye="+player.getEyePos()+" direction="+player.getRotationVec(1)+" ray="+ray+" owner="+owner+" shape="+t.getWorld().getBlockState(owner).getOutlineShape(t.getWorld(),owner).getBoundingBoxes());

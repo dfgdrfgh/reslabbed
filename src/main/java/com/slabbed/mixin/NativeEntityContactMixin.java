@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 /** Dispatch physical contacts whose native owner is outside vanilla's touched cells. */
 @Mixin(Entity.class)
 public abstract class NativeEntityContactMixin {
-    @Inject(method="checkBlockCollision",at=@At("TAIL"))
+    @Inject(method="baseTick",at=@At("TAIL"))
     private void slabbed$projectedContacts(CallbackInfo ci) {
         var entity=(Entity)(Object)this;var world=entity.getWorld();var box=entity.getBoundingBox().contract(.001);
         int minX=MathHelper.floor(box.minX),maxX=MathHelper.floor(box.maxX);
