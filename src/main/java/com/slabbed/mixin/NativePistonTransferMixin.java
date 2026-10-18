@@ -76,6 +76,7 @@ public abstract class NativePistonTransferMixin {
             @Local(argsOnly=true) Direction direction,@Local(argsOnly=true) boolean extending) {
         boolean accepted=original.call(handler);
         if (!accepted) return false;
+        if (!PhysicalPistons.vanillaMatches(handler.getMovedBlocks())) return false;
         var destinations=SLABBED$MOVES.get().peek();
         if (destinations==null) return true;
         var motion=extending?direction:direction.getOpposite();
