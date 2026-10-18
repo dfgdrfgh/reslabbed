@@ -377,6 +377,8 @@ public final class NativeCellPistonTest {
         var owner=piston(t,3,3,3,false,Direction.UP);var world=t.getWorld();var source=owner.up();
         int half=source.getY()*2-1;adhesive(t,source,Blocks.SLIME_BLOCK,-1);
         var branch=source.south();
+        for(int y=source.getY()+1;y<=owner.getY()+16;y++)
+            world.setBlockState(new BlockPos(source.getX(),y,source.getZ()),Blocks.AIR.getDefaultState(),Block.NOTIFY_LISTENERS);
         for(int y=owner.getY();y<=owner.getY()+16;y++)
             world.setBlockState(new BlockPos(branch.getX(),y,branch.getZ()),Blocks.AIR.getDefaultState(),Block.NOTIFY_LISTENERS);
         for(int n=0;n<branchCount;n++)place(t,branch.getX(),branch.getZ(),half+2*n,Blocks.STONE);
@@ -384,7 +386,8 @@ public final class NativeCellPistonTest {
         for(int y=owner.getY();y<=owner.getY()+branchCount+1;y++) {
             var pos=new BlockPos(branch.getX(),y,branch.getZ());before.put(pos,CellWorld.contents(world,pos));
         }
-        t.runAtTick(2,()->power(t,owner,true));
+        // A side power block would itself touch the lowered slime and join the physical branch.
+        t.runAtTick(2,()->world.setBlockState(owner.down(),Blocks.REDSTONE_BLOCK.getDefaultState(),Block.NOTIFY_ALL));
         t.runAtTick(14,()-> {
             t.assertTrue(world.getBlockState(owner).get(PistonBlock.EXTENDED)==accepted,
                     "native adhesive counts once toward the twelve whole-piece limit");

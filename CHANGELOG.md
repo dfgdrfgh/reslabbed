@@ -1,3 +1,9 @@
+# 0.9.3 rewrite alpha — Fabric 1.21.1
+
+Adds native slime and honey adhesion for physical static branches during piston pushes and sticky pulls. Adhesive blocks retain their native identity and animation; physical pieces count once toward the twelve-piece limit. Slime and honey remain separate, and pieces without physical face contact do not join a branch.
+
+Blocked branches preserve their fragments and stationary native inventories. A native movement graph that disagrees with the physical preparation refuses the move and restores the removed static pieces. Destination validation accounts for vacating native adhesive sources. Placement origins outside actual piston movement remain permanent; see LAW.md. This remains a fresh-world alpha with immediate static-piece relocation and incomplete support for other mixed native chains.
+
 # 0.9.2 rewrite alpha — Fabric 1.21.1
 
 Restores native signs, beds, inventories, doors, workstations, connections, redstone components, rails, scaffolding and supported plant interactions at permanent half-block positions. Static pieces can share unused space beside native owners without replacing their data. See LAW.md and README.md for placement invariants and remaining limits.

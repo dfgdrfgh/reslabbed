@@ -192,7 +192,10 @@ public final class PhysicalPistons {
             var target=move.destination();int origin=target.minHalf(),length=move.source().length();
             for(int y=Math.floorDiv(origin,2);y<=Math.floorDiv(origin+length-1,2);y++) {
                 var pos=new BlockPos(target.minX(),y,target.minZ());
-                var contents=changes.computeIfAbsent(pos,p->staticContents(world,p));
+                var contents=changes.computeIfAbsent(pos,p-> {
+                    var before=staticContents(world,p);
+                    return before==null && plan.nativeSources().contains(p)?CellContents.empty():before;
+                });
                 if(contents==null)throw new IllegalStateException("blocked physical destination");
                 changes.put(pos,contents.add(new CellContents.Fragment<>(origin-y*2,length,move.source().value())));
             }

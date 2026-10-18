@@ -10,7 +10,7 @@ Placement checks physical clearance before accepting a click. Native blocks reta
 
 The native adapters cover containers, paired doors and beds, wall attachments, rails and minecarts, switches, redstone components, scaffolding and supported plants. Native particles use the remembered position. Supplemental luminous pieces participate in normal light propagation and chunk relighting. Custom modded mechanics still require dedicated compatibility testing.
 
-Pistons move complete static pieces atomically, preserve independent slabs and stationary native inventories, and reject a thirteenth pushed piece. The native head animates; static physical pieces currently relocate immediately. Physical slime/honey adhesion and mixed pushes into separately seated native objects are not supported yet. Fluid simulation and migration from the earlier offset format are also outside this candidate.
+Pistons move complete static pieces atomically, preserve independent slabs and stationary native inventories, and reject a thirteenth pushed piece. Native slime and honey can carry touching static physical branches, retaining their native behavior and their separation from the other adhesive type. Blocked branches reject before movement; a mismatch between native and physical movement graphs restores the static pieces and refuses the move. The native head and native adhesive blocks animate; static physical pieces currently relocate immediately. Other mixed pushes into separately seated native objects, fluid simulation and migration from the earlier offset format remain outside this candidate.
 
 This is a fresh-world candidate. It does not interpret the old offset attachment format. Existing saves require an explicit migration before upgrading.
 
