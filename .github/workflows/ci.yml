@@ -36,7 +36,7 @@ jobs:
           python3 tools/verify-test-count.py
       - name: Inspect native targets after a failed runtime check
         if: failure() && matrix.variant == 'indigo'
-        run: python3 tools/inspect-native-bytecode.py net.minecraft.block.PressurePlateBlock net.minecraft.block.WeightedPressurePlateBlock net.minecraft.block.PistonBlock net.minecraft.block.entity.PistonBlockEntity net.minecraft.block.WallBlock net.minecraft.item.ArmorStandItem net.minecraft.item.AxeItem
+        run: python3 tools/inspect-native-bytecode.py net.minecraft.block.PressurePlateBlock net.minecraft.block.WeightedPressurePlateBlock net.minecraft.block.PistonBlock net.minecraft.block.entity.PistonBlockEntity net.minecraft.block.WallBlock net.minecraft.item.ArmorStandItem net.minecraft.item.AxeItem net.minecraft.block.PointedDripstoneBlock net.minecraft.block.AbstractPressurePlateBlock
       - name: Stage complete latest pack
         if: matrix.variant == 'pack' || matrix.variant == 'control'
         env:

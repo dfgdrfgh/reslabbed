@@ -20,7 +20,7 @@ public final class CellPlacement {
         var clicked=BlockPos.ofFloored(hit.subtract(Vec3d.of(face.getVector()).multiply(1e-5)));
         var clickedState=world.getBlockState(clicked);
         com.slabbed.core.CellContents.Fragment<BlockState> fragment=null;
-        if(clickedState.isOf(Slabbed.CELL) || clickedState.getBlock() instanceof SlabBlock) {
+        if(clickedState.isOf(Slabbed.CELL) || SupplementalCells.has(world,clicked) || clickedState.getBlock() instanceof SlabBlock) {
             if(clickedState.getBlock() instanceof SlabBlock && clickedState.get(SlabBlock.WATERLOGGED)) return null;
             fragment=CellWorld.pick(world,clicked,new net.minecraft.util.hit.BlockHitResult(hit,face,clicked,false));
         }
@@ -66,7 +66,7 @@ public final class CellPlacement {
         var base=new BlockPos(x,com.slabbed.core.HalfGrid.at(origin).cellY(),z);
         if(!player.getAbilities().allowModifyWorld || !world.canPlayerModifyAt(player,base)
                 || !world.canPlayerModifyAt(player,new BlockPos(x,com.slabbed.core.HalfGrid.at(origin+length-1).cellY(),z))) return ActionResult.FAIL;
-        var shape=state.getCollisionShape(world,base).offset(x,origin*.5,z);
+        var shape=com.slabbed.nativeblock.NativeShapes.collision(world,base,state).offset(x,origin*.5,z);
         if(!world.doesNotIntersectEntities(null,shape)) return ActionResult.FAIL;
         if(!PieceSupport.supported(world,base,new com.slabbed.core.CellContents.Fragment<>(origin-base.getY()*2,length,state))) return ActionResult.FAIL;
         if(!CellWorld.canPlace(world,x,z,origin,state)) return ActionResult.FAIL;

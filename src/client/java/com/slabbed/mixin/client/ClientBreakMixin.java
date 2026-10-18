@@ -14,9 +14,10 @@ public abstract class ClientBreakMixin {
     @Inject(method="breakBlock",at=@At("HEAD"),cancellable=true)
     private void slabbed$awaitConfirmedPieceBreak(BlockPos pos,CallbackInfoReturnable<Boolean> cir) {
         var client=MinecraftClient.getInstance();var world=client.world;
-        if(world==null || !world.getBlockState(pos).isOf(Slabbed.CELL))return;
+        if(world==null || (!world.getBlockState(pos).isOf(Slabbed.CELL) && !com.slabbed.cell.SupplementalCells.has(world,pos)))return;
         var hit=client.crosshairTarget instanceof net.minecraft.util.hit.BlockHitResult h && h.getBlockPos().equals(pos)?h:null;
         var piece=com.slabbed.cell.CellWorld.pick(world,pos,hit);
+        if(piece==null && !world.getBlockState(pos).isOf(Slabbed.CELL))return;
         if(piece==null || client.player==null || client.player.isBlockBreakingRestricted(world,pos,client.interactionManager.getCurrentGameMode())
                 || !client.player.getMainHandStack().getItem().canMine(piece.value(),world,pos,client.player)) {
             cir.setReturnValue(false);return;
@@ -28,7 +29,7 @@ public abstract class ClientBreakMixin {
     @Inject(method={"attackBlock","updateBlockBreakingProgress"},at=@At("HEAD"))
     private void slabbed$sendSelectedPiece(BlockPos pos,net.minecraft.util.math.Direction direction,CallbackInfoReturnable<Boolean> cir) {
         var client=MinecraftClient.getInstance();
-        if(client.world==null || !client.world.getBlockState(pos).isOf(Slabbed.CELL))return;
+        if(client.world==null || (!client.world.getBlockState(pos).isOf(Slabbed.CELL) && !com.slabbed.cell.SupplementalCells.has(client.world,pos)))return;
         if(client.crosshairTarget instanceof net.minecraft.util.hit.BlockHitResult hit && hit.getBlockPos().equals(pos))
             net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking.send(new com.slabbed.cell.PieceTarget(pos,hit.getPos()));
     }

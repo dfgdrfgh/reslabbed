@@ -109,4 +109,42 @@ public final class NativeCohabitationTest {
     public void doorUpperCandidateRejectsExistingSupplementalGeometry(TestContext t) {
         rejectedPairedPlacement(t,Items.OAK_DOOR,t.getAbsolutePos(new BlockPos(3,5,3)));
     }
+    @GameTest(templateName="fabric-gametest-api-v1:empty",tickLimit=30)
+    public void supplementalLightEmitsFromReservedNativeOwnerCell(TestContext t) {
+        var f=barrel(t);var base=f.base();
+        t.assertTrue(place(f.player(),Items.GLOWSTONE,base.up(),base.getY()+1.5).isAccepted(),"real glowstone fills native free half");
+        t.runAtTick(10,()-> {
+            t.assertTrue(t.getWorld().getLightLevel(net.minecraft.world.LightType.BLOCK,base.up())==15,"supplemental source emits full block light in its actual storage cell");
+            nativeIntact(t,f);t.complete();
+        });
+    }
+    @GameTest(templateName="fabric-gametest-api-v1:empty")
+    public void supplementalMiningUsesSelectedStoneHardness(TestContext t) {
+        var f=barrel(t);var base=f.base();stack(t,f);var owner=base.up();var player=f.player();
+        player.setPosition(base.getX()+3.5,base.getY()+.13,base.getZ()+.5);player.setYaw(90);player.setPitch(0);
+        player.setStackInHand(Hand.MAIN_HAND,new ItemStack(Items.IRON_PICKAXE));
+        var ray=player.raycast(player.getBlockInteractionRange(),1,false);
+        t.assertTrue(ray instanceof BlockHitResult hit && hit.getBlockPos().equals(owner)
+                && CellWorld.pick(t.getWorld(),owner,hit)!=null,"physical view targets supplemental stone above native barrel");
+        float expected=Blocks.STONE.getDefaultState().calcBlockBreakingDelta(player,t.getWorld(),owner);
+        float actual=t.getWorld().getBlockState(owner).calcBlockBreakingDelta(player,t.getWorld(),owner);
+        t.assertTrue(Math.abs(actual-expected)<1e-7,"mining selected static stone uses its own tool speed and hardness");
+        nativeIntact(t,f);t.complete();
+    }
+
+    @GameTest(templateName="fabric-gametest-api-v1:empty")
+    public void supplementalWallTorchLosesPhysicalSupportWithoutRemovingBarrel(TestContext t) {
+        var f=barrel(t);var base=f.base();var support=base.east().up();int origin=base.getY()*2+3;
+        t.assertTrue(CellWorld.place(t.getWorld(),support.getX(),support.getZ(),origin,Blocks.STONE.getDefaultState()),"physical side support spans native owner's unused upper half");
+        f.player().setStackInHand(Hand.MAIN_HAND,new ItemStack(Items.TORCH,2));
+        var point=new Vec3d(support.getX(),base.getY()+1.75,support.getZ()+.5);
+        var hit=new BlockHitResult(point,Direction.WEST,support,false);
+        t.assertTrue(f.player().getMainHandStack().useOnBlock(new ItemUsageContext(f.player(),Hand.MAIN_HAND,hit)).isAccepted(),"real wall torch shares native barrel owner's free volume");
+        piece(t,base.up(),Blocks.WALL_TORCH,origin);
+        CellWorld.remove(t.getWorld(),support,1,f.player(),false);
+        var contents=CellWorld.contents(t.getWorld(),base.up());
+        t.assertTrue(contents==null || contents.fragments().stream().noneMatch(p->p.value().isOf(Blocks.WALL_TORCH)),"support loss removes supplemental torch through ordinary neighbor update");
+        nativeIntact(t,f);t.complete();
+    }
+
 }

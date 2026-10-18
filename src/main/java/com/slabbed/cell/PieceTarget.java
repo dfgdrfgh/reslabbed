@@ -46,7 +46,7 @@ public record PieceTarget(BlockPos pos,Vec3d point) implements CustomPayload {
     private CellContents.Fragment<BlockState> resolve(ServerPlayerEntity player) {
         var world=player.getServerWorld();
         if(!Double.isFinite(point.x)||!Double.isFinite(point.y)||!Double.isFinite(point.z)
-                || !world.isChunkLoaded(pos) || !world.getBlockState(pos).isOf(Slabbed.CELL))return null;
+                || !world.isChunkLoaded(pos) || (!world.getBlockState(pos).isOf(Slabbed.CELL) && !SupplementalCells.has(world,pos)))return null;
         var eye=player.getEyePos();double range=player.getBlockInteractionRange();
         if(eye.squaredDistanceTo(point)>range*range+1e-6 || !new Box(pos).expand(.001).contains(point))return null;
         var delta=point.subtract(eye);

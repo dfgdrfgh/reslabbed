@@ -27,25 +27,29 @@ public abstract class NativeStateShapesMixin {
     private VoxelShape slabbed$nativeOutline(BlockView world,BlockPos pos,ShapeContext context,Operation<VoxelShape> original) {
         if(NativeShapes.raw() || !NativeRules.accepts((BlockState)(Object)this))return original.call(world,pos,context);
         var shape=NativeShapes.withRaw(()->original.call(world,pos,context));
-        double offset=NativeSeats.offset(world,pos,(BlockState)(Object)this);return offset==0?shape:shape.offset(0,offset,0);
+        double offset=NativeSeats.offset(world,pos,(BlockState)(Object)this);shape=offset==0?shape:shape.offset(0,offset,0);
+        return net.minecraft.util.shape.VoxelShapes.union(shape,com.slabbed.cell.SupplementalCells.outline(world,pos));
     }
     @WrapMethod(method="getCollisionShape(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/ShapeContext;)Lnet/minecraft/util/shape/VoxelShape;")
     private VoxelShape slabbed$nativeCollision(BlockView world,BlockPos pos,ShapeContext context,Operation<VoxelShape> original) {
         if(NativeShapes.raw() || !NativeRules.accepts((BlockState)(Object)this))return original.call(world,pos,context);
         var shape=NativeShapes.withRaw(()->original.call(world,pos,context));
-        double offset=NativeSeats.offset(world,pos,(BlockState)(Object)this);return offset==0?shape:shape.offset(0,offset,0);
+        double offset=NativeSeats.offset(world,pos,(BlockState)(Object)this);shape=offset==0?shape:shape.offset(0,offset,0);
+        return net.minecraft.util.shape.VoxelShapes.union(shape,com.slabbed.cell.SupplementalCells.collision(world,pos));
     }
     @WrapMethod(method="getCollisionShape(Lnet/minecraft/world/BlockView;Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/util/shape/VoxelShape;")
     private VoxelShape slabbed$nativeCachedCollision(BlockView world,BlockPos pos,Operation<VoxelShape> original) {
         if(NativeShapes.raw() || !NativeRules.accepts((BlockState)(Object)this))return original.call(world,pos);
         var shape=NativeShapes.withRaw(()->original.call(world,pos));
-        double offset=NativeSeats.offset(world,pos,(BlockState)(Object)this);return offset==0?shape:shape.offset(0,offset,0);
+        double offset=NativeSeats.offset(world,pos,(BlockState)(Object)this);shape=offset==0?shape:shape.offset(0,offset,0);
+        return net.minecraft.util.shape.VoxelShapes.union(shape,com.slabbed.cell.SupplementalCells.collision(world,pos));
     }
     @WrapMethod(method="getRaycastShape")
     private VoxelShape slabbed$nativeRayShape(BlockView world,BlockPos pos,Operation<VoxelShape> original) {
         if(NativeShapes.raw() || !NativeRules.accepts((BlockState)(Object)this))return original.call(world,pos);
         var shape=NativeShapes.withRaw(()->original.call(world,pos));
-        double offset=NativeSeats.offset(world,pos,(BlockState)(Object)this);return offset==0?shape:shape.offset(0,offset,0);
+        double offset=NativeSeats.offset(world,pos,(BlockState)(Object)this);shape=offset==0?shape:shape.offset(0,offset,0);
+        return net.minecraft.util.shape.VoxelShapes.union(shape,com.slabbed.cell.SupplementalCells.outline(world,pos));
     }
     @Inject(method="getCullingFace",at=@At("RETURN"),cancellable=true)
     private void slabbed$nativeCullingFace(BlockView world,BlockPos pos,Direction direction,CallbackInfoReturnable<VoxelShape> cir) {
@@ -70,5 +74,6 @@ public abstract class NativeStateShapesMixin {
                     && !(state.contains(net.minecraft.state.property.Properties.DOUBLE_BLOCK_HALF) && direction==Direction.UP))
                 cir.setReturnValue(state);
         }
+        cir.setReturnValue(com.slabbed.nativeblock.NativeConnections.adjust(world,pos,cir.getReturnValue()));
     }
 }

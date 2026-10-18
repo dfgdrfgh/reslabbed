@@ -133,6 +133,9 @@ public final class NativePlacement {
                 var cell=new BlockPos(owner.getX(),y,owner.getZ());
                 if(!world.isInBuildLimit(cell) || !world.getWorldBorder().contains(cell) || !world.isChunkLoaded(cell)
                         || !world.canPlayerModifyAt(player,cell))return false;
+                var supplemental=com.slabbed.cell.SupplementalCells.outline(world,cell);
+                supplemental=VoxelShapes.union(supplemental,com.slabbed.cell.SupplementalCells.collision(world,cell)).offset(cell.getX(),cell.getY(),cell.getZ());
+                if(VoxelShapes.matchesAnywhere(physical,supplemental,BooleanBiFunction.AND))return false;
                 if(!plan.states.containsKey(cell)) {
                     var existing=world.getBlockState(cell);
                     if(!world.getFluidState(cell).isEmpty())return false;

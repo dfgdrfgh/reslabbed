@@ -18,10 +18,10 @@ public abstract class CellHitParticlesMixin {
     @Inject(method="addBlockBreakingParticles",at=@At("HEAD"),cancellable=true)
     private void slabbed$selectedMaterial(BlockPos pos,Direction side,CallbackInfo ci) {
         var client=MinecraftClient.getInstance();var world=client.world;
-        if(world==null || !world.getBlockState(pos).isOf(Slabbed.CELL))return;
-        ci.cancel();
+        if(world==null || (!world.getBlockState(pos).isOf(Slabbed.CELL) && !com.slabbed.cell.SupplementalCells.has(world,pos)))return;
         var hit=client.crosshairTarget instanceof BlockHitResult h && h.getBlockPos().equals(pos)?h:null;
         var piece=CellWorld.pick(world,pos,hit);
-        if(piece!=null)CellBreakEffects.hit(world,pos,piece,side);
+        if(piece!=null) {ci.cancel();CellBreakEffects.hit(world,pos,piece,side);}
+        else if(world.getBlockState(pos).isOf(Slabbed.CELL))ci.cancel();
     }
 }

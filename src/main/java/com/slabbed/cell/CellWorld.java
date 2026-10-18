@@ -21,9 +21,11 @@ public final class CellWorld {
     public static int length(BlockState state) { return state.getBlock() instanceof SlabBlock ? 1 : 2; }
     public static CellContents<BlockState> contents(World world,BlockPos pos) {
         if (!world.isChunkLoaded(pos)) return null;
+        var supplemental=SupplementalCells.contents(world,pos);
+        if(supplemental!=null)return supplemental;
         var state=world.getBlockState(pos);
         var nativeSeat=com.slabbed.nativeblock.NativeSeats.seat(world,pos);
-        if(nativeSeat!=null && nativeSeat.halfOffset()!=0)return null;
+        if(nativeSeat!=null)return CellContents.empty();
         if (state.isOf(Slabbed.CELL)) return world.getBlockEntity(pos) instanceof CellBlockEntity cell?cell.contents():null;
         if (state.hasBlockEntity()) return null;
         if (state.isAir() || state.isReplaceable()) return CellContents.empty();
@@ -77,6 +79,12 @@ public final class CellWorld {
         try {
             for(var entry:changes.entrySet()) {
                 var pos=entry.getKey(); var next=entry.getValue();
+                if(com.slabbed.nativeblock.NativeSeats.seat(world,pos)!=null && !world.getBlockState(pos).isOf(Slabbed.CELL)) {
+                    SupplementalCells.put(world,pos,next);
+                    world.getChunkManager().getLightingProvider().checkBlock(pos);
+                    continue;
+                }
+                SupplementalCells.remove(world,pos);
                 if(next.fragments().isEmpty()) { world.setBlockState(pos,Blocks.AIR.getDefaultState(),Block.NOTIFY_LISTENERS); continue; }
                 if(next.fragments().size()==1) {
                     var p=next.fragments().getFirst();
@@ -100,10 +108,10 @@ public final class CellWorld {
     }
     public static CellContents.Fragment<BlockState> pick(World world,BlockPos pos,BlockHitResult hit) {
         var cell=contents(world,pos); if(cell==null) return null;
-        if(hit==null) return cell.fragments().isEmpty()?null:cell.fragments().getLast();
+        if(hit==null) return SupplementalCells.has(world,pos) || cell.fragments().isEmpty()?null:cell.fragments().getLast();
         var point=hit.getPos().subtract(Vec3d.of(pos)).subtract(Vec3d.of(hit.getSide().getVector()).multiply(1e-5));
         for(var p:cell.fragments()) {
-            var shape=p.value().getOutlineShape(world,pos).offset(0,p.offset()*.5,0);
+            var shape=com.slabbed.nativeblock.NativeShapes.outline(world,pos,p.value()).offset(0,p.offset()*.5,0);
             for(var box:shape.getBoundingBoxes()) if(box.expand(1e-6).contains(point)) return p;
         }
         return null;
@@ -121,6 +129,9 @@ public final class CellWorld {
             changes.put(pos,before.remove(local).add(new CellContents.Fragment<>(local,part.length(),next)));
         }
         commit(world,changes);return true;
+    }
+    public static void promoteSupplemental(World world,BlockPos pos,CellContents<BlockState> parts) {
+        commit(world,Map.of(pos,parts));
     }
     public static void clearOutsideCell(World world,BlockPos removed,CellContents<BlockState> snapshot) {
         Map<BlockPos,CellContents<BlockState>> changes=new LinkedHashMap<>();

@@ -27,15 +27,23 @@ public final class PieceSupport {
             if(!world.isChunkLoaded(adjacent))return true;
             boolean supported=false;
             var other=CellWorld.contents(world,adjacent);
-            if(other==null) {
-                var nativeState=world.getBlockState(adjacent);
-                supported=PieceRules.supports(nativeState) && (direction.getAxis().isHorizontal()
-                        || (direction==Direction.DOWN?adjacent.getY()*2+2==contact:adjacent.getY()*2==contact));
-            } else for(var support:other.fragments()) {
+            if(other!=null)for(var support:other.fragments()) {
                 if(!PieceRules.supports(support.value()))continue;
                 int start=adjacent.getY()*2+support.offset(),end=start+support.length();
                 if(direction.getAxis().isHorizontal()?start<=origin && end>=origin+part.length()
                         : direction==Direction.DOWN?end==contact:start==contact) supported=true;
+            }
+            for(int n=-1;n<=1;n++) {
+                var owner=adjacent.up(n);var nativeState=world.getBlockState(owner);
+                if(nativeState.isOf(com.slabbed.Slabbed.CELL) || !PieceRules.supports(nativeState))continue;
+                var seat=com.slabbed.nativeblock.NativeSeats.seat(world,owner);
+                if(seat==null && nativeState.getBlock() instanceof SlabBlock
+                        && nativeState.get(SlabBlock.TYPE)!=net.minecraft.block.enums.SlabType.DOUBLE)continue;
+                int start=owner.getY()*2+(seat==null?0:seat.halfOffset());
+                int length=nativeState.getBlock() instanceof SlabBlock
+                        && nativeState.get(SlabBlock.TYPE)!=net.minecraft.block.enums.SlabType.DOUBLE?1:2;
+                if(direction.getAxis().isHorizontal()?start<=origin && start+length>=origin+part.length()
+                        : direction==Direction.DOWN?start+length==contact:start==contact)supported=true;
             }
             return supported;
     }

@@ -1,4 +1,4 @@
-"""Print the exact mapped pressure-plate methods used by the runtime build."""
+"""Print exact mapped native methods used by the runtime build."""
 import os
 import subprocess
 import sys

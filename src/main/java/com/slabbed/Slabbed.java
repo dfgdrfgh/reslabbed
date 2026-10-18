@@ -18,6 +18,7 @@ public final class Slabbed implements ModInitializer {
         Registry.register(Registries.BLOCK, Identifier.of("slabbed", "cell"), CELL);
         Registry.register(Registries.BLOCK_ENTITY_TYPE, Identifier.of("slabbed", "cell"), CELL_ENTITY);
         com.slabbed.nativeblock.NativeSeats.init();
+        com.slabbed.cell.SupplementalCells.init();
         com.slabbed.cell.CellInteractions.register();
         com.slabbed.cell.PieceTarget.register();
     }

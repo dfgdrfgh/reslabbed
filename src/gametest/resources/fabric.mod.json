@@ -15,7 +15,9 @@
       "com.slabbed.test.NativeCohabitationTest",
       "com.slabbed.test.NativePistonTest",
       "com.slabbed.test.NativeTransformationTest",
-      "com.slabbed.test.NativeEntityItemTest"
+      "com.slabbed.test.NativeEntityItemTest",
+      "com.slabbed.test.NativeRailTest",
+      "com.slabbed.test.NativeEffectsTest"
     ],
     "client": [
       "com.slabbed.test.PhysicalClientProbe"
@@ -26,6 +28,7 @@
     "fabric-gametest-api-v1": "*"
   },
   "mixins": [
+    "physical-native-particle.mixins.json",
     {
       "config": "physical-test.mixins.json",
       "environment": "client"

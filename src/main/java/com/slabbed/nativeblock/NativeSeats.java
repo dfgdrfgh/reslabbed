@@ -15,6 +15,12 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.WorldChunk;
 
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerChunkEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.ChunkPos;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
@@ -61,14 +67,33 @@ public final class NativeSeats {
             builder->builder.persistent(CODEC).syncWith(PACKET_CODEC,AttachmentSyncPredicate.all()));
     public static Function<BlockPos,Seat> clientSnapshot=pos->null;
     public static BiConsumer<World,BlockPos> changed=(world,pos)->{};
+    private static final ConcurrentMap<ServerWorld,ConcurrentMap<Long,Map<String,Seat>>> SERVER_SNAPSHOTS=new ConcurrentHashMap<>();
     private NativeSeats() {}
-    public static void init() {}
+    public static void init() {
+        ServerChunkEvents.CHUNK_LOAD.register((world,chunk)->publish(world,chunk));
+        ServerChunkEvents.CHUNK_UNLOAD.register((world,chunk)-> {
+            var chunks=SERVER_SNAPSHOTS.get(world);if(chunks!=null)chunks.remove(chunk.getPos().toLong());
+        });
+        ServerLifecycleEvents.SERVER_STOPPED.register(server->SERVER_SNAPSHOTS.keySet().removeIf(world->world.getServer()==server));
+    }
+    private static void publish(World world,WorldChunk chunk) {
+        if(world instanceof ServerWorld server)
+            SERVER_SNAPSHOTS.computeIfAbsent(server,key->new ConcurrentHashMap<>()).put(chunk.getPos().toLong(),snapshot(chunk));
+    }
     public static Map<String,Seat> snapshot(WorldChunk chunk) {
         var map=chunk.getAttached(TYPE);return map==null?Map.of():map;
     }
     public static Seat seat(BlockView view,BlockPos pos) {
         var pending=NativePlacement.pending(view,pos);
         if(pending!=null) return pending;
+        var transformed=NativeTransformations.pending(view,pos);if(transformed!=null)return transformed;
+        // Lighting workers must never request a server chunk or wait for the server thread.
+        if(view instanceof ServerWorld server && !server.getServer().isOnThread()) {
+            var chunks=SERVER_SNAPSHOTS.get(server);
+            if(chunks==null)return null;
+            var snapshot=chunks.get(ChunkPos.toLong(pos.getX()>>4,pos.getZ()>>4));
+            return snapshot==null?null:snapshot.get(Long.toString(pos.asLong()));
+        }
         Seat seat;
         if(view instanceof World world) {
             if(!world.isChunkLoaded(pos)) return null;
@@ -83,18 +108,19 @@ public final class NativeSeats {
         var seat=seat(view,pos);return seat==null?0:seat.offset();
     }
     public static double offset(BlockView view,BlockPos pos,net.minecraft.block.BlockState state) {
-        return view.getBlockState(pos).getBlock()==state.getBlock()?offset(view,pos):0;
+        var seat=seat(view,pos);
+        return seat!=null && Registries.BLOCK.getId(state.getBlock()).toString().equals(seat.block())?seat.offset():0;
     }
     public static void put(World world,BlockPos pos,Seat seat) {
         var chunk=world.getWorldChunk(pos);var next=new HashMap<>(snapshot(chunk));
         next.put(Long.toString(pos.asLong()),seat);chunk.setAttached(TYPE,Map.copyOf(next));
-        chunk.setNeedsSaving(true);changed.accept(world,pos);
+        publish(world,chunk);chunk.setNeedsSaving(true);changed.accept(world,pos);
     }
     public static void remove(World world,BlockPos pos) {
         if(!world.isChunkLoaded(pos))return;
         var chunk=world.getWorldChunk(pos);var before=snapshot(chunk);var key=Long.toString(pos.asLong());
         if(!before.containsKey(key))return;
         var next=new HashMap<>(before);next.remove(key);chunk.setAttached(TYPE,Map.copyOf(next));
-        chunk.setNeedsSaving(true);changed.accept(world,pos);
+        publish(world,chunk);chunk.setNeedsSaving(true);changed.accept(world,pos);
     }
 }

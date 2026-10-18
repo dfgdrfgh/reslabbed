@@ -1,11 +1,14 @@
 package com.slabbed.test;
 
 import com.slabbed.nativeblock.NativeSeats;
+import com.slabbed.nativeblock.NativePistonPose;
+import com.slabbed.nativeblock.NativeShapes;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.PistonBlock;
 import net.minecraft.block.entity.BarrelBlockEntity;
 import net.minecraft.block.entity.PistonBlockEntity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.item.Items;
@@ -40,11 +43,34 @@ public final class NativePistonTest {
         t.getWorld().setBlockState(pos,(powered?Blocks.REDSTONE_BLOCK:Blocks.AIR).getDefaultState(),Block.NOTIFY_ALL);
     }
 
+    private static void moving(TestContext t,BlockPos pos) {
+        var world=t.getWorld();var state=world.getBlockState(pos);
+        t.assertTrue(world.getBlockEntity(pos) instanceof PistonBlockEntity,"actual vanilla moving piston block entity exists");
+        var entity=(PistonBlockEntity)world.getBlockEntity(pos);
+        remembered(t,pos,Blocks.MOVING_PISTON);
+        t.assertTrue(Integer.valueOf(-1).equals(((NativePistonPose)entity).slabbed$halfOffset()),"moving entity remembers source pose");
+        var copy=new PistonBlockEntity(pos,state);
+        copy.read(entity.createNbt(world.getRegistryManager()),world.getRegistryManager());
+        t.assertTrue(Integer.valueOf(-1).equals(((NativePistonPose)copy).slabbed$halfOffset()),"moving entity NBT preserves frozen source pose");
+        var raw=NativeShapes.collision(world,pos,state).getBoundingBox();
+        var physical=state.getCollisionShape(world,pos).getBoundingBox();
+        t.assertTrue(Math.abs(physical.minY-raw.minY+.5)<1e-7 && Math.abs(physical.maxY-raw.maxY+.5)<1e-7,
+                "in-flight moving piston collision applies physical seat exactly once");
+        if (entity.getFacing().getAxis().isHorizontal())
+            t.assertTrue(Math.abs(physical.minY+.5)<1e-7 && Math.abs(physical.maxY-.5)<1e-7,
+                    "horizontal moving cube and head have absolute Y bounds -0.5 to 0.5");
+        else if (!entity.isSource()) {
+            double motion=entity.getRenderOffsetY(1);
+            t.assertTrue(Math.abs(physical.minY-(motion-.5))<1e-7 && Math.abs(physical.maxY-(motion+.5))<1e-7,
+                    "vertical moving cube absolute Y matches vanilla motion plus remembered seat");
+        }
+    }
+
     private static BlockPos itemPiston(TestContext t) {
         var base=t.getAbsolutePos(new BlockPos(2,3,3));
         t.getWorld().setBlockState(base,Blocks.OAK_SLAB.getDefaultState());
         var player=t.createMockPlayer(GameMode.SURVIVAL);
-        player.setPosition(base.getX()+.5,base.getY(),base.getZ()-3);
+        player.setPosition(base.getX()-3,base.getY(),base.getZ()+.5);
         player.setYaw(90);player.setPitch(0);
         player.setStackInHand(Hand.MAIN_HAND,new ItemStack(Items.PISTON,2));
         var hit=new BlockHitResult(Vec3d.ofBottomCenter(base).add(0,.5,0),Direction.UP,base,false);
@@ -61,10 +87,7 @@ public final class NativePistonTest {
     public void itemPlacedPistonExtendsAndRetractsPhysicalHead(TestContext t) {
         var owner=itemPiston(t);var head=owner.east();var source=owner.north();
         t.runAtTick(2,()->power(t,source,true));
-        t.runAtTick(3,()-> {
-            t.assertTrue(t.getWorld().getBlockEntity(head) instanceof PistonBlockEntity,
-                    "real extension creates vanilla moving piston block entity");
-        });
+        t.runAtTick(3,()->moving(t,head));
         t.runAtTick(10,()-> {
             remembered(t,owner,Blocks.PISTON);remembered(t,head,Blocks.PISTON_HEAD);
             t.assertTrue(t.getWorld().getBlockState(owner).get(PistonBlock.EXTENDED),"vanilla piston reaches extended state");
@@ -88,12 +111,16 @@ public final class NativePistonTest {
         fixture(t,owner,Blocks.STICKY_PISTON,Direction.EAST);
         // The fixture deliberately retains native STONE identity and an explicit frozen seat.
         fixture(t,original,Blocks.STONE,Direction.EAST);
+        var entity=t.spawnEntity(EntityType.SILVERFISH,new Vec3d(4.35,3.55,3.5));
+        entity.setAiDisabled(true);entity.setNoGravity(true);
         t.runAtTick(2,()->power(t,owner.north(),true));
-        t.runAtTick(3,()->t.assertTrue(t.getWorld().getBlockEntity(pushed) instanceof PistonBlockEntity,
-                "horizontal push uses actual vanilla moving block entity"));
+        t.runAtTick(3,()->moving(t,pushed));
         t.runAtTick(10,()-> {
             remembered(t,owner,Blocks.STICKY_PISTON);remembered(t,original,Blocks.PISTON_HEAD);remembered(t,pushed,Blocks.STONE);
             t.assertTrue(t.getWorld().getBlockState(owner).get(PistonBlock.EXTENDED),"sticky piston extends");
+            t.assertTrue(entity.getBoundingBox().maxY<owner.getY(),"short pushed entity stays wholly below native owner height");
+            t.assertTrue(entity.getX()>pushed.getX()+1,"actual moving physical cube pushes the low entity beyond its destination");
+            entity.discard();
             power(t,owner.north(),false);
         });
         t.runAtTick(20,()-> {
@@ -109,8 +136,7 @@ public final class NativePistonTest {
         var owner=t.getAbsolutePos(new BlockPos(3,3,3));var original=owner.up();var pushed=owner.up(2);
         fixture(t,owner,Blocks.STICKY_PISTON,Direction.UP);fixture(t,original,Blocks.STONE,Direction.UP);
         t.runAtTick(2,()->power(t,owner.west(),true));
-        t.runAtTick(3,()->t.assertTrue(t.getWorld().getBlockEntity(pushed) instanceof PistonBlockEntity,
-                "vertical push uses actual vanilla moving block entity"));
+        t.runAtTick(3,()->moving(t,pushed));
         t.runAtTick(10,()-> {
             remembered(t,owner,Blocks.STICKY_PISTON);remembered(t,original,Blocks.PISTON_HEAD);remembered(t,pushed,Blocks.STONE);
             t.assertTrue(t.getWorld().getBlockState(owner).get(PistonBlock.EXTENDED),"vertical sticky piston extends");
@@ -148,8 +174,7 @@ public final class NativePistonTest {
         for(int n=1;n<=12;n++) fixture(t,twelve.up(n),Blocks.STONE,Direction.UP);
         for(int n=1;n<=13;n++) fixture(t,thirteen.up(n),Blocks.STONE,Direction.UP);
         t.runAtTick(2,()-> {power(t,twelve.west(),true);power(t,thirteen.west(),true);});
-        t.runAtTick(3,()->t.assertTrue(t.getWorld().getBlockEntity(twelve.up(13)) instanceof PistonBlockEntity,
-                "twelve-piece column is actually moved by vanilla piston block entities"));
+        t.runAtTick(3,()->moving(t,twelve.up(13)));
         t.runAtTick(12,()-> {
             remembered(t,twelve,Blocks.PISTON);remembered(t,twelve.up(),Blocks.PISTON_HEAD);
             t.assertTrue(t.getWorld().getBlockState(twelve).get(PistonBlock.EXTENDED),"twelve whole pieces may extend");

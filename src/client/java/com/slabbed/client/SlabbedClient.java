@@ -7,6 +7,7 @@ import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 public final class SlabbedClient implements ClientModInitializer {
     @Override public void onInitializeClient() { BlockEntityRendererFactories.register(Slabbed.CELL_ENTITY,CellRenderer::new);
         NativeSeatClient.init();
+        SupplementalCellClient.init();
         net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents.CHUNK_UNLOAD.register((world,chunk)->CellRenderSync.unload(chunk.getPos()));
         net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents.DISCONNECT.register((handler,client)->CellRenderSync.reset());
         net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents.START.register(context->CellRenderSync.beginFrame());

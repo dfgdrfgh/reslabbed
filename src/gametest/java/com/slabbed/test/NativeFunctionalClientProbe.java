@@ -41,6 +41,7 @@ public final class NativeFunctionalClientProbe {
     /** Call before the parent probe closes screens; false means this helper still owns the player. */
     public static boolean tick(MinecraftClient client,boolean reopen) {
         if(Boolean.getBoolean("slabbed.controlProbe"))return true;
+        if(!NativeParticleClientProbe.tick(client))return false;
         if(failure!=null)throw new AssertionError("native functional server probe failed",failure);
         if(stage==99)return true;
         NativeRenderAudit.tick(client);

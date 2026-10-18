@@ -16,7 +16,7 @@ public final class CellInteractions {
     private CellInteractions() {}
     public static void register() { UseBlockCallback.EVENT.register(CellInteractions::use); }
     public static ActionResult use(PlayerEntity player,World world,Hand hand,BlockHitResult hit) {
-        if(player.isSpectator() || !world.getBlockState(hit.getBlockPos()).isOf(Slabbed.CELL)) return ActionResult.PASS;
+        if(player.isSpectator() || (!world.getBlockState(hit.getBlockPos()).isOf(Slabbed.CELL) && !SupplementalCells.has(world,hit.getBlockPos()))) return ActionResult.PASS;
         var part=CellWorld.pick(world,hit.getBlockPos(),hit);
         if(part==null || !(part.value().getBlock() instanceof FlowerPotBlock pot)) return ActionResult.PASS;
         if(!player.getAbilities().allowModifyWorld || !world.canPlayerModifyAt(player,hit.getBlockPos())) return ActionResult.FAIL;

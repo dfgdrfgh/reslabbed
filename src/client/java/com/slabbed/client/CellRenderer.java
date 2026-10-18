@@ -22,6 +22,10 @@ public final class CellRenderer implements BlockEntityRenderer<CellBlockEntity> 
         CellRenderSync.registered(cell);
         if(cell.getWorld()==null || cell.renderBounds()==null || (frustum!=null && !frustum.isVisible(cell.renderBounds())))return;
         if(!CellRenderSync.draw(cell))return;
+        renderSupplemental(cell,tickDelta,matrices,vertices,light,overlay);
+    }
+    public void renderSupplemental(CellBlockEntity cell,float tickDelta,MatrixStack matrices,VertexConsumerProvider vertices,int light,int overlay) {
+        if(cell.getWorld()==null || cell.renderBounds()==null || (frustum!=null && !frustum.isVisible(cell.renderBounds())))return;
         var renderer=MinecraftClient.getInstance().getBlockRenderManager();
         for(var part:cell.contents().fragments()) {
             if(part.offset()<0) continue;

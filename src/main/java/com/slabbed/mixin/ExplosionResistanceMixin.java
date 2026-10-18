@@ -21,6 +21,13 @@ public abstract class ExplosionResistanceMixin {
             float resistance=fluid.getBlastResistance();
             for(var part:cell.contents().fragments())resistance=Math.max(resistance,part.value().getBlock().getBlastResistance());
             cir.setReturnValue(Optional.of(resistance));
+        } else {
+            var parts=com.slabbed.cell.SupplementalCells.contents(world,pos);
+            if(parts!=null) {
+                float resistance=Math.max(fluid.getBlastResistance(),state.getBlock().getBlastResistance());
+                for(var part:parts.fragments())resistance=Math.max(resistance,part.value().getBlock().getBlastResistance());
+                cir.setReturnValue(Optional.of(resistance));
+            }
         }
     }
 }

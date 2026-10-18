@@ -20,9 +20,10 @@ public abstract class ServerBreakMixin {
     @Shadow @Final protected ServerPlayerEntity player;
     @Inject(method="tryBreakBlock",at=@At("HEAD"),cancellable=true)
     private void slabbed$breakPiece(BlockPos pos,CallbackInfoReturnable<Boolean> cir) {
-        if(!world.getBlockState(pos).isOf(Slabbed.CELL)) return;
-        if(!world.canPlayerModifyAt(player,pos) || player.isBlockBreakingRestricted(world,pos,player.interactionManager.getGameMode())) { cir.setReturnValue(false); return; }
+        if(!world.getBlockState(pos).isOf(Slabbed.CELL) && !com.slabbed.cell.SupplementalCells.has(world,pos)) return;
         var part=com.slabbed.cell.PieceTarget.selected(player,pos);
+        if(part==null && !world.getBlockState(pos).isOf(Slabbed.CELL))return;
+        if(!world.canPlayerModifyAt(player,pos) || player.isBlockBreakingRestricted(world,pos,player.interactionManager.getGameMode())) { cir.setReturnValue(false); return; }
         if(part==null) { cir.setReturnValue(false); return; }
         var tool=player.getMainHandStack();
         if(!tool.getItem().canMine(part.value(),world,pos,player)) { cir.setReturnValue(false); return; }

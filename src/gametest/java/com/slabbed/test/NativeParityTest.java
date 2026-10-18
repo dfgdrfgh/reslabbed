@@ -206,7 +206,13 @@ public final class NativeParityTest {
         var entity=t.spawnEntity(EntityType.SILVERFISH,new Vec3d(3.5,3.5,3.5));entity.setAiDisabled(true);
         t.runAtTick(5,()-> {
             t.assertTrue(entity.getBoundingBox().maxY<owner.getY(),"activation entity remains wholly below native owner cell");
-            t.assertTrue(world.getBlockState(owner).get(Properties.POWERED),"actual short entity activates lowered physical plate");
+            boolean active=world.getBlockState(owner).get(Properties.POWERED);
+            if(!active) {
+                System.out.println("NATIVE_PLATE_CONTACT entity="+entity.getBoundingBox()+" owner="+owner+" outline="+world.getBlockState(owner).getOutlineShape(world,owner).getBoundingBoxes()+" seat="+NativeSeats.seat(world,owner));
+                world.getBlockState(owner).onEntityCollision(world,owner,entity);
+                System.out.println("NATIVE_PLATE_DIRECT_DETECTION powered="+world.getBlockState(owner).get(Properties.POWERED));
+            }
+            t.assertTrue(active,"actual short entity activates lowered physical plate");
             t.assertTrue(seat.equals(NativeSeats.seat(world,owner)),"plate activation preserves seat");entity.discard();
         });
         t.runAtTick(35,()-> {

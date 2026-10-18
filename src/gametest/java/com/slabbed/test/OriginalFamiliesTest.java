@@ -181,7 +181,7 @@ public final class OriginalFamiliesTest {
         require(!pose.shape().isEmpty(),"placed physical outline empty");
         var box=pose.shape().getBoundingBox();
         require(box.minY>=origin*.5-1e-6 && box.maxY<=origin*.5+1.5+1e-6,"outline escaped physical placement bounds: "+box);
-        var center=box.getCenter();
+        var center=pose.shape().getBoundingBoxes().getFirst().getCenter();
         var visible=t.getWorld().raycast(new RaycastContext(center.add(0,2,0),center,
                 RaycastContext.ShapeType.OUTLINE,RaycastContext.FluidHandling.NONE,player));
         // Ceiling support can occlude a top-down ray; approach that attachment from below instead.
