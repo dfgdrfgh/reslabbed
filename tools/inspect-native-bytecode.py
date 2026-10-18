@@ -1,6 +1,7 @@
 """Print the exact mapped pressure-plate methods used by the runtime build."""
 import os
 import subprocess
+import sys
 from pathlib import Path
 from zipfile import ZipFile, BadZipFile
 
@@ -16,8 +17,8 @@ for root in roots:
                     continue
         except (BadZipFile, OSError):
             continue
-        for name in ['PressurePlateBlock', 'WeightedPressurePlateBlock']:
+        for name in (sys.argv[1:] or ['net.minecraft.block.PressurePlateBlock', 'net.minecraft.block.WeightedPressurePlateBlock']):
             print('NATIVE_BYTECODE ' + name, flush=True)
-            subprocess.run(['javap', '-c', '-p', '-classpath', str(jar), 'net.minecraft.block.' + name], check=True)
+            subprocess.run(['javap', '-c', '-p', '-classpath', str(jar), name], check=True)
         raise SystemExit(0)
 raise SystemExit('Mapped Minecraft JAR not found')

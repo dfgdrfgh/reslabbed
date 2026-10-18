@@ -13,7 +13,9 @@
       "com.slabbed.test.OriginalFamiliesTest",
       "com.slabbed.test.NativeConnectionTest",
       "com.slabbed.test.NativeCohabitationTest",
-      "com.slabbed.test.NativePistonTest"
+      "com.slabbed.test.NativePistonTest",
+      "com.slabbed.test.NativeTransformationTest",
+      "com.slabbed.test.NativeEntityItemTest"
     ],
     "client": [
       "com.slabbed.test.PhysicalClientProbe"

@@ -32,11 +32,11 @@ jobs:
       - name: Compile and server-test the fresh implementation
         run: |
           rm -rf build/run/gameTest
-          bash gradlew --no-daemon --console=plain build runGameTest writeProbeRuntime
+          python3 tools/server-check.py
           python3 tools/verify-test-count.py
-      - name: Inspect pressure plate target after a failed runtime bootstrap
+      - name: Inspect native targets after a failed runtime check
         if: failure() && matrix.variant == 'indigo'
-        run: python3 tools/inspect-native-bytecode.py
+        run: python3 tools/inspect-native-bytecode.py net.minecraft.block.PressurePlateBlock net.minecraft.block.WeightedPressurePlateBlock net.minecraft.block.PistonBlock net.minecraft.block.entity.PistonBlockEntity net.minecraft.block.WallBlock net.minecraft.item.ArmorStandItem net.minecraft.item.AxeItem
       - name: Stage complete latest pack
         if: matrix.variant == 'pack' || matrix.variant == 'control'
         env:
