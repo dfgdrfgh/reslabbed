@@ -34,6 +34,9 @@ jobs:
           rm -rf build/run/gameTest
           bash gradlew --no-daemon --console=plain build runGameTest writeProbeRuntime
           python3 tools/verify-test-count.py
+      - name: Inspect pressure plate target after a failed runtime bootstrap
+        if: failure() && matrix.variant == 'indigo'
+        run: python3 tools/inspect-native-bytecode.py
       - name: Stage complete latest pack
         if: matrix.variant == 'pack' || matrix.variant == 'control'
         env:
