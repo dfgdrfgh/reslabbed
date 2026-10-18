@@ -28,7 +28,12 @@ tasks.register('halfGridTest', JavaExec) {
     classpath = sourceSets.unit.runtimeClasspath
     mainClass = 'com.slabbed.core.HalfGridTest'
 }
-tasks.named('check') { dependsOn 'halfGridTest' }
+tasks.register('physicalPushTest', JavaExec) {
+    dependsOn tasks.named('unitClasses')
+    classpath = sourceSets.unit.runtimeClasspath
+    mainClass = 'com.slabbed.core.PhysicalPushTest'
+}
+tasks.named('check') { dependsOn 'halfGridTest', 'physicalPushTest' }
 tasks.register('clientProbeJar', Jar) {
     dependsOn 'gametestClasses'
     from sourceSets.gametest.output

@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.At;
 /** Native scheduled detection uses the same physical bounds as initial contact. */
 @Mixin({PressurePlateBlock.class,WeightedPressurePlateBlock.class})
 public abstract class NativePlateDetectionMixin {
-    @ModifyExpressionValue(method="getRedstoneOutput",at=@At(value="INVOKE",target="Lnet/minecraft/util/math/Box;offset(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/util/math/Box;"))
+    @ModifyExpressionValue(method="getRedstoneOutput(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)I",at=@At(value="INVOKE",target="Lnet/minecraft/util/math/Box;offset(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/util/math/Box;"))
     private Box slabbed$physicalDetection(Box box,World world,BlockPos pos) {
         return box.offset(0,NativeSeats.offset(world,pos),0);
     }
