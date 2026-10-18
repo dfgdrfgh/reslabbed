@@ -141,6 +141,25 @@ public final class NativeCohabitationTest {
     }
 
     @GameTest(templateName="fabric-gametest-api-v1:empty")
+    public void sameMaterialSupplementalMiningTerminatesWithNativeHardness(TestContext t) {
+        var world=t.getWorld();var owner=t.getAbsolutePos(new BlockPos(3,4,3));var control=owner.east(3);
+        world.setBlockState(owner,Blocks.STONE.getDefaultState());world.setBlockState(control,Blocks.STONE.getDefaultState());
+        NativeSeats.put(world,owner,new NativeSeats.Seat(-1,"minecraft:stone"));
+        t.assertTrue(CellWorld.place(world,owner.getX(),owner.getZ(),owner.getY()*2+1,Blocks.STONE.getDefaultState()),"matching stone piece occupies unused native half");
+        var player=t.createMockPlayer(GameMode.SURVIVAL);
+        player.setPosition(owner.getX()+.5,owner.getY()-.87,owner.getZ()-2.5);player.setYaw(0);player.setPitch(0);
+        player.setStackInHand(Hand.MAIN_HAND,new ItemStack(Items.IRON_PICKAXE));
+        var ray=player.raycast(player.getBlockInteractionRange(),1,false);
+        t.assertTrue(ray instanceof BlockHitResult hit && hit.getBlockPos().equals(owner)
+                && CellWorld.pick(world,owner,hit)!=null,"ray selects matching supplemental material");
+        float expected=world.getBlockState(control).calcBlockBreakingDelta(player,world,control);
+        float actual;
+        try {actual=world.getBlockState(owner).calcBlockBreakingDelta(player,world,owner);}
+        catch(StackOverflowError recursion) {t.assertTrue(false,"same-material mining must terminate without recursive delegation");return;}
+        t.assertTrue(Math.abs(actual-expected)<1e-7,"matching supplemental material retains native hardness");t.complete();
+    }
+
+    @GameTest(templateName="fabric-gametest-api-v1:empty")
     public void supplementalWallTorchLosesPhysicalSupportWithoutRemovingBarrel(TestContext t) {
         var f=barrel(t);var base=f.base();var support=base.east().up();int origin=base.getY()*2+3;
         t.assertTrue(CellWorld.place(t.getWorld(),support.getX(),support.getZ(),origin,Blocks.STONE.getDefaultState()),"physical side support spans native owner's unused upper half");
