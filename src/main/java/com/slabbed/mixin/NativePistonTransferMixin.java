@@ -6,6 +6,7 @@ import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
 import com.slabbed.nativeblock.NativePistons;
 import com.slabbed.nativeblock.NativeSeats;
+import com.slabbed.nativeblock.PhysicalPistons;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.PistonBlock;
 import net.minecraft.block.piston.PistonHandler;
@@ -31,13 +32,32 @@ public abstract class NativePistonTransferMixin {
         var stack=SLABBED$MOVES.get();
         var destinations=new LinkedHashMap<BlockPos,Integer>();stack.push(destinations);
         try {
-            boolean moved=original.call(world,pos,direction,extending);
-            if (moved) destinations.forEach((destination,half)->NativePistons.publish(world,destination,half));
-            return moved;
+            var plan=PhysicalPistons.prepare(world,pos,direction,extending);
+            java.util.function.BooleanSupplier vanilla=()-> {
+                boolean moved=original.call(world,pos,direction,extending);
+                if(moved) destinations.forEach((destination,half)->NativePistons.publish(world,destination,half));
+                return moved;
+            };
+            return plan==null?vanilla.getAsBoolean():PhysicalPistons.move(world,plan,vanilla);
         } finally {
             stack.pop();
             if (stack.isEmpty()) SLABBED$MOVES.remove();
         }
+    }
+
+    @WrapOperation(method="tryMove",at=@At(value="INVOKE",target="Lnet/minecraft/block/piston/PistonHandler;calculatePush()Z"))
+    private boolean slabbed$physicalPreflight(PistonHandler handler,Operation<Boolean> original,
+            @Local(argsOnly=true) World world,@Local(argsOnly=true) BlockPos pos,
+            @Local(argsOnly=true) BlockState state) {
+        var plan=PhysicalPistons.prepare(world,pos,state.get(PistonBlock.FACING),true);
+        return plan==null?original.call(handler):plan.accepted();
+    }
+
+    @WrapOperation(method="onSyncedBlockEvent",at=@At(value="INVOKE",target="Lnet/minecraft/block/PistonBlock;isMovable(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;ZLnet/minecraft/util/math/Direction;)Z"))
+    private boolean slabbed$physicalPull(BlockState target,World world,BlockPos targetPos,Direction motion,
+            boolean canBreak,Direction facing,Operation<Boolean> original,@Local(argsOnly=true) BlockPos pos) {
+        var plan=PhysicalPistons.prepare(world,pos,facing,false);
+        return plan==null?original.call(target,world,targetPos,motion,canBreak,facing):plan.accepted();
     }
 
     @WrapOperation(method="move",at=@At(value="INVOKE",target="Lnet/minecraft/block/piston/PistonHandler;calculatePush()Z"))
@@ -57,9 +77,11 @@ public abstract class NativePistonTransferMixin {
     @WrapMethod(method="onSyncedBlockEvent")
     private boolean slabbed$base(BlockState state,World world,BlockPos pos,int type,int data,Operation<Boolean> original) {
         var seat=NativeSeats.seat(world,pos);
-        boolean accepted=original.call(state,world,pos,type,data);
-        if (accepted && seat!=null) NativePistons.publish(world,pos,seat.halfOffset());
-        return accepted;
+        return com.slabbed.cell.CellWorld.pistonTransaction(world,()->NativePistons.withBasePose(world,pos,seat,()-> {
+            boolean accepted=original.call(state,world,pos,type,data);
+            if(accepted && seat!=null)NativePistons.publish(world,pos,seat.halfOffset());
+            return accepted;
+        }));
     }
 
     @Unique private static void slabbed$copy(World world,BlockPos source,BlockPos destination,Map<BlockPos,Integer> destinations) {

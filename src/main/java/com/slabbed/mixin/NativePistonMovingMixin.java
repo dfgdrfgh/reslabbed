@@ -38,7 +38,7 @@ public abstract class NativePistonMovingMixin implements NativePistonPose {
     @WrapMethod(method="tick")
     private static void slabbed$tick(World world,BlockPos pos,BlockState state,PistonBlockEntity entity,Operation<Void> original) {
         NativePistons.capture(entity);
-        original.call(world,pos,state,entity);
+        NativePistons.animate(entity,()->original.call(world,pos,state,entity));
         NativePistons.settle(entity);
     }
 
@@ -46,7 +46,7 @@ public abstract class NativePistonMovingMixin implements NativePistonPose {
     private void slabbed$finish(Operation<Void> original) {
         var entity=(PistonBlockEntity)(Object)this;
         NativePistons.capture(entity);
-        original.call();
+        NativePistons.animate(entity,()->original.call());
         NativePistons.settle(entity);
     }
 

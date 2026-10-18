@@ -45,7 +45,7 @@ public final class NativeCellPistonTest {
     }
 
     private static void place(TestContext t,int x,int z,int half,Block block) {
-        t.assertTrue(CellWorld.place(t.getWorld(),x,z,half,block.getDefaultState()),"static piece fixture fits at half "+half);
+        t.assertTrue(CellWorld.place(t.getWorld(),x,z,half,block.getDefaultState()),"static piece fixture fits at half "+half+"; lower="+t.getWorld().getBlockState(new BlockPos(x,Math.floorDiv(half,2),z))+"; upper="+t.getWorld().getBlockState(new BlockPos(x,Math.floorDiv(half+1,2),z)));
     }
 
     private static void piece(TestContext t,int x,int z,int half,int length,Block block,boolean present) {
@@ -120,6 +120,9 @@ public final class NativeCellPistonTest {
     public void twelveWholeCrossingPiecesMoveButThirteenRejectAtomically(TestContext t) {
         var twelve=piston(t,2,3,2,false,Direction.UP);var thirteen=piston(t,5,3,5,false,Direction.UP);
         int half=twelve.getY()*2+1;
+        // The empty template has a roof above the small fixture; the column extends beyond it.
+        for(var base:new BlockPos[]{twelve,thirteen}) for(int y=base.getY()+1;y<=base.getY()+15;y++)
+            t.getWorld().setBlockState(new BlockPos(base.getX(),y,base.getZ()),Blocks.AIR.getDefaultState(),Block.NOTIFY_LISTENERS);
         for(int n=0;n<12;n++) place(t,twelve.getX(),twelve.getZ(),half+2*n,Blocks.STONE);
         for(int n=0;n<13;n++) place(t,thirteen.getX(),thirteen.getZ(),half+2*n,Blocks.STONE);
         t.runAtTick(2,()-> {power(t,twelve,true);power(t,thirteen,true);});

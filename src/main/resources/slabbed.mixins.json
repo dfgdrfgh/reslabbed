@@ -33,7 +33,14 @@
     "HangingDecorationItemMixin",
     "HangingItemFrameMixin",
     "HangingPaintingMixin",
-    "HangingSurvivalMixin"
+    "HangingSurvivalMixin",
+    "NativeDisplayParticleMixin",
+    "NativeCampfireParticleMixin",
+    "NativeCampfireCookingParticleMixin",
+    "NativeLeverParticleMixin",
+    "NativePotParticleMixin",
+    "NativeCandleParticleMixin",
+    "NativeDistributedParticleMixin"
   ],
   "injectors": {
     "defaultRequire": 1

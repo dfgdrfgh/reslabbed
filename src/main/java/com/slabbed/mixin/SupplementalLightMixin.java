@@ -17,5 +17,6 @@ public abstract class SupplementalLightMixin {
         var pos=BlockPos.fromLong(packed);
         var view=((NativeLightingAccess)this).slabbed$lightingChunk(pos.getX()>>4,pos.getZ()>>4);
         if(view!=null)cir.setReturnValue(Math.max(cir.getReturnValue(),SupplementalCells.luminance(view,pos)));
+        if(state.isOf(net.minecraft.block.Blocks.BARREL))System.out.println("SUPPLEMENTAL_LIGHT_VIEW pos="+pos+" view="+(view==null?null:view.getClass())+" source="+(view==null?0:SupplementalCells.luminance(view,pos))+" result="+cir.getReturnValue());
     }
 }

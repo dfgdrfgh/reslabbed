@@ -124,6 +124,8 @@ public final class NativeParticleClientProbe {
             for(int n=0;n<64;n++)CampfireBlockEntity.clientTick(world,pos,world.getBlockState(pos),fire);
         });
         compare(client,"campfire_ambient",0,pos->ambient(client,pos));
+        compare(client,"candle_direct",1,pos->display(client,pos));
+        compare(client,"candle_ambient",1,pos->ambient(client,pos));
         compare(client,"candle_extinguish",1,pos->AbstractCandleBlock.extinguish(client.player,world.getBlockState(pos),world,pos));
         compare(client,"lever_click",2,pos->{
             var hit=new BlockHitResult(Vec3d.ofCenter(pos),Direction.UP,pos,false);

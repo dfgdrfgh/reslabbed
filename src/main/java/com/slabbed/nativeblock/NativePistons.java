@@ -8,7 +8,31 @@ import net.minecraft.world.World;
 
 /** Copies frozen source facts through vanilla piston identities without consulting supports (LAW.md). */
 public final class NativePistons {
+    private record BasePose(World world,BlockPos pos,int half) {}
+    private static final ThreadLocal<java.util.ArrayDeque<BasePose>> BASE_POSES=ThreadLocal.withInitial(java.util.ArrayDeque::new);
+    private static final ThreadLocal<PistonBlockEntity> ANIMATING=new ThreadLocal<>();
     private NativePistons() {}
+    public static boolean settling(World world,BlockPos pos,net.minecraft.block.BlockState next) {
+        var entity=ANIMATING.get();
+        return entity!=null && entity.getWorld()==world && entity.getPos().equals(pos)
+                && next.getBlock()==entity.getPushedBlock().getBlock();
+    }
+    public static void animate(PistonBlockEntity entity,Runnable action) {
+        var previous=ANIMATING.get();ANIMATING.set(entity);
+        try {action.run();}
+        finally {if(previous==null)ANIMATING.remove();else ANIMATING.set(previous);}
+    }
+
+    public static int baseHalf(World world,BlockPos pos) {
+        for(var pose:BASE_POSES.get()) if(pose.world()==world && pose.pos().equals(pos))return pose.half();
+        return (int)Math.round(NativeSeats.offset(world,pos)*2);
+    }
+    public static boolean withBasePose(World world,BlockPos pos,NativeSeats.Seat seat,java.util.function.BooleanSupplier action) {
+        if(seat==null)return action.getAsBoolean();
+        var stack=BASE_POSES.get();stack.push(new BasePose(world,pos.toImmutable(),seat.halfOffset()));
+        try {return action.getAsBoolean();}
+        finally {stack.pop();if(stack.isEmpty())BASE_POSES.remove();}
+    }
 
     public static void publish(World world,BlockPos pos,Integer halfOffset) {
         if (world==null || halfOffset==null) return;

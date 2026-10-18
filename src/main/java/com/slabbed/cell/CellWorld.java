@@ -16,6 +16,7 @@ import java.util.Map;
 /** Transactions touch only the cells intersecting a piece. See LAW.md. */
 public final class CellWorld {
     private static final ThreadLocal<Boolean> MUTATING=ThreadLocal.withInitial(()->false);
+    private static final ThreadLocal<java.util.Set<BlockPos>> PISTON_CHANGES=new ThreadLocal<>();
     private CellWorld() {}
     public static boolean mutating() { return MUTATING.get(); }
     public static int length(BlockState state) { return state.getBlock() instanceof SlabBlock ? 1 : 2; }
@@ -99,12 +100,28 @@ public final class CellWorld {
                 cell.setContents(next);
             }
         } finally { MUTATING.set(previous); }
-        for(var pos:changes.keySet()) {
+        var deferred=PISTON_CHANGES.get();
+        if(deferred!=null) { deferred.addAll(changes.keySet()); return; }
+        publishChanges(world,changes.keySet());
+    }
+    private static void publishChanges(World world,java.util.Set<BlockPos> positions) {
+        for(var pos:positions) {
             world.updateNeighbors(pos,world.getBlockState(pos).getBlock());
             world.updateListeners(pos,world.getBlockState(pos),world.getBlockState(pos),Block.NOTIFY_ALL);
             if(!world.isClient) {PieceSupport.revalidate(world,pos);PieceSupport.revalidateNear(world,pos); }
             if(!world.isClient) com.slabbed.nativeblock.NativeSupport.revalidateNear(world,pos);
         }
+    }
+    /** Piston fragments and the vanilla head publish as one final physical edit (LAW.md). */
+    public static boolean pistonTransaction(World world,java.util.function.BooleanSupplier action) {
+        if(PISTON_CHANGES.get()!=null) return action.getAsBoolean();
+        var changed=new java.util.LinkedHashSet<BlockPos>();
+        PISTON_CHANGES.set(changed);
+        try { return action.getAsBoolean(); }
+        finally { PISTON_CHANGES.remove(); publishChanges(world,changed); }
+    }
+    public static void applyPiston(World world,Map<BlockPos,CellContents<BlockState>> changes) {
+        commit(world,changes);
     }
     public static CellContents.Fragment<BlockState> pick(World world,BlockPos pos,BlockHitResult hit) {
         var cell=contents(world,pos); if(cell==null) return null;

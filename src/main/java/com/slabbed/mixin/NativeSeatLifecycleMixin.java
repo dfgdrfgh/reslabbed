@@ -21,7 +21,8 @@ public abstract class NativeSeatLifecycleMixin {
             NativeSeats.remove(chunk.getWorld(),pos);
         var world=chunk.getWorld();
         if(before!=null && before.getBlock()!=next.getBlock() && !world.isClient
-                && !com.slabbed.cell.CellWorld.mutating() && !com.slabbed.nativeblock.NativeTransformations.active(world,pos)) {
+                && !com.slabbed.cell.CellWorld.mutating() && !com.slabbed.nativeblock.NativeTransformations.active(world,pos)
+                && !com.slabbed.nativeblock.NativePistons.settling(world,pos,next)) {
             var supplemental=com.slabbed.cell.SupplementalCells.contents(chunk,pos);
             if(supplemental!=null) {
                 com.slabbed.cell.SupplementalCells.remove(world,pos);
