@@ -90,15 +90,15 @@ public final class NativeCohabitationTest {
     private static void rejectedPairedPlacement(TestContext t,Item item,BlockPos obstructed) {
         var world=t.getWorld();var base=t.getAbsolutePos(new BlockPos(3,3,3));var foot=base.up();
         world.setBlockState(base,Blocks.STONE.getDefaultState());world.setBlockState(base.south(),Blocks.STONE.getDefaultState());
-        world.setBlockState(obstructed,Blocks.SHORT_GRASS.getDefaultState(),Block.NOTIFY_LISTENERS);
-        NativeSeats.put(world,obstructed,new NativeSeats.Seat(-1,"minecraft:short_grass"));
+        world.setBlockState(obstructed,Blocks.LIGHT.getDefaultState(),Block.NOTIFY_LISTENERS);
+        NativeSeats.put(world,obstructed,new NativeSeats.Seat(-1,"minecraft:light"));
         int origin=obstructed.getY()*2+1;
         t.assertTrue(CellWorld.place(world,obstructed.getX(),obstructed.getZ(),origin,Blocks.BIRCH_SLAB.getDefaultState()),"static slab occupies replaceable native member's free physical half");
         var player=t.createMockPlayer(GameMode.SURVIVAL);player.setPosition(base.getX()+.5,base.getY(),base.getZ()-3);player.setYaw(0);
         t.assertFalse(place(player,item,base,base.getY()+1).isAccepted(),"paired native placement rejects existing supplemental geometry");
         t.assertTrue(player.getMainHandStack().getCount()==2,"rejected paired placement consumes no item");
         t.assertTrue(world.getBlockState(foot).isAir(),"rejected paired placement leaves no first member");
-        t.assertTrue(world.getBlockState(obstructed).isOf(Blocks.SHORT_GRASS),"rejected paired placement preserves outgoing native member");
+        t.assertTrue(world.getBlockState(obstructed).isOf(Blocks.LIGHT),"rejected paired placement preserves outgoing native member");
         piece(t,obstructed,Blocks.BIRCH_SLAB,origin);t.complete();
     }
     @GameTest(templateName="fabric-gametest-api-v1:empty")
@@ -124,6 +124,7 @@ public final class NativeCohabitationTest {
         player.setPosition(base.getX()+3.5,base.getY()+.13,base.getZ()+.5);player.setYaw(90);player.setPitch(0);
         player.setStackInHand(Hand.MAIN_HAND,new ItemStack(Items.IRON_PICKAXE));
         var ray=player.raycast(player.getBlockInteractionRange(),1,false);
+        System.out.println("SUPPLEMENTAL_MINING_RAY eye="+player.getEyePos()+" direction="+player.getRotationVec(1)+" ray="+ray+" owner="+owner+" shape="+t.getWorld().getBlockState(owner).getOutlineShape(t.getWorld(),owner).getBoundingBoxes());
         t.assertTrue(ray instanceof BlockHitResult hit && hit.getBlockPos().equals(owner)
                 && CellWorld.pick(t.getWorld(),owner,hit)!=null,"physical view targets supplemental stone above native barrel");
         float expected=Blocks.STONE.getDefaultState().calcBlockBreakingDelta(player,t.getWorld(),owner);

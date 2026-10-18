@@ -105,7 +105,7 @@ public final class NativePlacement {
         for(int n=-1;n<=1;n++) {
             var owner=physical.up(n);var stored=NativeSeats.seat(world,owner);
             var state=world.getBlockState(owner);
-            if(stored==null || (!PieceRules.supports(state) && !(state.getBlock() instanceof FarmlandBlock)))continue;
+            if(stored==null || (!PieceRules.supports(state) && !(state.getBlock() instanceof FarmlandBlock) && !(state.getBlock() instanceof ScaffoldingBlock)))continue;
             var local=hit.subtract(Vec3d.of(side.getVector()).multiply(1e-5)).subtract(Vec3d.of(owner));
             var shape=NativeShapes.occupied(world,owner,world.getBlockState(owner),stored.halfOffset());
             if(shape.getBoundingBoxes().stream().anyMatch(box->box.expand(1e-6).contains(local)))

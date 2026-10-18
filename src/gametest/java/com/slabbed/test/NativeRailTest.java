@@ -55,7 +55,8 @@ public final class NativeRailTest {
         }
         place(t,player,item,base,top);
         var owner=base.up();
-        t.assertTrue(world.getBlockState(owner).isOf(expected),"rail retains native block identity");
+        t.assertTrue(world.getBlockState(owner).isOf(expected),"rail retains native block identity: owner="+owner
+                +" support="+support+" expected="+expected+" actual="+world.getBlockState(owner));
         int half=support==Support.FULL?0:-1;
         t.assertTrue(Math.abs(NativeSeats.offset(world,owner)-half*.5)<EPS,"rail remembers bounded physical seat");
         if(half!=0)t.assertTrue(NativeSeats.seat(world,owner)!=null,"shifted rail stores authored seat");
@@ -63,6 +64,7 @@ public final class NativeRailTest {
     }
     private static RailShape shape(TestContext t,BlockPos rail) {
         var state=t.getWorld().getBlockState(rail);
+        t.assertTrue(state.getBlock() instanceof AbstractRailBlock,"rail survives native neighbor update at "+rail+": "+state);
         return state.get(((AbstractRailBlock)state.getBlock()).getShapeProperty());
     }
     private static void outline(TestContext t,BlockPos rail,double min,double max) {
@@ -151,6 +153,9 @@ public final class NativeRailTest {
         t.assertTrue(seat.equals(NativeSeats.seat(t.getWorld(),low)),"connecting higher neighbor changes slope without changing seat");
         t.getWorld().breakBlock(high,false);outline(t,low,-.5,-.375);
         t.assertTrue(seat.equals(NativeSeats.seat(t.getWorld(),low)),"neighbor removal preserves rail placement");
+        t.getWorld().breakBlock(low.down(),false);
+        t.assertTrue(t.getWorld().getBlockState(low).isAir() && NativeSeats.seat(t.getWorld(),low)==null,
+                "physical floor loss still removes unsupported native rail and its seat");
         t.complete();
     }
 

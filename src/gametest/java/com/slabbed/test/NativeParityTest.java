@@ -208,7 +208,7 @@ public final class NativeParityTest {
             t.assertTrue(entity.getBoundingBox().maxY<owner.getY(),"activation entity remains wholly below native owner cell");
             boolean active=world.getBlockState(owner).get(Properties.POWERED);
             if(!active) {
-                System.out.println("NATIVE_PLATE_CONTACT entity="+entity.getBoundingBox()+" owner="+owner+" outline="+world.getBlockState(owner).getOutlineShape(world,owner).getBoundingBoxes()+" seat="+NativeSeats.seat(world,owner));
+                System.out.println("NATIVE_PLATE_CONTACT age="+entity.age+" velocity="+entity.getVelocity()+" entity="+entity.getBoundingBox()+" owner="+owner+" outline="+world.getBlockState(owner).getOutlineShape(world,owner).getBoundingBoxes()+" seat="+NativeSeats.seat(world,owner));
                 world.getBlockState(owner).onEntityCollision(world,owner,entity);
                 System.out.println("NATIVE_PLATE_DIRECT_DETECTION powered="+world.getBlockState(owner).get(Properties.POWERED));
             }

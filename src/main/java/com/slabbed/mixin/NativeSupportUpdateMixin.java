@@ -13,6 +13,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public abstract class NativeSupportUpdateMixin {
     @Inject(method="setBlockState(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;II)Z",at=@At("RETURN"))
     private void slabbed$physicalSupportChanged(BlockPos pos,BlockState state,int flags,int depth,CallbackInfoReturnable<Boolean> cir) {
-        if(cir.getReturnValue())NativeSupport.revalidateNear((World)(Object)this,pos);
+        if(cir.getReturnValue()) {
+            var world=(World)(Object)this;NativeSupport.revalidateNear(world,pos);
+            com.slabbed.cell.PieceSupport.revalidateNear(world,pos);
+        }
     }
 }

@@ -17,7 +17,9 @@
       "com.slabbed.test.NativeTransformationTest",
       "com.slabbed.test.NativeEntityItemTest",
       "com.slabbed.test.NativeRailTest",
-      "com.slabbed.test.NativeEffectsTest"
+      "com.slabbed.test.NativeEffectsTest",
+      "com.slabbed.test.NativeThreadAccessTest",
+      "com.slabbed.test.NativeCellPistonTest"
     ],
     "client": [
       "com.slabbed.test.PhysicalClientProbe"

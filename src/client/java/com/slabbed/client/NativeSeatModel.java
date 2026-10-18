@@ -23,6 +23,7 @@ public final class NativeSeatModel extends ForwardingBakedModel {
     @Override public boolean isVanillaAdapter() {return false;}
     @Override public void emitBlockQuads(BlockRenderView view,BlockState state,BlockPos pos,Supplier<Random> random,RenderContext context) {
         float offset=(float)NativeSeats.offset(view,pos,state);
+        if(NativeRailGeometry.emitIfFitted(wrapped,view,state,pos,random,context,offset))return;
         if(offset==0) {super.emitBlockQuads(view,state,pos,random,context);return;}
         context.pushTransform(quad-> {
             quad.cullFace(null);

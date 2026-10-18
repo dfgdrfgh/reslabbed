@@ -114,6 +114,7 @@ public final class NativeSupport {
     /** Physical contact can be diagonal to the native owner, so inspect a fixed seventeen owners. */
     public static void revalidateNear(World world,BlockPos changed) {
         if(world.isClient || REVALIDATING.get() || CellWorld.mutating())return;
+        if(world instanceof net.minecraft.server.world.ServerWorld server && !server.getServer().isOnThread())return;
         REVALIDATING.set(true);
         try {
             for(int y=-2;y<=2;y++)revalidate(world,changed.up(y));
@@ -135,6 +136,7 @@ public final class NativeSupport {
                     || side(world,owner,state.get(BellBlock.FACING).getOpposite(),origin);
         };
     }
+    public static boolean floor(World world,BlockPos owner,int origin) {return horizontal(world,owner,origin,Direction.DOWN);}
     private static boolean horizontal(World world,BlockPos owner,int contact,Direction direction) {
         return contact(world,owner,contact,direction,(floor,pos)->PieceRules.supports(floor));
     }

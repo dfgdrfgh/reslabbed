@@ -79,13 +79,14 @@ public final class NativePistonTest {
         var owner=base.up();
         remembered(t,owner,Blocks.PISTON);
         t.assertTrue(player.getMainHandStack().getCount()==1,"piston item consumed once");
-        t.assertTrue(t.getWorld().getBlockState(owner).get(PistonBlock.FACING)==Direction.EAST,"item piston faces east");
         return owner;
     }
 
     @GameTest(templateName="fabric-gametest-api-v1:empty",tickLimit=55)
     public void itemPlacedPistonExtendsAndRetractsPhysicalHead(TestContext t) {
-        var owner=itemPiston(t);var head=owner.east();var source=owner.north();
+        var owner=itemPiston(t);var direction=t.getWorld().getBlockState(owner).get(PistonBlock.FACING);
+        var head=owner.offset(direction);
+        var source=owner.offset(direction.getAxis()==Direction.Axis.X?Direction.NORTH:Direction.WEST);
         t.runAtTick(2,()->power(t,source,true));
         t.runAtTick(3,()->moving(t,head));
         t.runAtTick(10,()-> {

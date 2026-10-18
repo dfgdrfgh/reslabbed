@@ -2,6 +2,7 @@
 import os
 import subprocess
 import sys
+import re
 from pathlib import Path
 from zipfile import ZipFile, BadZipFile
 
@@ -19,6 +20,16 @@ for root in roots:
             continue
         for name in (sys.argv[1:] or ['net.minecraft.block.PressurePlateBlock', 'net.minecraft.block.WeightedPressurePlateBlock']):
             print('NATIVE_BYTECODE ' + name, flush=True)
-            subprocess.run(['javap', '-c', '-p', '-classpath', str(jar), name], check=True)
+            class_name, _, methods = name.partition('#')
+            result = subprocess.run(['javap', '-c', '-p', '-classpath', str(jar), class_name], check=True, capture_output=True, text=True)
+            if not methods:
+                print(result.stdout, flush=True)
+            else:
+                keep = False
+                for line in result.stdout.splitlines():
+                    if re.match(r'^  (public|protected|private|static)', line):
+                        keep = any(re.search(r'\b'+re.escape(method)+r'\(', line) for method in methods.split(','))
+                    if keep:
+                        print(line, flush=True)
         raise SystemExit(0)
 raise SystemExit('Mapped Minecraft JAR not found')

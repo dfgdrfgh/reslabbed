@@ -7,7 +7,21 @@ import net.minecraft.world.World;
 
 /** Only vanilla support removal can remove a decoration; stored origins never move (LAW.md). */
 public final class PieceSupport {
+    private static final ThreadLocal<Boolean> REVALIDATING=ThreadLocal.withInitial(()->false);
     private PieceSupport() {}
+    public static void revalidateNear(World world,BlockPos changed) {
+        if(world.isClient || CellWorld.mutating() || REVALIDATING.get())return;
+        if(world instanceof net.minecraft.server.world.ServerWorld server && !server.getServer().isOnThread())return;
+        REVALIDATING.set(true);
+        try {
+            for(int y=-2;y<=2;y++)revalidateSupplemental(world,changed.up(y));
+            for(var direction:Direction.Type.HORIZONTAL)
+                for(int y=-1;y<=1;y++)revalidateSupplemental(world,changed.offset(direction).up(y));
+        } finally {REVALIDATING.set(false);}
+    }
+    private static void revalidateSupplemental(World world,BlockPos pos) {
+        if(SupplementalCells.has(world,pos))revalidate(world,pos);
+    }
     public static void revalidate(World world,BlockPos pos) {
         var contents=CellWorld.contents(world,pos);if(contents==null)return;
         for(var part:contents.fragments()) {

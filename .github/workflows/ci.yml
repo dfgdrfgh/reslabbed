@@ -36,7 +36,16 @@ jobs:
           python3 tools/verify-test-count.py
       - name: Inspect native targets after a failed runtime check
         if: failure() && matrix.variant == 'indigo'
-        run: python3 tools/inspect-native-bytecode.py net.minecraft.block.PressurePlateBlock net.minecraft.block.WeightedPressurePlateBlock net.minecraft.block.PistonBlock net.minecraft.block.entity.PistonBlockEntity net.minecraft.block.WallBlock net.minecraft.item.ArmorStandItem net.minecraft.item.AxeItem net.minecraft.block.PointedDripstoneBlock net.minecraft.block.AbstractPressurePlateBlock
+        run: python3 tools/inspect-native-bytecode.py net.minecraft.block.PressurePlateBlock net.minecraft.block.WeightedPressurePlateBlock net.minecraft.block.PistonBlock net.minecraft.block.entity.PistonBlockEntity net.minecraft.block.WallBlock net.minecraft.item.ArmorStandItem net.minecraft.item.AxeItem net.minecraft.block.PointedDripstoneBlock net.minecraft.block.AbstractPressurePlateBlock net.minecraft.entity.Entity#tick,baseTick,checkBlockCollision,tryCheckBlockCollision net.minecraft.world.chunk.light.ChunkBlockLightProvider net.minecraft.entity.vehicle.AbstractMinecartEntity#tick,moveOnRail,snapPositionToRail,snapPositionToRailWithOffset
+      - name: Observe production client behavior after server regressions
+        if: failure() && matrix.variant == 'indigo'
+        env:
+          LIBGL_ALWAYS_SOFTWARE: '1'
+        run: |
+          if [ -f 'build/libs/slabbed-0.9.2-rewrite-alpha+1.21.1-fabric.jar' ]; then
+            bash gradlew --no-daemon --console=plain writeProbeRuntime
+            timeout 15m xvfb-run -a python3 tools/client-runtime.py
+          fi
       - name: Stage complete latest pack
         if: matrix.variant == 'pack' || matrix.variant == 'control'
         env:

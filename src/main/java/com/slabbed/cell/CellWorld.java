@@ -102,7 +102,7 @@ public final class CellWorld {
         for(var pos:changes.keySet()) {
             world.updateNeighbors(pos,world.getBlockState(pos).getBlock());
             world.updateListeners(pos,world.getBlockState(pos),world.getBlockState(pos),Block.NOTIFY_ALL);
-            if(!world.isClient) PieceSupport.revalidate(world,pos);
+            if(!world.isClient) {PieceSupport.revalidate(world,pos);PieceSupport.revalidateNear(world,pos); }
             if(!world.isClient) com.slabbed.nativeblock.NativeSupport.revalidateNear(world,pos);
         }
     }
