@@ -267,4 +267,110 @@ public final class NativeCellPistonTest {
         });
     }
 
+    private static void adhesive(TestContext t,BlockPos owner,Block block,int offset) {
+        t.getWorld().setBlockState(owner,block.getDefaultState(),Block.NOTIFY_LISTENERS);
+        NativeSeats.put(t.getWorld(),owner,new NativeSeats.Seat(offset,
+                net.minecraft.registry.Registries.BLOCK.getId(block).toString()));
+    }
+
+    private static void adhesiveCycle(TestContext t,Block glue) {
+        var owner=piston(t,2,4,3,true,Direction.EAST);var world=t.getWorld();
+        var source=owner.east();int half=owner.getY()*2-1;
+        adhesive(t,source,glue,-1);
+        var branch=source.south();place(t,branch.getX(),branch.getZ(),half,Blocks.STONE);
+        t.runAtTick(2,()->power(t,owner,true));
+        t.runAtTick(12,()-> {
+            t.assertTrue(world.getBlockState(owner).get(PistonBlock.EXTENDED),"adhesive physical branch permits extension");
+            t.assertTrue(world.getBlockState(source.east()).isOf(glue),"adhesive retains its native block identity");
+            t.assertTrue(NativeSeats.seat(world,source.east())!=null && NativeSeats.seat(world,source.east()).halfOffset()==-1,
+                    "moved adhesive retains its physical seat");
+            piece(t,branch.getX(),branch.getZ(),half,2,Blocks.STONE,false);
+            piece(t,branch.east().getX(),branch.getZ(),half,2,Blocks.STONE,true);
+            power(t,owner,false);
+        });
+        t.runAtTick(26,()-> {
+            t.assertFalse(world.getBlockState(owner).get(PistonBlock.EXTENDED),"adhesive branch retracts");
+            t.assertTrue(world.getBlockState(source).isOf(glue),"native adhesive returns with sticky pull");
+            t.assertTrue(NativeSeats.seat(world,source)!=null && NativeSeats.seat(world,source).halfOffset()==-1,
+                    "returned adhesive keeps its original half offset");
+            piece(t,branch.getX(),branch.getZ(),half,2,Blocks.STONE,true);
+            piece(t,branch.east().getX(),branch.getZ(),half,2,Blocks.STONE,false);t.complete();
+        });
+    }
+
+    @GameTest(templateName="fabric-gametest-api-v1:empty",tickLimit=45)
+    public void loweredSlimePushesAndPullsPhysicalSideBranch(TestContext t) {
+        adhesiveCycle(t,Blocks.SLIME_BLOCK);
+    }
+
+    @GameTest(templateName="fabric-gametest-api-v1:empty",tickLimit=45)
+    public void loweredHoneyPushesAndPullsPhysicalSideBranch(TestContext t) {
+        adhesiveCycle(t,Blocks.HONEY_BLOCK);
+    }
+
+    @GameTest(templateName="fabric-gametest-api-v1:empty",tickLimit=35)
+    public void blockedAdhesiveSideBranchPreservesPiecesAndInventory(TestContext t) {
+        var owner=piston(t,2,4,3,true,Direction.EAST);var world=t.getWorld();
+        var source=owner.east();var branch=source.south();var blocker=branch.east();int half=owner.getY()*2-1;
+        adhesive(t,source,Blocks.SLIME_BLOCK,-1);
+        place(t,branch.getX(),branch.getZ(),half,Blocks.STONE);
+        adhesive(t,blocker,Blocks.BARREL,-1);
+        var barrel=(BarrelBlockEntity)world.getBlockEntity(blocker);barrel.setStack(0,new ItemStack(Items.DIAMOND,7));
+        var before=CellWorld.contents(world,branch);var companion=CellWorld.contents(world,branch.down());
+        t.runAtTick(2,()->power(t,owner,true));
+        t.runAtTick(12,()-> {
+            t.assertFalse(world.getBlockState(owner).get(PistonBlock.EXTENDED),"blocked adhesive branch refuses whole push");
+            t.assertTrue(world.getBlockState(source).isOf(Blocks.SLIME_BLOCK),"refusal leaves native slime in place");
+            t.assertTrue(NativeSeats.seat(world,source).halfOffset()==-1,"refusal preserves slime seat");
+            t.assertTrue(java.util.Objects.equals(before,CellWorld.contents(world,branch))
+                    && java.util.Objects.equals(companion,CellWorld.contents(world,branch.down())),"refusal preserves both exact branch fragments");
+            t.assertTrue(world.getBlockEntity(blocker)==barrel && barrel.getStack(0).isOf(Items.DIAMOND)
+                    && barrel.getStack(0).getCount()==7,"refusal preserves native barrel identity and inventory");
+            t.assertTrue(NativeSeats.seat(world,blocker).halfOffset()==-1,"refusal preserves blocker seat");t.complete();
+        });
+    }
+
+    @GameTest(templateName="fabric-gametest-api-v1:empty",tickLimit=35)
+    public void slimeDoesNotDragHoneyOrItsPhysicalBranch(TestContext t) {
+        var owner=piston(t,2,4,3,false,Direction.EAST);var world=t.getWorld();var source=owner.east();
+        int half=owner.getY()*2-1;adhesive(t,source,Blocks.SLIME_BLOCK,-1);
+        var honey=source.south();adhesive(t,honey,Blocks.HONEY_BLOCK,-1);
+        var branch=honey.south();place(t,branch.getX(),branch.getZ(),half,Blocks.STONE);
+        t.runAtTick(2,()->power(t,owner,true));
+        t.runAtTick(12,()-> {
+            t.assertTrue(world.getBlockState(owner).get(PistonBlock.EXTENDED),"slime separates from honey");
+            t.assertTrue(world.getBlockState(source.east()).isOf(Blocks.SLIME_BLOCK),"slime moves normally");
+            t.assertTrue(world.getBlockState(honey).isOf(Blocks.HONEY_BLOCK) && NativeSeats.seat(world,honey).halfOffset()==-1,
+                    "honey keeps native identity and seat");
+            piece(t,branch.getX(),branch.getZ(),half,2,Blocks.STONE,true);t.complete();
+        });
+    }
+
+    @GameTest(templateName="fabric-gametest-api-v1:empty",tickLimit=35)
+    public void adhesiveIgnoresPhysicalSidePieceWithoutVerticalOverlap(TestContext t) {
+        var owner=piston(t,2,4,3,false,Direction.EAST);var world=t.getWorld();var source=owner.east();
+        int half=owner.getY()*2-1;adhesive(t,source,Blocks.SLIME_BLOCK,-1);
+        var branch=source.south();place(t,branch.getX(),branch.getZ(),half+2,Blocks.STONE);
+        t.runAtTick(2,()->power(t,owner,true));
+        t.runAtTick(12,()-> {
+            t.assertTrue(world.getBlockState(owner).get(PistonBlock.EXTENDED),"vertical edge contact does not block movement");
+            piece(t,branch.getX(),branch.getZ(),half+2,2,Blocks.STONE,true);
+            piece(t,branch.east().getX(),branch.getZ(),half+2,2,Blocks.STONE,false);t.complete();
+        });
+    }
+
+    @GameTest(templateName="fabric-gametest-api-v1:empty",tickLimit=35)
+    public void adhesiveIgnoresImmovableSideNeighborButMovesPhysicalBranch(TestContext t) {
+        var owner=piston(t,2,4,3,false,Direction.EAST);var world=t.getWorld();var source=owner.east();
+        int half=owner.getY()*2-1;adhesive(t,source,Blocks.SLIME_BLOCK,-1);
+        adhesive(t,source.north(),Blocks.OBSIDIAN,-1);
+        var branch=source.south();place(t,branch.getX(),branch.getZ(),half,Blocks.STONE);
+        t.runAtTick(2,()->power(t,owner,true));
+        t.runAtTick(12,()-> {
+            t.assertTrue(world.getBlockState(owner).get(PistonBlock.EXTENDED),"immovable side neighbor does not adhere");
+            t.assertTrue(world.getBlockState(source.north()).isOf(Blocks.OBSIDIAN),"obsidian stays in place");
+            piece(t,branch.east().getX(),branch.getZ(),half,2,Blocks.STONE,true);t.complete();
+        });
+    }
+
 }
