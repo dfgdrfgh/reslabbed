@@ -1,22 +1,27 @@
 package com.slabbed.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.slabbed.cell.SupplementalCells;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.light.ChunkBlockLightProvider;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 /** Light reads the lighting provider's existing chunk cache, never a server chunk request. */
 @Mixin(ChunkBlockLightProvider.class)
 public abstract class SupplementalLightMixin {
-    @Inject(method="getLightSourceLuminance",at=@At("RETURN"),cancellable=true)
-    private void slabbed$supplementalEmission(long packed,BlockState state,CallbackInfoReturnable<Integer> cir) {
-        var pos=BlockPos.fromLong(packed);
+    @ModifyExpressionValue(method="getLightSourceLuminance",at=@At(value="INVOKE",target="Lnet/minecraft/block/BlockState;getLuminance()I"))
+    private int slabbed$supplementalEmission(int original,long packed,BlockState state) {
+        return slabbed$source(original,BlockPos.fromLong(packed));
+    }
+    @ModifyExpressionValue(method="method_51532",at=@At(value="INVOKE",target="Lnet/minecraft/block/BlockState;getLuminance()I"))
+    private int slabbed$loadedEmission(int original,BlockPos pos,BlockState state) {
+        return slabbed$source(original,pos);
+    }
+    @org.spongepowered.asm.mixin.Unique
+    private int slabbed$source(int original,BlockPos pos) {
         var view=((NativeLightingAccess)this).slabbed$lightingChunk(pos.getX()>>4,pos.getZ()>>4);
-        if(view!=null)cir.setReturnValue(Math.max(cir.getReturnValue(),SupplementalCells.luminance(view,pos)));
-        if(state.isOf(net.minecraft.block.Blocks.BARREL))System.out.println("SUPPLEMENTAL_LIGHT_VIEW pos="+pos+" view="+(view==null?null:view.getClass())+" source="+(view==null?0:SupplementalCells.luminance(view,pos))+" result="+cir.getReturnValue());
+        return view==null?original:Math.max(original,SupplementalCells.luminance(view,pos));
     }
 }

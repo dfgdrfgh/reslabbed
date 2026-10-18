@@ -53,6 +53,16 @@ public abstract class NativePistonTransferMixin {
         return plan==null?original.call(handler):plan.accepted();
     }
 
+    @WrapOperation(method="onSyncedBlockEvent",at=@At(value="INVOKE",target="Lnet/minecraft/world/World;setBlockState(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;I)Z"))
+    private boolean slabbed$retractingBasePose(World world,BlockPos target,BlockState next,int flags,Operation<Boolean> original,
+            @Local(argsOnly=true) BlockPos piston) {
+        int half=NativePistons.baseHalf(world,piston);
+        boolean changed=original.call(world,target,next,flags);
+        if(changed && target.equals(piston) && next.isOf(net.minecraft.block.Blocks.MOVING_PISTON))
+            NativePistons.publish(world,target,half);
+        return changed;
+    }
+
     @WrapOperation(method="onSyncedBlockEvent",at=@At(value="INVOKE",target="Lnet/minecraft/block/PistonBlock;isMovable(Lnet/minecraft/block/BlockState;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/math/Direction;ZLnet/minecraft/util/math/Direction;)Z"))
     private boolean slabbed$physicalPull(BlockState target,World world,BlockPos targetPos,Direction motion,
             boolean canBreak,Direction facing,Operation<Boolean> original,@Local(argsOnly=true) BlockPos pos) {

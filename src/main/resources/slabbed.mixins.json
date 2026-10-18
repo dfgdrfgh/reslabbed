@@ -22,6 +22,7 @@
     "NativeRailNeighborMixin",
     "NativeLightingAccess",
     "SupplementalLightMixin",
+    "SupplementalLightSourcesMixin",
     "NativeBlockItemMixin",
     "NativeStateShapesMixin",
     "NativeRaycastMixin",

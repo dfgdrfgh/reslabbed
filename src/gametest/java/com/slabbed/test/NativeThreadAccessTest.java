@@ -32,6 +32,20 @@ public final class NativeThreadAccessTest {
         t.complete();
     }
     @GameTest(templateName="fabric-gametest-api-v1:empty")
+    public void lightingWrapperReadsFrozenSeatAndEnumeratesSupplementalSource(TestContext t) {
+        var world=t.getWorld();var pos=t.getAbsolutePos(new BlockPos(3,4,3));
+        world.setBlockState(pos,Blocks.BARREL.getDefaultState());
+        NativeSeats.put(world,pos,new NativeSeats.Seat(-1,"minecraft:barrel"));
+        t.assertTrue(CellWorld.place(world,pos.getX(),pos.getZ(),pos.getY()*2+1,Blocks.GLOWSTONE.getDefaultState()),"source occupies free half above native barrel");
+        var wrapper=new net.minecraft.world.chunk.WrapperProtoChunk(world.getWorldChunk(pos),false);
+        t.assertTrue(NativeSeats.offset(wrapper,pos)==-.5 && SupplementalCells.luminance(wrapper,pos)==15,"lighting wrapper reads actual frozen chunk facts");
+        var sources=new java.util.HashSet<BlockPos>();wrapper.forEachLightSource((source,state)->sources.add(source.toImmutable()));
+        t.assertTrue(sources.contains(pos),"chunk relighting enumerates native owner supplemental source");
+        CellWorld.remove(world,pos,1,null,false);
+        sources.clear();wrapper.forEachLightSource((source,state)->sources.add(source.toImmutable()));
+        t.assertTrue(SupplementalCells.luminance(wrapper,pos)==0 && !sources.contains(pos),"removed supplemental source leaves no relight residue");t.complete();
+    }
+    @GameTest(templateName="fabric-gametest-api-v1:empty")
     public void workerQueriesNeverLoadAnAbsentChunk(TestContext t) {
         var world=t.getWorld();var far=t.getAbsolutePos(new BlockPos(8192,4,8192));
         t.assertFalse(world.isChunkLoaded(far),"far worker-query fixture starts unloaded");

@@ -84,7 +84,7 @@ public final class NativeCellPistonTest {
 
     @GameTest(templateName="fabric-gametest-api-v1:empty",tickLimit=40)
     public void verticalPushMovesOneLogicalPieceAcrossItsCompanions(TestContext t) {
-        var owner=piston(t,3,3,3,false,Direction.UP);int half=owner.getY()*2+1;
+        var owner=piston(t,3,3,3,true,Direction.UP);int half=owner.getY()*2+1;
         place(t,owner.getX(),owner.getZ(),half,Blocks.STONE);
         t.assertTrue(SupplementalCells.has(t.getWorld(),owner),"crossing piece initially shares piston owner as supplemental geometry");
         t.runAtTick(2,()->power(t,owner,true));
@@ -95,7 +95,15 @@ public final class NativeCellPistonTest {
             piece(t,owner.getX(),owner.getZ(),half,2,Blocks.STONE,false);
             piece(t,owner.getX(),owner.getZ(),half+2,2,Blocks.STONE,true);
             t.assertFalse(SupplementalCells.has(t.getWorld(),owner),"vacated piston owner has no companion residue");
-            t.assertTrue(t.getWorld().getBlockState(owner.up()).isOf(Blocks.PISTON_HEAD),"vanilla physical head remains native");t.complete();
+            t.assertTrue(t.getWorld().getBlockState(owner.up()).isOf(Blocks.PISTON_HEAD),"vanilla physical head remains native");
+            power(t,owner,false);
+        });
+        t.runAtTick(24,()-> {
+            t.assertFalse(t.getWorld().getBlockState(owner).get(PistonBlock.EXTENDED),"vertical sticky piston retracts");
+            piece(t,owner.getX(),owner.getZ(),half,2,Blocks.STONE,true);
+            piece(t,owner.getX(),owner.getZ(),half+2,2,Blocks.STONE,false);
+            t.assertTrue(SupplementalCells.has(t.getWorld(),owner),"returned companion shares the original native piston owner");
+            t.complete();
         });
     }
 

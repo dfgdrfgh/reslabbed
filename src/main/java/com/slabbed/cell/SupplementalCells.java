@@ -137,6 +137,7 @@ public final class SupplementalCells {
         var map=chunk.getAttached(TYPE);return map==null?Map.of():map;
     }
     private static StoredCell stored(BlockView view,BlockPos pos) {
+        if(view instanceof net.minecraft.world.chunk.WrapperProtoChunk wrapper)return stored(wrapper.getWrappedChunk(),pos);
         if(view instanceof ServerWorld world && !world.getServer().isOnThread()) {
             var chunks=SERVER_SNAPSHOTS.get(world);if(chunks==null)return null;
             var cells=chunks.get(ChunkPos.toLong(pos.getX()>>4,pos.getZ()>>4));

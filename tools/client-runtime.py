@@ -23,10 +23,15 @@ if args.control:
     release=[root/'build/feedback-control.jar']
 if args.pack:
     fixture=json.loads((root/'tools/full-pack-fixture.json').read_text())
+    staged=json.loads((root/'build/full-pack-baseline/pack-staging.json').read_text())
+    assert staged['complete'] and staged['sourcePackSha256']==fixture['sourcePackSha256'],'Client requires the exact complete latest pack'
+    assert staged['modCount']==fixture['modCount'] and staged['resourcePackCount']==fixture['resourcePackCount'],staged
     for source in (root/'build/full-pack-baseline').rglob('*'):
         if source.is_file():
             target=game/source.relative_to(root/'build/full-pack-baseline');target.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(source,target)
     add(root/'build/full-pack-loader.jar')
+    print('PHYSICAL_PACK_SOURCE_SHA256',staged['sourcePackSha256'],'mods='+str(staged['modCount']),
+          'resourcepacks='+str(staged['resourcePackCount']),flush=True)
 else:
     add(jars('net.fabricmc','fabric-loader')[-1])
     api=jars('net.fabricmc.fabric-api','fabric-api',runtime['fabricVersion'])[-1];shutil.copy2(api,mods/api.name)
@@ -61,7 +66,10 @@ for path in (home/'caches/fabric-loom').rglob('minecraft-client.jar'):
         if 'fzf.class' in archive.namelist() and json.loads(archive.read('version.json'))['id']=='1.21.1':games.append(path)
 assert games;add(games[0])
 indexes=list((home/'caches/fabric-loom').rglob('indexes/*17*.json'));assert len(indexes)==1;index=indexes[0]
-(game/'options.txt').write_text('renderClouds:false\nrenderDistance:6\nmaxFps:60\n')
+options=game/'options.txt'
+settings=dict(line.split(':',1) for line in options.read_text().splitlines() if ':' in line) if options.exists() else {}
+settings.update(renderClouds='false',renderDistance='6',maxFps='60')
+options.write_text(''.join(key+':'+value+'\n' for key,value in settings.items()))
 print('PHYSICAL_JAR_SHA256',hashlib.sha256(release[0].read_bytes()).hexdigest(),flush=True)
 for phase in (['fresh'] if args.control else ['fresh','reopen']):
     marker=game/'physical-pass.txt';marker.unlink(missing_ok=True)
