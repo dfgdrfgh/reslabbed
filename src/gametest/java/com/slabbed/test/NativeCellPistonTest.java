@@ -373,4 +373,94 @@ public final class NativeCellPistonTest {
         });
     }
 
+    private static void adhesiveLimit(TestContext t,int branchCount,boolean accepted) {
+        var owner=piston(t,3,3,3,false,Direction.UP);var world=t.getWorld();var source=owner.up();
+        int half=source.getY()*2-1;adhesive(t,source,Blocks.SLIME_BLOCK,-1);
+        var branch=source.south();
+        for(int y=owner.getY();y<=owner.getY()+16;y++)
+            world.setBlockState(new BlockPos(branch.getX(),y,branch.getZ()),Blocks.AIR.getDefaultState(),Block.NOTIFY_LISTENERS);
+        for(int n=0;n<branchCount;n++)place(t,branch.getX(),branch.getZ(),half+2*n,Blocks.STONE);
+        var before=new java.util.LinkedHashMap<BlockPos,com.slabbed.core.CellContents<net.minecraft.block.BlockState>>();
+        for(int y=owner.getY();y<=owner.getY()+branchCount+1;y++) {
+            var pos=new BlockPos(branch.getX(),y,branch.getZ());before.put(pos,CellWorld.contents(world,pos));
+        }
+        t.runAtTick(2,()->power(t,owner,true));
+        t.runAtTick(14,()-> {
+            t.assertTrue(world.getBlockState(owner).get(PistonBlock.EXTENDED)==accepted,
+                    "native adhesive counts once toward the twelve whole-piece limit");
+            if(accepted) {
+                t.assertTrue(world.getBlockState(source.up()).isOf(Blocks.SLIME_BLOCK),"twelve-piece branch moves native slime");
+                piece(t,branch.getX(),branch.getZ(),half,2,Blocks.STONE,false);
+                for(int n=0;n<branchCount;n++)piece(t,branch.getX(),branch.getZ(),half+2+2*n,2,Blocks.STONE,true);
+            } else {
+                t.assertTrue(world.getBlockState(source).isOf(Blocks.SLIME_BLOCK),"thirteen-piece refusal leaves native slime in place");
+                before.forEach((pos,contents)->t.assertTrue(java.util.Objects.equals(contents,CellWorld.contents(world,pos)),
+                        "thirteen-piece adhesion refusal preserves exact branch contents"));
+            }
+            t.complete();
+        });
+    }
+
+    @GameTest(templateName="fabric-gametest-api-v1:empty",tickLimit=35)
+    public void nativeSlimeAndElevenPhysicalBranchPiecesCanMove(TestContext t) {
+        adhesiveLimit(t,11,true);
+    }
+
+    @GameTest(templateName="fabric-gametest-api-v1:empty",tickLimit=35)
+    public void nativeSlimeAndTwelvePhysicalBranchPiecesRejectWithoutChanges(TestContext t) {
+        adhesiveLimit(t,12,false);
+    }
+
+    @GameTest(templateName="fabric-gametest-api-v1:empty",tickLimit=35)
+    public void nativeGraphMismatchRestoresRemovedPhysicalBranch(TestContext t) {
+        var owner=piston(t,2,4,3,false,Direction.EAST);var world=t.getWorld();var source=owner.east();
+        int half=owner.getY()*2-1;adhesive(t,source,Blocks.SLIME_BLOCK,-1);
+        var unrelated=source.north();adhesive(t,unrelated,Blocks.SLIME_BLOCK,1);
+        var branch=source.south();place(t,branch.getX(),branch.getZ(),half,Blocks.STONE);
+        var before=CellWorld.contents(world,branch);var companion=CellWorld.contents(world,branch.down());
+        t.runAtTick(2,()->power(t,owner,true));
+        t.runAtTick(14,()-> {
+            t.assertFalse(world.getBlockState(owner).get(PistonBlock.EXTENDED),"different vanilla and physical graphs refuse safely");
+            t.assertTrue(world.getBlockState(source).isOf(Blocks.SLIME_BLOCK) && NativeSeats.seat(world,source).halfOffset()==-1,
+                    "mismatch preserves source slime and seat");
+            t.assertTrue(world.getBlockState(unrelated).isOf(Blocks.SLIME_BLOCK) && NativeSeats.seat(world,unrelated).halfOffset()==1,
+                    "mismatch cannot move a noncontacting native neighbor");
+            t.assertTrue(java.util.Objects.equals(before,CellWorld.contents(world,branch))
+                    && java.util.Objects.equals(companion,CellWorld.contents(world,branch.down())),"mismatch restores both removed branch fragments");
+            piece(t,branch.east().getX(),branch.getZ(),half,2,Blocks.STONE,false);t.complete();
+        });
+    }
+
+    private static void unseatedAxialCycle(TestContext t,Block glue) {
+        var world=t.getWorld();var owner=t.getAbsolutePos(new BlockPos(2,4,3));var source=owner.east();
+        world.setBlockState(owner,Blocks.STICKY_PISTON.getDefaultState().with(PistonBlock.FACING,Direction.EAST));
+        world.setBlockState(source,glue.getDefaultState());
+        int half=owner.getY()*2+1;var branch=source.east();
+        place(t,branch.getX(),branch.getZ(),half,Blocks.STONE);
+        t.assertTrue(NativeSeats.seat(world,source)==null,"ordinary native glue starts without a saved seat");
+        t.runAtTick(2,()->power(t,owner,true));
+        t.runAtTick(12,()-> {
+            t.assertTrue(world.getBlockState(owner).get(PistonBlock.EXTENDED),"ordinary glue pushes crossing axial branch");
+            t.assertTrue(world.getBlockState(source.east()).isOf(glue),"ordinary native glue moves to axial branch source");
+            piece(t,branch.east().getX(),branch.getZ(),half,2,Blocks.STONE,true);
+            power(t,owner,false);
+        });
+        t.runAtTick(26,()-> {
+            t.assertFalse(world.getBlockState(owner).get(PistonBlock.EXTENDED),"ordinary glue retracts with axial branch");
+            t.assertTrue(world.getBlockState(source).isOf(glue),"ordinary glue returns to original position");
+            piece(t,branch.getX(),branch.getZ(),half,2,Blocks.STONE,true);
+            piece(t,branch.east().getX(),branch.getZ(),half,2,Blocks.STONE,false);t.complete();
+        });
+    }
+
+    @GameTest(templateName="fabric-gametest-api-v1:empty",tickLimit=45)
+    public void unseatedSlimePushesAndPullsAxialPhysicalBranch(TestContext t) {
+        unseatedAxialCycle(t,Blocks.SLIME_BLOCK);
+    }
+
+    @GameTest(templateName="fabric-gametest-api-v1:empty",tickLimit=45)
+    public void unseatedHoneyPushesAndPullsAxialPhysicalBranch(TestContext t) {
+        unseatedAxialCycle(t,Blocks.HONEY_BLOCK);
+    }
+
 }
