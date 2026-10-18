@@ -51,6 +51,15 @@ public abstract class NativeStateShapesMixin {
         double offset=NativeSeats.offset(world,pos,(BlockState)(Object)this);shape=offset==0?shape:shape.offset(0,offset,0);
         return net.minecraft.util.shape.VoxelShapes.union(shape,com.slabbed.cell.SupplementalCells.outline(world,pos));
     }
+    @Inject(method="calcBlockBreakingDelta",at=@At("HEAD"),cancellable=true)
+    private void slabbed$supplementalHardness(net.minecraft.entity.player.PlayerEntity player,BlockView view,BlockPos pos,CallbackInfoReturnable<Float> cir) {
+        if(!(view instanceof net.minecraft.world.World world) || (Object)this!=world.getBlockState(pos)
+                || !com.slabbed.cell.SupplementalCells.has(world,pos))return;
+        var ray=player.raycast(player.getBlockInteractionRange(),1,false);
+        if(!(ray instanceof net.minecraft.util.hit.BlockHitResult hit) || !hit.getBlockPos().equals(pos))return;
+        var part=com.slabbed.cell.CellWorld.pick(world,pos,hit);
+        if(part!=null)cir.setReturnValue(part.value().calcBlockBreakingDelta(player,view,pos));
+    }
     @Inject(method="getCullingFace",at=@At("RETURN"),cancellable=true)
     private void slabbed$nativeCullingFace(BlockView world,BlockPos pos,Direction direction,CallbackInfoReturnable<VoxelShape> cir) {
         if(NativeRules.accepts((BlockState)(Object)this) && NativeSeats.offset(world,pos,(BlockState)(Object)this)!=0)

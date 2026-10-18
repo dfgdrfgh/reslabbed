@@ -109,13 +109,20 @@ public final class NativeCohabitationTest {
     public void doorUpperCandidateRejectsExistingSupplementalGeometry(TestContext t) {
         rejectedPairedPlacement(t,Items.OAK_DOOR,t.getAbsolutePos(new BlockPos(3,5,3)));
     }
-    @GameTest(templateName="fabric-gametest-api-v1:empty",tickLimit=30)
+    @GameTest(templateName="fabric-gametest-api-v1:empty",tickLimit=100)
     public void supplementalLightEmitsFromReservedNativeOwnerCell(TestContext t) {
         var f=barrel(t);var base=f.base();
         t.assertTrue(place(f.player(),Items.GLOWSTONE,base.up(),base.getY()+1.5).isAccepted(),"real glowstone fills native free half");
-        t.runAtTick(10,()-> {
+        var control=base.add(3,1,0);
+        t.getWorld().setBlockState(control,Blocks.GLOWSTONE.getDefaultState(),Block.NOTIFY_ALL);
+        t.runAtTick(10,()->System.out.println("SUPPLEMENTAL_LIGHT_DIAG source="
+                +com.slabbed.cell.SupplementalCells.luminance(t.getWorld().getWorldChunk(base.up()),base.up())
+                +" supplemental="+t.getWorld().getLightLevel(net.minecraft.world.LightType.BLOCK,base.up())
+                +" nativeControl="+t.getWorld().getLightLevel(net.minecraft.world.LightType.BLOCK,control)));
+        t.addInstantFinalTask(()-> {
+            t.assertTrue(t.getWorld().getLightLevel(net.minecraft.world.LightType.BLOCK,control)==15,"vanilla light control propagates");
             t.assertTrue(t.getWorld().getLightLevel(net.minecraft.world.LightType.BLOCK,base.up())==15,"supplemental source emits full block light in its actual storage cell");
-            nativeIntact(t,f);t.complete();
+            nativeIntact(t,f);
         });
     }
     @GameTest(templateName="fabric-gametest-api-v1:empty")
