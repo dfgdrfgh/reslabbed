@@ -58,7 +58,7 @@ public abstract class NativeStateShapesMixin {
         var ray=player.raycast(player.getBlockInteractionRange(),1,false);
         if(!(ray instanceof net.minecraft.util.hit.BlockHitResult hit) || !hit.getBlockPos().equals(pos))return;
         var part=com.slabbed.cell.CellWorld.pick(world,pos,hit);
-        if(part!=null)cir.setReturnValue(part.value().calcBlockBreakingDelta(player,view,pos));
+        if(part!=null && part.value()!=(Object)this)cir.setReturnValue(part.value().calcBlockBreakingDelta(player,view,pos));
     }
     @Inject(method="getCullingFace",at=@At("RETURN"),cancellable=true)
     private void slabbed$nativeCullingFace(BlockView world,BlockPos pos,Direction direction,CallbackInfoReturnable<VoxelShape> cir) {
