@@ -25,6 +25,9 @@
     ],
     "client": [
       "com.slabbed.test.PhysicalClientProbe"
+    ],
+    "main": [
+      "com.slabbed.test.DiagnosticShapeFixture"
     ]
   },
   "depends": {

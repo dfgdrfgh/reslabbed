@@ -42,4 +42,31 @@ public final class DiagnosticGameTest {
         } finally {DiagnosticRecorder.stop();}
         t.complete();
     }
+    @GameTest(templateName="fabric-gametest-api-v1:empty")
+    public void reportShapesCannotLoadChunksAndRetainStoredGeometry(TestContext t) {
+        var world=t.getWorld();var center=t.getAbsolutePos(new BlockPos(3,2,3));var far=center.add(1600,0,1600);
+        t.assertFalse(world.isChunkLoaded(far),"context neighbor starts unloaded");
+        world.setBlockState(center,DiagnosticShapeFixture.BLOCK.getDefaultState());
+        var piston=center.east();world.setBlockState(piston,Blocks.PISTON.getDefaultState());
+        com.slabbed.nativeblock.NativeSeats.put(world,piston,new com.slabbed.nativeblock.NativeSeats.Seat(-1,"minecraft:piston"));
+        t.assertTrue(CellWorld.place(world,piston.getX(),piston.getZ(),piston.getY()*2+1,Blocks.STONE.getDefaultState()),"supplemental upper piece");
+        var before=CellWorld.contents(world,piston);var seat=com.slabbed.nativeblock.NativeSeats.seat(world,piston);
+        DiagnosticShapeFixture.outlines=DiagnosticShapeFixture.collisions=0;DiagnosticShapeFixture.target=far;
+        com.google.gson.JsonObject snapshot;
+        try {snapshot=com.slabbed.debug.DiagnosticWorld.snapshot(world,center);}
+        finally {DiagnosticShapeFixture.target=null;}
+        t.assertTrue(DiagnosticShapeFixture.outlines>0 && DiagnosticShapeFixture.collisions>0,"both contextual shapes exercised");
+        t.assertFalse(world.isChunkLoaded(far),"outline/collision/block-entity reads cannot load a context neighbor");
+        t.assertTrue(java.util.Objects.equals(before,CellWorld.contents(world,piston))
+                && seat.equals(com.slabbed.nativeblock.NativeSeats.seat(world,piston)),"snapshot preserves all stored geometry");
+        var blocks=snapshot.getAsJsonArray("blocks");boolean found=false;
+        for(var raw:blocks) {
+            var cell=raw.getAsJsonObject();if(!cell.get("pos").getAsString().equals(piston.toShortString()))continue;
+            found=true;double min=Double.POSITIVE_INFINITY,max=Double.NEGATIVE_INFINITY;
+            for(var box:cell.getAsJsonArray("outline")) {var coordinates=box.getAsJsonArray();min=Math.min(min,coordinates.get(1).getAsDouble());max=Math.max(max,coordinates.get(4).getAsDouble());}
+            t.assertTrue(min==-.5 && max==1.0,"report includes frozen lowered native shape and clipped supplemental shape");
+        }
+        t.assertTrue(found,"piston context present");t.complete();
+    }
+
 }
