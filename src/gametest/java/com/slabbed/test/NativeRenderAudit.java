@@ -27,10 +27,23 @@ public final class NativeRenderAudit {
     private static final Set<BlockPos> PENDING_REMESH=ConcurrentHashMap.newKeySet();
     private static final class Observation {
         final double expectedMin,expectedMax;
+        final BlockState expectedState;
+        boolean otherStateReported;
         int vertices;
         boolean completed;
         double min=Double.POSITIVE_INFINITY,max=Double.NEGATIVE_INFINITY;
-        Observation(double expectedMin,double expectedMax) {this.expectedMin=expectedMin;this.expectedMax=expectedMax;}
+        Observation(double expectedMin,double expectedMax) {this(expectedMin,expectedMax,null);}
+        Observation(double expectedMin,double expectedMax,BlockState expectedState) {
+            this.expectedMin=expectedMin;this.expectedMax=expectedMax;this.expectedState=expectedState;
+        }
+        synchronized boolean accepts(BlockState state) {
+            if(expectedState==null || expectedState==state)return true;
+            if(!otherStateReported) {
+                otherStateReported=true;
+                System.out.println("PHYSICAL_NATIVE_MODEL_OTHER_STATE expected="+expectedState+" observed="+state);
+            }
+            return false;
+        }
         synchronized void vertex(double y) {vertices++;min=Math.min(min,y);max=Math.max(max,y);}
         synchronized boolean ready() {return vertices>=4;}
         synchronized void complete() {completed=true;}
@@ -133,7 +146,7 @@ public final class NativeRenderAudit {
         collectRawModel(model,state,null,raw);
         for(var face:Direction.values())collectRawModel(model,state,face,raw);
         if(raw.vertices<4)throw new AssertionError("piston reference emitted no geometry at "+owner);
-        MODELS.put(owner.toImmutable(),new Observation(owner.getY()-.5+raw.min,owner.getY()-.5+raw.max));
+        MODELS.put(owner.toImmutable(),new Observation(owner.getY()-.5+raw.min,owner.getY()-.5+raw.max,state));
         remesh(client,owner);
     }
     /** Sodium ignores rebuild requests until the initial section mesh has been uploaded. */
@@ -158,17 +171,17 @@ public final class NativeRenderAudit {
         System.out.println("PHYSICAL_NATIVE_MODEL_PATH owner="+owner+" stage="+stage+" model="
                 +(model==null?"null":model.getClass().getName())+" thread="+Thread.currentThread().getName());
     }
-    public static void quad(BlockPos owner,QuadView quad) {
-        var observation=MODELS.get(owner);if(observation==null)return;
+    public static void quad(BlockPos owner,BlockState state,QuadView quad) {
+        var observation=MODELS.get(owner);if(observation==null || !observation.accepts(state))return;
         for(int n=0;n<4;n++)observation.vertex(owner.getY()+quad.y(n));
     }
     public static boolean readyModel(BlockPos owner) {
         var observation=MODELS.get(owner);
         return observation!=null && observation.modelReady();
     }
-    public static void modelComplete(BlockPos owner) {
+    public static void modelComplete(BlockPos owner,BlockState state) {
         var observation=MODELS.get(owner);
-        if(observation!=null)observation.complete();
+        if(observation!=null && observation.accepts(state))observation.complete();
     }
     public static void verifyModel(BlockPos owner) {
         PENDING_REMESH.remove(owner);

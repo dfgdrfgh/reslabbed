@@ -22,12 +22,12 @@ public abstract class NativeModelQuadCaptureMixin {
     private void slabbed$observeEmittedQuads(BlockRenderView world,BlockState state,BlockPos pos,Supplier<Random> random,
                                             RenderContext context,CallbackInfo ci) {
         NativeRenderAudit.renderPath(pos,(BakedModel)(Object)this,"native_emit");
-        context.pushTransform(quad->{NativeRenderAudit.quad(pos,quad);return true;});
+        context.pushTransform(quad->{NativeRenderAudit.quad(pos,state,quad);return true;});
     }
     @Inject(method="emitBlockQuads",at=@At("RETURN"),remap=false)
     private void slabbed$finishEmittedQuads(BlockRenderView world,BlockState state,BlockPos pos,Supplier<Random> random,
                                            RenderContext context,CallbackInfo ci) {
         context.popTransform();
-        NativeRenderAudit.modelComplete(pos);
+        NativeRenderAudit.modelComplete(pos,state);
     }
 }

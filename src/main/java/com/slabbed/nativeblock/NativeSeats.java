@@ -97,15 +97,22 @@ public final class NativeSeats {
             var snapshot=chunks.get(ChunkPos.toLong(pos.getX()>>4,pos.getZ()>>4));
             return snapshot==null?null:snapshot.get(Long.toString(pos.asLong()));
         }
-        Seat seat;
+        Seat seat;boolean clientFacts;
         if(view instanceof World world) {
             if(!world.isChunkLoaded(pos)) return null;
             seat=snapshot(world.getWorldChunk(pos)).get(Long.toString(pos.asLong()));
-        } else if(view instanceof WorldChunk chunk) seat=snapshot(chunk).get(Long.toString(pos.asLong()));
-        else seat=clientSnapshot.apply(pos);
+            clientFacts=world.isClient;
+        } else if(view instanceof WorldChunk chunk) {
+            seat=snapshot(chunk).get(Long.toString(pos.asLong()));clientFacts=chunk.getWorld().isClient;
+        } else {seat=clientSnapshot.apply(pos);clientFacts=true;}
         if(seat==null) return null;
         var state=view.getBlockState(pos);
-        return NativeRules.accepts(state) && Registries.BLOCK.getId(state.getBlock()).toString().equals(seat.block())?seat:null;
+        if(!NativeRules.accepts(state))return null;
+        var identity=Registries.BLOCK.getId(state.getBlock()).toString();
+        if(identity.equals(seat.block()))return seat;
+        // Client state and pose packets can straddle a temporary piston identity in either order.
+        // The remembered offset is returned verbatim; authoritative attachment data is untouched (LAW.md).
+        return clientFacts && NativePistons.clientIdentity(seat.block(),identity)?new Seat(seat.halfOffset(),identity):null;
     }
     public static double offset(BlockView view,BlockPos pos) {
         var seat=seat(view,pos);return seat==null?0:seat.offset();

@@ -116,6 +116,17 @@ public final class PistonSlabRegressionTest {
         });
     }
 
+    @GameTest(templateName="fabric-gametest-api-v1:empty")
+    public void serverPistonFactsRetainStrictBlockIdentity(TestContext t) {
+        var owner=placed(t,Direction.EAST);var world=t.getWorld();
+        NativeSeats.put(world,owner,new NativeSeats.Seat(-1,"minecraft:moving_piston"));
+        t.assertTrue(NativeSeats.seat(world,owner)==null,"server world does not normalize mismatched piston facts");
+        t.assertTrue(NativeSeats.seat(world.getWorldChunk(owner),owner)==null,"server chunk does not normalize mismatched piston facts");
+        t.assertTrue(NativeSeats.snapshot(world.getWorldChunk(owner)).get(Long.toString(owner.asLong())).block().equals("minecraft:moving_piston"),
+                "strict server reads do not mutate saved facts");
+        t.complete();
+    }
+
     private static void groundLever(TestContext t,Direction facing,int floorDrop,boolean expected) {
         var world=t.getWorld();var owner=placed(t,facing);
         var floor=owner.north().down(floorDrop);var lever=floor.up();
