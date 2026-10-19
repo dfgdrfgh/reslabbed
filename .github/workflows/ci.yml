@@ -56,7 +56,7 @@ jobs:
         run: python3 tools/inspect-native-bytecode.py net.minecraft.block.PressurePlateBlock net.minecraft.block.WeightedPressurePlateBlock net.minecraft.block.PistonBlock net.minecraft.block.entity.PistonBlockEntity net.minecraft.block.WallBlock net.minecraft.item.ArmorStandItem net.minecraft.item.AxeItem net.minecraft.block.PointedDripstoneBlock net.minecraft.block.AbstractPressurePlateBlock net.minecraft.entity.Entity#tick,baseTick,checkBlockCollision,tryCheckBlockCollision net.minecraft.world.chunk.light.ChunkBlockLightProvider net.minecraft.entity.vehicle.AbstractMinecartEntity#tick,moveOnRail,snapPositionToRail,snapPositionToRailWithOffset net.minecraft.block.CampfireBlock net.minecraft.block.entity.CampfireBlockEntity net.minecraft.block.AbstractCandleBlock net.minecraft.block.LeverBlock net.minecraft.block.TorchBlock net.minecraft.block.WallTorchBlock net.minecraft.block.DecoratedPotBlock net.minecraft.particle.ParticleUtil
       - name: Inspect piston pose and occlusion targets
         if: always() && matrix.variant == 'indigo'
-        run: python3 tools/inspect-native-bytecode.py net.minecraft.block.PistonBlock net.minecraft.block.entity.PistonBlockEntity net.minecraft.block.Block#shouldDrawSide
+        run: python3 tools/inspect-native-bytecode.py net.minecraft.block.PistonBlock net.minecraft.block.entity.PistonBlockEntity net.minecraft.block.Block#shouldDrawSide net.minecraft.client.render.entity.EntityRenderer#getLight,getBlockLight,getSkyLight net.minecraft.block.AbstractBlock#getOpacity,isTransparent net.minecraft.block.AbstractBlock\$AbstractBlockState#getOpacity,getCullingShape
       - name: Production clients
         if: ${{ !cancelled() }}
         env:
