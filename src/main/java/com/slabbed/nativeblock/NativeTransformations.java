@@ -23,7 +23,11 @@ public final class NativeTransformations {
         return NativeRules.accepts(state)?new NativeSeats.Seat(frame.seat().halfOffset(),Registries.BLOCK.getId(state.getBlock()).toString()):null;
     }
     public static ActionResult use(ItemUsageContext context,Supplier<ActionResult> vanilla) {
-        var world=context.getWorld();var pos=context.getBlockPos().toImmutable();var seat=NativeSeats.seat(world,pos);
+        return at(context.getWorld(),context.getBlockPos(),vanilla);
+    }
+    /** Natural material changes keep native geometry and any independent shared fragments. */
+    public static <T> T at(World world,BlockPos target,Supplier<T> vanilla) {
+        var pos=target.toImmutable();var seat=NativeSeats.seat(world,pos);
         if(seat==null)return vanilla.get();
         var previous=ACTIVE.get();ACTIVE.set(new Frame(world,pos,seat));
         try {return vanilla.get();}

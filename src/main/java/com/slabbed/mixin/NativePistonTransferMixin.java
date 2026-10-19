@@ -91,7 +91,7 @@ public abstract class NativePistonTransferMixin {
     private boolean slabbed$capture(PistonHandler handler,Operation<Boolean> original,
             @Local(argsOnly=true) World world,@Local(argsOnly=true) BlockPos pos,
             @Local(argsOnly=true) Direction direction,@Local(argsOnly=true) boolean extending) {
-        boolean accepted=original.call(handler);
+        boolean accepted=PhysicalPistons.calculatePush(handler,()->original.call(handler));
         if (!accepted) {
             com.slabbed.debug.DiagnosticWorld.piston(world,pos,"piston_plan","VANILLA_REJECTED");return false;
         }

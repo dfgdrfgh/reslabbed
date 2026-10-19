@@ -7,9 +7,11 @@ import com.slabbed.cell.SupplementalCells;
 import com.slabbed.core.CellContents;
 import com.slabbed.core.PhysicalPush;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.PistonBlock;
 import net.minecraft.block.piston.PistonBehavior;
+import net.minecraft.block.piston.PistonHandler;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
@@ -23,9 +25,20 @@ import java.util.Set;
 /** Physical pieces move once per logical identity; native owners retain vanilla data (DY_SPEC.md). */
 public final class PhysicalPistons {
     private static final ThreadLocal<Set<BlockPos>> VANILLA_SOURCES=new ThreadLocal<>();
+    private static final ThreadLocal<List<BlockPos>> NATIVE_ORDER=new ThreadLocal<>();
     private PhysicalPistons() {}
-    public record Plan(List<PhysicalPush.Move<BlockState>> moves,Set<BlockPos> nativeSources,boolean accepted) {
-        public Plan {moves=List.copyOf(moves);nativeSources=Set.copyOf(nativeSources);}
+    public record Plan(List<PhysicalPush.Move<BlockState>> moves,Map<PhysicalPush.SpatialKey,BlockPos> nativeOwners,boolean accepted) {
+        public Plan {moves=List.copyOf(moves);nativeOwners=Map.copyOf(nativeOwners);}
+        public Set<BlockPos> nativeSources() {return Set.copyOf(nativeOwners.values());}
+    }
+
+    /** A native cube contacted across a cell boundary must move from its actual owner. */
+    public static boolean calculatePush(PistonHandler handler,java.util.function.BooleanSupplier vanilla) {
+        var order=NATIVE_ORDER.get();
+        if(order==null)return vanilla.getAsBoolean();
+        handler.getMovedBlocks().clear();handler.getMovedBlocks().addAll(order);
+        handler.getBrokenBlocks().clear();
+        return true;
     }
 
     /** The vanilla movement graph must match the native members of the physical plan exactly. */
@@ -38,7 +51,7 @@ public final class PhysicalPistons {
         return state.isOf(Blocks.SLIME_BLOCK) || state.isOf(Blocks.HONEY_BLOCK);
     }
 
-    private static Plan rejected() {return new Plan(List.of(),Set.of(),false);}
+    private static Plan rejected() {return new Plan(List.of(),Map.of(),false);}
 
     /** Null retains the vanilla native-object path. A rejected physical plan changes nothing. */
     public static Plan prepare(World world,BlockPos piston,Direction facing,boolean extending) {
@@ -46,7 +59,7 @@ public final class PhysicalPistons {
         var front=piston.offset(facing,extending?1:2);
         int frontHalf=half+facing.getOffsetY()*(extending?2:4);
         var bounds=new PhysicalPush.Bounds(front.getX(),frontHalf,front.getZ(),front.getX()+1,frontHalf+2,front.getZ()+1);
-        boolean physical=false;
+        boolean physical=NativePistons.baseHalf(world,piston)!=0;
         for(int y=Math.floorDiv(frontHalf,2);y<=Math.floorDiv(frontHalf+1,2);y++) {
             var cell=new BlockPos(front.getX(),y,front.getZ());
             if(world.getBlockState(cell).isOf(Slabbed.CELL) || SupplementalCells.has(world,cell)) physical=true;
@@ -54,7 +67,7 @@ public final class PhysicalPistons {
         var scene=new Scene(world,piston,facing);
         var seeds=scene.occupants(bounds);
         // Ordinary native piston graphs keep vanilla handling unless physical geometry participates.
-        if(!physical && seeds.stream().noneMatch(piece->adhesive(piece.value())))return null;
+        if(!physical && !scene.physical && seeds.stream().noneMatch(piece->adhesive(piece.value())))return null;
         var motion=extending?facing:facing.getOpposite();
         var result=PhysicalPush.plan(seeds,PhysicalPush.Direction6.valueOf(motion.name()),
                 scene::occupants,scene::attached);
@@ -62,18 +75,18 @@ public final class PhysicalPistons {
         if(!result.success()) {
             com.slabbed.debug.DiagnosticWorld.piston(world,piston,"piston_plan",result.failure().name());return rejected();
         }
-        var nativeSources=new java.util.LinkedHashSet<BlockPos>();
+        var nativeOwners=new LinkedHashMap<PhysicalPush.SpatialKey,BlockPos>();
         for(var move:result.moves()) {
             var owner=scene.nativeSources.get(move.source().key());
-            if(owner!=null)nativeSources.add(owner);
+            if(owner!=null)nativeOwners.put(move.source().key(),owner);
         }
         var head=piston.offset(facing);
         var headState=world.getBlockState(head);
         if(extending && NativeSeats.seat(world,head)!=null && !headState.isOf(Blocks.PISTON_HEAD)
-                && !nativeSources.contains(head)) {
+                && !nativeOwners.containsValue(head)) {
             com.slabbed.debug.DiagnosticWorld.piston(world,piston,"piston_plan","HEAD_TARGET_BLOCKED");return rejected();
         }
-        var plan=new Plan(result.moves(),nativeSources,true);
+        var plan=new Plan(result.moves(),nativeOwners,true);
         // Validate all target fragments before the first world write.
         try { changed(world,plan,true); }
         catch(IllegalArgumentException|IllegalStateException invalid) {
@@ -162,9 +175,10 @@ public final class PhysicalPistons {
                     var test=new net.minecraft.util.math.Box(bounds.minX()-x,bounds.minHalf()*.5-y,bounds.minZ()-z,
                             bounds.maxX()-x,bounds.maxHalf()*.5-y,bounds.maxZ()-z);
                     if(shape.getBoundingBoxes().stream().anyMatch(box->box.intersects(test))) {
-                        var piece=new PhysicalPush.Piece<>(x,z,y*2+offset,2,state,adhesive(state)
+                        var piece=new PhysicalPush.Piece<>(x,z,y*2+offset,2,state,
+                                (adhesive(state) || Block.isShapeFullCube(NativeShapes.outline(world,pos,state)))
                                 && PistonBlock.isMovable(state,world,pos,facing,false,facing));
-                        if(adhesive(state))nativeSources.put(piece.key(),pos.toImmutable());
+                        nativeSources.put(piece.key(),pos.toImmutable());
                         add(result,piece);
                     }
                 }
@@ -187,7 +201,7 @@ public final class PhysicalPistons {
         var changes=new LinkedHashMap<BlockPos,CellContents<BlockState>>();
         for(var move:plan.moves()) {
             var source=move.source();
-            if(adhesive(source.value()))continue;
+            if(plan.nativeOwners().containsKey(source.key()))continue;
             for(int y=Math.floorDiv(source.originHalf(),2);y<=Math.floorDiv(source.originHalf()+source.length()-1,2);y++) {
                 var pos=new BlockPos(source.x(),y,source.z());
                 var contents=changes.computeIfAbsent(pos,p->staticContents(world,p));
@@ -196,7 +210,7 @@ public final class PhysicalPistons {
             }
         }
         if(addTargets) for(var move:plan.moves()) {
-            if(adhesive(move.source().value()))continue;
+            if(plan.nativeOwners().containsKey(move.source().key()))continue;
             var target=move.destination();int origin=target.minHalf(),length=move.source().length();
             for(int y=Math.floorDiv(origin,2);y<=Math.floorDiv(origin+length-1,2);y++) {
                 var pos=new BlockPos(target.minX(),y,target.minZ());
@@ -219,12 +233,23 @@ public final class PhysicalPistons {
             CellWorld.applyPiston(world,removed);
             boolean accepted;
             var previous=VANILLA_SOURCES.get();VANILLA_SOURCES.set(plan.nativeSources());
+            var previousOrder=NATIVE_ORDER.get();
+            if(plan.moves().stream().anyMatch(move->plan.nativeOwners().containsKey(move.source().key()) && !adhesive(move.source().value()))) {
+                var order=new ArrayList<BlockPos>();
+                for(var move:plan.moves()) {
+                    var owner=plan.nativeOwners().get(move.source().key());if(owner!=null)order.add(owner);
+                }
+                java.util.Collections.reverse(order);NATIVE_ORDER.set(List.copyOf(order));
+            } else NATIVE_ORDER.remove();
             try {accepted=vanilla.getAsBoolean();}
-            finally {if(previous==null)VANILLA_SOURCES.remove();else VANILLA_SOURCES.set(previous);}
+            finally {
+                if(previous==null)VANILLA_SOURCES.remove();else VANILLA_SOURCES.set(previous);
+                if(previousOrder==null)NATIVE_ORDER.remove();else NATIVE_ORDER.set(previousOrder);
+            }
             if(!accepted) {CellWorld.applyPiston(world,originals);return false;}
             var targets=new LinkedHashMap<BlockPos,CellContents<BlockState>>();
             for(var move:plan.moves()) {
-                if(adhesive(move.source().value()))continue;
+                if(plan.nativeOwners().containsKey(move.source().key()))continue;
                 int origin=move.destination().minHalf(),length=move.source().length();
                 for(int y=Math.floorDiv(origin,2);y<=Math.floorDiv(origin+length-1,2);y++) {
                     var pos=new BlockPos(move.destination().minX(),y,move.destination().minZ());

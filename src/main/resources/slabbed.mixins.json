@@ -13,6 +13,7 @@
     "NativePistonTransferMixin",
     "NativePistonMovingMixin",
     "NativeToolTransformationMixin",
+    "NativeSoilTransformationMixin",
     "NativeDripstoneSupportMixin",
     "NativeScaffoldingMixin",
     "NativeMinecartMixin",

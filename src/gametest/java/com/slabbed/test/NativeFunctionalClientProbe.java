@@ -43,6 +43,7 @@ public final class NativeFunctionalClientProbe {
     public static boolean tick(MinecraftClient client,boolean reopen) {
         if(Boolean.getBoolean("slabbed.controlProbe"))return true;
         if(!NativePistonClientProbe.tick(client))return false;
+        if(!NativeOffsetPistonClientProbe.tick(client))return false;
         if(!NativeParticleClientProbe.tick(client))return false;
         if(!NativeRedstoneLightClientProbe.tick(client))return false;
         if(failure!=null)throw new AssertionError("native functional server probe failed",failure);

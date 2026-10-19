@@ -1,3 +1,11 @@
+# 0.9.8 rewrite alpha — Fabric 1.21.1
+
+Lowered piston heads check physical contact with ordinary-height native cubes, including blocks owned by the cell below the head. Movable cubes retain their original height; intersecting immovable blocks prevent extension. The native animation receives actual contacted owner positions. Existing adhesive-only graphs retain their graph consistency check.
+
+Grass and mycelium spreading or decaying retain the transformed block's fixed placement and independently stored slab fragments. See LAW.md.
+
+Adds four-direction offset-grass pushes, an obsidian obstruction check, a covered-grass decay regression, and production-client checks for offset contact with the pinned optimization subsets.
+
 # 0.9.7 rewrite alpha — Fabric 1.21.1
 
 Apply remembered placement heights to runtime-selected blockstate aliases, including VanillaBackport's redstone torch and repeater models. Model aliases need not name registered blocks. Placement facts remain permanent; see LAW.md.

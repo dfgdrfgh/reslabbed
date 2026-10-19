@@ -140,6 +140,7 @@ for phase in (['fresh'] if args.control else ['fresh','reopen']):
     if result.returncode!=0 or not marker.exists():print('\n'.join(lines[-100:]));raise AssertionError('Physical client failed '+phase)
     assert any('PHYSICAL_REDSTONE_MODEL_HEIGHT_PASS' in line for line in lines),'Redstone model height checks did not complete'
     assert any('PHYSICAL_DROPPED_ITEM_LIGHT_PASS' in line for line in lines),'Dropped item light checks did not complete'
+    assert any('PHYSICAL_OFFSET_PISTON_CONTACT_PASS' in line for line in lines),'Offset piston contact checks did not complete'
     assert any('PHYSICAL_NATIVE_PISTON_CYCLE_PASS' in line for line in lines),'Native piston client cycle did not complete'
     assert any('PHYSICAL_DIAGNOSTIC_REPORT_PASS' in line for line in lines),'Optional recorder report probe did not complete'
     assert any('PHYSICAL_PISTON_CAPTURE_PASS' in line for line in lines),'Authoritative moving pose capture probe did not complete'
