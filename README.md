@@ -14,4 +14,6 @@ Pistons move complete static pieces atomically, preserve independent slabs and s
 
 This is a fresh-world candidate. It does not interpret the old offset attachment format. Existing saves require an explicit migration before upgrading.
 
+Actions validates the server and the Indigo and Sodium clients on every rewrite push. Complete-pack and comparison checks run when the exact pack source is available; otherwise they are explicitly skipped and the missing inputs are listed in the workflow summary. They are never reported as a compatibility pass. Local pack checks accept `SLABBED_FULL_PACK`; Actions can download the exact archive from the `SLABBED_FULL_PACK_URL` repository secret. Its SHA-256 must match the current fixture before staging, and the pack is never published with the production JAR.
+
 Based on the Slabbed concept by its original contributors: https://modrinth.com/mod/slabbed and https://github.com/peetsamods/slabbed. Distributed under GPL-3.0-only; see LICENSE.

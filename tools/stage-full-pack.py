@@ -1,6 +1,7 @@
 """Stage hash-verified published fork JARs and the indexed pack files."""
 from pathlib import Path
 import argparse,concurrent.futures,hashlib,json,os,shutil,urllib.request,urllib.error,zipfile
+from pack_source import resolve_source
 
 root=Path.cwd()
 fixture=json.loads((root/'tools/full-pack-fixture.json').read_text())
@@ -9,11 +10,10 @@ parser.add_argument('--source-pack',type=Path,default=os.environ.get('SLABBED_FU
                     help='Local copy of the exact supplied complete pack; never uploaded')
 args=parser.parse_args()
 source_pack=None
-if args.source_pack:
-    assert hashlib.sha256(args.source_pack.read_bytes()).hexdigest()==fixture['sourcePackSha256'],'Source pack hash mismatch'
-    source_pack=zipfile.ZipFile(args.source_pack)
-unavailable=[entry['path'] for entry in fixture.get('overrides',[]) if not entry.get('downloads') and source_pack is None]
-assert not unavailable,'Exact complete pack files unavailable; provide --source-pack: '+', '.join(unavailable)
+source_path=resolve_source(fixture,root/'build/private-source-pack.mrpack',args.source_pack,
+                           os.environ.get('SLABBED_FULL_PACK_URL'))
+if source_path:
+    source_pack=zipfile.ZipFile(source_path)
 out=root/'build/full-pack-baseline';out.mkdir(parents=True,exist_ok=True)
 # A stale baseline must never satisfy a newer fixture's count or file checks.
 shutil.rmtree(out);out.mkdir(parents=True)

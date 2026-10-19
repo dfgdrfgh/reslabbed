@@ -10,12 +10,29 @@ concurrency:
   group: physical-rewrite-${{ github.ref }}
   cancel-in-progress: true
 jobs:
+  pack-inputs:
+    name: Check complete pack inputs
+    runs-on: ubuntu-22.04
+    timeout-minutes: 5
+    outputs:
+      ready: ${{ steps.source.outputs.ready }}
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          persist-credentials: false
+      - name: Test complete-pack source handling
+        run: python3 -m unittest discover -s tools -p test_pack_source.py -v
+      - name: Check exact complete-pack source availability
+        id: source
+        env:
+          SLABBED_FULL_PACK_URL: ${{ secrets.SLABBED_FULL_PACK_URL }}
+        run: python3 tools/pack_source.py
   verify:
     name: Server and ${{ matrix.variant }} client
     strategy:
       fail-fast: false
       matrix:
-        variant: [indigo, sodium, pack, control]
+        variant: [indigo, sodium]
     runs-on: ubuntu-22.04
     timeout-minutes: 40
     steps:
@@ -46,11 +63,6 @@ jobs:
             bash gradlew --no-daemon --console=plain writeProbeRuntime
             timeout 15m xvfb-run -a python3 tools/client-runtime.py
           fi
-      - name: Stage complete latest pack
-        if: matrix.variant == 'pack' || matrix.variant == 'control'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: python3 tools/stage-full-pack.py
       - name: Production clients
         env:
           VARIANT: ${{ matrix.variant }}
@@ -59,8 +71,6 @@ jobs:
         run: |
           if [ "$VARIANT" = "indigo" ]; then
             timeout 20m xvfb-run -a python3 tools/client-runtime.py
-          elif [ "$VARIANT" = "control" ]; then
-            timeout 20m xvfb-run -a python3 tools/client-runtime.py --pack --control
           else
             timeout 20m xvfb-run -a python3 tools/client-runtime.py --"$VARIANT"
           fi
@@ -72,3 +82,45 @@ jobs:
           path: build/libs/slabbed-0.9.3-rewrite-alpha+1.21.1-fabric.jar
           if-no-files-found: error
           retention-days: 30
+  compatibility:
+    name: Complete pack and ${{ matrix.variant }} client
+    needs: pack-inputs
+    if: needs.pack-inputs.outputs.ready == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        variant: [pack, control]
+    runs-on: ubuntu-22.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: gradle/actions/setup-gradle@3f131e8634966bd73d06cc69884922b02e6faf92
+        with:
+          cache-provider: basic
+      - name: Compile and server-test the fresh implementation
+        run: |
+          rm -rf build/run/gameTest
+          python3 tools/server-check.py
+          python3 tools/verify-test-count.py
+      - name: Stage exact complete latest pack
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SLABBED_FULL_PACK_URL: ${{ secrets.SLABBED_FULL_PACK_URL }}
+        run: python3 tools/stage-full-pack.py
+      - name: Complete-pack production clients
+        env:
+          VARIANT: ${{ matrix.variant }}
+          LIBGL_ALWAYS_SOFTWARE: '1'
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "$VARIANT" = "control" ]; then
+            timeout 20m xvfb-run -a python3 tools/client-runtime.py --pack --control
+          else
+            timeout 20m xvfb-run -a python3 tools/client-runtime.py --pack
+          fi
