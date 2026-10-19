@@ -16,6 +16,8 @@ import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.ArrayDeque;
 import java.util.LinkedHashMap;
@@ -26,6 +28,13 @@ import java.util.Map;
 public abstract class NativePistonTransferMixin {
     @Unique private static final ThreadLocal<ArrayDeque<Map<BlockPos,Integer>>> SLABBED$MOVES=
             ThreadLocal.withInitial(ArrayDeque::new);
+
+    @Inject(method="shouldExtend",at=@At("RETURN"),cancellable=true)
+    private void slabbed$physicalPower(net.minecraft.world.RedstoneView world,BlockPos pos,Direction facing,
+                                       CallbackInfoReturnable<Boolean> result) {
+        if(!result.getReturnValue() && com.slabbed.nativeblock.NativePistonSignal.physicalPower(world,pos,facing))
+            result.setReturnValue(true);
+    }
 
     @WrapMethod(method="move")
     private boolean slabbed$move(World world,BlockPos pos,Direction direction,boolean extending,Operation<Boolean> original) {

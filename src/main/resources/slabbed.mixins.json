@@ -41,7 +41,8 @@
     "NativeLeverParticleMixin",
     "NativePotParticleMixin",
     "NativeCandleParticleMixin",
-    "NativeDistributedParticleMixin"
+    "NativeDistributedParticleMixin",
+    "NativeFaceCullingMixin"
   ],
   "injectors": {
     "defaultRequire": 1

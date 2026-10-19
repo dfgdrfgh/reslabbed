@@ -16,7 +16,8 @@
     "NativeBlockEntityVertexCaptureMixin",
     "NativeModelQuadCaptureMixin",
     "OptimizedModelSelectionCaptureMixin",
-    "SodiumNativeModelCaptureMixin"
+    "SodiumNativeModelCaptureMixin",
+    "NativePistonPacketTraceMixin"
   ],
   "injectors": {
     "defaultRequire": 1

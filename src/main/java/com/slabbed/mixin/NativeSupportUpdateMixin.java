@@ -16,6 +16,7 @@ public abstract class NativeSupportUpdateMixin {
         if(cir.getReturnValue()) {
             var world=(World)(Object)this;NativeSupport.revalidateNear(world,pos);
             com.slabbed.cell.PieceSupport.revalidateNear(world,pos);
+            com.slabbed.nativeblock.NativePistonSignal.changed(world,pos,state);
         }
     }
 }
