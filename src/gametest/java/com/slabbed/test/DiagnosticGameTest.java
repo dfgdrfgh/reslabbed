@@ -17,7 +17,8 @@ public final class DiagnosticGameTest {
         var world=t.getWorld();var base=t.getAbsolutePos(new BlockPos(3,2,3));
         world.setBlockState(base,Blocks.PISTON.getDefaultState().with(PistonBlock.FACING,Direction.UP));
         for(int y=1;y<=16;y++)world.setBlockState(base.up(y),Blocks.AIR.getDefaultState());
-        for(int n=0;n<13;n++)t.assertTrue(CellWorld.place(world,base.getX(),base.getZ(),base.getY()*2+2+2*n,
+        com.slabbed.nativeblock.NativeSeats.put(world,base,new com.slabbed.nativeblock.NativeSeats.Seat(-1,"minecraft:piston"));
+        for(int n=0;n<13;n++)t.assertTrue(CellWorld.place(world,base.getX(),base.getZ(),base.getY()*2+1+2*n,
                 Blocks.STONE.getDefaultState()),"limit fixture");
         DiagnosticRecorder.start();
         try {
