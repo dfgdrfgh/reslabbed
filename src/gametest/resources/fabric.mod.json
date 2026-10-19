@@ -19,7 +19,8 @@
       "com.slabbed.test.NativeRailTest",
       "com.slabbed.test.NativeEffectsTest",
       "com.slabbed.test.NativeThreadAccessTest",
-      "com.slabbed.test.NativeCellPistonTest"
+      "com.slabbed.test.NativeCellPistonTest",
+      "com.slabbed.test.PistonSlabRegressionTest"
     ],
     "client": [
       "com.slabbed.test.PhysicalClientProbe"

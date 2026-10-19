@@ -63,6 +63,9 @@ jobs:
             bash gradlew --no-daemon --console=plain writeProbeRuntime
             timeout 15m xvfb-run -a python3 tools/client-runtime.py
           fi
+      - name: Inspect piston pose and occlusion targets
+        if: always() && matrix.variant == 'indigo'
+        run: python3 tools/inspect-native-bytecode.py net.minecraft.block.PistonBlock net.minecraft.block.entity.PistonBlockEntity net.minecraft.block.Block#shouldDrawSide net.minecraft.client.render.block.entity.PistonBlockEntityRenderer
       - name: Production clients
         env:
           VARIANT: ${{ matrix.variant }}
