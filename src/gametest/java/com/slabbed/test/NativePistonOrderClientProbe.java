@@ -44,6 +44,17 @@ public final class NativePistonOrderClientProbe {
         check(raw==NativeSeats.snapshot(world.getWorldChunk(POS)),"client piston settlement does not rewrite authoritative identity");
         NativeSeats.put(world,POS,new NativeSeats.Seat(-1,"minecraft:stone"));
         check(NativeSeats.offset(world,POS)==-.5,"authoritative final stone pose survives settlement");
+        world.setBlockState(POS,Blocks.MOVING_PISTON.getDefaultState(),Block.NOTIFY_LISTENERS);
+        var moving=(net.minecraft.block.entity.PistonBlockEntity)net.minecraft.block.PistonExtensionBlock.createBlockEntityPiston(
+                POS,world.getBlockState(POS),Blocks.STONE.getDefaultState(),net.minecraft.util.math.Direction.EAST,true,false);
+        moving.setWorld(world);world.addBlockEntity(moving);
+        ((com.slabbed.nativeblock.NativePistonPose)moving).slabbed$halfOffset(0);
+        raw=NativeSeats.snapshot(world.getWorldChunk(POS));
+        com.slabbed.nativeblock.NativePistons.capture(moving);
+        check(Integer.valueOf(-1).equals(((com.slabbed.nativeblock.NativePistonPose)moving).slabbed$halfOffset()),
+                "ahead final stone fact corrects an initialized moving-entity fallback");
+        check(raw==NativeSeats.snapshot(world.getWorldChunk(POS)),"moving capture does not rewrite authoritative facts");
+        System.out.println("PHYSICAL_PISTON_CAPTURE_PASS");
         world.setBlockState(POS,Blocks.STICKY_PISTON.getDefaultState(),Block.NOTIFY_LISTENERS);
         NativeSeats.put(world,POS,new NativeSeats.Seat(-1,"minecraft:moving_piston"));
         check(NativeSeats.offset(world,POS)==-.5,"moving fact arriving after final sticky base retains height");
