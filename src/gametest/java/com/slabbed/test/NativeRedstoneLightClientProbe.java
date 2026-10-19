@@ -27,7 +27,7 @@ public final class NativeRedstoneLightClientProbe {
     private record Fixture(BlockPos pos,BlockState state) {}
     private static final List<Fixture> MODELS=new ArrayList<>();
     private static final BlockState[] SURFACES={Blocks.GRASS_BLOCK.getDefaultState(),Blocks.PODZOL.getDefaultState(),
-            Blocks.MYCELIUM.getDefaultState(),Blocks.GRASS_BLOCK.getDefaultState()};
+            Blocks.MYCELIUM.getDefaultState(),Blocks.GRASS_BLOCK.getDefaultState(),Blocks.PODZOL.getDefaultState()};
     private static int stage,ticks,started;
     private static volatile boolean pending;
     private static volatile Throwable failure;
@@ -76,7 +76,7 @@ public final class NativeRedstoneLightClientProbe {
             }
             for(var fixture:MODELS)NativeRenderAudit.verifyModel(fixture.pos());
             System.out.println("PHYSICAL_REDSTONE_MODEL_HEIGHT_PASS torch_lit_unlit repeater_all_delays_powered_unpowered");
-            System.out.println("PHYSICAL_DROPPED_ITEM_LIGHT_PASS grass podzol mycelium flush_control");
+            System.out.println("PHYSICAL_DROPPED_ITEM_LIGHT_PASS grass podzol mycelium flush_control enclosed_control");
             stage=99;return true;
         }
         return false;
@@ -120,7 +120,13 @@ public final class NativeRedstoneLightClientProbe {
             world.setBlockState(pos.down(),Blocks.OAK_SLAB.getDefaultState(),Block.NOTIFY_LISTENERS);
             world.setBlockState(pos,state,Block.NOTIFY_LISTENERS);
             NativeSeats.put(world,pos,new NativeSeats.Seat(i==3?0:-1,Registries.BLOCK.getId(state.getBlock()).toString()));
-            var item=new ItemEntity(world,pos.getX()+.5,pos.getY()+1.5,pos.getZ()+.5,new ItemStack(Items.DIAMOND));
+            if(i==4) {
+                for(int x=-1;x<=1;x++)for(int z=-1;z<=1;z++) {
+                    world.setBlockState(pos.add(x,1,z),Blocks.STONE.getDefaultState(),Block.NOTIFY_LISTENERS);
+                    if(x!=0 || z!=0)world.setBlockState(pos.add(x,0,z),Blocks.STONE.getDefaultState(),Block.NOTIFY_LISTENERS);
+                }
+            }
+            var item=new ItemEntity(world,pos.getX()+.5,pos.getY()+(i==4?.75:1.5),pos.getZ()+.5,new ItemStack(Items.DIAMOND));
             item.setVelocity(0,0,0);item.setPickupDelayInfinite();world.spawnEntity(item);
         }
     }
@@ -134,7 +140,7 @@ public final class NativeRedstoneLightClientProbe {
             int light=client.getEntityRenderDispatcher().getRenderer(item).getLight(item,1);
             int sky=(light>>20)&15,expected=client.world.getLightLevel(LightType.SKY,pos.up());
             System.out.println("PHYSICAL_DROPPED_ITEM_LIGHT_OBSERVED surface="+SURFACES[i]+" y="+item.getY()+" light="+light+" sky="+sky+" expectedSky="+expected);
-            check(expected==15,"outdoor item fixture must have open sky");
+            check(expected==(i==4?0:15),"item fixture must retain its outdoor or enclosed light level");
             check(sky==expected,"item above shifted "+SURFACES[i]+" samples the opaque owner instead of exposed air: "+sky+" expected="+expected);
         }
     }

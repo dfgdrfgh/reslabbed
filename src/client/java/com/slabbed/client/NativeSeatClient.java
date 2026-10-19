@@ -36,7 +36,9 @@ public final class NativeSeatClient {
         ModelLoadingPlugin.register(plugin->plugin.modifyModelAfterBake().register(ModelModifier.WRAP_PHASE,(model,context)-> {
             var id=context.topLevelId();
             if(model==null || id==null || ModelIdentifier.INVENTORY_VARIANT.equals(id.getVariant()))return model;
-            return NativeSeatModel.workstationModel(id.id())?new NativeSeatModel(model):model;
+            // Runtime-selected blockstate aliases need the same pose even when their IDs
+            // do not name registered blocks, as with VanillaBackport's redstone models.
+            return model instanceof NativeSeatModel?model:new NativeSeatModel(model);
         }));
     }
     private static void reset() {CHUNKS.clear();SEEN.clear();published=Map.of();}

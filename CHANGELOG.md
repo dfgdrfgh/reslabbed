@@ -1,3 +1,11 @@
+# 0.9.7 rewrite alpha — Fabric 1.21.1
+
+Apply remembered placement heights to runtime-selected blockstate aliases, including VanillaBackport's redstone torch and repeater models. Model aliases need not name registered blocks. Placement facts remain permanent; see LAW.md.
+
+Entity lighting samples the exposed side of shifted opaque blocks when the entity's light probe lies outside their physical volume. Ordinary world light levels and entity light overrides remain in use.
+
+Adds emitted-vertex checks for lit and unlit torches and every repeater delay, settled-item light checks on grass, podzol and mycelium, and ordinary-height and enclosed-light controls. A separate compatibility subset uses the exact VanillaBackport JAR pinned by the supplied pack fixture. Complete-pack verification still requires the private source input.
+
 # 0.9.5 rewrite alpha — Fabric 1.21.1
 
 Lowered pistons also receive direct horizontal power in their second occupied cell, including ground-level levers beside a slab. Front-facing inputs and sources separated from the bottom by a half-block gap remain excluded. Vanilla vertical power and quasi-connectivity checks are preserved.
