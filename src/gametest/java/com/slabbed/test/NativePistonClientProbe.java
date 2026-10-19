@@ -145,14 +145,19 @@ public final class NativePistonClientProbe {
                 var base=slabBase(n);var facing=FACES[n];
                 check(client.world.getBlockState(base).isOf(Blocks.PISTON) && !client.world.getBlockState(base).get(PistonBlock.EXTENDED),
                         "client slab piston retracts "+facing);
-                System.out.println("PHYSICAL_PISTON_POSE retracted facing="+facing+" base="+NativeSeats.offset(client.world,base));
+                if(ticks-started==10)System.out.println("PHYSICAL_PISTON_POSE retracted facing="+facing+" base="+NativeSeats.offset(client.world,base));
                 check(NativeSeats.offset(client.world,base)==-.5,"client retracted piston stays on slab "+facing);
             }
             for(int n=0;n<BASES.length;n++) {
                 var base=BASES[n];double offset=n==0?0:-.5;
                 if(!client.world.getBlockState(base.east()).isOf(Blocks.STONE)
                         || !client.world.getBlockState(base.east(2)).isAir()
-                        || NativeSeats.offset(client.world,base.east())!=offset)return false;
+                        || NativeSeats.offset(client.world,base.east())!=offset) {
+                    check(ticks-started<30,"client sticky return base="+base+" source="+client.world.getBlockState(base.east())
+                            +" destination="+client.world.getBlockState(base.east(2))+" offset="+NativeSeats.offset(client.world,base.east())
+                            +" expected="+offset+" fact="+NativeSeats.snapshot(client.world.getWorldChunk(base.east())).get(Long.toString(base.east().asLong())));
+                    return false;
+                }
             }
             for(int n=0;n<FACES.length;n++)NativeRenderAudit.beginPistonModel(client,slabBase(n));
             next(8);return false;

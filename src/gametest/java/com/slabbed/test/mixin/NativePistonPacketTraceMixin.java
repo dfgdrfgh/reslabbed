@@ -22,8 +22,10 @@ public abstract class NativePistonPacketTraceMixin {
     }
     private void trace(String stage,BlockPos pos,BlockState next) {
         var chunk=(WorldChunk)(Object)this;
-        if(!chunk.getWorld().isClient || pos.getX()!=42 || pos.getZ()!=8 || pos.getY()!=64)return;
+        boolean base=pos.getX()==42 && (pos.getZ()==8 || pos.getZ()==28);
+        boolean stone=pos.getX()>=34 && pos.getX()<=36 && pos.getZ()==12;
+        if(!chunk.getWorld().isClient || (!base && !stone) || pos.getY()!=64)return;
         var fact=NativeSeats.snapshot(chunk).get(Long.toString(pos.asLong()));
-        System.out.println("PHYSICAL_PISTON_PACKET "+stage+" current="+chunk.getBlockState(pos)+" next="+next+" fact="+fact);
+        System.out.println("PHYSICAL_PISTON_PACKET "+stage+" pos="+pos+" current="+chunk.getBlockState(pos)+" next="+next+" fact="+fact);
     }
 }
