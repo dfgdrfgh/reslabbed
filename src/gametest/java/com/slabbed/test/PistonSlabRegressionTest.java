@@ -96,9 +96,29 @@ public final class PistonSlabRegressionTest {
     }
 
     @GameTest(templateName="fabric-gametest-api-v1:empty",tickLimit=40)
-    public void groundLeverBesideSlabPistonActivatesItsPhysicalSide(TestContext t) {
-        var world=t.getWorld();var owner=placed(t,Direction.EAST);
-        var floor=owner.north().down(2);var lever=floor.up();
+    public void groundLeverBesideSlabPistonActivatesItsPhysicalSide(TestContext t) {groundLever(t,Direction.EAST,2,true);}
+
+    @GameTest(templateName="fabric-gametest-api-v1:empty",tickLimit=40)
+    public void groundLeverAtPistonFrontDoesNotActivateIt(TestContext t) {groundLever(t,Direction.NORTH,2,false);}
+
+    @GameTest(templateName="fabric-gametest-api-v1:empty",tickLimit=40)
+    public void groundLeverBelowPhysicalSideDoesNotActivateIt(TestContext t) {groundLever(t,Direction.EAST,3,false);}
+
+    @GameTest(templateName="fabric-gametest-api-v1:empty",tickLimit=30)
+    public void powerHalfBlockBelowPistonBottomDoesNotActivateIt(TestContext t) {
+        var owner=placed(t,Direction.EAST);var world=t.getWorld();
+        world.setBlockState(owner.down(2),Blocks.REDSTONE_BLOCK.getDefaultState(),Block.NOTIFY_ALL);
+        world.getBlockState(owner).neighborUpdate(world,owner,Blocks.REDSTONE_BLOCK,owner.north(),false);
+        t.runAtTick(12,()-> {
+            t.assertFalse(world.getBlockState(owner).get(PistonBlock.EXTENDED),"power separated from the piston bottom by half a block cannot activate it");
+            t.assertTrue(NativeSeats.offset(world,owner)==-.5,"power gap check retains the piston height");
+            t.complete();
+        });
+    }
+
+    private static void groundLever(TestContext t,Direction facing,int floorDrop,boolean expected) {
+        var world=t.getWorld();var owner=placed(t,facing);
+        var floor=owner.north().down(floorDrop);var lever=floor.up();
         world.setBlockState(floor,Blocks.STONE.getDefaultState(),Block.NOTIFY_ALL);
         var player=t.createMockPlayer(GameMode.SURVIVAL);
         player.setPosition(floor.getX()-2,floor.getY()+1,floor.getZ()+.5);
@@ -111,7 +131,7 @@ public final class PistonSlabRegressionTest {
         player.setStackInHand(Hand.MAIN_HAND,ItemStack.EMPTY);
         t.runAtTick(2,()->world.getBlockState(lever).onUse(world,player,hit));
         t.runAtTick(12,()-> {
-            t.assertTrue(world.getBlockState(owner).get(PistonBlock.EXTENDED),"ground lever powers the physical side of the slab piston");
+            t.assertTrue(world.getBlockState(owner).get(PistonBlock.EXTENDED)==expected,"ground lever respects physical side height and excludes the piston front");
             world.getBlockState(lever).onUse(world,player,hit);
         });
         t.runAtTick(25,()-> {

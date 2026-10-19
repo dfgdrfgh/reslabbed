@@ -152,6 +152,13 @@ public final class NativePistonClientProbe {
                         || !client.world.getBlockState(base.east(2)).isAir()
                         || NativeSeats.offset(client.world,base.east())!=offset)return false;
             }
+            for(int n=0;n<FACES.length;n++)NativeRenderAudit.beginPistonModel(client,slabBase(n));
+            next(8);return false;
+        }
+        if(stage==8) {
+            for(int n=0;n<FACES.length;n++)if(!NativeRenderAudit.readyModel(slabBase(n)))return false;
+            for(int n=0;n<FACES.length;n++)NativeRenderAudit.verifyModel(slabBase(n));
+            System.out.println("PHYSICAL_PISTON_MODELS_PASS retracted all_six_directions");
             System.out.println("PHYSICAL_NATIVE_PISTON_CYCLE_PASS lithium="+FabricLoader.getInstance().isModLoaded("lithium"));
             stage=99;return true;
         }

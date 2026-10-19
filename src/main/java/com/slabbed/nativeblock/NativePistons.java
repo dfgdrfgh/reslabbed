@@ -12,6 +12,14 @@ public final class NativePistons {
     private static final ThreadLocal<java.util.ArrayDeque<BasePose>> BASE_POSES=ThreadLocal.withInitial(java.util.ArrayDeque::new);
     private static final ThreadLocal<PistonBlockEntity> ANIMATING=new ThreadLocal<>();
     private NativePistons() {}
+
+    /** A final state packet can precede the final attachment; retain its explicit moving pose (LAW.md). */
+    public static void restoreClientIdentity(World world,BlockPos pos,net.minecraft.block.BlockState next) {
+        if(!world.isClient || !(next.getBlock() instanceof net.minecraft.block.PistonBlock
+                || next.isOf(Blocks.PISTON_HEAD)))return;
+        var fact=NativeSeats.snapshot(world.getWorldChunk(pos)).get(Long.toString(pos.asLong()));
+        if(fact!=null && fact.block().equals("minecraft:moving_piston"))publish(world,pos,fact.halfOffset());
+    }
     public static boolean settling(World world,BlockPos pos,net.minecraft.block.BlockState next) {
         var entity=ANIMATING.get();
         return entity!=null && entity.getWorld()==world && entity.getPos().equals(pos)

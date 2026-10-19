@@ -117,6 +117,9 @@ for phase in (['fresh'] if args.control else ['fresh','reopen']):
         continue
     if result.returncode!=0 or not marker.exists():print('\n'.join(lines[-100:]));raise AssertionError('Physical client failed '+phase)
     assert any('PHYSICAL_NATIVE_PISTON_CYCLE_PASS' in line for line in lines),'Native piston client cycle did not complete'
+    assert any('PHYSICAL_NATIVE_FACE_CULLING_PASS' in line for line in lines),'Native face culling probe did not complete'
+    for pose in ['extended','retracted']:
+        assert any('PHYSICAL_PISTON_MODELS_PASS '+pose+' all_six_directions' in line for line in lines),'Piston model height probe did not complete: '+pose
     if args.lithium:
         assert any('PHYSICAL_NATIVE_PISTON_CYCLE_PASS lithium=true' in line for line in lines),'Lithium piston initialization not exercised'
     if phase=='fresh':
