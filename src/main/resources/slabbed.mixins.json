@@ -42,7 +42,8 @@
     "NativePotParticleMixin",
     "NativeCandleParticleMixin",
     "NativeDistributedParticleMixin",
-    "NativeFaceCullingMixin"
+    "NativeFaceCullingMixin",
+    "DiagnosticServerActionMixin"
   ],
   "injectors": {
     "defaultRequire": 1

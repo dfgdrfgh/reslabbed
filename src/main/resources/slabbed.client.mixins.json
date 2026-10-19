@@ -13,7 +13,8 @@
     "CellPickMixin",
     "NativeBlockEntityRenderMixin",
     "OptimizedNativeSeatModelMixin",
-    "MoreCullingNativeFaceMixin"
+    "MoreCullingNativeFaceMixin",
+    "DiagnosticActionMixin"
   ],
   "injectors": {
     "defaultRequire": 1

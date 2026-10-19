@@ -1,1 +1,6 @@
-{"block.slabbed.cell":"Slab-supported structure"}
+{
+  "block.slabbed.cell": "Slab-supported structure",
+  "category.slabbed.debug": "Slabbed diagnostics",
+  "key.slabbed.debug_toggle": "Toggle debug recording",
+  "key.slabbed.debug_report": "Export debug report"
+}

@@ -34,6 +34,9 @@ public abstract class NativePistonTransferMixin {
                                        CallbackInfoReturnable<Boolean> result) {
         if(!result.getReturnValue() && com.slabbed.nativeblock.NativePistonSignal.physicalPower(world,pos,facing))
             result.setReturnValue(true);
+        if(com.slabbed.debug.DiagnosticRecorder.isActive() && world instanceof World actual)
+            com.slabbed.debug.DiagnosticWorld.piston(actual,pos,"piston_power","facing="+facing+" powered="+result.getReturnValue()
+                    +" half="+NativePistons.baseHalf(actual,pos));
     }
 
     @WrapMethod(method="move")
@@ -47,7 +50,10 @@ public abstract class NativePistonTransferMixin {
                 if(moved) destinations.forEach((destination,half)->NativePistons.publish(world,destination,half));
                 return moved;
             };
-            return plan==null?vanilla.getAsBoolean():PhysicalPistons.move(world,plan,vanilla);
+            boolean moved=plan==null?vanilla.getAsBoolean():PhysicalPistons.move(world,plan,vanilla);
+            if(com.slabbed.debug.DiagnosticRecorder.isActive())com.slabbed.debug.DiagnosticWorld.piston(world,pos,"piston_move",
+                    "facing="+direction+" extending="+extending+" accepted="+moved+" path="+(plan==null?"vanilla":"physical"));
+            return moved;
         } finally {
             stack.pop();
             if (stack.isEmpty()) SLABBED$MOVES.remove();
@@ -59,7 +65,9 @@ public abstract class NativePistonTransferMixin {
             @Local(argsOnly=true) World world,@Local(argsOnly=true) BlockPos pos,
             @Local(argsOnly=true) BlockState state) {
         var plan=PhysicalPistons.prepare(world,pos,state.get(PistonBlock.FACING),true);
-        return plan==null?original.call(handler):plan.accepted();
+        boolean accepted=plan==null?original.call(handler):plan.accepted();
+        if(plan==null && !accepted)com.slabbed.debug.DiagnosticWorld.piston(world,pos,"piston_plan","VANILLA_REJECTED");
+        return accepted;
     }
 
     @WrapOperation(method="onSyncedBlockEvent",at=@At(value="INVOKE",target="Lnet/minecraft/world/World;setBlockState(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;I)Z"))
@@ -84,8 +92,12 @@ public abstract class NativePistonTransferMixin {
             @Local(argsOnly=true) World world,@Local(argsOnly=true) BlockPos pos,
             @Local(argsOnly=true) Direction direction,@Local(argsOnly=true) boolean extending) {
         boolean accepted=original.call(handler);
-        if (!accepted) return false;
-        if (!PhysicalPistons.vanillaMatches(handler.getMovedBlocks())) return false;
+        if (!accepted) {
+            com.slabbed.debug.DiagnosticWorld.piston(world,pos,"piston_plan","VANILLA_REJECTED");return false;
+        }
+        if (!PhysicalPistons.vanillaMatches(handler.getMovedBlocks())) {
+            com.slabbed.debug.DiagnosticWorld.piston(world,pos,"piston_plan","NATIVE_GRAPH_MISMATCH");return false;
+        }
         var destinations=SLABBED$MOVES.get().peek();
         if (destinations==null) return true;
         var motion=extending?direction:direction.getOpposite();

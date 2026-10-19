@@ -14,27 +14,34 @@ import java.util.zip.ZipFile;
 /** Real default bindings, gameplay events, thread-owned context and local report output. */
 public final class DiagnosticClientProbe {
     private static int beginTicks,reportTicks;
-    private static boolean armed,exported,done;
+    private static boolean armed,recordingStarted,exported,done,finished;
     private static Set<Path> previous=Set.of();
     private DiagnosticClientProbe() {}
     public static boolean begin(MinecraftClient client) {
         if(Boolean.getBoolean("slabbed.controlProbe"))return true;
+        if(recordingStarted)return true;
         if(!armed) {
             check(!DiagnosticRecorder.isActive(),"recorder starts off");
             KeyBinding.onKeyPressed(InputUtil.Type.KEYSYM.createFromCode(GLFW.GLFW_KEY_F8));armed=true;return false;
         }
         if(!DiagnosticRecorder.isActive()) {check(++beginTicks<50,"F8 enables optional recorder");return false;}
-        return true;
+        recordingStarted=true;return true;
     }
     public static boolean finish(MinecraftClient client) throws Exception {
-        if(done || Boolean.getBoolean("slabbed.controlProbe"))return true;
+        if(finished || Boolean.getBoolean("slabbed.controlProbe"))return true;
+        if(done) {
+            if(DiagnosticRecorder.isActive()) {check(++reportTicks<550,"F8 stops recording");return false;}
+            finished=true;System.out.println("PHYSICAL_DIAGNOSTIC_REPORT_PASS integrated_server_and_client valid_json png keybindings");return true;
+        }
         var directory=client.runDirectory.toPath().resolve("logs/slabbed-debug");
         if(!exported) {
-            previous=reports(directory);KeyBinding.onKeyPressed(InputUtil.Type.KEYSYM.createFromCode(GLFW.GLFW_KEY_F9));exported=true;return false;
+            previous=reports(directory);KeyBinding.onKeyPressed(InputUtil.Type.KEYSYM.createFromCode(GLFW.GLFW_KEY_F9));
+            KeyBinding.onKeyPressed(InputUtil.Type.KEYSYM.createFromCode(GLFW.GLFW_KEY_F9));exported=true;return false;
         }
         check(++reportTicks<500,"F9 report export completes without blocking gameplay");
         var report=reports(directory).stream().filter(p->!previous.contains(p)).findFirst();
         if(report.isEmpty())return false;
+        check(reports(directory).stream().filter(p->!previous.contains(p)).count()==1,"only one report in flight");
         try(var zip=new ZipFile(report.get().toFile())) {
             var context=JsonParser.parseString(new String(zip.getInputStream(zip.getEntry("context.json")).readAllBytes(),java.nio.charset.StandardCharsets.UTF_8)).getAsJsonObject();
             check(context.get("coverage").getAsString().equals("integrated_server_and_client"),"report includes integrated server coverage");
@@ -51,8 +58,7 @@ public final class DiagnosticClientProbe {
             var png=zip.getInputStream(zip.getEntry("screenshot.png")).readNBytes(8);
             check(png.length==8 && png[0]==(byte)137 && png[1]==80 && png[2]==78 && png[3]==71,"real PNG screenshot exported");
         }
-        DiagnosticRecorder.stop();done=true;
-        System.out.println("PHYSICAL_DIAGNOSTIC_REPORT_PASS integrated_server_and_client valid_json png keybindings");return true;
+        KeyBinding.onKeyPressed(InputUtil.Type.KEYSYM.createFromCode(GLFW.GLFW_KEY_F8));done=true;return false;
     }
     private static Set<Path> reports(Path directory) throws Exception {
         if(!Files.isDirectory(directory))return Set.of();

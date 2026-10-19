@@ -59,7 +59,9 @@ public final class PhysicalPistons {
         var result=PhysicalPush.plan(seeds,PhysicalPush.Direction6.valueOf(motion.name()),
                 scene::occupants,scene::attached);
         if(!physical && !scene.physical)return null;
-        if(!result.success())return rejected();
+        if(!result.success()) {
+            com.slabbed.debug.DiagnosticWorld.piston(world,piston,"piston_plan",result.failure().name());return rejected();
+        }
         var nativeSources=new java.util.LinkedHashSet<BlockPos>();
         for(var move:result.moves()) {
             var owner=scene.nativeSources.get(move.source().key());
@@ -68,12 +70,17 @@ public final class PhysicalPistons {
         var head=piston.offset(facing);
         var headState=world.getBlockState(head);
         if(extending && NativeSeats.seat(world,head)!=null && !headState.isOf(Blocks.PISTON_HEAD)
-                && !nativeSources.contains(head))
-            return rejected();
+                && !nativeSources.contains(head)) {
+            com.slabbed.debug.DiagnosticWorld.piston(world,piston,"piston_plan","HEAD_TARGET_BLOCKED");return rejected();
+        }
         var plan=new Plan(result.moves(),nativeSources,true);
         // Validate all target fragments before the first world write.
         try { changed(world,plan,true); }
-        catch(IllegalArgumentException|IllegalStateException invalid) {return rejected();}
+        catch(IllegalArgumentException|IllegalStateException invalid) {
+            com.slabbed.debug.DiagnosticWorld.piston(world,piston,"piston_plan","TARGET_BLOCKED_OR_CONFLICT");return rejected();
+        }
+        if(com.slabbed.debug.DiagnosticRecorder.isActive())com.slabbed.debug.DiagnosticWorld.piston(world,piston,
+                "piston_plan","ACCEPTED moves="+plan.moves().size()+" facing="+facing+" extending="+extending);
         return plan;
     }
 
