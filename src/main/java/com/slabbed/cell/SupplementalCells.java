@@ -137,6 +137,8 @@ public final class SupplementalCells {
         var map=chunk.getAttached(TYPE);return map==null?Map.of():map;
     }
     private static StoredCell stored(BlockView view,BlockPos pos) {
+        // Shared shape caches have no world placement and must not consume live client geometry.
+        if(pos==null || view==null || view==EmptyBlockView.INSTANCE)return null;
         if(view instanceof net.minecraft.world.chunk.WrapperProtoChunk wrapper)return stored(wrapper.getWrappedChunk(),pos);
         if(view instanceof ServerWorld world && !world.getServer().isOnThread()) {
             var chunks=SERVER_SNAPSHOTS.get(world);if(chunks==null)return null;

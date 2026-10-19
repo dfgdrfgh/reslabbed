@@ -1,3 +1,9 @@
+# 0.9.4 rewrite alpha — Fabric 1.21.1
+
+Fixes a piston-activation crash with Lithium when shared collision-shape initialization queries a missing position. Positionless and empty-world shape queries now retain vanilla geometry without reading live client placements. Stored native and supplemental placement facts remain unchanged; see LAW.md.
+
+Adds production-client piston extension and sticky-pull checks at normal and lowered heights, including a hash-verified Lithium and Sodium subset from the current complete-pack fixture.
+
 # 0.9.3 rewrite alpha — Fabric 1.21.1
 
 Adds native slime and honey adhesion for physical static branches during piston pushes and sticky pulls. Adhesive blocks retain their native identity and animation; physical pieces count once toward the twelve-piece limit. Slime and honey remain separate, and pieces without physical face contact do not join a branch.

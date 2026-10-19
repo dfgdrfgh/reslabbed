@@ -32,7 +32,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        variant: [indigo, sodium]
+        variant: [indigo, sodium, lithium]
     runs-on: ubuntu-22.04
     timeout-minutes: 40
     steps:
@@ -59,7 +59,7 @@ jobs:
         env:
           LIBGL_ALWAYS_SOFTWARE: '1'
         run: |
-          if [ -f 'build/libs/slabbed-0.9.3-rewrite-alpha+1.21.1-fabric.jar' ]; then
+          if [ -f 'build/libs/slabbed-0.9.4-rewrite-alpha+1.21.1-fabric.jar' ]; then
             bash gradlew --no-daemon --console=plain writeProbeRuntime
             timeout 15m xvfb-run -a python3 tools/client-runtime.py
           fi
@@ -79,7 +79,7 @@ jobs:
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         with:
           name: slabbed-physical-rewrite-mc1.21.1-fabric
-          path: build/libs/slabbed-0.9.3-rewrite-alpha+1.21.1-fabric.jar
+          path: build/libs/slabbed-0.9.4-rewrite-alpha+1.21.1-fabric.jar
           if-no-files-found: error
           retention-days: 30
   compatibility:

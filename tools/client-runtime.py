@@ -2,10 +2,13 @@
 from pathlib import Path
 import argparse,hashlib,json,os,shutil,subprocess,zipfile,urllib.request
 
-parser=argparse.ArgumentParser();parser.add_argument('--pack',action='store_true');parser.add_argument('--sodium',action='store_true');parser.add_argument('--control',action='store_true');args=parser.parse_args()
+parser=argparse.ArgumentParser();parser.add_argument('--pack',action='store_true');parser.add_argument('--sodium',action='store_true');parser.add_argument('--lithium',action='store_true');parser.add_argument('--control',action='store_true');args=parser.parse_args()
+if args.lithium:
+    assert not args.pack,'Lithium subset requires its own fresh runtime'
+    args.sodium=True
 root=Path.cwd();runtime=json.loads((root/'build/probe/dependencies.json').read_text())
 home=Path(runtime['gradleHome']);modules=home/'caches/modules-2/files-2.1'
-game=root/('build/run/physical-pack' if args.pack else 'build/run/physical-sodium' if args.sodium else 'build/run/physical-indigo')
+game=root/('build/run/physical-pack' if args.pack else 'build/run/physical-lithium' if args.lithium else 'build/run/physical-sodium' if args.sodium else 'build/run/physical-indigo')
 if args.control: game=root/'build/run/physical-control'
 assert not game.exists(),'Client requires a fresh run directory'
 game.mkdir(parents=True);mods=game/'mods';mods.mkdir()
@@ -40,6 +43,13 @@ if args.sodium:
     data=urllib.request.urlopen(url).read()
     assert hashlib.sha512(data).hexdigest()=='8614a374593698069a80ac74de8cd9c28f3928d16819a0e0d6320b538e823f7e54e8be06d5ea5a9c268beb0e02073209d1f831a02dede851588b972367680853'
     (mods/'sodium.jar').write_bytes(data)
+if args.lithium:
+    fixture=json.loads((root/'tools/full-pack-fixture.json').read_text())
+    lithium=next(entry for entry in fixture['downloads'] if entry['path'].startswith('mods/lithium-'))
+    data=urllib.request.urlopen(lithium['downloads'][0]).read()
+    for algorithm,expected_hash in lithium['hashes'].items():
+        assert hashlib.new(algorithm,data).hexdigest()==expected_hash,'Lithium fixture hash mismatch'
+    (mods/Path(lithium['path']).name).write_bytes(data)
 expected=[]
 for jar in list(mods.glob('*.jar')):
     with zipfile.ZipFile(jar) as archive:metadata=json.loads(archive.read('fabric.mod.json'))
@@ -94,6 +104,9 @@ for phase in (['fresh'] if args.control else ['fresh','reopen']):
         print(marker.read_text().strip(),flush=True)
         continue
     if result.returncode!=0 or not marker.exists():print('\n'.join(lines[-100:]));raise AssertionError('Physical client failed '+phase)
+    assert any('PHYSICAL_NATIVE_PISTON_CYCLE_PASS' in line for line in lines),'Native piston client cycle did not complete'
+    if args.lithium:
+        assert any('PHYSICAL_NATIVE_PISTON_CYCLE_PASS lithium=true' in line for line in lines),'Lithium piston initialization not exercised'
     if phase=='fresh':
         row=next(line for line in reversed(lines) if 'PHYSICAL_TRANSITION_OBSERVED' in line)
         assert ('terrainLighting=false' if args.control else 'terrainLighting=true') in row,row
@@ -105,4 +118,4 @@ for phase in (['fresh'] if args.control else ['fresh','reopen']):
             assert (delayed>0 if args.control else delayed==0),row
         print('PHYSICAL_TRANSITION_CHECK_PASS control='+str(args.control),flush=True)
     print(marker.read_text().strip(),flush=True)
-print('PHYSICAL_CLIENT_PHASES_PASS pack='+str(args.pack)+' sodium='+str(args.sodium)+' control='+str(args.control),flush=True)
+print('PHYSICAL_CLIENT_PHASES_PASS pack='+str(args.pack)+' sodium='+str(args.sodium)+' lithium='+str(args.lithium)+' control='+str(args.control),flush=True)

@@ -84,6 +84,8 @@ public final class NativeSeats {
         var map=chunk.getAttached(TYPE);return map==null?Map.of():map;
     }
     public static Seat seat(BlockView view,BlockPos pos) {
+        // Shared shape caches have no world placement and must not consume live client facts.
+        if(pos==null || view==null || view==net.minecraft.world.EmptyBlockView.INSTANCE)return null;
         if(view instanceof net.minecraft.world.chunk.WrapperProtoChunk wrapper)return seat(wrapper.getWrappedChunk(),pos);
         var pending=NativePlacement.pending(view,pos);
         if(pending!=null) return pending;
