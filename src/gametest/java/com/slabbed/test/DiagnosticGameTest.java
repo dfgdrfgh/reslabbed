@@ -51,10 +51,10 @@ public final class DiagnosticGameTest {
         com.slabbed.nativeblock.NativeSeats.put(world,piston,new com.slabbed.nativeblock.NativeSeats.Seat(-1,"minecraft:piston"));
         t.assertTrue(CellWorld.place(world,piston.getX(),piston.getZ(),piston.getY()*2+1,Blocks.STONE.getDefaultState()),"supplemental upper piece");
         var before=CellWorld.contents(world,piston);var seat=com.slabbed.nativeblock.NativeSeats.seat(world,piston);
-        DiagnosticShapeFixture.outlines=DiagnosticShapeFixture.collisions=0;DiagnosticShapeFixture.target=far;
+        DiagnosticShapeFixture.outlines=DiagnosticShapeFixture.collisions=0;DiagnosticShapeFixture.TARGET.set(far);
         com.google.gson.JsonObject snapshot;
         try {snapshot=com.slabbed.debug.DiagnosticWorld.snapshot(world,center);}
-        finally {DiagnosticShapeFixture.target=null;}
+        finally {DiagnosticShapeFixture.TARGET.remove();}
         t.assertTrue(DiagnosticShapeFixture.outlines>0 && DiagnosticShapeFixture.collisions>0,"both contextual shapes exercised");
         t.assertFalse(world.isChunkLoaded(far),"outline/collision/block-entity reads cannot load a context neighbor");
         t.assertTrue(java.util.Objects.equals(before,CellWorld.contents(world,piston))
