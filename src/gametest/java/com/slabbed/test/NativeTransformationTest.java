@@ -16,6 +16,26 @@ import net.minecraft.world.GameMode;
 
 /** Native item transformations retain the chosen physical origin and ordinary item behavior. */
 public final class NativeTransformationTest {
+    @GameTest(templateName="fabric-gametest-api-v1:empty")
+    public void coveredGrassDecayPreservesStackHeightAndSharedSlab(TestContext t) {
+        var world=t.getWorld();var base=t.getAbsolutePos(new BlockPos(3,3,3));
+        world.setBlockState(base,Blocks.OAK_SLAB.getDefaultState());
+        var player=t.createMockPlayer(GameMode.SURVIVAL);
+        player.setPosition(base.getX()-3,base.getY(),base.getZ()+.5);
+        player.setStackInHand(Hand.MAIN_HAND,new ItemStack(Items.GRASS_BLOCK));
+        var hit=new BlockHitResult(Vec3d.ofBottomCenter(base).add(0,.5,0),Direction.UP,base,false);
+        t.assertTrue(player.getMainHandStack().useOnBlock(new ItemUsageContext(player,Hand.MAIN_HAND,hit)).isAccepted(),"grass placed on slab");
+        var owner=base.up();
+        t.assertTrue(com.slabbed.cell.CellWorld.place(world,owner.getX(),owner.getZ(),owner.getY()*2+1,Blocks.OAK_SLAB.getDefaultState()),"upper slab shares the native grass owner");
+        var slab=com.slabbed.cell.SupplementalCells.contents(world,owner);
+        world.setBlockState(owner.up(),Blocks.STONE.getDefaultState());
+        world.getBlockState(owner).randomTick(world,owner,net.minecraft.util.math.random.Random.create(1));
+        t.assertTrue(world.getBlockState(owner).isOf(Blocks.DIRT),"actual vanilla grass random tick turns covered grass into dirt");
+        t.assertTrue(NativeSeats.offset(world,owner)==-.5,"soil decay must not raise the block off its slab");
+        t.assertTrue(slab.equals(com.slabbed.cell.SupplementalCells.contents(world,owner)),"soil decay must preserve the slab above it");
+        t.assertTrue(Math.abs(world.getBlockState(owner).getOutlineShape(world,owner).getBoundingBox().minY+.5)<1e-7,"transformed soil geometry keeps its bottom");
+        t.complete();
+    }
     private static void tillOrFlatten(TestContext t,net.minecraft.item.Item tool,net.minecraft.block.Block result) {
         var world=t.getWorld();var base=t.getAbsolutePos(new BlockPos(3,3,3));
         world.setBlockState(base,Blocks.OAK_SLAB.getDefaultState());

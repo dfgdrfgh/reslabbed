@@ -21,6 +21,40 @@ import net.minecraft.world.GameMode;
 
 /** Real item placement on a slab followed by ordinary neighbor-driven piston events. */
 public final class PistonSlabRegressionTest {
+    private static void offsetGrassPush(TestContext t,Direction facing) {
+        var owner=placed(t,facing);var world=t.getWorld();
+        var source=owner.offset(facing).down();var destination=source.offset(facing);
+        world.setBlockState(source,Blocks.GRASS_BLOCK.getDefaultState(),Block.NOTIFY_ALL);
+        var power=owner.offset(facing.getAxis()==Direction.Axis.X?Direction.NORTH:Direction.WEST);
+        t.runAtTick(2,()->world.setBlockState(power,Blocks.REDSTONE_BLOCK.getDefaultState(),Block.NOTIFY_ALL));
+        t.runAtTick(12,()-> {
+            t.assertTrue(world.getBlockState(owner).get(PistonBlock.EXTENDED),"lowered piston extends against intersecting ordinary-height grass");
+            t.assertTrue(world.getBlockState(source).isAir(),"piston cannot extend through the upper half of the grass block");
+            t.assertTrue(world.getBlockState(destination).isOf(Blocks.GRASS_BLOCK),"whole native grass block moves horizontally");
+            t.assertTrue(NativeSeats.offset(world,destination)==0,"pushed grass retains its original vertical position");
+            t.assertTrue(NativeSeats.offset(world,owner.offset(facing))==-.5,"head retains its independent slab height");
+            t.complete();
+        });
+    }
+    @GameTest(templateName="fabric-gametest-api-v1:empty",tickLimit=25)
+    public void slabPistonPushesLowerOrdinaryGrassEast(TestContext t) {offsetGrassPush(t,Direction.EAST);}
+    @GameTest(templateName="fabric-gametest-api-v1:empty",tickLimit=25)
+    public void slabPistonPushesLowerOrdinaryGrassWest(TestContext t) {offsetGrassPush(t,Direction.WEST);}
+    @GameTest(templateName="fabric-gametest-api-v1:empty",tickLimit=25)
+    public void slabPistonPushesLowerOrdinaryGrassNorth(TestContext t) {offsetGrassPush(t,Direction.NORTH);}
+    @GameTest(templateName="fabric-gametest-api-v1:empty",tickLimit=25)
+    public void slabPistonPushesLowerOrdinaryGrassSouth(TestContext t) {offsetGrassPush(t,Direction.SOUTH);}
+
+    @GameTest(templateName="fabric-gametest-api-v1:empty",tickLimit=25)
+    public void slabPistonCannotExtendThroughLowerOrdinaryObsidian(TestContext t) {
+        var owner=placed(t,Direction.EAST);var world=t.getWorld();var source=owner.east().down();
+        world.setBlockState(source,Blocks.OBSIDIAN.getDefaultState(),Block.NOTIFY_ALL);
+        t.runAtTick(2,()->world.setBlockState(owner.north(),Blocks.REDSTONE_BLOCK.getDefaultState(),Block.NOTIFY_ALL));
+        t.runAtTick(12,()-> {
+            t.assertFalse(world.getBlockState(owner).get(PistonBlock.EXTENDED),"physical obsidian intersection blocks extension");
+            t.assertTrue(world.getBlockState(source).isOf(Blocks.OBSIDIAN),"obstruction remains intact");t.complete();
+        });
+    }
     private static BlockPos placed(TestContext t,Direction facing) {
         var world=t.getWorld();var slab=t.getAbsolutePos(new BlockPos(3,4,3));
         world.setBlockState(slab,Blocks.OAK_SLAB.getDefaultState(),Block.NOTIFY_ALL);
