@@ -67,7 +67,7 @@ public final class DiagnosticWorld {
         @Override public int getBottomY() {return world.getBottomY();}
         @Override public NativeSeats.Seat slabbed$nativeSeat(BlockPos pos) {return loaded(pos)?NativeSeats.seat(world,pos):null;}
         @Override public com.slabbed.cell.SupplementalCells.StoredCell slabbed$supplementalCell(BlockPos pos) {
-            return loaded(pos)?com.slabbed.cell.SupplementalCells.stored(world,pos):null;
+            return loaded(pos)?com.slabbed.cell.SupplementalCells.snapshot(world.getWorldChunk(pos)).get(Long.toString(pos.asLong())):null;
         }
     }
     private static JsonArray boxes(net.minecraft.util.shape.VoxelShape shape) {
