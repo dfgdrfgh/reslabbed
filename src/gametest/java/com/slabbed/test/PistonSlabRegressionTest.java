@@ -94,4 +94,30 @@ public final class PistonSlabRegressionTest {
                 "cached flush piston must not hide the exposed face beside a lowered piston");
         t.complete();
     }
+
+    @GameTest(templateName="fabric-gametest-api-v1:empty",tickLimit=40)
+    public void groundLeverBesideSlabPistonActivatesItsPhysicalSide(TestContext t) {
+        var world=t.getWorld();var owner=placed(t,Direction.EAST);
+        var floor=owner.north().down(2);var lever=floor.up();
+        world.setBlockState(floor,Blocks.STONE.getDefaultState(),Block.NOTIFY_ALL);
+        var player=t.createMockPlayer(GameMode.SURVIVAL);
+        player.setPosition(floor.getX()-2,floor.getY()+1,floor.getZ()+.5);
+        player.setStackInHand(Hand.MAIN_HAND,new ItemStack(Items.LEVER));
+        t.assertTrue(player.getMainHandStack().useOnBlock(new ItemUsageContext(player,Hand.MAIN_HAND,
+                new BlockHitResult(Vec3d.ofBottomCenter(floor).add(0,1,0),Direction.UP,floor,false))).isAccepted(),
+                "real lever is placed on the ground beside the slab");
+        t.assertTrue(world.getBlockState(lever).isOf(Blocks.LEVER),"ground lever retains its native owner below the piston owner");
+        var hit=new BlockHitResult(Vec3d.ofCenter(lever),Direction.UP,lever,false);
+        player.setStackInHand(Hand.MAIN_HAND,ItemStack.EMPTY);
+        t.runAtTick(2,()->world.getBlockState(lever).onUse(world,player,hit));
+        t.runAtTick(12,()-> {
+            t.assertTrue(world.getBlockState(owner).get(PistonBlock.EXTENDED),"ground lever powers the physical side of the slab piston");
+            world.getBlockState(lever).onUse(world,player,hit);
+        });
+        t.runAtTick(25,()-> {
+            t.assertFalse(world.getBlockState(owner).get(PistonBlock.EXTENDED),"ground lever releases piston power");
+            t.assertTrue(NativeSeats.offset(world,owner)==-.5,"lever cycle does not move the piston off its slab");
+            t.complete();
+        });
+    }
 }
