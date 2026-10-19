@@ -15,8 +15,8 @@ public final class NativePistonSignal {
         var seat=NativeSeats.seat(view,owner);
         if(seat==null || seat.halfOffset()==0)return false;
         var cell=owner.up(seat.halfOffset());
-        for(var side:Direction.values())if(side!=facing && view.isEmittingRedstonePower(cell.offset(side),side))return true;
-        return view.isEmittingRedstonePower(cell,Direction.DOWN);
+        for(var side:Direction.Type.HORIZONTAL)if(side!=facing && view.isEmittingRedstonePower(cell.offset(side),side))return true;
+        return false;
     }
     /** Ordinary neighbor notifications do not reach an owner diagonally above the visible source. */
     public static void changed(World world,BlockPos source,BlockState sourceState) {

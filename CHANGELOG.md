@@ -1,3 +1,11 @@
+# 0.9.5 rewrite alpha — Fabric 1.21.1
+
+Lowered pistons also receive direct horizontal power in their second occupied cell, including ground-level levers beside a slab. Front-facing inputs and sources separated from the bottom by a half-block gap remain excluded. Vanilla vertical power and quasi-connectivity checks are preserved.
+
+Client piston base and head settlement retain the explicit moving-piston height while state and pose packets arrive. Position-dependent faces bypass ordinary state-only visibility caches, including MoreCulling's Sodium path. Frozen placement and persistent formats remain unchanged; see LAW.md.
+
+Adds six-direction item-placement cycles, warmed face-cache checks, all-direction client pose and emitted-model checks before and after retraction, and a pinned Sodium/Lithium/OBE/MoreCulling test subset. Complete-pack gameplay is a separate check and is not implied by this subset.
+
 # 0.9.4 rewrite alpha — Fabric 1.21.1
 
 Fixes a piston-activation crash with Lithium when shared collision-shape initialization queries a missing position. Positionless and empty-world shape queries now retain vanilla geometry without reading live client placements. Stored native and supplemental placement facts remain unchanged; see LAW.md.
