@@ -14,6 +14,47 @@ import java.util.concurrent.TimeUnit;
 /** Lighting workers consume published facts without asking the waiting server thread for chunks. */
 public final class NativeThreadAccessTest {
     @GameTest(templateName="fabric-gametest-api-v1:empty")
+    public void contextFreeNativeSeatsNeverReadClientFacts(TestContext t) {
+        var previous=NativeSeats.clientSnapshot;
+        NativeSeats.clientSnapshot=pos->{throw new AssertionError("context-free query consulted client native seats");};
+        try {
+            t.assertTrue(NativeSeats.seat(net.minecraft.world.EmptyBlockView.INSTANCE,null)==null,"positionless shape query has no native seat");
+            t.assertTrue(NativeSeats.offset(net.minecraft.world.EmptyBlockView.INSTANCE,BlockPos.ORIGIN)==0,"empty view cannot acquire a live client origin seat");
+            t.assertTrue(NativeSeats.offset(null,BlockPos.ORIGIN)==0,"absent view has no native seat");
+        } finally {NativeSeats.clientSnapshot=previous;}
+        t.complete();
+    }
+
+    @GameTest(templateName="fabric-gametest-api-v1:empty")
+    public void contextFreeSupplementalCellsNeverReadClientFacts(TestContext t) {
+        var previous=SupplementalCells.clientSnapshot;
+        SupplementalCells.clientSnapshot=pos->{throw new AssertionError("context-free query consulted client supplemental cells");};
+        try {
+            t.assertTrue(SupplementalCells.contents(net.minecraft.world.EmptyBlockView.INSTANCE,null)==null,"positionless query has no supplemental fragments");
+            t.assertTrue(SupplementalCells.collision(net.minecraft.world.EmptyBlockView.INSTANCE,BlockPos.ORIGIN).isEmpty(),"empty view has no live supplemental collision");
+            t.assertTrue(SupplementalCells.outline(null,BlockPos.ORIGIN).isEmpty(),"absent view has no supplemental outline");
+        } finally {SupplementalCells.clientSnapshot=previous;}
+        t.complete();
+    }
+
+    @GameTest(templateName="fabric-gametest-api-v1:empty")
+    public void cachedPistonShapesStayIndependentOfClientFacts(TestContext t) {
+        var previousNative=NativeSeats.clientSnapshot;var previousSupplemental=SupplementalCells.clientSnapshot;
+        NativeSeats.clientSnapshot=pos->{throw new AssertionError("cached collision queried a client native seat");};
+        SupplementalCells.clientSnapshot=pos->{throw new AssertionError("cached collision queried client supplemental geometry");};
+        try {
+            for(var block:new net.minecraft.block.Block[]{Blocks.PISTON,Blocks.STICKY_PISTON,Blocks.PISTON_HEAD,Blocks.STONE})
+                for(var state:block.getStateManager().getStates()) {
+                    var expected=com.slabbed.nativeblock.NativeShapes.withRaw(()->state.getCollisionShape(net.minecraft.world.EmptyBlockView.INSTANCE,null));
+                    var actual=state.getCollisionShape(net.minecraft.world.EmptyBlockView.INSTANCE,null);
+                    t.assertFalse(net.minecraft.util.shape.VoxelShapes.matchesAnywhere(expected,actual,net.minecraft.util.function.BooleanBiFunction.NOT_SAME),
+                            "positionless cached collision retains vanilla shape for "+state);
+                }
+        } finally {NativeSeats.clientSnapshot=previousNative;SupplementalCells.clientSnapshot=previousSupplemental;}
+        t.complete();
+    }
+
+    @GameTest(templateName="fabric-gametest-api-v1:empty")
     public void workerReadsShiftedGeometryAndSupplementalSnapshotWithoutServerTasks(TestContext t) {
         var world=t.getWorld();var pos=t.getAbsolutePos(new BlockPos(3,4,3));
         world.setBlockState(pos,Blocks.STONE.getDefaultState());
