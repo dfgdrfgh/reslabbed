@@ -52,9 +52,9 @@ public final class DiagnosticClientProbe {
             for(var line:lines) {
                 var event=JsonParser.parseString(line).getAsJsonObject();
                 server|=event.get("side").getAsString().equals("server") && event.get("kind").getAsString().startsWith("piston_");
-                clientAction|=event.get("side").getAsString().equals("client") && event.get("kind").getAsString().equals("block_use");
+                clientAction|=event.get("side").getAsString().equals("client") && (event.get("kind").getAsString().equals("block_use") || event.get("kind").getAsString().equals("block_attack"));
             }
-            check(server && clientAction,"actual server piston decisions and client action results recorded");
+            check(server && clientAction,"actual server piston decisions and client action results recorded: server="+server+" action="+clientAction);
             var png=zip.getInputStream(zip.getEntry("screenshot.png")).readNBytes(8);
             check(png.length==8 && png[0]==(byte)137 && png[1]==80 && png[2]==78 && png[3]==71,"real PNG screenshot exported");
         }

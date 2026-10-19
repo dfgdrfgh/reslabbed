@@ -20,7 +20,8 @@ public final class DiagnosticWorld {
     public static JsonObject snapshot(World world,BlockPos center) {
         var out=new JsonObject();out.addProperty("dimension",world.getRegistryKey().getValue().toString());
         out.addProperty("worldTick",world.getTime());out.addProperty("center",center.toShortString());
-        var blocks=new JsonArray();
+        var blocks=new JsonArray();var view=new LoadedView(world);
+        out.addProperty("shapeContext","loaded_only");
         for(int x=-2;x<=2;x++)for(int y=-2;y<=2;y++)for(int z=-2;z<=2;z++) {
             var pos=center.add(x,y,z);var cell=new JsonObject();cell.addProperty("pos",pos.toShortString());blocks.add(cell);
             if(!world.isInBuildLimit(pos) || !world.isChunkLoaded(pos)) {cell.addProperty("loaded",false);continue;}
@@ -37,8 +38,8 @@ public final class DiagnosticWorld {
                     var part=new JsonObject();part.addProperty("offset",piece.offset());part.addProperty("length",piece.length());
                     part.addProperty("state",piece.value().toString());pieces.add(part);
                 }
-                cell.add("fragments",pieces);cell.add("outline",boxes(state.getOutlineShape(world,pos)));
-                cell.add("collision",boxes(state.getCollisionShape(world,pos)));
+                cell.add("fragments",pieces);cell.add("outline",boxes(state.getOutlineShape(view,pos)));
+                cell.add("collision",boxes(state.getCollisionShape(view,pos)));
                 cell.addProperty("blockLight",world.getLightLevel(LightType.BLOCK,pos));cell.addProperty("skyLight",world.getLightLevel(LightType.SKY,pos));
                 if(world.getBlockEntity(pos) instanceof net.minecraft.block.entity.PistonBlockEntity moving) {
                     cell.addProperty("pushedState",moving.getPushedBlock().toString());
@@ -46,7 +47,28 @@ public final class DiagnosticWorld {
                 }
             } catch(RuntimeException failure) {cell.addProperty("captureFailure",failure.getClass().getSimpleName());}
         }
-        out.add("blocks",blocks);return out;
+        out.add("blocks",blocks);out.addProperty("shapeContextIncomplete",view.incomplete);return out;
+    }
+    /** Arbitrary shape implementations receive no path to an unloaded chunk. */
+    private static final class LoadedView implements com.slabbed.nativeblock.StoredGeometryView {
+        private final World world;
+        private boolean incomplete;
+        private LoadedView(World world) {this.world=world;}
+        private boolean loaded(BlockPos pos) {
+            boolean available=world.isInBuildLimit(pos) && world.isChunkLoaded(pos);
+            if(!available)incomplete=true;return available;
+        }
+        @Override public net.minecraft.block.BlockState getBlockState(BlockPos pos) {
+            return loaded(pos)?world.getBlockState(pos):net.minecraft.block.Blocks.AIR.getDefaultState();
+        }
+        @Override public net.minecraft.fluid.FluidState getFluidState(BlockPos pos) {return getBlockState(pos).getFluidState();}
+        @Override public net.minecraft.block.entity.BlockEntity getBlockEntity(BlockPos pos) {return loaded(pos)?world.getBlockEntity(pos):null;}
+        @Override public int getHeight() {return world.getHeight();}
+        @Override public int getBottomY() {return world.getBottomY();}
+        @Override public NativeSeats.Seat slabbed$nativeSeat(BlockPos pos) {return loaded(pos)?NativeSeats.seat(world,pos):null;}
+        @Override public com.slabbed.cell.SupplementalCells.StoredCell slabbed$supplementalCell(BlockPos pos) {
+            return loaded(pos)?com.slabbed.cell.SupplementalCells.stored(world,pos):null;
+        }
     }
     private static JsonArray boxes(net.minecraft.util.shape.VoxelShape shape) {
         var out=new JsonArray();int count=0;

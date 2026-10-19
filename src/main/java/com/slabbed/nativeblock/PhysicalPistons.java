@@ -143,7 +143,8 @@ public final class PhysicalPistons {
                     var contents=staticContents(world,pos);
                     if(contents!=null) for(var part:contents.fragments()) {
                         var piece=new PhysicalPush.Piece<>(x,z,y*2+part.offset(),part.length(),part.value(),
-                                part.value().getPistonBehavior()==PistonBehavior.NORMAL && part.value().getHardness(world,pos)>=0);
+                                part.value().getPistonBehavior()==PistonBehavior.NORMAL && part.value().getHardness(world,pos)>=0
+                                        && PistonBlock.isMovable(part.value(),world,pos,facing,false,facing));
                         if(bounds.intersects(piece.bounds())) add(result,piece);
                     }
                 }
