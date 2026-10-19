@@ -35,6 +35,15 @@ public final class NativePistonOrderClientProbe {
         world.setBlockState(POS,Blocks.PISTON_HEAD.getDefaultState(),Block.NOTIFY_LISTENERS);
         NativeSeats.put(world,POS,new NativeSeats.Seat(-1,"minecraft:moving_piston"));
         check(NativeSeats.offset(world,POS)==-.5,"moving fact arriving after final head retains height");
+        raw=NativeSeats.snapshot(world.getWorldChunk(POS));
+        world.setBlockState(POS,Blocks.AIR.getDefaultState(),Block.NOTIFY_LISTENERS);
+        check(NativeSeats.seat(world,POS)==null,"temporary air has no visible piston geometry");
+        check(raw==NativeSeats.snapshot(world.getWorldChunk(POS)),"temporary client air does not erase an ahead moving fact");
+        world.setBlockState(POS,Blocks.STONE.getDefaultState(),Block.NOTIFY_LISTENERS);
+        com.slabbed.nativeblock.NativePistons.publish(world,POS,-1);
+        check(raw==NativeSeats.snapshot(world.getWorldChunk(POS)),"client piston settlement does not rewrite authoritative identity");
+        NativeSeats.put(world,POS,new NativeSeats.Seat(-1,"minecraft:stone"));
+        check(NativeSeats.offset(world,POS)==-.5,"authoritative final stone pose survives settlement");
         world.setBlockState(POS,Blocks.STICKY_PISTON.getDefaultState(),Block.NOTIFY_LISTENERS);
         NativeSeats.put(world,POS,new NativeSeats.Seat(-1,"minecraft:moving_piston"));
         check(NativeSeats.offset(world,POS)==-.5,"moving fact arriving after final sticky base retains height");

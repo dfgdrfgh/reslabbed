@@ -48,16 +48,31 @@ public final class NativePistons {
         if (world==null || halfOffset==null) return;
         var state=world.getBlockState(pos);
         if (state.isAir()) return;
+        if(world.isClient) {
+            // Client animation must not replace an authoritative attachment that arrived ahead of it.
+            if(state.isOf(Blocks.MOVING_PISTON) && world.getBlockEntity(pos) instanceof PistonBlockEntity entity) {
+                capture(entity);
+                if(((NativePistonPose)entity).slabbed$halfOffset()==null && halfOffset!=0)
+                    ((NativePistonPose)entity).slabbed$halfOffset(halfOffset);
+            }
+            return;
+        }
         var desired=new NativeSeats.Seat(halfOffset,Registries.BLOCK.getId(state.getBlock()).toString());
-        if (!desired.equals(NativeSeats.seat(world,pos))) NativeSeats.put(world,pos,desired);
+        var saved=NativeSeats.snapshot(world.getWorldChunk(pos)).get(Long.toString(pos.asLong()));
+        if (!desired.equals(saved)) NativeSeats.put(world,pos,desired);
         if (state.isOf(Blocks.MOVING_PISTON) && world.getBlockEntity(pos) instanceof PistonBlockEntity entity)
             ((NativePistonPose)entity).slabbed$halfOffset(halfOffset);
     }
 
     public static void capture(PistonBlockEntity entity) {
         var pose=(NativePistonPose)entity;
-        if (pose.slabbed$halfOffset()!=null || entity.getWorld()==null) return;
-        var seat=NativeSeats.seat(entity.getWorld(),entity.getPos());
+        var world=entity.getWorld();
+        if(world==null || !world.isClient && pose.slabbed$halfOffset()!=null)return;
+        var seat=NativeSeats.seat(world,entity.getPos());
+        if(world.isClient && seat==null) {
+            var saved=NativeSeats.snapshot(world.getWorldChunk(entity.getPos())).get(Long.toString(entity.getPos().asLong()));
+            if(saved!=null && saved.block().equals(Registries.BLOCK.getId(entity.getPushedBlock().getBlock()).toString()))seat=saved;
+        }
         if (seat!=null) pose.slabbed$halfOffset(seat.halfOffset());
     }
 
