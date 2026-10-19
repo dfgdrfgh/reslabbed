@@ -8,6 +8,11 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.item.ItemUsageContext;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.registry.Registries;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
@@ -44,9 +49,15 @@ public final class NativeRedstoneLightClientProbe {
         }
         if(stage==1) {
             for(var fixture:MODELS)if(client.world.getBlockState(fixture.pos())!=fixture.state()
-                    || NativeSeats.offset(client.world,fixture.pos())!=-.5)return false;
+                    || NativeSeats.offset(client.world,fixture.pos())!=-.5) {
+                check(ticks<160,"redstone fixture mismatch: "+fixture+" actual="+client.world.getBlockState(fixture.pos())
+                        +" seat="+NativeSeats.seat(client.world,fixture.pos()));return false;
+            }
             for(int i=0;i<SURFACES.length;i++)if(client.world.getBlockState(surface(i))!=SURFACES[i]
-                    || NativeSeats.offset(client.world,surface(i))!=(i==3?0:-.5))return false;
+                    || NativeSeats.offset(client.world,surface(i))!=(i==3?0:-.5)) {
+                check(ticks<160,"surface fixture mismatch at "+surface(i)+" actual="+client.world.getBlockState(surface(i))
+                        +" seat="+NativeSeats.seat(client.world,surface(i)));return false;
+            }
             for(var fixture:MODELS) {
                 var shape=fixture.state().getOutlineShape(client.world,fixture.pos()).getBoundingBox();
                 check(shape.minY<0,"redstone outline must use slab height: "+fixture);
@@ -88,9 +99,19 @@ public final class NativeRedstoneLightClientProbe {
         }
         for(var fixture:MODELS) {
             world.setBlockState(fixture.pos().down(),Blocks.OAK_SLAB.getDefaultState(),Block.NOTIFY_LISTENERS);
+            player.setStackInHand(Hand.MAIN_HAND,new ItemStack(fixture.state().getBlock()));
+            var hit=new BlockHitResult(Vec3d.ofBottomCenter(fixture.pos().down()).add(0,.5,0),Direction.UP,fixture.pos().down(),false);
+            check(player.getMainHandStack().useOnBlock(new ItemUsageContext(player,Hand.MAIN_HAND,hit)).isAccepted(),"redstone item placement accepted: "+fixture);
             world.setBlockState(fixture.pos(),fixture.state(),Block.NOTIFY_LISTENERS);
-            NativeSeats.put(world,fixture.pos(),new NativeSeats.Seat(-1,Registries.BLOCK.getId(fixture.state().getBlock()).toString()));
+            check(NativeSeats.offset(world,fixture.pos())==-.5,"real redstone item retains slab seat");
         }
+        for(var fixture:MODELS)if(fixture.state().isOf(Blocks.REPEATER) && fixture.state().get(Properties.POWERED)) {
+            var source=fixture.pos().offset(fixture.state().get(Properties.HORIZONTAL_FACING));
+            world.setBlockState(source,Blocks.REDSTONE_BLOCK.getDefaultState(),Block.NOTIFY_LISTENERS);
+            NativeSeats.put(world,source,new NativeSeats.Seat(-1,"minecraft:redstone_block"));
+        }
+        var unlitSupport=MODELS.get(1).pos().down().north();
+        world.setBlockState(unlitSupport,Blocks.REDSTONE_BLOCK.getDefaultState(),Block.NOTIFY_ALL);
         world.getEntitiesByClass(ItemEntity.class,new Box(47,63,23,61,68,26),entity->true).forEach(ItemEntity::discard);
         for(int i=0;i<SURFACES.length;i++) {
             var pos=surface(i);var state=SURFACES[i];

@@ -1,15 +1,16 @@
 """Run the remapped physical-cell probe in an unmodified production client namespace."""
 from pathlib import Path
-import argparse,hashlib,json,os,shutil,subprocess,zipfile,urllib.request
+import argparse,hashlib,json,os,shutil,subprocess,zipfile,urllib.request,urllib.error,io
 
-parser=argparse.ArgumentParser();parser.add_argument('--pack',action='store_true');parser.add_argument('--sodium',action='store_true');parser.add_argument('--lithium',action='store_true');parser.add_argument('--control',action='store_true');parser.add_argument('--optimized',action='store_true');args=parser.parse_args()
+parser=argparse.ArgumentParser();parser.add_argument('--pack',action='store_true');parser.add_argument('--sodium',action='store_true');parser.add_argument('--lithium',action='store_true');parser.add_argument('--control',action='store_true');parser.add_argument('--optimized',action='store_true');parser.add_argument('--backport',action='store_true');args=parser.parse_args()
+if args.backport:args.optimized=True
 if args.optimized: args.lithium=True
 if args.lithium:
     assert not args.pack,'Lithium subset requires its own fresh runtime'
     args.sodium=True
 root=Path.cwd();runtime=json.loads((root/'build/probe/dependencies.json').read_text())
 home=Path(runtime['gradleHome']);modules=home/'caches/modules-2/files-2.1'
-game=root/('build/run/physical-optimized' if args.optimized else 'build/run/physical-pack' if args.pack else 'build/run/physical-lithium' if args.lithium else 'build/run/physical-sodium' if args.sodium else 'build/run/physical-indigo')
+game=root/('build/run/physical-backport' if args.backport else 'build/run/physical-optimized' if args.optimized else 'build/run/physical-pack' if args.pack else 'build/run/physical-lithium' if args.lithium else 'build/run/physical-sodium' if args.sodium else 'build/run/physical-indigo')
 if args.control: game=root/'build/run/physical-control'
 assert not game.exists(),'Client requires a fresh run directory'
 game.mkdir(parents=True);mods=game/'mods';mods.mkdir()
@@ -62,6 +63,27 @@ if args.optimized:
     for path in ['config/lithium.properties','config/moreculling.toml']:
         target=game/path;target.parent.mkdir(parents=True,exist_ok=True);target.write_text(fixture['configs'][path])
     print('PHYSICAL_OPTIMIZED_SUBSET Sodium Lithium OBE MoreCulling with pinned configuration libraries',flush=True)
+if args.backport:
+    fixture=json.loads((root/'tools/full-pack-fixture.json').read_text())
+    entry=next(entry for entry in fixture['forks'] if entry['id']=='vanillabackport')
+    class NoRedirect(urllib.request.HTTPRedirectHandler):
+        def redirect_request(self,*args):return None
+    headers={'Accept':'application/vnd.github+json'}
+    if os.environ.get('GH_TOKEN'):headers['Authorization']='Bearer '+os.environ['GH_TOKEN']
+    request=urllib.request.Request(f"https://api.github.com/repos/{entry['repo']}/actions/artifacts/{entry['artifact']}/zip",headers=headers)
+    try:response=urllib.request.build_opener(NoRedirect()).open(request,timeout=90)
+    except urllib.error.HTTPError as error:
+        if error.code in (301,302,303,307,308):response=urllib.request.urlopen(error.headers['Location'],timeout=90)
+        elif error.code in (401,403,404):response=urllib.request.urlopen(f"https://nightly.link/{entry['repo']}/actions/artifacts/{entry['artifact']}.zip",timeout=90)
+        else:raise
+    with response:archive_data=response.read()
+    with zipfile.ZipFile(io.BytesIO(archive_data)) as archive:
+        data=archive.read(next(name for name in archive.namelist() if Path(name).name==entry['file']))
+    assert hashlib.sha256(data).hexdigest()==entry['sha256'],'Backport fixture hash mismatch'
+    (mods/entry['file']).write_bytes(data)
+    for path in ['config/vanillabackport-client.toml','config/vanillabackport-common.toml']:
+        target=game/path;target.parent.mkdir(parents=True,exist_ok=True);target.write_text(fixture['configs'][path])
+    print('PHYSICAL_BACKPORT_SUBSET exact pinned VanillaBackport with Sodium Lithium OBE MoreCulling',flush=True)
 expected=[]
 for jar in list(mods.glob('*.jar')):
     with zipfile.ZipFile(jar) as archive:metadata=json.loads(archive.read('fabric.mod.json'))
@@ -116,6 +138,8 @@ for phase in (['fresh'] if args.control else ['fresh','reopen']):
         print(marker.read_text().strip(),flush=True)
         continue
     if result.returncode!=0 or not marker.exists():print('\n'.join(lines[-100:]));raise AssertionError('Physical client failed '+phase)
+    assert any('PHYSICAL_REDSTONE_MODEL_HEIGHT_PASS' in line for line in lines),'Redstone model height checks did not complete'
+    assert any('PHYSICAL_DROPPED_ITEM_LIGHT_PASS' in line for line in lines),'Dropped item light checks did not complete'
     assert any('PHYSICAL_NATIVE_PISTON_CYCLE_PASS' in line for line in lines),'Native piston client cycle did not complete'
     assert any('PHYSICAL_DIAGNOSTIC_REPORT_PASS' in line for line in lines),'Optional recorder report probe did not complete'
     assert any('PHYSICAL_PISTON_CAPTURE_PASS' in line for line in lines),'Authoritative moving pose capture probe did not complete'
