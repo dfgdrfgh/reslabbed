@@ -33,6 +33,7 @@ public final class NativePistonClientProbe {
             server(client,()-> {
                 var world=client.getServer().getOverworld();
                 NativeCullingClientProbe.setup(world);
+                NativePistonOrderClientProbe.setup(world);
                 var player=client.getServer().getPlayerManager().getPlayer(client.player.getUuid());
                 player.getAbilities().flying=true;player.sendAbilitiesUpdate();
                 player.networkHandler.requestTeleport(55.5,67,18.5,90,15);
@@ -58,8 +59,9 @@ public final class NativePistonClientProbe {
             });next(1);return false;
         }
         if(stage==1) {
-            if(ticks-started<10 || !NativeCullingClientProbe.ready(client))return false;
+            if(ticks-started<10 || !NativeCullingClientProbe.ready(client) || !NativePistonOrderClientProbe.ready(client))return false;
             NativeCullingClientProbe.verify(client);
+            NativePistonOrderClientProbe.verify(client);
             server(client,()-> {
                 var world=client.getServer().getOverworld();
                 for(var base:BASES)world.setBlockState(base.north(),Blocks.REDSTONE_BLOCK.getDefaultState(),Block.NOTIFY_ALL);
