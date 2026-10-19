@@ -125,6 +125,17 @@ public final class NativeRenderAudit {
         MODELS.put(owner.toImmutable(),new Observation(owner.getY()-.5,owner.getY()+.5));
         remesh(client,owner);
     }
+    public static void beginPistonModel(MinecraftClient client,BlockPos owner) {
+        var state=client.world.getBlockState(owner);
+        BakedModel model=client.getBlockRenderManager().getModel(state);
+        while(model instanceof NativeSeatModel seated)model=seated.getWrappedModel();
+        var raw=new Observation(0,0);
+        collectRawModel(model,state,null,raw);
+        for(var face:Direction.values())collectRawModel(model,state,face,raw);
+        if(raw.vertices<4)throw new AssertionError("piston reference emitted no geometry at "+owner);
+        MODELS.put(owner.toImmutable(),new Observation(owner.getY()-.5+raw.min,owner.getY()-.5+raw.max));
+        remesh(client,owner);
+    }
     /** Sodium ignores rebuild requests until the initial section mesh has been uploaded. */
     public static void tick(MinecraftClient client) {
         for(var owner:PENDING_REMESH)if(client.worldRenderer.isRenderingReady(owner)) {

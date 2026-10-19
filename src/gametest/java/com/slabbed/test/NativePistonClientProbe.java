@@ -12,6 +12,11 @@ import net.minecraft.util.math.Direction;
 /** First-use piston initialization and native movement with initialized client snapshots. */
 public final class NativePistonClientProbe {
     private static final BlockPos[] BASES={new BlockPos(34,64,8),new BlockPos(34,64,12)};
+    private static final Direction[] FACES=Direction.values();
+    private static BlockPos slabBase(int index) {return new BlockPos(42,64,8+index*4);}
+    private static BlockPos powerPos(BlockPos base,Direction facing) {
+        return base.offset(facing.getAxis()==Direction.Axis.Z?Direction.WEST:Direction.NORTH);
+    }
     private static int stage,ticks,started;
     private static volatile boolean pending;
     private static volatile Throwable failure;
@@ -22,11 +27,24 @@ public final class NativePistonClientProbe {
         if(failure!=null)throw new AssertionError("native piston client probe failed",failure);
         check(++ticks<600,"native piston client timeout stage="+stage);
         if(pending)return false;
+        NativeRenderAudit.tick(client);
+        client.player.setVelocity(net.minecraft.util.math.Vec3d.ZERO);
         if(stage==0) {
             server(client,()-> {
                 var world=client.getServer().getOverworld();
+                var player=client.getServer().getPlayerManager().getPlayer(client.player.getUuid());
+                player.getAbilities().flying=true;player.sendAbilitiesUpdate();
+                player.networkHandler.requestTeleport(55.5,67,18.5,90,15);
                 for(int x=33;x<=37;x++)for(int y=62;y<=66;y++)for(int z=7;z<=13;z++)
                     world.setBlockState(new BlockPos(x,y,z),Blocks.AIR.getDefaultState(),Block.NOTIFY_ALL);
+                for(int n=0;n<FACES.length;n++) {
+                    var base=slabBase(n);var facing=FACES[n];
+                    for(int x=-2;x<=2;x++)for(int y=-3;y<=3;y++)for(int z=-2;z<=2;z++)
+                        world.setBlockState(base.add(x,y,z),Blocks.AIR.getDefaultState(),Block.NOTIFY_ALL);
+                    if(facing!=Direction.DOWN)world.setBlockState(base.down(),Blocks.OAK_SLAB.getDefaultState(),Block.NOTIFY_ALL);
+                    world.setBlockState(base,Blocks.PISTON.getDefaultState().with(PistonBlock.FACING,facing),Block.NOTIFY_ALL);
+                    NativeSeats.put(world,base,new NativeSeats.Seat(-1,"minecraft:piston"));
+                }
                 for(int n=0;n<BASES.length;n++) {
                     var base=BASES[n];
                     world.setBlockState(base,Blocks.STICKY_PISTON.getDefaultState().with(PistonBlock.FACING,Direction.EAST),Block.NOTIFY_ALL);
@@ -43,12 +61,20 @@ public final class NativePistonClientProbe {
             server(client,()-> {
                 var world=client.getServer().getOverworld();
                 for(var base:BASES)world.setBlockState(base.north(),Blocks.REDSTONE_BLOCK.getDefaultState(),Block.NOTIFY_ALL);
+                for(int n=0;n<FACES.length;n++)world.setBlockState(powerPos(slabBase(n),FACES[n]),Blocks.REDSTONE_BLOCK.getDefaultState(),Block.NOTIFY_ALL);
             });next(2);return false;
         }
         if(stage==2) {
             if(ticks-started<20)return false;
             server(client,()-> {
                 var world=client.getServer().getOverworld();
+                for(int n=0;n<FACES.length;n++) {
+                    var base=slabBase(n);var facing=FACES[n];
+                    check(world.getBlockState(base).get(PistonBlock.EXTENDED),"server slab piston extends "+facing);
+                    check(world.getBlockState(base.offset(facing)).isOf(Blocks.PISTON_HEAD),"server slab piston has head "+facing);
+                    check(NativeSeats.offset(world,base)==-.5 && NativeSeats.offset(world,base.offset(facing))==-.5,
+                            "server slab piston base/head retain height "+facing);
+                }
                 for(int n=0;n<BASES.length;n++) {
                     var base=BASES[n];double offset=n==0?0:-.5;
                     check(world.getBlockState(base).get(PistonBlock.EXTENDED),"server piston extends");
@@ -60,6 +86,16 @@ public final class NativePistonClientProbe {
             });next(3);return false;
         }
         if(stage==3) {
+            if(ticks-started<10)return false;
+            for(int n=0;n<FACES.length;n++) {
+                var base=slabBase(n);var facing=FACES[n];var head=base.offset(facing);
+                check(client.world.getBlockState(base).isOf(Blocks.PISTON) && client.world.getBlockState(base).get(PistonBlock.EXTENDED),
+                        "client slab piston extends "+facing);
+                check(client.world.getBlockState(head).isOf(Blocks.PISTON_HEAD),"client slab piston has head "+facing);
+                System.out.println("PHYSICAL_PISTON_POSE extended facing="+facing+" base="+NativeSeats.offset(client.world,base)+" head="+NativeSeats.offset(client.world,head));
+                check(NativeSeats.offset(client.world,base)==-.5 && NativeSeats.offset(client.world,head)==-.5,
+                        "client slab piston head stays attached at placed height "+facing);
+            }
             for(int n=0;n<BASES.length;n++) {
                 var base=BASES[n];double offset=n==0?0:-.5;
                 if(!client.world.getBlockState(base.east()).isOf(Blocks.PISTON_HEAD)
@@ -68,9 +104,24 @@ public final class NativePistonClientProbe {
                 check(Math.abs(client.world.getBlockState(base.east(2)).getCollisionShape(client.world,base.east(2)).getBoundingBox().minY-offset)<1e-7,
                         "client sees native stone at the physical height");
             }
+            for(int n=0;n<FACES.length;n++) {
+                NativeRenderAudit.beginPistonModel(client,slabBase(n));
+                NativeRenderAudit.beginPistonModel(client,slabBase(n).offset(FACES[n]));
+            }
+            next(6);return false;
+        }
+        if(stage==6) {
+            for(int n=0;n<FACES.length;n++)if(!NativeRenderAudit.readyModel(slabBase(n))
+                    || !NativeRenderAudit.readyModel(slabBase(n).offset(FACES[n])))return false;
+            for(int n=0;n<FACES.length;n++) {
+                NativeRenderAudit.verifyModel(slabBase(n));
+                NativeRenderAudit.verifyModel(slabBase(n).offset(FACES[n]));
+            }
+            System.out.println("PHYSICAL_PISTON_MODELS_PASS extended all_six_directions");
             server(client,()-> {
                 var world=client.getServer().getOverworld();
                 for(var base:BASES)world.setBlockState(base.north(),Blocks.AIR.getDefaultState(),Block.NOTIFY_ALL);
+                for(int n=0;n<FACES.length;n++)world.setBlockState(powerPos(slabBase(n),FACES[n]),Blocks.AIR.getDefaultState(),Block.NOTIFY_ALL);
             });next(4);return false;
         }
         if(stage==4) {
@@ -85,6 +136,14 @@ public final class NativePistonClientProbe {
             });next(5);return false;
         }
         if(stage==5) {
+            if(ticks-started<10)return false;
+            for(int n=0;n<FACES.length;n++) {
+                var base=slabBase(n);var facing=FACES[n];
+                check(client.world.getBlockState(base).isOf(Blocks.PISTON) && !client.world.getBlockState(base).get(PistonBlock.EXTENDED),
+                        "client slab piston retracts "+facing);
+                System.out.println("PHYSICAL_PISTON_POSE retracted facing="+facing+" base="+NativeSeats.offset(client.world,base));
+                check(NativeSeats.offset(client.world,base)==-.5,"client retracted piston stays on slab "+facing);
+            }
             for(int n=0;n<BASES.length;n++) {
                 var base=BASES[n];double offset=n==0?0:-.5;
                 if(!client.world.getBlockState(base.east()).isOf(Blocks.STONE)

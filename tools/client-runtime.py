@@ -2,13 +2,14 @@
 from pathlib import Path
 import argparse,hashlib,json,os,shutil,subprocess,zipfile,urllib.request
 
-parser=argparse.ArgumentParser();parser.add_argument('--pack',action='store_true');parser.add_argument('--sodium',action='store_true');parser.add_argument('--lithium',action='store_true');parser.add_argument('--control',action='store_true');args=parser.parse_args()
+parser=argparse.ArgumentParser();parser.add_argument('--pack',action='store_true');parser.add_argument('--sodium',action='store_true');parser.add_argument('--lithium',action='store_true');parser.add_argument('--control',action='store_true');parser.add_argument('--optimized',action='store_true');args=parser.parse_args()
+if args.optimized: args.lithium=True
 if args.lithium:
     assert not args.pack,'Lithium subset requires its own fresh runtime'
     args.sodium=True
 root=Path.cwd();runtime=json.loads((root/'build/probe/dependencies.json').read_text())
 home=Path(runtime['gradleHome']);modules=home/'caches/modules-2/files-2.1'
-game=root/('build/run/physical-pack' if args.pack else 'build/run/physical-lithium' if args.lithium else 'build/run/physical-sodium' if args.sodium else 'build/run/physical-indigo')
+game=root/('build/run/physical-optimized' if args.optimized else 'build/run/physical-pack' if args.pack else 'build/run/physical-lithium' if args.lithium else 'build/run/physical-sodium' if args.sodium else 'build/run/physical-indigo')
 if args.control: game=root/'build/run/physical-control'
 assert not game.exists(),'Client requires a fresh run directory'
 game.mkdir(parents=True);mods=game/'mods';mods.mkdir()
@@ -50,6 +51,17 @@ if args.lithium:
     for algorithm,expected_hash in lithium['hashes'].items():
         assert hashlib.new(algorithm,data).hexdigest()==expected_hash,'Lithium fixture hash mismatch'
     (mods/Path(lithium['path']).name).write_bytes(data)
+if args.optimized:
+    fixture=json.loads((root/'tools/full-pack-fixture.json').read_text())
+    for prefix in ['obe+', 'moreculling-', 'cloth-config-', 'yet_another_config_lib_v3-', 'midnightlib-']:
+        entry=next(entry for entry in fixture['downloads'] if Path(entry['path']).name.startswith(prefix))
+        data=urllib.request.urlopen(entry['downloads'][0]).read()
+        for algorithm,expected_hash in entry['hashes'].items():
+            assert hashlib.new(algorithm,data).hexdigest()==expected_hash,'Render subset hash mismatch'
+        (mods/Path(entry['path']).name).write_bytes(data)
+    for path in ['config/lithium.properties','config/moreculling.toml']:
+        target=game/path;target.parent.mkdir(parents=True,exist_ok=True);target.write_text(fixture['configs'][path])
+    print('PHYSICAL_OPTIMIZED_SUBSET Sodium Lithium OBE MoreCulling with pinned configuration libraries',flush=True)
 expected=[]
 for jar in list(mods.glob('*.jar')):
     with zipfile.ZipFile(jar) as archive:metadata=json.loads(archive.read('fabric.mod.json'))

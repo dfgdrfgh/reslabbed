@@ -32,7 +32,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        variant: [indigo, sodium, lithium]
+        variant: [indigo, sodium, lithium, optimized]
     runs-on: ubuntu-22.04
     timeout-minutes: 40
     steps:
@@ -65,7 +65,7 @@ jobs:
           fi
       - name: Inspect piston pose and occlusion targets
         if: always() && matrix.variant == 'indigo'
-        run: python3 tools/inspect-native-bytecode.py net.minecraft.block.PistonBlock net.minecraft.block.entity.PistonBlockEntity net.minecraft.block.Block#shouldDrawSide net.minecraft.client.render.block.entity.PistonBlockEntityRenderer
+        run: python3 tools/inspect-native-bytecode.py net.minecraft.block.PistonBlock net.minecraft.block.entity.PistonBlockEntity net.minecraft.block.Block#shouldDrawSide
       - name: Production clients
         env:
           VARIANT: ${{ matrix.variant }}
