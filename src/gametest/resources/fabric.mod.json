@@ -20,7 +20,8 @@
       "com.slabbed.test.NativeEffectsTest",
       "com.slabbed.test.NativeThreadAccessTest",
       "com.slabbed.test.NativeCellPistonTest",
-      "com.slabbed.test.PistonSlabRegressionTest"
+      "com.slabbed.test.PistonSlabRegressionTest",
+      "com.slabbed.test.DiagnosticGameTest"
     ],
     "client": [
       "com.slabbed.test.PhysicalClientProbe"

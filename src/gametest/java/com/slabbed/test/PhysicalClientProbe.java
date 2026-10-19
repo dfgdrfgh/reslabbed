@@ -70,7 +70,9 @@ public final class PhysicalClientProbe implements ClientModInitializer {
         }
         if(client.world==null || client.player==null || client.getServer()==null) return;
         client.options.pauseOnLostFocus=false;
+        if(!DiagnosticClientProbe.begin(client))return;
         if(!NativeFunctionalClientProbe.tick(client,reopen))return;
+        if(!DiagnosticClientProbe.finish(client))return;
         if(client.currentScreen!=null) client.setScreen(null);
         client.player.getAbilities().flying=true;
         client.player.setVelocity(Vec3d.ZERO);

@@ -117,6 +117,7 @@ for phase in (['fresh'] if args.control else ['fresh','reopen']):
         continue
     if result.returncode!=0 or not marker.exists():print('\n'.join(lines[-100:]));raise AssertionError('Physical client failed '+phase)
     assert any('PHYSICAL_NATIVE_PISTON_CYCLE_PASS' in line for line in lines),'Native piston client cycle did not complete'
+    assert any('PHYSICAL_DIAGNOSTIC_REPORT_PASS' in line for line in lines),'Optional recorder report probe did not complete'
     assert any('PHYSICAL_PISTON_CAPTURE_PASS' in line for line in lines),'Authoritative moving pose capture probe did not complete'
     assert any('PHYSICAL_PISTON_PACKET_ORDER_PASS' in line for line in lines),'Piston packet ordering probe did not complete'
     assert any('PHYSICAL_NATIVE_FACE_CULLING_PASS' in line for line in lines),'Native face culling probe did not complete'
