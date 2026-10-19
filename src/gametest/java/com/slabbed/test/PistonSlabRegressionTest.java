@@ -80,4 +80,18 @@ public final class PistonSlabRegressionTest {
                 "stone face above a lowered piston remains visible");
         t.complete();
     }
+
+    @GameTest(templateName="fabric-gametest-api-v1:empty")
+    public void ordinaryFaceCacheCannotHideFaceBesideLoweredPiston(TestContext t) {
+        var world=t.getWorld();var owner=placed(t,Direction.WEST);
+        var normal=owner.east(3);var state=Blocks.PISTON.getDefaultState().with(PistonBlock.FACING,Direction.WEST);
+        world.setBlockState(normal,state,Block.NOTIFY_ALL);
+        world.setBlockState(normal.north(),Blocks.GOLD_BLOCK.getDefaultState(),Block.NOTIFY_ALL);
+        t.assertFalse(Block.shouldDrawSide(Blocks.GOLD_BLOCK.getDefaultState(),world,normal.north(),Direction.SOUTH,normal),
+                "ordinary flush piston hides the shared gold face and warms the state-only cache");
+        world.setBlockState(owner.north(),Blocks.GOLD_BLOCK.getDefaultState(),Block.NOTIFY_ALL);
+        t.assertTrue(Block.shouldDrawSide(Blocks.GOLD_BLOCK.getDefaultState(),world,owner.north(),Direction.SOUTH,owner),
+                "cached flush piston must not hide the exposed face beside a lowered piston");
+        t.complete();
+    }
 }
