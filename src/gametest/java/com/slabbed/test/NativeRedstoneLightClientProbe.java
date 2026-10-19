@@ -99,6 +99,10 @@ public final class NativeRedstoneLightClientProbe {
         }
         for(var fixture:MODELS) {
             world.setBlockState(fixture.pos().down(),Blocks.OAK_SLAB.getDefaultState(),Block.NOTIFY_LISTENERS);
+            if(fixture.state().isOf(Blocks.REDSTONE_TORCH) && !fixture.state().get(Properties.LIT)) {
+                world.setBlockState(fixture.pos().down(),Blocks.REDSTONE_BLOCK.getDefaultState(),Block.NOTIFY_LISTENERS);
+                NativeSeats.put(world,fixture.pos().down(),new NativeSeats.Seat(-1,"minecraft:redstone_block"));
+            }
             player.setStackInHand(Hand.MAIN_HAND,new ItemStack(fixture.state().getBlock()));
             var hit=new BlockHitResult(Vec3d.ofBottomCenter(fixture.pos().down()).add(0,.5,0),Direction.UP,fixture.pos().down(),false);
             check(player.getMainHandStack().useOnBlock(new ItemUsageContext(player,Hand.MAIN_HAND,hit)).isAccepted(),"redstone item placement accepted: "+fixture);
@@ -110,8 +114,6 @@ public final class NativeRedstoneLightClientProbe {
             world.setBlockState(source,Blocks.REDSTONE_BLOCK.getDefaultState(),Block.NOTIFY_LISTENERS);
             NativeSeats.put(world,source,new NativeSeats.Seat(-1,"minecraft:redstone_block"));
         }
-        var unlitSupport=MODELS.get(1).pos().down().north();
-        world.setBlockState(unlitSupport,Blocks.REDSTONE_BLOCK.getDefaultState(),Block.NOTIFY_ALL);
         world.getEntitiesByClass(ItemEntity.class,new Box(47,63,23,61,68,26),entity->true).forEach(ItemEntity::discard);
         for(int i=0;i<SURFACES.length;i++) {
             var pos=surface(i);var state=SURFACES[i];
