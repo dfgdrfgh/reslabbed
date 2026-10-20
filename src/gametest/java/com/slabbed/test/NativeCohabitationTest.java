@@ -56,6 +56,27 @@ public final class NativeCohabitationTest {
         t.complete();
     }
     private record Fixture(BlockPos base,PlayerEntity player,BarrelBlockEntity barrel,NativeSeats.Seat seat) {}
+    @GameTest(templateName="fabric-gametest-api-v1:empty")
+    public void supplementalSlabPairRejectsBlockedCapWithoutConsumingItem(TestContext t) {
+        var f=barrel(t);var world=t.getWorld();var owner=f.base().up();
+        t.assertTrue(place(f.player(),Items.OAK_SLAB,owner,owner.getY()+.5).isAccepted(),"first supplemental slab placed");
+        var before=CellWorld.contents(world,owner);
+        world.setBlockState(owner.up(),Blocks.OBSIDIAN.getDefaultState());
+        t.assertFalse(place(f.player(),Items.OAK_SLAB,owner,owner.getY()+1).isAccepted(),"obstructed second half rejected");
+        t.assertTrue(f.player().getMainHandStack().getCount()==2 && before.equals(CellWorld.contents(world,owner)),"rejected pair preserves first slab and item");
+        t.assertTrue(world.getBlockState(owner.up()).isOf(Blocks.OBSIDIAN),"obstruction preserved");
+        nativeIntact(t,f);t.complete();
+    }
+    @GameTest(templateName="fabric-gametest-api-v1:empty")
+    public void differentSlabMaterialsRemainIndependentAboveNativeOwner(TestContext t) {
+        var f=barrel(t);var owner=f.base().up();var world=t.getWorld();
+        t.assertTrue(place(f.player(),Items.OAK_SLAB,owner,owner.getY()+.5).isAccepted(),"oak slab placed");
+        t.assertTrue(place(f.player(),Items.BIRCH_SLAB,owner,owner.getY()+1).isAccepted(),"different slab placed above oak");
+        CellWorld.remove(world,owner.up(),0,f.player(),false);
+        piece(t,owner,Blocks.OAK_SLAB,owner.getY()*2+1);
+        t.assertTrue(world.getBlockState(owner.up()).isAir(),"only birch slab removed");
+        nativeIntact(t,f);t.complete();
+    }
     private static ActionResult place(PlayerEntity player,Item item,BlockPos hitCell,double y) {
         player.setStackInHand(Hand.MAIN_HAND,new ItemStack(item,2));
         var hit=new BlockHitResult(new Vec3d(hitCell.getX()+.5,y,hitCell.getZ()+.5),Direction.UP,hitCell,false);

@@ -69,9 +69,15 @@ public final class CellPlacement {
         var shape=com.slabbed.nativeblock.NativeShapes.collision(world,base,state).offset(x,origin*.5,z);
         if(!world.doesNotIntersectEntities(null,shape)) return ActionResult.FAIL;
         if(!PieceSupport.supported(world,base,new com.slabbed.core.CellContents.Fragment<>(origin-base.getY()*2,length,state))) return ActionResult.FAIL;
-        if(!CellWorld.canPlace(world,x,z,origin,state)) return ActionResult.FAIL;
+        boolean slabPair=fragment.length()==1 && block instanceof SlabBlock && support.getBlock()==block
+                && face.getAxis().isVertical();
+        if(slabPair) {
+            if(!CellWorld.extendSlab(world,clicked,fragment.offset(),origin))return ActionResult.FAIL;
+        } else {
+            if(!CellWorld.canPlace(world,x,z,origin,state)) return ActionResult.FAIL;
+            if(!world.isClient && !CellWorld.place(world,x,z,origin,state)) return ActionResult.FAIL;
+        }
         if(world.isClient) return ActionResult.SUCCESS;
-        if(!CellWorld.place(world,x,z,origin,state)) return ActionResult.FAIL;
         var sounds=state.getSoundGroup();
         world.playSound(null,base,sounds.getPlaceSound(),SoundCategory.BLOCKS,(sounds.getVolume()+1)*.5f,sounds.getPitch()*.8f);
         if(!player.isCreative()) context.getStack().decrement(1);

@@ -19,7 +19,9 @@ public final class CellWorld {
     private static final ThreadLocal<java.util.Set<BlockPos>> PISTON_CHANGES=new ThreadLocal<>();
     private CellWorld() {}
     public static boolean mutating() { return MUTATING.get(); }
-    public static int length(BlockState state) { return state.getBlock() instanceof SlabBlock ? 1 : 2; }
+    public static int length(BlockState state) {
+        return state.getBlock() instanceof SlabBlock && state.get(SlabBlock.TYPE)!=SlabType.DOUBLE ? 1 : 2;
+    }
     public static CellContents<BlockState> contents(World world,BlockPos pos) {
         if (!world.isChunkLoaded(pos)) return null;
         var supplemental=SupplementalCells.contents(world,pos);
@@ -47,19 +49,37 @@ public final class CellWorld {
         return true;
     }
     private static Map<BlockPos,CellContents<BlockState>> prepare(World world,int x,int z,int origin,BlockState state) {
+        return prepare(world,x,z,origin,state,Map.of());
+    }
+    private static Map<BlockPos,CellContents<BlockState>> prepare(World world,int x,int z,int origin,BlockState state,
+                                                                 Map<BlockPos,CellContents<BlockState>> initial) {
         if (!PieceRules.accepts(state)) return null;
-        if (state.getBlock() instanceof SlabBlock) state=state.with(SlabBlock.TYPE,SlabType.BOTTOM);
+        if (state.getBlock() instanceof SlabBlock && length(state)==1) state=state.with(SlabBlock.TYPE,SlabType.BOTTOM);
         if(com.slabbed.nativeblock.NativeShapes.intersects(world,x,z,origin,state))return null;
         int length=length(state); int low=HalfGrid.at(origin).cellY(),high=HalfGrid.at(origin+length-1).cellY();
         Map<BlockPos,CellContents<BlockState>> changes=new LinkedHashMap<>();
         for (int y=low;y<=high;y++) {
             var pos=new BlockPos(x,y,z);
             if (!world.isInBuildLimit(pos) || !world.getWorldBorder().contains(pos)) return null;
-            var before=contents(world,pos); if(before==null) return null;
+            var before=initial.containsKey(pos)?initial.get(pos):contents(world,pos); if(before==null) return null;
             try { changes.put(pos,before.add(new CellContents.Fragment<>(origin-y*2,length,state))); }
             catch(IllegalArgumentException overlap) { return null; }
         }
         return changes;
+    }
+    /** An explicit second slab placement replaces the selected half with one vanilla double slab. */
+    public static boolean extendSlab(World world,BlockPos cellPos,int offset,int addedOrigin) {
+        var before=contents(world,cellPos);if(before==null)return false;
+        var part=before.fragments().stream().filter(p->p.offset()==offset).findFirst().orElse(null);
+        int original=cellPos.getY()*2+offset;
+        if(part==null || part.length()!=1 || !(part.value().getBlock() instanceof SlabBlock)
+                || Math.abs(addedOrigin-original)!=1)return false;
+        var state=part.value().with(SlabBlock.TYPE,SlabType.DOUBLE);
+        var changes=prepare(world,cellPos.getX(),cellPos.getZ(),Math.min(original,addedOrigin),state,
+                Map.of(cellPos,before.remove(offset)));
+        if(changes==null)return false;
+        if(!world.isClient)commit(world,changes);
+        return true;
     }
     public static void remove(World world,BlockPos cellPos,int offset,PlayerEntity player,boolean drop) {
         var cell=contents(world,cellPos); if(cell==null) return;

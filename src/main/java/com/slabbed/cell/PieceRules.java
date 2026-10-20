@@ -1,7 +1,6 @@
 package com.slabbed.cell;
 
 import net.minecraft.block.*;
-import net.minecraft.block.enums.SlabType;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.shape.VoxelShapes;
@@ -17,7 +16,7 @@ public final class PieceRules {
         if(state.getBlock() instanceof RedstoneTorchBlock) return false;
         if(state.hasBlockEntity() || !state.getFluidState().isEmpty()) return false;
         var block=state.getBlock();
-        if(block instanceof SlabBlock) return state.get(SlabBlock.TYPE)!=SlabType.DOUBLE;
+        if(block instanceof SlabBlock) return true;
         if(block instanceof TorchBlock || block instanceof WallTorchBlock || block instanceof LanternBlock
                 || block instanceof ChainBlock || block instanceof FlowerPotBlock || block instanceof CarpetBlock) return true;
         if(block instanceof FallingBlock || block instanceof PistonBlock || block instanceof TntBlock

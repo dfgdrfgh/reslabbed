@@ -46,6 +46,7 @@ public final class NativeFunctionalClientProbe {
         if(!NativeOffsetPistonClientProbe.tick(client))return false;
         if(!NativeParticleClientProbe.tick(client))return false;
         if(!NativeRedstoneLightClientProbe.tick(client))return false;
+        if(!SharedSlabClientProbe.tick(client))return false;
         if(failure!=null)throw new AssertionError("native functional server probe failed",failure);
         if(stage==99)return true;
         NativeRenderAudit.tick(client);
