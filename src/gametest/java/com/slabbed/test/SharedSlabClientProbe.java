@@ -136,6 +136,7 @@ public final class SharedSlabClientProbe {
             intact(client.world);
             debugBlock(client,new BlockHitResult(Vec3d.ofBottomCenter(OWNER).add(0,.5,0),Direction.UP,OWNER,false),"minecraft:grass_block",null);
             SlabFeedbackAudit.verify();
+            DeferredDebrisChecks.run(client);
             System.out.println("PHYSICAL_SHARED_SLAB_PACKET_PASS double_placement lower_half_selection whole_pair_break native_pose_preserved");
             stage=99;return true;
         }
