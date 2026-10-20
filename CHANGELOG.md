@@ -1,3 +1,11 @@
+# 0.9.12 rewrite alpha — Fabric 1.21.1
+
+Slabs placed against a full block use the aimed physical upper or lower half. Placing the matching opposite half completes one double slab at its existing origin, including pairs crossing a cell boundary. Different materials remain separate, and blocked placement consumes nothing. See LAW.md.
+
+Debris in an exposed native half-cell receives sky and block light through its open neighbors, including under opaque ceilings. The query is cached per client tick and bounded by ordinary light attenuation. Vanilla dust fallback also uses its remembered physical source height, preserving source light when debris enters another solid. Enclosed and physically occupied controls retain ordinary darkness.
+
+Adds side placement server and packet tests, actual single-slab debris under ceilings with lateral light, and rendered particle light capture.
+
 # 0.9.11 rewrite alpha — Fabric 1.21.1
 
 Break sounds remain immediate. Debris waits until every fragment of the selected piece is gone on the client and its original volume is clear. This prevents particles entering the support while a delayed server confirmation leaves the old collision shape in place. Pending effects expire or clear on unload and disconnect; block positions and stored origins remain unchanged. See LAW.md.

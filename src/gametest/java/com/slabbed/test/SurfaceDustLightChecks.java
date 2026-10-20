@@ -114,6 +114,7 @@ public final class SurfaceDustLightChecks {
             observe(client,ticks-started);
             if(ticks-started<30)return false;
             check(ERRORS.isEmpty(),"surface dust failures: "+String.join("; ",ERRORS));
+            check(darkOutside==0,"debris outside physical solids must retain ordinary light: dark samples="+darkOutside);
             System.out.println("PHYSICAL_SURFACE_DUST_PASS particles="+DUST.size()+" penetrating="+penetrating+" darkOutside="+darkOutside);
             stage=99;return true;
         }

@@ -55,10 +55,14 @@ public final class CellPlacement {
         if(!PieceRules.accepts(state)) return null;
         int length=CellWorld.length(state);
         int origin=clicked.getY()*2+fragment.offset();
+        int supportOrigin=origin;
         int x=clicked.getX(),z=clicked.getZ();
         if(face==Direction.UP) origin+=fragment.length();
         else if(face==Direction.DOWN) origin-=length;
-        else { x+=face.getOffsetX(); z+=face.getOffsetZ(); }
+        else {
+            x+=face.getOffsetX(); z+=face.getOffsetZ();
+            if(block instanceof SlabBlock && fragment.length()==2 && hit.y>supportOrigin*.5+.5)origin++;
+        }
         // Vanilla slab merges still need clearance from native objects projecting into the added half.
         if(clickedState.getBlock() instanceof SlabBlock && item.getBlock()==clickedState.getBlock()
                 && face.getAxis().isVertical() && clickedState.get(SlabBlock.TYPE)!=SlabType.DOUBLE)
@@ -71,8 +75,18 @@ public final class CellPlacement {
         if(!PieceSupport.supported(world,base,new com.slabbed.core.CellContents.Fragment<>(origin-base.getY()*2,length,state))) return ActionResult.FAIL;
         boolean slabPair=fragment.length()==1 && block instanceof SlabBlock && support.getBlock()==block
                 && face.getAxis().isVertical();
+        var pairPos=clicked;int pairOffset=fragment.offset();
+        if(block instanceof SlabBlock && face.getAxis().isHorizontal() && fragment.length()==2) {
+            int mateOrigin=supportOrigin+(origin==supportOrigin?1:0);
+            var matePos=new BlockPos(x,com.slabbed.core.HalfGrid.at(mateOrigin).cellY(),z);
+            var contents=CellWorld.contents(world,matePos);
+            if(contents!=null)for(var part:contents.fragments())
+                if(matePos.getY()*2+part.offset()==mateOrigin && part.length()==1 && part.value().getBlock()==block) {
+                    slabPair=true;pairPos=matePos;pairOffset=part.offset();break;
+                }
+        }
         if(slabPair) {
-            if(!CellWorld.extendSlab(world,clicked,fragment.offset(),origin))return ActionResult.FAIL;
+            if(!CellWorld.extendSlab(world,pairPos,pairOffset,origin))return ActionResult.FAIL;
         } else {
             if(!CellWorld.canPlace(world,x,z,origin,state)) return ActionResult.FAIL;
             if(!world.isClient && !CellWorld.place(world,x,z,origin,state)) return ActionResult.FAIL;

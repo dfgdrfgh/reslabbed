@@ -146,6 +146,8 @@ for phase in (['fresh'] if args.control else ['fresh','reopen']):
     assert any('PHYSICAL_REAL_SLAB_DUST_COLLISION samples=9' in line for line in lines),'Emitted break dust collision checks did not complete'
     assert any('PHYSICAL_SLAB_DELAYED_FEEDBACK_OBSERVED ticks=4' in line for line in lines),'Delayed server confirmation debris check did not complete'
     assert any('PHYSICAL_DEFERRED_DEBRIS_ORDER_PASS' in line for line in lines),'Deferred debris packet order and lifecycle checks did not complete'
+    assert any('PHYSICAL_SURFACE_DUST_PASS' in line for line in lines),'Ceiling and side-lit physical debris checks did not complete'
+    assert any('PHYSICAL_SIDE_SLAB_PACKET_PASS' in line for line in lines),'Side slab placement packets did not complete'
     assert sum('PHYSICAL_SLAB_DUST_COLLISION_PASS' in line for line in lines)>=5,'Soil surface collision checks did not complete'
     assert any('PHYSICAL_OFFSET_PISTON_CONTACT_PASS' in line for line in lines),'Offset piston contact checks did not complete'
     assert any('PHYSICAL_NATIVE_PISTON_CYCLE_PASS' in line for line in lines),'Native piston client cycle did not complete'

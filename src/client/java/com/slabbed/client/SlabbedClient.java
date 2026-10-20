@@ -8,6 +8,7 @@ public final class SlabbedClient implements ClientModInitializer {
     @Override public void onInitializeClient() { BlockEntityRendererFactories.register(Slabbed.CELL_ENTITY,CellRenderer::new);
         NativeSeatClient.init();
         CellBreakEffects.init();
+        NativeParticleLight.init();
         com.slabbed.client.debug.DiagnosticClient.init();
         SupplementalCellClient.init();
         net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents.CHUNK_UNLOAD.register((world,chunk)->CellRenderSync.unload(chunk.getPos()));
