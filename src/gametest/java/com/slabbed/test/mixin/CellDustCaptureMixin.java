@@ -16,5 +16,6 @@ public abstract class CellDustCaptureMixin {
     private void slabbed$actualDust(ClientWorld world,double x,double y,double z,double vx,double vy,double vz,
                                     BlockState material,BlockPos pos,CallbackInfo ci) {
         CellClientLifecycleRegression.dust(material,x,y,z);
+        com.slabbed.test.SlabFeedbackAudit.record((BlockDustParticle)(Object)this,material,y);
     }
 }

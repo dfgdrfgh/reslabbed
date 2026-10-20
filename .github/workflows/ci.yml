@@ -57,6 +57,9 @@ jobs:
       - name: Inspect piston pose and occlusion targets
         if: always()
         run: python3 tools/inspect-native-bytecode.py net.minecraft.client.particle.BlockDustParticle net.minecraft.client.particle.Particle#getBrightness net.minecraft.block.SlabBlock net.minecraft.block.PistonBlock net.minecraft.block.entity.PistonBlockEntity net.minecraft.block.SpreadableBlock net.minecraft.block.piston.PistonHandler net.minecraft.block.Block#shouldDrawSide net.minecraft.client.render.entity.EntityRenderer#getLight,getBlockLight,getSkyLight net.minecraft.block.AbstractBlock#getOpacity,isTransparent net.minecraft.block.AbstractBlock\$AbstractBlockState#getOpacity,getCullingShape
+      - name: Inspect slab feedback targets
+        if: always() && matrix.variant == 'indigo'
+        run: python3 tools/inspect-native-bytecode.py net.minecraft.client.gui.hud.DebugHud#getRightText,render net.minecraft.client.particle.Particle#move,setPos,getBrightness
       - name: Production clients
         if: ${{ !cancelled() }}
         env:

@@ -20,7 +20,7 @@ import net.minecraft.world.World;
 /** Production placement, selection payload and break packets for a slab beside lowered soil. */
 public final class SharedSlabClientProbe {
     private static final BlockPos OWNER=new BlockPos(64,64,18);
-    private static int stage,ticks;
+    private static int stage,ticks,brokenAt;
     private static volatile boolean pending,confirmed;
     private static volatile Throwable failure;
     private SharedSlabClientProbe() {}
@@ -29,6 +29,7 @@ public final class SharedSlabClientProbe {
         if(failure!=null)throw new AssertionError("shared slab server fixture failed",failure);
         check(++ticks<300,"shared slab packet timeout stage="+stage);
         if(pending)return false;
+        if(stage>=4 && stage<99)SlabFeedbackAudit.observe(client,OWNER);
         if(stage==0) {
             server(client,()-> {
                 var world=client.getServer().getOverworld();
@@ -47,6 +48,12 @@ public final class SharedSlabClientProbe {
         if(stage==1) {
             if(CellWorld.contents(client.world,OWNER)==null || CellWorld.contents(client.world,OWNER).fragments().isEmpty()
                     || client.player.getPos().squaredDistanceTo(new Vec3d(OWNER.getX()+.5,OWNER.getY()+.5,OWNER.getZ()-2.5))>.1)return false;
+            var firstHit=new BlockHitResult(Vec3d.ofBottomCenter(OWNER).add(0,1,0),Direction.UP,OWNER,false);
+            debug(client,firstHit,"bottom");
+            client.crosshairTarget=firstHit;
+            SlabFeedbackAudit.beginHit(OWNER.getY()+1.1);
+            client.particleManager.addBlockBreakingParticles(OWNER,Direction.UP);
+            SlabFeedbackAudit.end();
             var stack=new ItemStack(Items.OAK_SLAB,16);client.player.setStackInHand(Hand.MAIN_HAND,stack);
             client.interactionManager.clickCreativeStack(stack.copy(),36+client.player.getInventory().selectedSlot);
             var hit=new BlockHitResult(Vec3d.ofBottomCenter(OWNER).add(0,1,0),Direction.UP,OWNER,false);
@@ -68,7 +75,11 @@ public final class SharedSlabClientProbe {
             check(client.crosshairTarget instanceof BlockHitResult hit && hit.getType()==HitResult.Type.BLOCK
                     && hit.getBlockPos().equals(OWNER) && CellWorld.pick(client.world,OWNER,hit)!=null,"crosshair selects the visible shared slab");
             var hit=(BlockHitResult)client.crosshairTarget;
+            debug(client,hit,"double");
+            SlabFeedbackAudit.begin();
             check(client.interactionManager.attackBlock(OWNER,hit.getSide()),"creative break packet accepted");
+            SlabFeedbackAudit.end();
+            brokenAt=ticks;
             confirmed=false;stage=4;return false;
         }
         if(stage==4) {
@@ -79,11 +90,21 @@ public final class SharedSlabClientProbe {
             });stage=5;return false;
         }
         if(stage==5 && confirmed) {
+            if(ticks-brokenAt<35)return false;
             intact(client.world);
+            SlabFeedbackAudit.verify();
             System.out.println("PHYSICAL_SHARED_SLAB_PACKET_PASS double_placement lower_half_selection whole_pair_break native_pose_preserved");
             stage=99;return true;
         }
         return false;
+    }
+    private static void debug(MinecraftClient client,BlockHitResult hit,String type) {
+        var hud=(com.slabbed.test.mixin.DebugHudAccess)client.getDebugHud();
+        hud.slabbed$blockHit(hit);hud.slabbed$fluidHit(hit);
+        var lines=hud.slabbed$rightText();
+        System.out.println("PHYSICAL_SLAB_F3_OBSERVED type="+type+" lines="+lines);
+        SlabFeedbackAudit.error(lines.stream().anyMatch(s->s.contains("minecraft:oak_slab")),"F3 must name selected oak slab: "+lines);
+        SlabFeedbackAudit.error(lines.stream().anyMatch(s->s.contains("type") && s.contains(type)),"F3 must show selected slab type="+type);
     }
     private static boolean doubled(World world) {
         var parts=CellWorld.contents(world,OWNER);
