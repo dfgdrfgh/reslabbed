@@ -65,7 +65,12 @@ public final class SharedSlabClientProbe {
             if(CellWorld.contents(client.world,OWNER)==null || CellWorld.contents(client.world,OWNER).fragments().isEmpty()
                     || CellWorld.contents(client.world,CARRIER)==null || CellWorld.contents(client.world,CARRIER).fragments().size()!=2
                     || CellWorld.contents(client.world,DARK)==null || CellWorld.contents(client.world,DARK).fragments().isEmpty()
+                    || NativeSeats.offset(client.world,DARK)!=-.5
+                    || client.world.getLightLevel(net.minecraft.world.LightType.SKY,DARK.up())!=0
+                    || client.world.getLightLevel(net.minecraft.world.LightType.SKY,DARK)!=0
                     || client.player.getPos().squaredDistanceTo(new Vec3d(OWNER.getX()+.5,OWNER.getY()+.5,OWNER.getZ()-2.5))>.1)return false;
+            System.out.println("PHYSICAL_SLAB_DARK_FIXTURE_READY ticks="+ticks+" roofSky="+client.world.getLightLevel(net.minecraft.world.LightType.SKY,DARK.up())
+                    +" ownerSky="+client.world.getLightLevel(net.minecraft.world.LightType.SKY,DARK));
             var firstHit=new BlockHitResult(Vec3d.ofBottomCenter(OWNER).add(0,1,0),Direction.UP,OWNER,false);
             debug(client,firstHit,"bottom");
             debugBlock(client,new BlockHitResult(Vec3d.ofBottomCenter(CARRIER).add(0,1,0),Direction.UP,CARRIER,false),"minecraft:birch_slab","bottom");
