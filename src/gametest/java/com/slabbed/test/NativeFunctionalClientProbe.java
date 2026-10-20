@@ -47,6 +47,7 @@ public final class NativeFunctionalClientProbe {
         if(!NativeParticleClientProbe.tick(client))return false;
         if(!SharedSlabClientProbe.tick(client))return false;
         if(!SurfaceDustLightChecks.tick(client))return false;
+        if(!StackDustLightChecks.tick(client))return false;
         if(!SideSlabClientProbe.tick(client))return false;
         if(!NativeRedstoneLightClientProbe.tick(client))return false;
         if(failure!=null)throw new AssertionError("native functional server probe failed",failure);
