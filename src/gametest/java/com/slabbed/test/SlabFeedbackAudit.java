@@ -14,24 +14,28 @@ public final class SlabFeedbackAudit {
     private static boolean capture;
     private static int settled,dark;
     private static double hitY=Double.NaN;
+    private static double breakFloor=Double.NaN;
     private static final List<String> ERRORS=new ArrayList<>();
     private SlabFeedbackAudit() {}
-    public static void begin() {DUST.clear();capture=true;settled=0;dark=0;hitY=Double.NaN;}
+    public static void begin() {DUST.clear();capture=true;settled=0;dark=0;hitY=Double.NaN;breakFloor=Double.NaN;}
     public static void beginHit(double expectedY) {begin();hitY=expectedY;}
+    public static void beginBreak(double supportTop) {begin();breakFloor=supportTop;}
     public static void end() {capture=false;}
     public static void contact(BlockPos owner) {contact(owner,15);}
     public static void contact(BlockPos owner,int expectedSky) {
         error(!DUST.isEmpty(),"actual mining effect created no dust");
         if(DUST.isEmpty())return;
         var dust=DUST.getFirst();
-        collision(dust,owner,expectedSky);
         dust.setPos(owner.getX()+.5,Math.nextDown(owner.getY()+.5),owner.getZ()+.5);
         int sky=(dust.getBrightness(1)>>20)&15;
         System.out.println("PHYSICAL_REAL_SLAB_DUST_CONTACT y="+Math.nextDown(owner.getY()+.5)+" sky="+sky+" expected="+expectedSky);
         error(sky==expectedSky,"debris at the soil contact must retain source light "+expectedSky+", got "+sky);
     }
     /** Use the emitted particle's own movement path, including a footprint straddling each edge. */
-    private static void collision(BlockDustParticle dust,BlockPos owner,int expectedSky) {
+    public static void collision(BlockPos owner,int expectedSky) {
+        error(!DUST.isEmpty(),"no emitted debris available for collision check");
+        if(DUST.isEmpty())return;
+        var dust=DUST.getFirst();
         double top=owner.getY()+.5,minY=Double.POSITIVE_INFINITY;
         int samples=0;
         for(double x:new double[]{.02,.5,.98})for(double z:new double[]{.02,.5,.98}) {
@@ -49,15 +53,21 @@ public final class SlabFeedbackAudit {
         if(!capture)return;
         DUST.add(dust);
         error(Double.isNaN(hitY) || Math.abs(y-hitY)<1e-5,"slab mining dust has wrong physical height: "+y+" expected="+hitY);
+        error(Double.isNaN(breakFloor) || y>=breakFloor,"slab break dust spawned inside its support: y="+y+" surface="+breakFloor);
         if(DUST.size()==1)System.out.println("PHYSICAL_REAL_SLAB_DUST_CREATED material="+material+" y="+y+" light="+dust.getBrightness(1));
     }
     public static void error(boolean valid,String message) {if(!valid)ERRORS.add(message);}
     public static void observe(MinecraftClient client,BlockPos owner) {
-        for(var dust:DUST) {
+        // The first object is reserved for the explicit contact and movement checks above.
+        for(int i=1;i<DUST.size();i++) {
+            var dust=DUST.get(i);
             if(!dust.isAlive())continue;
             var box=dust.getBoundingBox();var center=box.getCenter();double y=box.minY;
-            if(Math.abs(y-(owner.getY()+.5))>1e-4 || center.x<owner.getX()+.02 || center.x>owner.getX()+.98
+            if(center.x<owner.getX()+.02 || center.x>owner.getX()+.98
                     || center.z<owner.getZ()+.02 || center.z>owner.getZ()+.98)continue;
+            error(y>=owner.getY()+.5-1e-7 || box.maxY<=owner.getY()-.5,
+                    "naturally moving slab dust entered its soil support: box="+box);
+            if(Math.abs(y-(owner.getY()+.5))>1e-4)continue;
             int sky=(dust.getBrightness(1)>>20)&15,expected=client.world.getLightLevel(LightType.SKY,owner.up());
             settled++;if(sky!=expected)dark++;
             if(settled<=2 || sky!=expected)System.out.println("PHYSICAL_REAL_SLAB_DUST_SETTLED y="+y+" sky="+sky+" expected="+expected);
