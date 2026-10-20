@@ -14,6 +14,7 @@ import net.minecraft.client.particle.BlockDustParticle;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.world.LightType;
 
 import java.lang.reflect.Field;
@@ -22,13 +23,14 @@ import java.util.List;
 
 /** Untouched production dust in half-block cavities, with an ordinary vanilla ceiling control. */
 public final class SurfaceDustLightChecks {
-    private record Fixture(String name,BlockPos pos,BlockState floor,boolean ceiling,boolean side,boolean vanilla) {}
+    private record Fixture(String name,BlockPos pos,BlockState floor,boolean ceiling,boolean side,boolean vanilla,boolean direct) {}
     private record Tracked(Fixture fixture,BlockDustParticle dust,int initialLight) {}
     private static final List<Fixture> FIXTURES=List.of(
-            new Fixture("grass_open",new BlockPos(80,110,24),Blocks.GRASS_BLOCK.getDefaultState(),false,false,false),
-            new Fixture("stone_ceiling",new BlockPos(84,110,24),Blocks.STONE.getDefaultState(),true,false,false),
-            new Fixture("dirt_ceiling_side",new BlockPos(88,110,24),Blocks.DIRT.getDefaultState(),true,true,false),
-            new Fixture("vanilla_top_slab_ceiling",new BlockPos(92,110,24),Blocks.STONE.getDefaultState(),true,false,true));
+            new Fixture("grass_open",new BlockPos(80,110,24),Blocks.GRASS_BLOCK.getDefaultState(),false,false,false,false),
+            new Fixture("stone_ceiling",new BlockPos(84,110,24),Blocks.STONE.getDefaultState(),true,false,false,false),
+            new Fixture("dirt_ceiling_side",new BlockPos(88,110,24),Blocks.DIRT.getDefaultState(),true,true,false,false),
+            new Fixture("vanilla_top_slab_ceiling",new BlockPos(92,110,24),Blocks.STONE.getDefaultState(),true,false,true,false),
+            new Fixture("direct_glowstone",new BlockPos(96,110,24),Blocks.STONE.getDefaultState(),true,false,false,true));
     private static final List<Tracked> DUST=new ArrayList<>();
     private static final List<String> ERRORS=new ArrayList<>();
     private static int stage,ticks,started,penetrating,darkOutside;
@@ -65,6 +67,8 @@ public final class SurfaceDustLightChecks {
                             NativeSeats.put(world,p,new NativeSeats.Seat(-1,"minecraft:stone"));
                             world.setBlockState(pos.north(2),Blocks.GLOWSTONE.getDefaultState(),Block.NOTIFY_ALL);
                         }
+                        if(fixture.direct())for(var direction:Direction.Type.HORIZONTAL)
+                            world.setBlockState(pos.offset(direction),(direction==Direction.NORTH?Blocks.GLOWSTONE:Blocks.STONE).getDefaultState(),Block.NOTIFY_ALL);
                     }
                     var player=world.getServer().getPlayerManager().getPlayer(client.player.getUuid());
                     player.teleport(world,86.5,112,18.5,0,30);
@@ -83,6 +87,8 @@ public final class SurfaceDustLightChecks {
                 if(fixture.side() && (NativeSeats.offset(client.world,pos.up().east())!=-.5
                         || !client.world.getBlockState(pos.north(2)).isOf(Blocks.GLOWSTONE)
                         || client.world.getLightLevel(LightType.BLOCK,pos.north())==0))return false;
+                if(fixture.direct())for(var direction:Direction.Type.HORIZONTAL)
+                    if(!client.world.getBlockState(pos.offset(direction)).isOf(direction==Direction.NORTH?Blocks.GLOWSTONE:Blocks.STONE))return false;
             }
             started=ticks;stage=2;return false;
         }
@@ -143,10 +149,13 @@ public final class SurfaceDustLightChecks {
                     ERRORS.add(fixture.name()+" untouched particle entered physical floor at age="+age+" box="+box+" light="+light);
             }
             if(!penetration && light==0)darkOutside++;
-            if(age>=3 && fixture.side() && insideColumn && box.minY>=floor-1e-7 && box.minY<pos.getY()+1
+            if(age>=3 && (fixture.side() || fixture.direct()) && insideColumn && box.minY>=floor-1e-7 && box.minY<pos.getY()+1
                     && !penetration && ((light>>4)&15)==0 && ERRORS.size()<8)
                 ERRORS.add(fixture.name()+" exposed cavity particle lost visible glowstone block light at age="+age+" box="+box+" light="+light
                         +" adjacentBlock="+client.world.getLightLevel(LightType.BLOCK,pos.north()));
+            if(age>=3 && fixture.direct() && insideColumn && box.minY>=floor-1e-7 && box.minY<pos.getY()+1
+                    && !penetration && ((light>>20)&15)!=0 && ERRORS.size()<8)
+                ERRORS.add("enclosed direct-emitter cavity leaked sky light="+light);
             if((age==0 && i%8==0) || (penetration && penetrating<15) || (age==10 && i%8==0)) {
                 var vertices=new Captured();render(client,dust,vertices);
                 System.out.println("PHYSICAL_SURFACE_DUST_TRACE fixture="+fixture.name()+" particle="+i+" age="+age
