@@ -152,16 +152,21 @@ public final class NativeRedstoneLightClientProbe {
             double top=pos.getY()+(i==3?1:.5);
             var dust=new net.minecraft.client.particle.BlockDustParticle(client.world,pos.getX()+.5,top+.05,pos.getZ()+.5,
                     0,0,0,Blocks.OAK_SLAB.getDefaultState(),BlockPos.ofFloored(pos.getX()+.5,top+.05,pos.getZ()+.5));
-            int sky=(dust.getBrightness(1)>>20)&15;
+            int light=dust.getBrightness(1),sky=(light>>20)&15;
             int expected=client.world.getLightLevel(LightType.SKY,pos.up());
             System.out.println("PHYSICAL_SLAB_DUST_LIGHT_OBSERVED surface="+SURFACES[i]+" sky="+sky+" expected="+expected);
             check(sky==expected,"slab dust above shifted "+SURFACES[i]+" must sample exposed air: "+sky+" expected="+expected);
+            if(i==4) {
+                check(client.world.getLightLevel(LightType.BLOCK,pos.up())==0,"enclosed dust fixture has no block light source");
+                check(light==0,"enclosed dust must retain darkness in both light channels: "+light);
+            }
             for(double x:new double[]{.02,.5,.98})for(double z:new double[]{.02,.5,.98}) {
                 dust.setPos(pos.getX()+x,top+.2,pos.getZ()+z);
                 dust.move(0,-.45,0);
                 double settled=dust.getBoundingBox().minY;
                 check(Math.abs(settled-top)<1e-7,"dust penetrated "+SURFACES[i]+": y="+settled+" surface="+top+" x="+x+" z="+z);
                 check(((dust.getBrightness(1)>>20)&15)==expected,"collision-settled dust sampled opaque "+SURFACES[i]+" at y="+settled);
+                if(i==4)check(dust.getBrightness(1)==0,"settled enclosed dust leaked light at x="+x+" z="+z);
             }
             System.out.println("PHYSICAL_SLAB_DUST_COLLISION_PASS surface="+SURFACES[i]+" samples=9 top="+top+" sky="+expected);
             if(i!=3) {

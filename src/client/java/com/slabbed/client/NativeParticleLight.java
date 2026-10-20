@@ -1,5 +1,6 @@
 package com.slabbed.client;
 
+import com.slabbed.Slabbed;
 import com.slabbed.cell.CellWorld;
 import com.slabbed.nativeblock.NativeSeats;
 import com.slabbed.nativeblock.NativeShapes;
@@ -16,7 +17,7 @@ import java.util.Map;
 
 /** Empty native half-cells receive ordinary light through their physically open neighbors. */
 public final class NativeParticleLight {
-    private record Cell(boolean blocked,boolean virtual,int sky,int block) {}
+    private record Cell(boolean blocked,boolean virtual,int sky,int block,int emission) {}
     private record Visit(BlockPos pos,int distance) {}
     private static final Map<Long,Cell> CELLS=new HashMap<>();
     private static final Map<Long,Integer> LIGHT=new HashMap<>();
@@ -44,12 +45,15 @@ public final class NativeParticleLight {
         while(!queue.isEmpty()) {
             var visit=queue.removeFirst();var pos=visit.pos();int distance=visit.distance();
             var cell=cell(world,pos,half);
+            // An opaque emitter lights its face; propagated light must stop at the same solid.
+            block=Math.max(block,cell.emission()-distance);
             if(cell.blocked())continue;
             if(!cell.virtual()) {
                 sky=Math.max(sky,cell.sky()-distance);block=Math.max(block,cell.block()-distance);continue;
             }
             block=Math.max(block,cell.block()-distance);
             var vertical=cell(world,half==1?pos.up():pos.down(),1-half);
+            block=Math.max(block,vertical.emission()-distance-1);
             if(!vertical.blocked()) {
                 int skyLoss=half==1 && vertical.sky()==15?0:1;
                 sky=Math.max(sky,vertical.sky()-distance-skyLoss);
@@ -66,22 +70,29 @@ public final class NativeParticleLight {
     }
     private static Cell cell(World world,BlockPos pos,int half) {
         return CELLS.computeIfAbsent(key(pos,half),ignored->{
-            if(!world.isChunkLoaded(pos))return new Cell(true,false,0,0);
-            var opaque=VoxelShapes.empty();
+            if(!world.isChunkLoaded(pos))return new Cell(true,false,0,0,0);
+            var opaque=VoxelShapes.empty();int emission=0;
+            var space=VoxelShapes.cuboid(0,half*.5,0,1,(half+1)*.5,1);
             for(int n=-1;n<=1;n++) {
                 var owner=pos.up(n);var state=world.getBlockState(owner);double offset=NativeSeats.offset(world,owner);
-                if((n==0 || offset!=0) && state.isOpaque())
-                    opaque=VoxelShapes.union(opaque,NativeShapes.collision(world,owner,state).offset(0,n+offset,0));
+                if(n!=0 && offset==0)continue;
+                if(state.isOpaque())opaque=VoxelShapes.union(opaque,NativeShapes.collision(world,owner,state).offset(0,n+offset,0));
+                if(!state.isOf(Slabbed.CELL) && state.getLuminance()>0 && VoxelShapes.matchesAnywhere(space,
+                        NativeShapes.outline(world,owner,state).offset(0,n+offset,0),BooleanBiFunction.AND))
+                    emission=Math.max(emission,state.getLuminance());
             }
             var contents=CellWorld.contents(world,pos);
-            if(contents!=null)for(var part:contents.fragments())if(part.value().isOpaque())
-                opaque=VoxelShapes.union(opaque,NativeShapes.collision(world,pos,part.value()).offset(0,part.offset()*.5,0));
-            var space=VoxelShapes.cuboid(0,half*.5,0,1,(half+1)*.5,1);
+            if(contents!=null)for(var part:contents.fragments()) {
+                if(part.value().isOpaque())opaque=VoxelShapes.union(opaque,NativeShapes.collision(world,pos,part.value()).offset(0,part.offset()*.5,0));
+                if(part.value().getLuminance()>0 && VoxelShapes.matchesAnywhere(space,
+                        NativeShapes.outline(world,pos,part.value()).offset(0,part.offset()*.5,0),BooleanBiFunction.AND))
+                    emission=Math.max(emission,part.value().getLuminance());
+            }
             boolean blocked=!VoxelShapes.matchesAnywhere(space,opaque,BooleanBiFunction.ONLY_FIRST);
             var state=world.getBlockState(pos);double offset=NativeSeats.offset(world,pos);
             boolean virtual=state.isOpaqueFullCube(world,pos) && (half==1?offset<0:offset>0);
             return new Cell(blocked,virtual,world.getLightLevel(LightType.SKY,pos),
-                    Math.max(world.getLightLevel(LightType.BLOCK,pos),state.getLuminance()));
+                    Math.max(world.getLightLevel(LightType.BLOCK,pos),state.getLuminance()),emission);
         });
     }
 }
