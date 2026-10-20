@@ -13,6 +13,7 @@
     "CellPickMixin",
     "NativeBlockEntityRenderMixin",
     "NativeEntityLightMixin",
+    "NativeParticleLightMixin",
     "OptimizedNativeSeatModelMixin",
     "MoreCullingNativeFaceMixin",
     "DiagnosticActionMixin"

@@ -1,3 +1,11 @@
+# 0.9.9 rewrite alpha — Fabric 1.21.1
+
+Matching slabs placed onto supplemental or carrier slabs form one double slab, including pairs spanning two physical cells. Breaking either half removes the whole pair and uses vanilla double-slab loot. Placement validates the added volume before changing either cell. Existing native owners and independent pieces retain their fixed origins; see LAW.md.
+
+Particles in the exposed half of a shifted opaque owner's cell use adjacent world light, as dropped items do. Ordinary-height, physically occupied and enclosed samples retain their normal light levels.
+
+Adds shared-grass slab placement, saved-data and two-item loot checks, obstruction and mixed-material controls, production placement and break packets, and dust-light comparisons on grass, podzol and mycelium.
+
 # 0.9.8 rewrite alpha — Fabric 1.21.1
 
 Lowered piston heads check physical contact with ordinary-height native cubes, including blocks owned by the cell below the head. Movable cubes retain their original height; intersecting immovable blocks prevent extension. The native animation receives actual contacted owner positions. Existing adhesive-only graphs retain their graph consistency check.

@@ -156,6 +156,11 @@ public final class NativeRedstoneLightClientProbe {
             int expected=client.world.getLightLevel(LightType.SKY,pos.up());
             System.out.println("PHYSICAL_SLAB_DUST_LIGHT_OBSERVED surface="+SURFACES[i]+" sky="+sky+" expected="+expected);
             check(sky==expected,"slab dust above shifted "+SURFACES[i]+" must sample exposed air: "+sky+" expected="+expected);
+            if(i!=3) {
+                var inside=new net.minecraft.client.particle.BlockDustParticle(client.world,pos.getX()+.5,pos.getY()+.25,pos.getZ()+.5,
+                        0,0,0,Blocks.OAK_SLAB.getDefaultState(),pos);
+                check(((inside.getBrightness(1)>>20)&15)==0,"particles inside physical soil must retain its dark sample");
+            }
         }
     }
     private static void check(boolean value,String message) {if(!value)throw new AssertionError(message);}

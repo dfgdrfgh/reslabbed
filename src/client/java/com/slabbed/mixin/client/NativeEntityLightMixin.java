@@ -1,6 +1,6 @@
 package com.slabbed.mixin.client;
 
-import com.slabbed.nativeblock.NativeSeats;
+import com.slabbed.client.NativeLight;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
@@ -13,12 +13,6 @@ import org.spongepowered.asm.mixin.injection.ModifyVariable;
 public abstract class NativeEntityLightMixin {
     @ModifyVariable(method="getLight",at=@At("STORE"),ordinal=0)
     private BlockPos slabbed$physicalLightSample(BlockPos sample,Entity entity,float tickDelta) {
-        var world=entity.getWorld();
-        double offset=NativeSeats.offset(world,sample);
-        if(offset==0 || !world.getBlockState(sample).isOpaqueFullCube(world,sample))return sample;
-        double y=entity.getClientCameraPosVec(tickDelta).y-sample.getY();
-        if(offset<0 && y>=1+offset)return sample.up();
-        if(offset>0 && y<offset)return sample.down();
-        return sample;
+        return NativeLight.sample(entity.getWorld(),sample,entity.getClientCameraPosVec(tickDelta).y);
     }
 }
