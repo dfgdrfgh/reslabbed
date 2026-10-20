@@ -1,3 +1,9 @@
+# 0.9.11 rewrite alpha — Fabric 1.21.1
+
+Break sounds remain immediate. Debris waits until every fragment of the selected piece is gone on the client and its original volume is clear. This prevents particles entering the support while a delayed server confirmation leaves the old collision shape in place. Pending effects expire or clear on unload and disconnect; block positions and stored origins remain unchanged. See LAW.md.
+
+Adds delayed-confirmation debris checks, untouched particle overlap and settled-light assertions, and collision tests at soil surface edges with outdoor and enclosed controls.
+
 # 0.9.10 rewrite alpha — Fabric 1.21.1
 
 F3's targeted block name, properties and tags describe the selected physical piece in shared or carrier cells. Native world owners remain intact. Mining and break effects use the material's raw shape before applying its stored origin, preventing neighboring fragments from enlarging slab debris. See LAW.md.

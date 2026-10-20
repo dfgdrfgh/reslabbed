@@ -21,6 +21,7 @@ public final class SlabFeedbackAudit {
     public static void beginHit(double expectedY) {begin();hitY=expectedY;}
     public static void beginBreak(double supportTop) {begin();breakFloor=supportTop;}
     public static void end() {capture=false;}
+    public static boolean hasDust() {return !DUST.isEmpty();}
     public static void contact(BlockPos owner) {contact(owner,15);}
     public static void contact(BlockPos owner,int expectedSky) {
         error(!DUST.isEmpty(),"actual mining effect created no dust");
@@ -75,6 +76,7 @@ public final class SlabFeedbackAudit {
     }
     public static void verify() {
         error(!DUST.isEmpty(),"actual slab break created no block dust");
+        error(settled>0,"no untouched breaking debris reached the soil surface");
         error(dark==0,"actual settled slab dust had "+dark+" dark samples of "+settled);
         if(!ERRORS.isEmpty())throw new AssertionError(String.join("; ",ERRORS));
         System.out.println("PHYSICAL_REAL_SLAB_FEEDBACK_PASS dust="+DUST.size()+" settled_samples="+settled);

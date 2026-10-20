@@ -108,23 +108,25 @@ public final class SharedSlabClientProbe {
             // Keep the unconfirmed piece for four ticks, as on a delayed server connection.
             SlabFeedbackAudit.beginBreak(OWNER.getY()+.5);
             com.slabbed.client.CellBreakEffects.play(client.world,OWNER,CellWorld.pick(client.world,OWNER,hit));
-            SlabFeedbackAudit.end();brokenAt=ticks;stage=6;return false;
+            brokenAt=ticks;stage=6;return false;
         }
         if(stage==6) {
             if(ticks-brokenAt<4)return false;
             check(doubled(client.world),"unconfirmed slab remains during delayed feedback check");
+            check(!SlabFeedbackAudit.hasDust(),"break debris must wait for authoritative geometry removal");
             System.out.println("PHYSICAL_SLAB_DELAYED_FEEDBACK_OBSERVED ticks="+(ticks-brokenAt));
             var hit=(BlockHitResult)client.crosshairTarget;
-            SlabFeedbackAudit.beginBreak(OWNER.getY()+.5);
             check(client.interactionManager.attackBlock(OWNER,hit.getSide()),"creative break packet accepted");
-            SlabFeedbackAudit.end();
-            SlabFeedbackAudit.contact(OWNER);
             brokenAt=ticks;
             confirmed=false;stage=4;return false;
         }
         if(stage==4) {
             var parts=CellWorld.contents(client.world,OWNER);
             if(parts==null || !parts.fragments().isEmpty() || !client.world.getBlockState(OWNER.up()).isAir())return false;
+            if(!SlabFeedbackAudit.hasDust())return false;
+            SlabFeedbackAudit.end();
+            SlabFeedbackAudit.collision(OWNER,15);
+            SlabFeedbackAudit.contact(OWNER);
             server(client,()-> {
                 intact(client.getServer().getOverworld());confirmed=true;
             });stage=5;return false;
@@ -133,7 +135,6 @@ public final class SharedSlabClientProbe {
             if(ticks-brokenAt<35)return false;
             intact(client.world);
             debugBlock(client,new BlockHitResult(Vec3d.ofBottomCenter(OWNER).add(0,.5,0),Direction.UP,OWNER,false),"minecraft:grass_block",null);
-            SlabFeedbackAudit.collision(OWNER,15);
             SlabFeedbackAudit.verify();
             System.out.println("PHYSICAL_SHARED_SLAB_PACKET_PASS double_placement lower_half_selection whole_pair_break native_pose_preserved");
             stage=99;return true;
