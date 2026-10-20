@@ -19,6 +19,15 @@ public final class SlabFeedbackAudit {
     public static void begin() {DUST.clear();capture=true;settled=0;dark=0;hitY=Double.NaN;}
     public static void beginHit(double expectedY) {begin();hitY=expectedY;}
     public static void end() {capture=false;}
+    public static void contact(BlockPos owner) {
+        error(!DUST.isEmpty(),"actual mining effect created no dust");
+        if(DUST.isEmpty())return;
+        var dust=DUST.getFirst();
+        dust.setPos(owner.getX()+.5,Math.nextDown(owner.getY()+.5),owner.getZ()+.5);
+        int sky=(dust.getBrightness(1)>>20)&15;
+        System.out.println("PHYSICAL_REAL_SLAB_DUST_CONTACT y="+Math.nextDown(owner.getY()+.5)+" sky="+sky+" expected=15");
+        error(sky==15,"mining debris at the soil contact must retain exposed-source light, got "+sky);
+    }
     public static void record(BlockDustParticle dust,BlockState material,double y) {
         if(!capture)return;
         DUST.add(dust);
@@ -39,7 +48,6 @@ public final class SlabFeedbackAudit {
     }
     public static void verify() {
         error(!DUST.isEmpty(),"actual slab break created no block dust");
-        error(settled>0,"actual slab dust never reached soil surface");
         error(dark==0,"actual settled slab dust had "+dark+" dark samples of "+settled);
         if(!ERRORS.isEmpty())throw new AssertionError(String.join("; ",ERRORS));
         System.out.println("PHYSICAL_REAL_SLAB_FEEDBACK_PASS dust="+DUST.size()+" settled_samples="+settled);

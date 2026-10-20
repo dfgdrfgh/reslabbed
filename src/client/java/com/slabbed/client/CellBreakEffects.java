@@ -15,7 +15,7 @@ import net.minecraft.util.math.Vec3d;
 public final class CellBreakEffects {
     private CellBreakEffects() {}
     public static void hit(ClientWorld world,BlockPos pos,CellContents.Fragment<BlockState> piece,net.minecraft.util.math.Direction side) {
-        var state=piece.value();var shape=state.getOutlineShape(world,pos);
+        var state=piece.value();var shape=com.slabbed.nativeblock.NativeShapes.outline(world,pos,state);
         if(shape.isEmpty() || state.getRenderType()==net.minecraft.block.BlockRenderType.INVISIBLE)return;
         var box=shape.getBoundingBox().offset(pos.getX(),pos.getY()+piece.offset()*.5,pos.getZ());
         double x=box.minX+.1+world.random.nextDouble()*(box.maxX-box.minX-.2);
@@ -33,7 +33,7 @@ public final class CellBreakEffects {
                 world,x,y,z,0,0,0,state,pos).move(.2f).scale(.6f));
     }
     public static void play(ClientWorld world,BlockPos pos,CellContents.Fragment<BlockState> piece) {
-        var state=piece.value();var shape=state.getOutlineShape(world,pos);
+        var state=piece.value();var shape=com.slabbed.nativeblock.NativeShapes.outline(world,pos,state);
         var center=shape.isEmpty()?new Vec3d(.5,.5,.5):shape.getBoundingBox().getCenter();
         center=center.add(pos.getX(),pos.getY()+piece.offset()*.5,pos.getZ());
         var sound=state.getSoundGroup();

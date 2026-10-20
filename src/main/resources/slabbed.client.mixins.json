@@ -10,6 +10,7 @@
     "CellUpdatesMixin",
     "SodiumCellUpdatesMixin",
     "CellOutlineMixin",
+    "CellDebugHudMixin",
     "CellPickMixin",
     "NativeBlockEntityRenderMixin",
     "NativeEntityLightMixin",
