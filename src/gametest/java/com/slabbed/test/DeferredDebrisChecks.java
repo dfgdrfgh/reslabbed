@@ -57,7 +57,7 @@ public final class DeferredDebrisChecks {
         CellBreakEffects.play(world,POS,piece);clear(world);
         world.setBlockState(POS,Slabbed.CELL.getDefaultState(),Block.NOTIFY_LISTENERS);
         world.removeBlockEntity(POS);tick(world);
-        check(CellFeedbackAudit.breaks==0,"carrier without contents must wait for its geometry data");
+        check(CellFeedbackAudit.breaks==0,"incomplete carrier must wait for its geometry data");
         clear(world);tick(world);
         check(CellFeedbackAudit.breaks==64,"cleared incomplete carrier permits the saved burst");
 

@@ -42,7 +42,9 @@ public final class CellBreakEffects {
             for(int y=HalfGrid.at(pending.origin()).cellY();y<=HalfGrid.at(pending.origin()+pending.piece().length()-1).cellY();y++) {
                 var pos=new BlockPos(pending.pos().getX(),y,pending.pos().getZ());
                 var contents=CellWorld.contents(world,pos);
-                if(contents==null && world.getBlockState(pos).isOf(com.slabbed.Slabbed.CELL)) {present=true;break;}
+                // Empty carriers are temporary packet states; confirmed empty cells become air.
+                if(world.getBlockState(pos).isOf(com.slabbed.Slabbed.CELL)
+                        && (contents==null || contents.fragments().isEmpty())) {present=true;break;}
                 if(contents!=null && contents.fragments().stream().anyMatch(p->pos.getY()*2+p.offset()==pending.origin())) {present=true;break;}
             }
             if(present)continue;
