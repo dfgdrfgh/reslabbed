@@ -156,6 +156,14 @@ public final class NativeRedstoneLightClientProbe {
             int expected=client.world.getLightLevel(LightType.SKY,pos.up());
             System.out.println("PHYSICAL_SLAB_DUST_LIGHT_OBSERVED surface="+SURFACES[i]+" sky="+sky+" expected="+expected);
             check(sky==expected,"slab dust above shifted "+SURFACES[i]+" must sample exposed air: "+sky+" expected="+expected);
+            for(double x:new double[]{.02,.5,.98})for(double z:new double[]{.02,.5,.98}) {
+                dust.setPos(pos.getX()+x,top+.2,pos.getZ()+z);
+                dust.move(0,-.45,0);
+                double settled=dust.getBoundingBox().minY;
+                check(Math.abs(settled-top)<1e-7,"dust penetrated "+SURFACES[i]+": y="+settled+" surface="+top+" x="+x+" z="+z);
+                check(((dust.getBrightness(1)>>20)&15)==expected,"collision-settled dust sampled opaque "+SURFACES[i]+" at y="+settled);
+            }
+            System.out.println("PHYSICAL_SLAB_DUST_COLLISION_PASS surface="+SURFACES[i]+" samples=9 top="+top+" sky="+expected);
             if(i!=3) {
                 var inside=new net.minecraft.client.particle.BlockDustParticle(client.world,pos.getX()+.5,pos.getY()+.25,pos.getZ()+.5,
                         0,0,0,Blocks.OAK_SLAB.getDefaultState(),pos);

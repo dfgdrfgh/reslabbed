@@ -24,10 +24,26 @@ public final class SlabFeedbackAudit {
         error(!DUST.isEmpty(),"actual mining effect created no dust");
         if(DUST.isEmpty())return;
         var dust=DUST.getFirst();
+        collision(dust,owner,expectedSky);
         dust.setPos(owner.getX()+.5,Math.nextDown(owner.getY()+.5),owner.getZ()+.5);
         int sky=(dust.getBrightness(1)>>20)&15;
         System.out.println("PHYSICAL_REAL_SLAB_DUST_CONTACT y="+Math.nextDown(owner.getY()+.5)+" sky="+sky+" expected="+expectedSky);
         error(sky==expectedSky,"debris at the soil contact must retain source light "+expectedSky+", got "+sky);
+    }
+    /** Use the emitted particle's own movement path, including a footprint straddling each edge. */
+    private static void collision(BlockDustParticle dust,BlockPos owner,int expectedSky) {
+        double top=owner.getY()+.5,minY=Double.POSITIVE_INFINITY;
+        int samples=0;
+        for(double x:new double[]{.02,.5,.98})for(double z:new double[]{.02,.5,.98}) {
+            dust.setPos(owner.getX()+x,top+.2,owner.getZ()+z);
+            dust.move(0,-.45,0);
+            double y=dust.getBoundingBox().minY;
+            minY=Math.min(minY,y);samples++;
+            error(Math.abs(y-top)<1e-7,"actual dust penetrated the soil: y="+y+" surface="+top+" x="+x+" z="+z);
+            int sky=(dust.getBrightness(1)>>20)&15;
+            error(sky==expectedSky,"collision-settled dust sampled dark soil: sky="+sky+" expected="+expectedSky+" y="+y);
+        }
+        System.out.println("PHYSICAL_REAL_SLAB_DUST_COLLISION samples="+samples+" minimum_y="+minY+" surface="+top+" expected_sky="+expectedSky);
     }
     public static void record(BlockDustParticle dust,BlockState material,double y) {
         if(!capture)return;

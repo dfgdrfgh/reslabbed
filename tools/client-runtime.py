@@ -143,6 +143,8 @@ for phase in (['fresh'] if args.control else ['fresh','reopen']):
     assert any('PHYSICAL_SLAB_DUST_LIGHT_PASS' in line for line in lines),'Slab dust light checks did not complete'
     assert any('PHYSICAL_SHARED_SLAB_PACKET_PASS' in line for line in lines),'Shared slab packet checks did not complete'
     assert any('PHYSICAL_REAL_SLAB_FEEDBACK_PASS' in line for line in lines),'Actual slab debug and debris checks did not complete'
+    assert sum('PHYSICAL_REAL_SLAB_DUST_COLLISION samples=9' in line for line in lines)==3,'Actual mining and break dust collision checks did not complete'
+    assert sum('PHYSICAL_SLAB_DUST_COLLISION_PASS' in line for line in lines)==5,'Soil surface collision checks did not complete'
     assert any('PHYSICAL_OFFSET_PISTON_CONTACT_PASS' in line for line in lines),'Offset piston contact checks did not complete'
     assert any('PHYSICAL_NATIVE_PISTON_CYCLE_PASS' in line for line in lines),'Native piston client cycle did not complete'
     assert any('PHYSICAL_DIAGNOSTIC_REPORT_PASS' in line for line in lines),'Optional recorder report probe did not complete'
