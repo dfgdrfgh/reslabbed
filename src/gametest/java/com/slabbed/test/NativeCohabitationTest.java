@@ -22,6 +22,39 @@ import net.minecraft.world.GameMode;
 
 /** Independent physical pieces can share a native owner's unused volume without losing native data. */
 public final class NativeCohabitationTest {
+    @GameTest(templateName="fabric-gametest-api-v1:empty")
+    public void matchingSlabsAboveLoweredGrassBecomeOneDoubleSlab(TestContext t) {
+        var world=t.getWorld();var base=t.getAbsolutePos(new BlockPos(3,3,3));var owner=base.up();
+        world.setBlockState(base,Blocks.OAK_SLAB.getDefaultState());
+        var player=t.createMockPlayer(GameMode.SURVIVAL);
+        player.setPosition(base.getX()-3,base.getY(),base.getZ()+.5);
+        t.assertTrue(place(player,Items.GRASS_BLOCK,base,base.getY()+.5).isAccepted(),"grass placed on bottom slab");
+        var seat=NativeSeats.seat(world,owner);
+        t.assertTrue(place(player,Items.OAK_SLAB,owner,base.getY()+1.5).isAccepted(),"first slab shares grass owner");
+        t.assertTrue(place(player,Items.OAK_SLAB,owner,base.getY()+2).isAccepted(),"second matching slab placed");
+        t.assertTrue(player.getMainHandStack().getCount()==1,"second slab consumes exactly one item");
+        var parts=CellWorld.contents(world,owner);
+        t.assertTrue(parts!=null && parts.fragments().size()==1,"one logical slab piece in shared owner");
+        var part=parts.fragments().getFirst();
+        t.assertTrue(part.offset()==1 && part.length()==2
+                && part.value().get(net.minecraft.block.SlabBlock.TYPE)==net.minecraft.block.enums.SlabType.DOUBLE,
+                "matching supplemental slabs must become one double slab at their original bottom: "+parts);
+        var cap=CellWorld.contents(world,owner.up());
+        t.assertTrue(cap!=null && cap.fragments().size()==1 && cap.fragments().getFirst().offset()==-1
+                && cap.fragments().getFirst().value().equals(part.value()),"double slab has matching upper companion");
+        var entity=(com.slabbed.cell.CellBlockEntity)world.getBlockEntity(owner.up());
+        var copy=new com.slabbed.cell.CellBlockEntity(owner.up(),world.getBlockState(owner.up()));
+        copy.read(entity.createNbt(world.getRegistryManager()),world.getRegistryManager());
+        t.assertTrue(copy.contents().equals(entity.contents()),"crossing double slab survives saved cell data");
+        CellWorld.remove(world,owner.up(),-1,player,true);
+        int drops=world.getEntitiesByClass(net.minecraft.entity.ItemEntity.class,new net.minecraft.util.math.Box(owner).expand(2),
+                e->e.getStack().isOf(Items.OAK_SLAB)).stream().mapToInt(e->e.getStack().getCount()).sum();
+        t.assertTrue(drops==2,"breaking either half drops both slab items exactly once: "+drops);
+        t.assertTrue(CellWorld.contents(world,owner).fragments().isEmpty() && world.getBlockState(owner.up()).isAir(),"breaking double removes both halves");
+        t.assertTrue(world.getBlockState(owner).isOf(Blocks.GRASS_BLOCK) && seat.equals(NativeSeats.seat(world,owner))
+                && world.getBlockState(base).isOf(Blocks.OAK_SLAB),"double placement and breaking preserve grass pose and original support");
+        t.complete();
+    }
     private record Fixture(BlockPos base,PlayerEntity player,BarrelBlockEntity barrel,NativeSeats.Seat seat) {}
     private static ActionResult place(PlayerEntity player,Item item,BlockPos hitCell,double y) {
         player.setStackInHand(Hand.MAIN_HAND,new ItemStack(item,2));

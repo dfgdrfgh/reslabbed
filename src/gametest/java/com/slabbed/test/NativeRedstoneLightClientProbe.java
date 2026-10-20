@@ -69,6 +69,7 @@ public final class NativeRedstoneLightClientProbe {
             if(ticks-started<60)return false;
             // Check light even if a model never reached the seated render path.
             verifyItems(client);
+            verifyDust(client);
             for(var fixture:MODELS)if(!NativeRenderAudit.readyModel(fixture.pos())) {
                 check(ticks-started<220,"redstone model never emitted seated geometry: "+fixture
                         +" selected="+client.getBlockRenderManager().getModel(fixture.state()).getClass().getName());
@@ -77,6 +78,7 @@ public final class NativeRedstoneLightClientProbe {
             for(var fixture:MODELS)NativeRenderAudit.verifyModel(fixture.pos());
             System.out.println("PHYSICAL_REDSTONE_MODEL_HEIGHT_PASS torch_lit_unlit repeater_all_delays_powered_unpowered");
             System.out.println("PHYSICAL_DROPPED_ITEM_LIGHT_PASS grass podzol mycelium flush_control enclosed_control");
+            System.out.println("PHYSICAL_SLAB_DUST_LIGHT_PASS grass podzol mycelium flush_control enclosed_control");
             stage=99;return true;
         }
         return false;
@@ -142,6 +144,18 @@ public final class NativeRedstoneLightClientProbe {
             System.out.println("PHYSICAL_DROPPED_ITEM_LIGHT_OBSERVED surface="+SURFACES[i]+" y="+item.getY()+" light="+light+" sky="+sky+" expectedSky="+expected);
             check(expected==(i==4?0:15),"item fixture must retain its outdoor or enclosed light level");
             check(sky==expected,"item above shifted "+SURFACES[i]+" samples the opaque owner instead of exposed air: "+sky+" expected="+expected);
+        }
+    }
+    private static void verifyDust(MinecraftClient client) {
+        for(int i=0;i<SURFACES.length;i++) {
+            var pos=surface(i);
+            double top=pos.getY()+(i==3?1:.5);
+            var dust=new net.minecraft.client.particle.BlockDustParticle(client.world,pos.getX()+.5,top+.05,pos.getZ()+.5,
+                    0,0,0,Blocks.OAK_SLAB.getDefaultState(),BlockPos.ofFloored(pos.getX()+.5,top+.05,pos.getZ()+.5));
+            int sky=(dust.getBrightness(1)>>20)&15;
+            int expected=client.world.getLightLevel(LightType.SKY,pos.up());
+            System.out.println("PHYSICAL_SLAB_DUST_LIGHT_OBSERVED surface="+SURFACES[i]+" sky="+sky+" expected="+expected);
+            check(sky==expected,"slab dust above shifted "+SURFACES[i]+" must sample exposed air: "+sky+" expected="+expected);
         }
     }
     private static void check(boolean value,String message) {if(!value)throw new AssertionError(message);}
