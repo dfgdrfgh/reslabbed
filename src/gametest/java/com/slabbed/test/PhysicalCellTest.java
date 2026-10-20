@@ -175,4 +175,77 @@ public final class PhysicalCellTest {
         t.assertTrue(w.getBlockState(p).isOf(Blocks.OAK_SLAB),"slab preserved");t.complete();
     }
 
+    private static BlockPos sideFixture(TestContext t,boolean nativeCube) {
+        var world=t.getWorld();var pos=t.getAbsolutePos(new BlockPos(3,3,3));
+        for(int x=-1;x<=1;x++)for(int z=-1;z<=1;z++)for(int y=0;y<=2;y++) {
+            var clear=pos.add(x,y,z);
+            com.slabbed.nativeblock.NativeSeats.remove(world,clear);
+            world.setBlockState(clear,Blocks.AIR.getDefaultState(),Block.NOTIFY_LISTENERS);
+        }
+        world.setBlockState(pos,Blocks.STONE_SLAB.getDefaultState(),Block.NOTIFY_LISTENERS);
+        if(nativeCube) {
+            world.setBlockState(pos.up(),Blocks.GRASS_BLOCK.getDefaultState(),Block.NOTIFY_LISTENERS);
+            com.slabbed.nativeblock.NativeSeats.put(world,pos.up(),new com.slabbed.nativeblock.NativeSeats.Seat(-1,"minecraft:grass_block"));
+        } else t.assertTrue(CellWorld.place(world,pos.getX(),pos.getZ(),pos.getY()*2+1,Blocks.STONE.getDefaultState()),"crossing side support placed");
+        return pos;
+    }
+    private static net.minecraft.util.ActionResult sideUse(net.minecraft.entity.player.PlayerEntity player,BlockPos base,Direction face,boolean upper,boolean nativeCube) {
+        var point=Vec3d.ofBottomCenter(base).add(face.getOffsetX()*.5,upper?1.25:.75,face.getOffsetZ()*.5);
+        var owner=nativeCube?base.up():BlockPos.ofFloored(point.subtract(Vec3d.of(face.getVector()).multiply(1e-5)));
+        return player.getMainHandStack().useOnBlock(new ItemUsageContext(player,Hand.MAIN_HAND,new BlockHitResult(point,face,owner,false)));
+    }
+    private static net.minecraft.entity.player.PlayerEntity sideBuilder(TestContext t,BlockPos base) {
+        var player=t.createMockPlayer(GameMode.SURVIVAL);
+        player.setPosition(base.getX()+.5,base.getY()+3,base.getZ()-3);
+        player.setStackInHand(Hand.MAIN_HAND,new ItemStack(Items.OAK_SLAB,4));return player;
+    }
+    @GameTest(templateName="fabric-gametest-api-v1:empty")
+    public void sideSlabUsesAimedPhysicalHalf(TestContext t) {
+        for(boolean nativeCube:new boolean[]{false,true})for(var face:Direction.Type.HORIZONTAL)for(boolean upper:new boolean[]{false,true}) {
+            var pos=sideFixture(t,nativeCube);var world=t.getWorld();var player=sideBuilder(t,pos);
+            t.assertTrue(sideUse(player,pos,face,upper,nativeCube).isAccepted(),"side slab accepted: native="+nativeCube+" face="+face+" upper="+upper);
+            int origin=pos.getY()*2+1+(upper?1:0);var target=new BlockPos(pos.getX()+face.getOffsetX(),Math.floorDiv(origin,2),pos.getZ()+face.getOffsetZ());
+            var contents=CellWorld.contents(world,target);
+            t.assertTrue(contents!=null && contents.fragments().stream().anyMatch(p->p.offset()==origin-target.getY()*2 && p.length()==1 && p.value().isOf(Blocks.OAK_SLAB)),
+                    "side slab must occupy aimed half: native="+nativeCube+" face="+face+" upper="+upper+" expectedOrigin="+origin+" actual="+contents);
+            t.assertTrue(player.getMainHandStack().getCount()==3,"side placement consumes once");
+        }
+        t.complete();
+    }
+    @GameTest(templateName="fabric-gametest-api-v1:empty")
+    public void sideSlabsFillOneDoubleInEitherOrder(TestContext t) {
+        for(boolean nativeCube:new boolean[]{false,true})for(var face:Direction.Type.HORIZONTAL)for(boolean upperFirst:new boolean[]{false,true}) {
+            var pos=sideFixture(t,nativeCube);var world=t.getWorld();var player=sideBuilder(t,pos);
+            t.assertTrue(sideUse(player,pos,face,upperFirst,nativeCube).isAccepted(),"first side half accepted");
+            t.assertTrue(sideUse(player,pos,face,!upperFirst,nativeCube).isAccepted(),"opposite side half must complete slab: native="+nativeCube+" face="+face+" upperFirst="+upperFirst);
+            var target=pos.offset(face);
+            for(int y=0;y<=1;y++) {
+                var contents=CellWorld.contents(world,target.up(y));
+                t.assertTrue(contents!=null && contents.fragments().size()==1 && contents.fragments().getFirst().offset()==1-y*2
+                        && contents.fragments().getFirst().length()==2 && contents.fragments().getFirst().value().get(SlabBlock.TYPE)==SlabType.DOUBLE,"side pair retains one double at its original origin");
+            }
+            t.assertTrue(player.getMainHandStack().getCount()==2,"two side halves consume two slabs");
+            if(nativeCube)t.assertTrue(com.slabbed.nativeblock.NativeSeats.offset(world,pos.up())==-.5,"side placement preserves native support pose");
+        }
+        t.complete();
+    }
+    @GameTest(templateName="fabric-gametest-api-v1:empty")
+    public void sideSlabPairPreservesObstructionAndInventory(TestContext t) {
+        var pos=sideFixture(t,true);var world=t.getWorld();var player=sideBuilder(t,pos);var target=pos.east();
+        t.assertTrue(sideUse(player,pos,Direction.EAST,false,true).isAccepted(),"lower side half accepted");
+        var before=CellWorld.contents(world,target);
+        world.setBlockState(target.up(),Blocks.STONE.getDefaultState(),Block.NOTIFY_LISTENERS);
+        t.assertFalse(sideUse(player,pos,Direction.EAST,true,true).isAccepted(),"occupied upper half rejected");
+        t.assertTrue(before.equals(CellWorld.contents(world,target)) && world.getBlockState(target.up()).isOf(Blocks.STONE),"failed side pair preserves both pieces");
+        t.assertTrue(player.getMainHandStack().getCount()==3,"failed side pair consumes nothing");t.complete();
+    }
+    @GameTest(templateName="fabric-gametest-api-v1:empty")
+    public void differentSideSlabMaterialsRemainIndependent(TestContext t) {
+        var pos=sideFixture(t,false);var world=t.getWorld();var player=sideBuilder(t,pos);
+        t.assertTrue(sideUse(player,pos,Direction.EAST,false,false).isAccepted(),"lower oak side half accepted");
+        player.setStackInHand(Hand.MAIN_HAND,new ItemStack(Items.BIRCH_SLAB,2));
+        t.assertTrue(sideUse(player,pos,Direction.EAST,true,false).isAccepted(),"upper birch side half accepted");
+        t.assertTrue(world.getBlockState(pos.east()).isOf(Blocks.OAK_SLAB) && world.getBlockState(pos.east().up()).isOf(Blocks.BIRCH_SLAB),"different side halves remain separate materials");
+        t.assertTrue(player.getMainHandStack().getCount()==1,"upper birch consumes once");t.complete();
+    }
 }
