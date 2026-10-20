@@ -32,7 +32,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        variant: [indigo, sodium, lithium, optimized, backport]
+        variant: [indigo, sodium, lithium, optimized, backport, asyncparticles]
     runs-on: ubuntu-22.04
     timeout-minutes: 40
     steps:

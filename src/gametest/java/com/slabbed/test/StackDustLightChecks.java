@@ -20,6 +20,9 @@ import net.minecraft.world.World;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.concurrent.ConcurrentHashMap;
 
 /** Break packets compare untouched debris at odd and even levels of actual item-built stacks. */
 public final class StackDustLightChecks {
@@ -30,8 +33,12 @@ public final class StackDustLightChecks {
     }
     private static final List<Fixture> FIXTURES=new ArrayList<>();
     private static final List<String> ERRORS=new ArrayList<>();
+    private record GpuPoint(double x,double y,double z,int light) {}
+    private static final Set<BlockDustParticle> GPU_SEEN=ConcurrentHashMap.newKeySet();
+    private static final ConcurrentHashMap<BlockDustParticle,GpuPoint> GPU_ZERO=new ConcurrentHashMap<>();
+    private static final Set<BlockDustParticle> REPORTED_GPU_ZERO=new HashSet<>();
     private static List<BlockDustParticle> dust=List.of();
-    private static int stage,index,ticks,started,dark,free,vertices;
+    private static int stage,index,ticks,started,dark,free,vertices,gpuDark;
     private static volatile boolean pending,confirmed;
     private static volatile Throwable failure;
     private static Vec3d arrival;
@@ -88,6 +95,7 @@ public final class StackDustLightChecks {
             check(client.crosshairTarget instanceof BlockHitResult hit && hit.getType()==HitResult.Type.BLOCK
                     && hit.getPos().squaredDistanceTo(point)<.01,"real ray selected stack level "+fixture.name()+" hit="+client.crosshairTarget);
             var hit=(BlockHitResult)client.crosshairTarget;
+            GPU_SEEN.clear();GPU_ZERO.clear();REPORTED_GPU_ZERO.clear();
             SlabFeedbackAudit.begin();
             check(client.interactionManager.attackBlock(hit.getBlockPos(),hit.getSide()),"stack break packet accepted "+fixture.name());
             started=ticks;stage=3;return false;
@@ -97,7 +105,7 @@ public final class StackDustLightChecks {
             if(present(client.world,fixture,fixture.selected()) || !SlabFeedbackAudit.hasDust())return false;
             dust=SlabFeedbackAudit.dust();SlabFeedbackAudit.end();
             check(dust.size()==(fixture.slab()?32:64),"actual stack break dust count "+fixture.name()+" count="+dust.size());
-            dark=0;free=0;vertices=0;
+            dark=0;free=0;vertices=0;gpuDark=0;
             observe(client,fixture,0);started=ticks;stage=4;return false;
         }
         if(stage==4) {
@@ -105,8 +113,11 @@ public final class StackDustLightChecks {
             if(ticks-started<30)return false;
             check(free>0,"stack debris never occupied vacated physical volume "+fixture.name());
             System.out.println("PHYSICAL_STACK_DUST_CASE fixture="+fixture.name()+" origin="+fixture.origin(fixture.selected())
-                    +" particles="+dust.size()+" free="+free+" dark="+dark+" vertices="+vertices);
-            if(dark>0)ERRORS.add(fixture.name()+" dark="+dark+"/"+free);
+                    +" particles="+dust.size()+" free="+free+" dark="+dark+" vertices="+vertices
+                    +" gpuSeen="+dust.stream().filter(GPU_SEEN::contains).count()+" gpuDark="+gpuDark);
+            if(dark>0 || gpuDark>0)ERRORS.add(fixture.name()+" dark="+dark+"/"+free+" gpuDark="+gpuDark);
+            if(net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("asyncparticles"))
+                check(dust.stream().anyMatch(GPU_SEEN::contains),"AsyncParticles GPU upload was not observed "+fixture.name());
             confirmed=false;
             server(client,()->{
                 var world=client.getServer().getOverworld();
@@ -130,8 +141,14 @@ public final class StackDustLightChecks {
     private static void observe(MinecraftClient client,Fixture fixture,int age) {
         double bottom=fixture.origin(fixture.selected())*.5,top=bottom+(fixture.slab()?.5:1);
         for(int i=0;i<dust.size();i++) {
-            var particle=dust.get(i);if(!particle.isAlive())continue;
-            var box=particle.getBoundingBox();var center=box.getCenter();var base=fixture.base();
+            var particle=dust.get(i);var gpu=GPU_ZERO.get(particle);var base=fixture.base();
+            if(gpu!=null && gpu.x()>base.getX() && gpu.x()<base.getX()+1 && gpu.z()>base.getZ() && gpu.z()<base.getZ()+1
+                    && gpu.y()>=bottom-1e-7 && gpu.y()<top-1e-7 && REPORTED_GPU_ZERO.add(particle)) {
+                gpuDark++;
+                System.out.println("PHYSICAL_STACK_DUST_GPU_DARK fixture="+fixture.name()+" point="+gpu+" cpuLight="+particle.getBrightness(1));
+            }
+            if(!particle.isAlive())continue;
+            var box=particle.getBoundingBox();var center=box.getCenter();
             boolean vacant=center.x>base.getX() && center.x<base.getX()+1 && center.z>base.getZ() && center.z<base.getZ()+1
                     && box.minY>=bottom-1e-7 && box.minY<top-1e-7;
             int light=particle.getBrightness(1);
@@ -146,6 +163,14 @@ public final class StackDustLightChecks {
                         +" raw="+raw+" state="+client.world.getBlockState(raw)+" native="+NativeSeats.offset(client.world,raw)
                         +" parts="+CellWorld.contents(client.world,raw)+" vertexLights="+capture.lights);
             }
+        }
+    }
+    public static void gpuLight(net.minecraft.client.particle.Particle particle,int light) {
+        if(!(particle instanceof BlockDustParticle dust))return;
+        GPU_SEEN.add(dust);
+        if(light==0) {
+            var box=dust.getBoundingBox();var center=box.getCenter();
+            GPU_ZERO.putIfAbsent(dust,new GpuPoint(center.x,box.minY,center.z,light));
         }
     }
     private static boolean present(World world,Fixture fixture,int piece) {

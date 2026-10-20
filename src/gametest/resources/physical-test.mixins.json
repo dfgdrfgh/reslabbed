@@ -9,6 +9,7 @@
     "CellLifecycleRenderCaptureMixin",
     "CellFramePresenceMixin",
     "CellDustCaptureMixin",
+    "AsyncGpuLightCaptureMixin",
     "CellPendingUpdateAccess",
     "CellParticleCaptureMixin",
     "CellUpdateCaptureMixin",
