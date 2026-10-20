@@ -11,8 +11,9 @@ public final class NativeLight {
         double offset=NativeSeats.offset(world,sample);
         if(offset==0 || !world.getBlockState(sample).isOpaqueFullCube(world,sample))return sample;
         double y=physicalY-sample.getY();
-        if(offset<0 && y>=1+offset)return sample.up();
-        if(offset>0 && y<offset)return sample.down();
+        // Collision contact can land one representable double inside the physical surface.
+        if(offset<0 && y>=1+offset-1e-7)return sample.up();
+        if(offset>0 && y<=offset+1e-7)return sample.down();
         return sample;
     }
 }

@@ -1,3 +1,11 @@
+# 0.9.10 rewrite alpha — Fabric 1.21.1
+
+F3's targeted block name, properties and tags describe the selected physical piece in shared or carrier cells. Native world owners remain intact. Mining and break effects use the material's raw shape before applying its stored origin, preventing neighboring fragments from enlarging slab debris. See LAW.md.
+
+Light probes accept collision contacts within the geometry tolerance of a shifted opaque surface. A particle one representable double below the grass surface samples the exposed side instead of the opaque owner's interior. Deep interior and enclosed controls retain ordinary darkness.
+
+Adds production F3 checks for shared single and double slabs, a static carrier and the exposed native owner; actual mining-particle height and contact-light tests; and observation of real packet-generated breaking debris.
+
 # 0.9.9 rewrite alpha — Fabric 1.21.1
 
 Matching slabs placed onto supplemental or carrier slabs form one double slab, including pairs spanning two physical cells. Breaking either half removes the whole pair and uses vanilla double-slab loot. Placement validates the added volume before changing either cell. Existing native owners and independent pieces retain their fixed origins; see LAW.md.

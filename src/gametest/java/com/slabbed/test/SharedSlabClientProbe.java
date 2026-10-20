@@ -21,6 +21,7 @@ import net.minecraft.world.World;
 public final class SharedSlabClientProbe {
     private static final BlockPos OWNER=new BlockPos(64,64,18);
     private static final BlockPos CARRIER=OWNER.east(3);
+    private static final BlockPos DARK=OWNER.east(8);
     private static int stage,ticks,brokenAt;
     private static volatile boolean pending,confirmed;
     private static volatile Throwable failure;
@@ -44,6 +45,16 @@ public final class SharedSlabClientProbe {
                 world.setBlockState(CARRIER.down(),Blocks.OAK_SLAB.getDefaultState(),Block.NOTIFY_ALL);
                 check(CellWorld.place(world,CARRIER.getX(),CARRIER.getZ(),CARRIER.getY()*2-1,Blocks.STONE.getDefaultState()),"static carrier floor placed");
                 check(CellWorld.place(world,CARRIER.getX(),CARRIER.getZ(),CARRIER.getY()*2+1,Blocks.BIRCH_SLAB.getDefaultState()),"carrier slab placed");
+                for(int x=-1;x<=1;x++)for(int z=-1;z<=1;z++)for(int y=-2;y<=2;y++)
+                    world.setBlockState(DARK.add(x,y,z),Blocks.AIR.getDefaultState(),Block.NOTIFY_ALL);
+                world.setBlockState(DARK,Blocks.GRASS_BLOCK.getDefaultState(),Block.NOTIFY_ALL);
+                NativeSeats.put(world,DARK,new NativeSeats.Seat(-1,"minecraft:grass_block"));
+                check(CellWorld.place(world,DARK.getX(),DARK.getZ(),DARK.getY()*2+1,Blocks.OAK_SLAB.getDefaultState()),"enclosed slab placed");
+                for(int x=-1;x<=1;x++)for(int z=-1;z<=1;z++) {
+                    world.setBlockState(DARK.add(x,1,z),Blocks.STONE.getDefaultState(),Block.NOTIFY_ALL);
+                    world.setBlockState(DARK.add(x,-2,z),Blocks.STONE.getDefaultState(),Block.NOTIFY_ALL);
+                    if(x!=0 || z!=0)for(int y=-1;y<=0;y++)world.setBlockState(DARK.add(x,y,z),Blocks.STONE.getDefaultState(),Block.NOTIFY_ALL);
+                }
                 var player=world.getServer().getPlayerManager().getPlayer(client.player.getUuid());
                 player.teleport(world,OWNER.getX()+.5,OWNER.getY()+.5,OWNER.getZ()-2.5,0,30);
                 player.getAbilities().flying=true;player.sendAbilitiesUpdate();
@@ -53,10 +64,15 @@ public final class SharedSlabClientProbe {
         if(stage==1) {
             if(CellWorld.contents(client.world,OWNER)==null || CellWorld.contents(client.world,OWNER).fragments().isEmpty()
                     || CellWorld.contents(client.world,CARRIER)==null || CellWorld.contents(client.world,CARRIER).fragments().size()!=2
+                    || CellWorld.contents(client.world,DARK)==null || CellWorld.contents(client.world,DARK).fragments().isEmpty()
                     || client.player.getPos().squaredDistanceTo(new Vec3d(OWNER.getX()+.5,OWNER.getY()+.5,OWNER.getZ()-2.5))>.1)return false;
             var firstHit=new BlockHitResult(Vec3d.ofBottomCenter(OWNER).add(0,1,0),Direction.UP,OWNER,false);
             debug(client,firstHit,"bottom");
             debugBlock(client,new BlockHitResult(Vec3d.ofBottomCenter(CARRIER).add(0,1,0),Direction.UP,CARRIER,false),"minecraft:birch_slab","bottom");
+            SlabFeedbackAudit.beginHit(DARK.getY()+1.1);
+            client.crosshairTarget=new BlockHitResult(Vec3d.ofBottomCenter(DARK).add(0,1,0),Direction.UP,DARK,false);
+            client.particleManager.addBlockBreakingParticles(DARK,Direction.UP);
+            SlabFeedbackAudit.end();SlabFeedbackAudit.contact(DARK,0);
             client.crosshairTarget=firstHit;
             SlabFeedbackAudit.beginHit(OWNER.getY()+1.1);
             client.particleManager.addBlockBreakingParticles(OWNER,Direction.UP);
@@ -87,6 +103,7 @@ public final class SharedSlabClientProbe {
             SlabFeedbackAudit.begin();
             check(client.interactionManager.attackBlock(OWNER,hit.getSide()),"creative break packet accepted");
             SlabFeedbackAudit.end();
+            SlabFeedbackAudit.contact(OWNER);
             brokenAt=ticks;
             confirmed=false;stage=4;return false;
         }
@@ -114,8 +131,11 @@ public final class SharedSlabClientProbe {
         var hud=(com.slabbed.test.mixin.DebugHudAccess)client.getDebugHud();
         hud.slabbed$blockHit(hit);hud.slabbed$fluidHit(hit);
         var lines=hud.slabbed$rightText();
-        System.out.println("PHYSICAL_SLAB_F3_OBSERVED type="+type+" lines="+lines);
-        SlabFeedbackAudit.error(lines.stream().anyMatch(s->s.contains(id)),"F3 must name selected "+id+": "+lines);
+        int start=0;
+        for(int i=0;i<lines.size();i++)if(lines.get(i).contains("Targeted Block")){start=i;break;}
+        var target=lines.subList(start,Math.min(start+4,lines.size()));
+        System.out.println("PHYSICAL_SLAB_F3_OBSERVED expected="+id+" type="+type+" target="+target);
+        SlabFeedbackAudit.error(lines.stream().anyMatch(s->s.contains(id)),"F3 must name selected "+id+": "+target);
         SlabFeedbackAudit.error(type==null || lines.stream().anyMatch(s->s.contains("type") && s.contains(type)),"F3 must show selected slab type="+type);
     }
     private static boolean doubled(World world) {

@@ -19,20 +19,21 @@ public final class SlabFeedbackAudit {
     public static void begin() {DUST.clear();capture=true;settled=0;dark=0;hitY=Double.NaN;}
     public static void beginHit(double expectedY) {begin();hitY=expectedY;}
     public static void end() {capture=false;}
-    public static void contact(BlockPos owner) {
+    public static void contact(BlockPos owner) {contact(owner,15);}
+    public static void contact(BlockPos owner,int expectedSky) {
         error(!DUST.isEmpty(),"actual mining effect created no dust");
         if(DUST.isEmpty())return;
         var dust=DUST.getFirst();
         dust.setPos(owner.getX()+.5,Math.nextDown(owner.getY()+.5),owner.getZ()+.5);
         int sky=(dust.getBrightness(1)>>20)&15;
-        System.out.println("PHYSICAL_REAL_SLAB_DUST_CONTACT y="+Math.nextDown(owner.getY()+.5)+" sky="+sky+" expected=15");
-        error(sky==15,"mining debris at the soil contact must retain exposed-source light, got "+sky);
+        System.out.println("PHYSICAL_REAL_SLAB_DUST_CONTACT y="+Math.nextDown(owner.getY()+.5)+" sky="+sky+" expected="+expectedSky);
+        error(sky==expectedSky,"debris at the soil contact must retain source light "+expectedSky+", got "+sky);
     }
     public static void record(BlockDustParticle dust,BlockState material,double y) {
         if(!capture)return;
         DUST.add(dust);
         error(Double.isNaN(hitY) || Math.abs(y-hitY)<1e-5,"slab mining dust has wrong physical height: "+y+" expected="+hitY);
-        System.out.println("PHYSICAL_REAL_SLAB_DUST_CREATED material="+material+" y="+y+" light="+dust.getBrightness(1));
+        if(DUST.size()==1)System.out.println("PHYSICAL_REAL_SLAB_DUST_CREATED material="+material+" y="+y+" light="+dust.getBrightness(1));
     }
     public static void error(boolean valid,String message) {if(!valid)ERRORS.add(message);}
     public static void observe(MinecraftClient client,BlockPos owner) {
@@ -43,7 +44,7 @@ public final class SlabFeedbackAudit {
                     || center.z<owner.getZ()+.02 || center.z>owner.getZ()+.98)continue;
             int sky=(dust.getBrightness(1)>>20)&15,expected=client.world.getLightLevel(LightType.SKY,owner.up());
             settled++;if(sky!=expected)dark++;
-            System.out.println("PHYSICAL_REAL_SLAB_DUST_SETTLED y="+y+" sky="+sky+" expected="+expected);
+            if(settled<=2 || sky!=expected)System.out.println("PHYSICAL_REAL_SLAB_DUST_SETTLED y="+y+" sky="+sky+" expected="+expected);
         }
     }
     public static void verify() {
