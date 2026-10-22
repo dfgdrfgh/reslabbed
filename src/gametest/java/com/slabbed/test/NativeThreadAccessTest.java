@@ -14,6 +14,23 @@ import java.util.concurrent.TimeUnit;
 /** Lighting workers consume published facts without asking the waiting server thread for chunks. */
 public final class NativeThreadAccessTest {
     @GameTest(templateName="fabric-gametest-api-v1:empty")
+    public void cachedChunkLightingReadsPublishedSourceLifecycle(TestContext t) {
+        var world=t.getWorld();var pos=t.getAbsolutePos(new BlockPos(3,4,3));
+        world.setBlockState(pos,Blocks.BARREL.getDefaultState());
+        NativeSeats.put(world,pos,new NativeSeats.Seat(-1,"minecraft:barrel"));
+        t.assertTrue(CellWorld.place(world,pos.getX(),pos.getZ(),pos.getY()*2+1,Blocks.GLOWSTONE.getDefaultState()),"supplemental emitter placed");
+        var chunk=world.getWorldChunk(pos);var key=Long.toString(pos.asLong());
+        try {
+            var snapshot=CompletableFuture.supplyAsync(()->SupplementalCells.lightingSnapshot(chunk)).get(2,TimeUnit.SECONDS);
+            t.assertTrue(snapshot.get(key).luminance()==15,"lighting worker sees the published cached-chunk source");
+            CellWorld.remove(world,pos,1,null,false);
+            t.assertTrue(CompletableFuture.supplyAsync(()->!SupplementalCells.lightingSnapshot(chunk).containsKey(key)).get(2,TimeUnit.SECONDS),
+                    "lighting worker sees source removal without a server task");
+            t.assertTrue(snapshot.get(key).luminance()==15,"previously published source snapshot remains immutable");
+        } catch(Exception error) {throw new AssertionError("cached-chunk lighting worker stalled",error);}
+        t.complete();
+    }
+    @GameTest(templateName="fabric-gametest-api-v1:empty")
     public void contextFreeNativeSeatsNeverReadClientFacts(TestContext t) {
         var previous=NativeSeats.clientSnapshot;
         NativeSeats.clientSnapshot=pos->{throw new AssertionError("context-free query consulted client native seats");};

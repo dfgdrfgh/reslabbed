@@ -29,11 +29,13 @@ public final class SupplementalCellClient {
     private static final Map<WorldChunk,Map<String,SupplementalCells.StoredCell>> SEEN=new HashMap<>();
     private static final Map<Long,RenderCell> RENDERED=new HashMap<>();
     private static volatile Map<Long,SupplementalCells.StoredCell> published=Map.of();
+    private static volatile Map<WorldChunk,Map<String,SupplementalCells.StoredCell>> publishedChunks=Map.of();
     private static ClientWorld world;
     private static CellRenderer renderer;
     private SupplementalCellClient() {}
     public static void init() {
         SupplementalCells.clientSnapshot=pos->published.get(pos.asLong());
+        SupplementalCells.clientLightingSnapshot=chunk->publishedChunks.getOrDefault(chunk,Map.of());
         SupplementalCells.changed=(changedWorld,pos)-> {if(changedWorld.isClient)refresh();};
         ClientPlayConnectionEvents.JOIN.register((handler,sender,client)->reset());
         ClientPlayConnectionEvents.DISCONNECT.register((handler,client)->reset());
@@ -46,11 +48,11 @@ public final class SupplementalCellClient {
         if(world==next)return;
         reset();world=next;
     }
-    private static void reset() {CHUNKS.clear();SEEN.clear();RENDERED.clear();published=Map.of();world=null;}
+    private static void reset() {CHUNKS.clear();SEEN.clear();RENDERED.clear();published=Map.of();publishedChunks=Map.of();world=null;}
     private static void refresh() {
         var client=MinecraftClient.getInstance();useWorld(client.world);if(world==null)return;
         CHUNKS.removeIf(chunk->chunk.getWorld()!=world);SEEN.keySet().retainAll(CHUNKS);
-        boolean dirty=false;
+        boolean dirty=false;Set<BlockPos> updates=new HashSet<>();
         for(var chunk:CHUNKS) {
             var before=SEEN.get(chunk);var after=SupplementalCells.snapshot(chunk);
             if(before==after)continue;
@@ -58,16 +60,23 @@ public final class SupplementalCellClient {
             Set<String> keys=new HashSet<>(after.keySet());if(before!=null)keys.addAll(before.keySet());
             for(var key:keys) {
                 if(before!=null && java.util.Objects.equals(before.get(key),after.get(key)))continue;
-                var pos=BlockPos.fromLong(Long.parseLong(key));
-                client.worldRenderer.scheduleBlockRenders(pos.getX()-1,pos.getY()-1,pos.getZ()-1,pos.getX()+1,pos.getY()+1,pos.getZ()+1);
-                world.getChunkManager().getLightingProvider().checkBlock(pos);
+                updates.add(BlockPos.fromLong(Long.parseLong(key)));
             }
         }
         if(dirty)publish();
+        for(var pos:updates) {
+            client.worldRenderer.scheduleBlockRenders(pos.getX()-1,pos.getY()-1,pos.getZ()-1,pos.getX()+1,pos.getY()+1,pos.getZ()+1);
+            world.getChunkManager().getLightingProvider().checkBlock(pos);
+        }
     }
     private static void publish() {
         var next=new HashMap<Long,SupplementalCells.StoredCell>();
-        for(var chunk:CHUNKS)SupplementalCells.snapshot(chunk).forEach((key,cell)->next.put(Long.parseLong(key),cell));
+        var chunks=new HashMap<WorldChunk,Map<String,SupplementalCells.StoredCell>>();
+        for(var chunk:CHUNKS) {
+            var cells=SupplementalCells.snapshot(chunk);chunks.put(chunk,cells);
+            cells.forEach((key,cell)->next.put(Long.parseLong(key),cell));
+        }
+        publishedChunks=Map.copyOf(chunks);
         published=Map.copyOf(next);RENDERED.keySet().retainAll(published.keySet());
     }
     private static void render(WorldRenderContext context) {

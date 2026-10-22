@@ -2,7 +2,8 @@
 from pathlib import Path
 import argparse,hashlib,json,os,shutil,subprocess,zipfile,urllib.request,urllib.error,io
 
-parser=argparse.ArgumentParser();parser.add_argument('--pack',action='store_true');parser.add_argument('--sodium',action='store_true');parser.add_argument('--lithium',action='store_true');parser.add_argument('--control',action='store_true');parser.add_argument('--optimized',action='store_true');parser.add_argument('--backport',action='store_true');parser.add_argument('--asyncparticles',action='store_true');args=parser.parse_args()
+parser=argparse.ArgumentParser();parser.add_argument('--pack',action='store_true');parser.add_argument('--sodium',action='store_true');parser.add_argument('--lithium',action='store_true');parser.add_argument('--control',action='store_true');parser.add_argument('--optimized',action='store_true');parser.add_argument('--backport',action='store_true');parser.add_argument('--asyncparticles',action='store_true');parser.add_argument('--scalablelux',action='store_true');args=parser.parse_args()
+if args.scalablelux:args.optimized=True
 if args.asyncparticles:args.optimized=True
 if args.backport:args.optimized=True
 if args.optimized: args.lithium=True
@@ -11,7 +12,7 @@ if args.lithium:
     args.sodium=True
 root=Path.cwd();runtime=json.loads((root/'build/probe/dependencies.json').read_text())
 home=Path(runtime['gradleHome']);modules=home/'caches/modules-2/files-2.1'
-game=root/('build/run/physical-asyncparticles' if args.asyncparticles else 'build/run/physical-backport' if args.backport else 'build/run/physical-optimized' if args.optimized else 'build/run/physical-pack' if args.pack else 'build/run/physical-lithium' if args.lithium else 'build/run/physical-sodium' if args.sodium else 'build/run/physical-indigo')
+game=root/('build/run/physical-scalablelux' if args.scalablelux else 'build/run/physical-asyncparticles' if args.asyncparticles else 'build/run/physical-backport' if args.backport else 'build/run/physical-optimized' if args.optimized else 'build/run/physical-pack' if args.pack else 'build/run/physical-lithium' if args.lithium else 'build/run/physical-sodium' if args.sodium else 'build/run/physical-indigo')
 if args.control: game=root/'build/run/physical-control'
 assert not game.exists(),'Client requires a fresh run directory'
 game.mkdir(parents=True);mods=game/'mods';mods.mkdir()
@@ -85,6 +86,14 @@ if args.backport:
     for path in ['config/vanillabackport-client.toml','config/vanillabackport-common.toml']:
         target=game/path;target.parent.mkdir(parents=True,exist_ok=True);target.write_text(fixture['configs'][path])
     print('PHYSICAL_BACKPORT_SUBSET exact pinned VanillaBackport with Sodium Lithium MoreCulling',flush=True)
+if args.scalablelux:
+    fixture=json.loads((root/'tools/full-pack-fixture.json').read_text())
+    entry=next(entry for entry in fixture['downloads'] if Path(entry['path']).name.startswith('ScalableLux-'))
+    data=urllib.request.urlopen(entry['downloads'][0]).read()
+    for algorithm,expected_hash in entry['hashes'].items():
+        assert hashlib.new(algorithm,data).hexdigest()==expected_hash,'ScalableLux fixture hash mismatch'
+    (mods/Path(entry['path']).name).write_bytes(data)
+    print('PHYSICAL_SCALABLELUX_SUBSET exact pinned lighting engine with Sodium Lithium MoreCulling',flush=True)
 if args.asyncparticles:
     fixture=json.loads((root/'tools/full-pack-fixture.json').read_text())
     entry=next(entry for entry in fixture['downloads'] if Path(entry['path']).name.startswith('AsyncParticles-'))

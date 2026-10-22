@@ -117,6 +117,7 @@ public final class SupplementalCells {
     public static final AttachmentType<Map<String,StoredCell>> TYPE=AttachmentRegistry.create(Identifier.of("slabbed","supplemental_cells"),
             builder->builder.persistent(CODEC).syncWith(PACKET_CODEC,AttachmentSyncPredicate.all()));
     public static Function<BlockPos,StoredCell> clientSnapshot=pos->null;
+    public static Function<WorldChunk,Map<String,StoredCell>> clientLightingSnapshot=chunk->Map.of();
     public static BiConsumer<World,BlockPos> changed=(world,pos)->{};
     private static final ConcurrentMap<ServerWorld,ConcurrentMap<Long,Map<String,StoredCell>>> SERVER_SNAPSHOTS=new ConcurrentHashMap<>();
     private SupplementalCells() {}
@@ -130,11 +131,24 @@ public final class SupplementalCells {
     private static void publish(ServerWorld world,WorldChunk chunk) {
         SERVER_SNAPSHOTS.computeIfAbsent(world,key->new ConcurrentHashMap<>()).put(chunk.getPos().toLong(),Map.copyOf(snapshot(chunk)));
     }
+    /** Deserialization owns the attachment container before initial lighting or saved-light edge checks run. */
+    public static void publishLoaded(ServerWorld world,net.minecraft.world.chunk.ProtoChunk chunk) {
+        if(chunk instanceof net.minecraft.world.chunk.WrapperProtoChunk wrapper)publish(world,wrapper.getWrappedChunk());
+    }
     private static void publish(World world,WorldChunk chunk) {
         if(world instanceof ServerWorld serverWorld)publish(serverWorld,chunk);
     }
     public static Map<String,StoredCell> snapshot(WorldChunk chunk) {
         var map=chunk.getAttached(TYPE);return map==null?Map.of():map;
+    }
+    /** Lighting workers consume published immutable data without reading the mutable attachment container. */
+    public static Map<String,StoredCell> lightingSnapshot(WorldChunk chunk) {
+        var world=chunk.getWorld();
+        if(world instanceof ServerWorld server && !server.getServer().isOnThread()) {
+            var chunks=SERVER_SNAPSHOTS.get(server);
+            return chunks==null?Map.of():chunks.getOrDefault(chunk.getPos().toLong(),Map.of());
+        }
+        return world.isClient?clientLightingSnapshot.apply(chunk):snapshot(chunk);
     }
     private static StoredCell stored(BlockView view,BlockPos pos) {
         // Shared shape caches have no world placement and must not consume live client geometry.

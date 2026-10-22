@@ -59,6 +59,15 @@ public final class SlabFeedbackAudit {
         if(DUST.size()==1)System.out.println("PHYSICAL_REAL_SLAB_DUST_CREATED material="+material+" y="+y+" light="+dust.getBrightness(1));
     }
     public static void error(boolean valid,String message) {if(!valid)ERRORS.add(message);}
+    public static void motion(net.minecraft.client.particle.Particle particle,net.minecraft.client.world.ClientWorld world,
+                              int age,int maxAge,boolean stopped,double velocityY) {
+        if(Double.isNaN(breakFloor) || DUST.size()<2 || DUST.get(1)!=particle || age>3)return;
+        var box=particle.getBoundingBox();var center=box.getCenter();var pos=BlockPos.ofFloored(center.x,box.minY,center.z);
+        System.out.println("PHYSICAL_REAL_SLAB_DUST_TICK age="+age+" max="+maxAge+" stopped="+stopped+" vy="+velocityY
+                +" box="+box+" seat="+com.slabbed.nativeblock.NativeSeats.offset(world,pos)
+                +" raw="+com.slabbed.nativeblock.NativeShapes.raw()+" state="+world.getBlockState(pos)
+                +" collision="+world.getBlockState(pos).getCollisionShape(world,pos));
+    }
     public static void observe(MinecraftClient client,BlockPos owner) {
         observations++;
         // The first object is reserved for the explicit contact and movement checks above.
