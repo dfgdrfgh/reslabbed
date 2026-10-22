@@ -12,12 +12,12 @@ import java.util.List;
 public final class SlabFeedbackAudit {
     private static final List<BlockDustParticle> DUST=new ArrayList<>();
     private static boolean capture;
-    private static int settled,dark;
+    private static int settled,dark,observations;
     private static double hitY=Double.NaN;
     private static double breakFloor=Double.NaN;
     private static final List<String> ERRORS=new ArrayList<>();
     private SlabFeedbackAudit() {}
-    public static void begin() {DUST.clear();capture=true;settled=0;dark=0;hitY=Double.NaN;breakFloor=Double.NaN;}
+    public static void begin() {DUST.clear();capture=true;settled=0;dark=0;observations=0;hitY=Double.NaN;breakFloor=Double.NaN;}
     public static void beginHit(double expectedY) {begin();hitY=expectedY;}
     public static void beginBreak(double supportTop) {begin();breakFloor=supportTop;}
     public static void end() {capture=false;}
@@ -60,9 +60,11 @@ public final class SlabFeedbackAudit {
     }
     public static void error(boolean valid,String message) {if(!valid)ERRORS.add(message);}
     public static void observe(MinecraftClient client,BlockPos owner) {
+        observations++;
         // The first object is reserved for the explicit contact and movement checks above.
         for(int i=1;i<DUST.size();i++) {
             var dust=DUST.get(i);
+            if(i<=2 && observations%5==0)System.out.println("PHYSICAL_REAL_SLAB_DUST_MOTION step="+observations+" particle="+i+" alive="+dust.isAlive()+" box="+dust.getBoundingBox()+" light="+dust.getBrightness(1));
             if(!dust.isAlive())continue;
             var box=dust.getBoundingBox();var center=box.getCenter();double y=box.minY;
             if(center.x<owner.getX()+.02 || center.x>owner.getX()+.98

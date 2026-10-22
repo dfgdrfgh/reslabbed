@@ -156,6 +156,7 @@ public final class NativeRedstoneLightClientProbe {
             int expected=client.world.getLightLevel(LightType.SKY,pos.up());
             System.out.println("PHYSICAL_SLAB_DUST_LIGHT_OBSERVED surface="+SURFACES[i]+" sky="+sky+" expected="+expected);
             check(sky==expected,"slab dust above shifted "+SURFACES[i]+" must sample exposed air: "+sky+" expected="+expected);
+            cachedLight(dust,light,"surface="+SURFACES[i]);
             if(i==4) {
                 check(client.world.getLightLevel(LightType.BLOCK,pos.up())==0,"enclosed dust fixture has no block light source");
                 check(light==0,"enclosed dust must retain darkness in both light channels: "+light);
@@ -167,14 +168,28 @@ public final class NativeRedstoneLightClientProbe {
                 check(Math.abs(settled-top)<1e-7,"dust penetrated "+SURFACES[i]+": y="+settled+" surface="+top+" x="+x+" z="+z);
                 check(((dust.getBrightness(1)>>20)&15)==expected,"collision-settled dust sampled opaque "+SURFACES[i]+" at y="+settled);
                 if(i==4)check(dust.getBrightness(1)==0,"settled enclosed dust leaked light at x="+x+" z="+z);
+                cachedLight(dust,dust.getBrightness(1),"settled surface="+SURFACES[i]+" x="+x+" z="+z);
             }
             System.out.println("PHYSICAL_SLAB_DUST_COLLISION_PASS surface="+SURFACES[i]+" samples=9 top="+top+" sky="+expected);
             if(i!=3) {
                 var inside=new net.minecraft.client.particle.BlockDustParticle(client.world,pos.getX()+.5,pos.getY()+.25,pos.getZ()+.5,
                         0,0,0,Blocks.OAK_SLAB.getDefaultState(),pos);
                 check(((inside.getBrightness(1)>>20)&15)==0,"particles inside physical soil must retain its dark sample");
+                cachedLight(inside,inside.getBrightness(1),"inside surface="+SURFACES[i]);
             }
         }
+        if(net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("asyncparticles"))
+            System.out.println("PHYSICAL_ASYNC_DUST_CACHE_PASS outdoor enclosed interior first_gpu_upload edge_contacts");
+    }
+    private static void cachedLight(net.minecraft.client.particle.BlockDustParticle dust,int expected,String fixture) {
+        if(!net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("asyncparticles"))return;
+        try {
+            dust.getClass().getMethod("asyncparticles$refresh").invoke(dust);
+            int cached=(Integer)dust.getClass().getMethod("asyncparticles$getCachedLight").invoke(dust);
+            check(cached==expected,"AsyncParticles cached physical light differs: "+fixture+" cached="+cached+" expected="+expected);
+            int gpu=(Integer)dust.getClass().getMethod("asyncparticles$getGpuLightCoords",float.class).invoke(dust,0f);
+            check(gpu==expected,"AsyncParticles GPU physical light differs: "+fixture+" gpu="+gpu+" expected="+expected);
+        } catch(ReflectiveOperationException error) {throw new AssertionError("AsyncParticles light API unavailable",error);}
     }
     private static void check(boolean value,String message) {if(!value)throw new AssertionError(message);}
 }

@@ -15,6 +15,7 @@
     "NativeBlockEntityRenderMixin",
     "NativeEntityLightMixin",
     "NativeParticleLightMixin",
+    "AsyncParticleLightMixin",
     "NativeDustSourceLightMixin",
     "OptimizedNativeSeatModelMixin",
     "MoreCullingNativeFaceMixin",

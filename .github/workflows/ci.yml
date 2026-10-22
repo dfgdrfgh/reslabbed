@@ -80,7 +80,7 @@ jobs:
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         with:
           name: slabbed-physical-rewrite-mc1.21.1-fabric
-          path: build/libs/slabbed-0.9.12-rewrite-alpha+1.21.1-fabric.jar
+          path: build/libs/slabbed-0.9.13-rewrite-alpha+1.21.1-fabric.jar
           if-no-files-found: error
           retention-days: 30
   compatibility:

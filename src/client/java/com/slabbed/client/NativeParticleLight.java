@@ -27,8 +27,8 @@ public final class NativeParticleLight {
         net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents.END_CLIENT_TICK.register(client->clear());
         net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents.DISCONNECT.register((handler,client)->clear());
     }
-    private static void clear() {CELLS.clear();LIGHT.clear();cachedWorld=null;}
-    public static int light(World world,BlockPos pos,double physicalY,int original) {
+    private static synchronized void clear() {CELLS.clear();LIGHT.clear();cachedWorld=null;}
+    public static synchronized int light(World world,BlockPos pos,double physicalY,int original) {
         double offset=NativeSeats.offset(world,pos),y=physicalY-pos.getY();
         if(offset==0 || !world.getBlockState(pos).isOpaqueFullCube(world,pos)
                 || (offset<0?y<1+offset-1e-7:y>offset+1e-7))return original;

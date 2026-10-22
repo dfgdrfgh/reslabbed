@@ -99,12 +99,18 @@ for entry in fixture.get('overrides',[]):
     else:download(entry)
 for name,data in fixture['configs'].items():
     target=out/name;target.parent.mkdir(parents=True,exist_ok=True);target.write_bytes(data.encode('utf-8'))
+if source_pack:
+    # The complete archive also retains configuration that does not belong in a public fixture.
+    for name in source_pack.namelist():
+        if not name.startswith('overrides/config/') or name.endswith('/'):continue
+        target=out/name.removeprefix('overrides/');target.parent.mkdir(parents=True,exist_ok=True)
+        target.write_bytes(source_pack.read(name))
 loader=fixture['dependencies']['fabric-loader']
 (root/'build/full-pack-loader.jar').write_bytes(urllib.request.urlopen(
     f'https://maven.fabricmc.net/net/fabricmc/fabric-loader/{loader}/fabric-loader-{loader}.jar',timeout=90).read())
 mod_count=len(list((out/'mods').glob('*.jar')))
 resource_pack_count=len(list((out/'resourcepacks').glob('*.zip')))
-assert mod_count==fixture['modCount'],(mod_count,fixture['modCount'])
+assert mod_count==fixture.get('sourceModCount',fixture['modCount']),(mod_count,fixture.get('sourceModCount',fixture['modCount']))
 assert resource_pack_count==fixture['resourcePackCount'],(resource_pack_count,fixture['resourcePackCount'])
 (out/'pack-staging.json').write_text(json.dumps({'sourcePackSha256':fixture['sourcePackSha256'],'modCount':mod_count,'resourcePackCount':resource_pack_count,'complete':True})+'\n')
 if source_pack:source_pack.close()

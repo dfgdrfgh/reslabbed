@@ -31,7 +31,7 @@ if args.pack:
     fixture=json.loads((root/'tools/full-pack-fixture.json').read_text())
     staged=json.loads((root/'build/full-pack-baseline/pack-staging.json').read_text())
     assert staged['complete'] and staged['sourcePackSha256']==fixture['sourcePackSha256'],'Client requires the exact complete latest pack'
-    assert staged['modCount']==fixture['modCount'] and staged['resourcePackCount']==fixture['resourcePackCount'],staged
+    assert staged['modCount']==fixture.get('sourceModCount',fixture['modCount']) and staged['resourcePackCount']==fixture['resourcePackCount'],staged
     for source in (root/'build/full-pack-baseline').rglob('*'):
         if source.is_file():
             target=game/source.relative_to(root/'build/full-pack-baseline');target.parent.mkdir(parents=True,exist_ok=True);shutil.copy2(source,target)
@@ -55,7 +55,7 @@ if args.lithium:
     (mods/Path(lithium['path']).name).write_bytes(data)
 if args.optimized:
     fixture=json.loads((root/'tools/full-pack-fixture.json').read_text())
-    for prefix in ['obe+', 'moreculling-', 'cloth-config-', 'yet_another_config_lib_v3-', 'midnightlib-']:
+    for prefix in ['moreculling-', 'cloth-config-', 'yet_another_config_lib_v3-']:
         entry=next(entry for entry in fixture['downloads'] if Path(entry['path']).name.startswith(prefix))
         data=urllib.request.urlopen(entry['downloads'][0]).read()
         for algorithm,expected_hash in entry['hashes'].items():
@@ -63,7 +63,7 @@ if args.optimized:
         (mods/Path(entry['path']).name).write_bytes(data)
     for path in ['config/lithium.properties','config/moreculling.toml']:
         target=game/path;target.parent.mkdir(parents=True,exist_ok=True);target.write_text(fixture['configs'][path])
-    print('PHYSICAL_OPTIMIZED_SUBSET Sodium Lithium OBE MoreCulling with pinned configuration libraries',flush=True)
+    print('PHYSICAL_OPTIMIZED_SUBSET Sodium Lithium MoreCulling with pinned configuration libraries',flush=True)
 if args.backport:
     fixture=json.loads((root/'tools/full-pack-fixture.json').read_text())
     entry=next(entry for entry in fixture['forks'] if entry['id']=='vanillabackport')
@@ -84,7 +84,7 @@ if args.backport:
     (mods/entry['file']).write_bytes(data)
     for path in ['config/vanillabackport-client.toml','config/vanillabackport-common.toml']:
         target=game/path;target.parent.mkdir(parents=True,exist_ok=True);target.write_text(fixture['configs'][path])
-    print('PHYSICAL_BACKPORT_SUBSET exact pinned VanillaBackport with Sodium Lithium OBE MoreCulling',flush=True)
+    print('PHYSICAL_BACKPORT_SUBSET exact pinned VanillaBackport with Sodium Lithium MoreCulling',flush=True)
 if args.asyncparticles:
     fixture=json.loads((root/'tools/full-pack-fixture.json').read_text())
     entry=next(entry for entry in fixture['downloads'] if Path(entry['path']).name.startswith('AsyncParticles-'))
@@ -148,7 +148,7 @@ for phase in (['fresh'] if args.control else ['fresh','reopen']):
         assert marker.read_text().strip()=='PHYSICAL_CONTROL_REPRODUCED_BLOCKED_PLACEMENT','Control marker mismatch'
         print(marker.read_text().strip(),flush=True)
         continue
-    if result.returncode!=0 or not marker.exists():print('\n'.join(lines[-100:]));raise AssertionError('Physical client failed '+phase)
+    if result.returncode!=0 or not marker.exists():print('\n'.join(lines[-100:]));raise AssertionError('Physical client failed '+phase+' exit='+str(result.returncode))
     assert any('PHYSICAL_REDSTONE_MODEL_HEIGHT_PASS' in line for line in lines),'Redstone model height checks did not complete'
     assert any('PHYSICAL_DROPPED_ITEM_LIGHT_PASS' in line for line in lines),'Dropped item light checks did not complete'
     assert any('PHYSICAL_SLAB_DUST_LIGHT_PASS' in line for line in lines),'Slab dust light checks did not complete'
@@ -159,6 +159,8 @@ for phase in (['fresh'] if args.control else ['fresh','reopen']):
     assert any('PHYSICAL_DEFERRED_DEBRIS_ORDER_PASS' in line for line in lines),'Deferred debris packet order and lifecycle checks did not complete'
     assert any('PHYSICAL_SURFACE_DUST_PASS' in line for line in lines),'Ceiling and side-lit physical debris checks did not complete'
     assert any('PHYSICAL_STACK_DUST_PASS' in line for line in lines),'Odd/even stack debris checks did not complete'
+    if any(entry['id']=='asyncparticles' for entry in expected):
+        assert any('PHYSICAL_ASYNC_DUST_CACHE_PASS' in line for line in lines),'Cached and initial GPU light controls did not complete'
     assert any('PHYSICAL_SIDE_SLAB_PACKET_PASS' in line for line in lines),'Side slab placement packets did not complete'
     assert sum('PHYSICAL_SLAB_DUST_COLLISION_PASS' in line for line in lines)>=5,'Soil surface collision checks did not complete'
     assert any('PHYSICAL_OFFSET_PISTON_CONTACT_PASS' in line for line in lines),'Offset piston contact checks did not complete'

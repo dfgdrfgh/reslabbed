@@ -1,609 +1,9 @@
 {
   "dependencies": {
-    "fabric-loader": "0.19.5",
-    "minecraft": "1.21.1"
+    "minecraft": "1.21.1",
+    "fabric-loader": "0.20.1"
   },
   "downloads": [
-    {
-      "path": "mods/placeholder-api-2.4.2+1.21.jar",
-      "hashes": {
-        "sha1": "aa1b9a49f9f190dfe4825c502b150817dd2998c3",
-        "sha512": "fc13d3a5c048dbaab86318edaf8b6c6b46ef9f1d367e8f063d19f5a9b0da66c5ae419d92c8c4608edc89a01eb44d91ffcf017fea73f39b222cbd85e82f70a233"
-      },
-      "env": {
-        "server": "required",
-        "client": "required"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/eXts2L7r/versions/U5bhVym2/placeholder-api-2.4.2%2B1.21.jar"
-      ],
-      "fileSize": 232325
-    },
-    {
-      "path": "mods/hideexperimentalwarning-1.21.1-1.3.jar",
-      "hashes": {
-        "sha512": "a45d6aa619670a64594c04ea59efb031aec92a84952106b2375e1667a9b445da4e4a6ed81557c99f9017e338f30b208812b0a0983907c9d094fab1ee661b73fb",
-        "sha1": "0c18b1e2534fd1dd633ae438a51206651fe46d6d"
-      },
-      "env": {
-        "server": "unsupported",
-        "client": "required"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/Rm4OOdHd/versions/tJbfSalt/hideexperimentalwarning-1.21.1-1.3.jar"
-      ],
-      "fileSize": 18664
-    },
-    {
-      "path": "mods/modmenu-11.0.5.jar",
-      "hashes": {
-        "sha1": "2321d890a25b5985eba576d7cd8fe9a9c136e33d",
-        "sha512": "92e8e96267ff18d320903090f2ad9b32408a218919f5a0d578e232ad774c89d49a34a8271806652be7d6283f24e98432bc4af7f95855e78b843f9100d68696c7"
-      },
-      "env": {
-        "client": "required",
-        "server": "unsupported"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/mOgUt4GM/versions/6lgOkclV/modmenu-11.0.5.jar"
-      ],
-      "fileSize": 975846
-    },
-    {
-      "path": "mods/guiscaler-1.21.1-1.1.3-fabric.jar",
-      "hashes": {
-        "sha1": "d2ee22217ec5227ddc7877af1a5f326464188f5f",
-        "sha512": "454d1fc26b83cbf32450e9aa922b4bde98f290c1c6e595fed8de6b4210184f0053a390dd46dd14cab85b498f1bb80aa544c40092eadeb740c23ba69cb528e136"
-      },
-      "env": {
-        "client": "required",
-        "server": "unsupported"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/fM4mOw7u/versions/rmiJoUQl/guiscaler-1.21.1-1.1.3-fabric.jar"
-      ],
-      "fileSize": 435243
-    },
-    {
-      "path": "mods/midnightlib-fabric-1.10.0+1.21.1.jar",
-      "hashes": {
-        "sha512": "5c1d174ec58bc90e2295a2e97f930bb2a97a5a1f6ee1e956f628237223386c9e40c50655b1238a2368735399472d9a1950d9f1c6ca472d279a57ee04dcf6d11e",
-        "sha1": "3120b1329ab0d01b4af4e659495259bffee2ddae"
-      },
-      "env": {
-        "server": "required",
-        "client": "required"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/codAaoxh/versions/jQ0KXdpD/midnightlib-fabric-1.10.0%2B1.21.1.jar"
-      ],
-      "fileSize": 63975
-    },
-    {
-      "path": "mods/fabric-api-0.116.17+1.21.1.jar",
-      "hashes": {
-        "sha1": "810b2b0195371a012906241d8b85a32a1d6de53c",
-        "sha512": "98c478217da19181f0e4df3ea6c2da6bdbda271c7544a4aea048513a49b444f1ff5b71dc0df6303017c48e8ff69b7bb6af6179bdf0d0e09ab3c1ee08411857a8"
-      },
-      "env": {
-        "server": "required",
-        "client": "required"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/P7dR8mSH/versions/Mys3P7lK/fabric-api-0.116.17%2B1.21.1.jar"
-      ],
-      "fileSize": 2452735
-    },
-    {
-      "path": "mods/screenshot-to-clipboard-fabric-1.0.10.jar",
-      "hashes": {
-        "sha512": "54f3c0fe55145f396a824c780bdaaf59026f855037ffa67c3c4228781685350d308feec5ed5527a7e4eaa1d4f71f6d106d5ac9d1bf7aa79cb74cad0953c60e8f",
-        "sha1": "d8a8af1844ae38ac4f39e4bf5756915e08081375"
-      },
-      "env": {
-        "server": "unsupported",
-        "client": "required"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/1KiJRrTg/versions/DHUI24N7/screenshot-to-clipboard-fabric-1.0.10.jar"
-      ],
-      "fileSize": 16285
-    },
-    {
-      "path": "mods/quick-pack-fabric-1.5.1+1.21.1.jar",
-      "hashes": {
-        "sha1": "df66cd08a0fe90e541b9c05beb9c49c76fd8a4bb",
-        "sha512": "8b81ba1160012e82bfa01527d781506011efef62c120085bd4a29604e8263e396d8a967f003ba2c383345562774693a10083fb5d961f690925fadb5f2d6e37d0"
-      },
-      "env": {
-        "server": "required",
-        "client": "required"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/pSISfJ4O/versions/QOqEPNtJ/quick-pack-fabric-1.5.1%2B1.21.1.jar"
-      ],
-      "fileSize": 22491
-    },
-    {
-      "path": "mods/biomecleaner-mc1.21.1-1.1.8-fabric.jar",
-      "hashes": {
-        "sha512": "ab7ac850d7043080fd6fa15e22790b208884f7b1e20ad0fc9033f61e786b19fdb366465b43f484119ac9dd1168781c480508cb30b878e030e8347431a370e327",
-        "sha1": "2cd5691a6f82d702eb4f295797682292ddd059f7"
-      },
-      "env": {
-        "server": "required",
-        "client": "required"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/mzuh1rlR/versions/d0gtrv25/biomecleaner-mc1.21.1-1.1.8-fabric.jar"
-      ],
-      "fileSize": 399253
-    },
-    {
-      "path": "mods/fabric-language-kotlin-1.14.2+kotlin.2.4.21.jar",
-      "hashes": {
-        "sha512": "7fb475c4a7e7bdf8d0aca4b5798a58a354c51443d5b1fbde3e8cf34dfbf7191ef4238b5f07d08ec9490ec180b371624523326c3ad45d4ed2b2be541de9407e5d",
-        "sha1": "f1d4ab6ecd54d9782521333a87eb50724ecb03e0"
-      },
-      "env": {
-        "client": "required",
-        "server": "required"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/Ha28R6CL/versions/SKW1BTL3/fabric-language-kotlin-1.14.2%2Bkotlin.2.4.21.jar"
-      ],
-      "fileSize": 8142878
-    },
-    {
-      "path": "resourcepacks/Vintage Panorama 1.1.1.zip",
-      "hashes": {
-        "sha1": "2e18ef9303f6661bf46f86c5f83c8ef6fb84b157",
-        "sha512": "e154ac4d449f90d04124f914f2d268b51b3928a876a34354a3ed5a1ca1de01704a02ca1f4fce09028592594d6f3054a621cdbdd5d6d178105e303ac57361377a"
-      },
-      "env": {
-        "client": "required",
-        "server": "required"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/1kx02Ah7/versions/qxs0J0lL/Vintage%20Panorama%201.1.1.zip"
-      ],
-      "fileSize": 5279504
-    },
-    {
-      "path": "mods/zoomify-2.15.2+1.21.1.jar",
-      "hashes": {
-        "sha1": "9ec9c47e1d3465ea0cbd595b6d9d12227239c9a6",
-        "sha512": "ce8db36e77f089f091986b6e8bea1c33433bbcffc7a47fa18d04dea5ecd4910286943600a85b4773fdf4ed5405f52f3c0dc08fea8b1551d7725a26e1f6ef2879"
-      },
-      "env": {
-        "server": "unsupported",
-        "client": "required"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/w7ThoJFB/versions/6jrMC48Z/zoomify-2.15.2%2B1.21.1.jar"
-      ],
-      "fileSize": 872937
-    },
-    {
-      "path": "mods/tectonic-3.0.28-fabric-21.1.jar",
-      "hashes": {
-        "sha512": "a15a85fb5c6d134d0967fa3ccd6797fa28348b69937b65b2a3bcd6173609e84ae97bd8400eb01013167ceca3434bf97216e879d4b0277c007f6deda7aa076afd",
-        "sha1": "41e58bae9c22e5999bfa56ae92f45ecdee07f1cf"
-      },
-      "env": {
-        "client": "required",
-        "server": "required"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/lWDHr9jE/versions/WdDiEKMn/tectonic-3.0.28-fabric-21.1.jar"
-      ],
-      "fileSize": 458013
-    },
-    {
-      "path": "mods/NoChatReports-FABRIC-1.21.1-v2.9.1.jar",
-      "hashes": {
-        "sha512": "23bb4a8a6a3f7071281cf97560e12f37e1f5f638a156e3fcb92a50ff0091f1fcfa3e090e7745e4b1175e7c2c784e38d73536a1044db1bf225a182fab758a5a29",
-        "sha1": "789cabd9b1fed079af87f675d1d6c1c95b603e19"
-      },
-      "env": {
-        "client": "required",
-        "server": "required"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/qQyHxfxd/versions/D8K0KJXM/NoChatReports-FABRIC-1.21.1-v2.9.1.jar"
-      ],
-      "fileSize": 309410
-    },
-    {
-      "path": "mods/c2me-fabric-mc1.21.1-0.4.0-alpha.0.30.jar",
-      "hashes": {
-        "sha512": "6fa50f7d626c0d0f9b877c76a2b176d8d22db17bf0530aa07ddd2a7d2f65a6328eb5326376aa28ae474d6c08610842c975548db4efc253f8386fdaefc60e08db",
-        "sha1": "7ce266eb1d7ff617751ed1f0ebb203662ed641b3"
-      },
-      "env": {
-        "client": "required",
-        "server": "required"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/VSNURh3q/versions/KxcgERSN/c2me-fabric-mc1.21.1-0.4.0-alpha.0.30.jar"
-      ],
-      "fileSize": 3810456
-    },
-    {
-      "path": "mods/libjf-3.17.5.jar",
-      "hashes": {
-        "sha512": "8e209148c313ecab6ac68d7980a2748efd415f956978076cd353c9daef39b005a19e342fa0c5a937be494c4921964c287ff22567e2417c1c83fc5f91101443fc",
-        "sha1": "67c0111a22b4b058e6f08c1e607d8e9605612716"
-      },
-      "env": {
-        "client": "required",
-        "server": "required"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/WKwQAwke/versions/WRFFw4eh/libjf-3.17.5.jar"
-      ],
-      "fileSize": 1282450
-    },
-    {
-      "path": "mods/ScalableLux-fabric-0.3.0-alpha.0.7-all.jar",
-      "hashes": {
-        "sha1": "ff6baa9ab1f2aecf0eba5b72595085551adddc7a",
-        "sha512": "e3c098b5136101575fe852d7d967f1be1c29a26ec687118e01a3efcea9ea1b8367d3b3be63ab7fa5029c12b478dcd764ad362980317e998674ddad4e0573349f"
-      },
-      "env": {
-        "server": "required",
-        "client": "required"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/Ps1zyz6x/versions/AodeMVa6/ScalableLux-fabric-0.3.0-alpha.0.7-all.jar"
-      ],
-      "fileSize": 196331
-    },
-    {
-      "path": "mods/resourcefullib-fabric-1.21-3.0.12.jar",
-      "hashes": {
-        "sha512": "df8a9586eaa0e2f8e1e6a5651ba79ff6c95327b0ab89cdab4708cc6ed51c3da6829d00e8f176e7e7b7b37d4af8c5bd9e3df047f3a8a04fd1af925d80c774185b",
-        "sha1": "cb67e1302b5116953f45556cc61dbcf40d986ecd"
-      },
-      "env": {
-        "client": "required",
-        "server": "required"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/G1hIVOrD/versions/Hf91FuVF/resourcefullib-fabric-1.21-3.0.12.jar"
-      ],
-      "fileSize": 485586
-    },
-    {
-      "path": "mods/smooth_steps-fabric-1.1.0.jar",
-      "hashes": {
-        "sha512": "b25061ed7fcb3825aad3e1e82ac319b77709bd8b3417d20d61a73e6c416916e51096cf694a2f8be0bfd3a9fe260b1df5b239b132eb44d48a7e6f90fe112e645a",
-        "sha1": "2d1093fded2a0ec7bd79a838a72f9b02e7ec186f"
-      },
-      "env": {
-        "server": "unsupported",
-        "client": "required"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/5VSZqDK0/versions/YcwNX8B8/smooth_steps-fabric-1.1.0.jar"
-      ],
-      "fileSize": 61468
-    },
-    {
-      "path": "mods/cristellib-fabric-1.21.1-3.1.7.jar",
-      "hashes": {
-        "sha512": "7a71a8f409d14268461bebb8d7c45a1e15e82f379d92c6f6938eb20cc480cc6bbb763affc1ac582c3733eac2c403788f1cf43edcb4abe345054b0acc5c4c045d",
-        "sha1": "4f966c3efd6ecfe679aac64ba7c6f4d4a648ad5b"
-      },
-      "env": {
-        "client": "required",
-        "server": "required"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/cl223EMc/versions/K1dyr5gj/cristellib-fabric-1.21.1-3.1.7.jar"
-      ],
-      "fileSize": 584853
-    },
-    {
-      "path": "mods/moreculling-fabric-1.21.1-1.0.10.jar",
-      "hashes": {
-        "sha512": "7f8f33e09a7b1952c4ae77843a28a5220fe9dd6436fda4b14edeb261a5ceb5468630c54ab3b8ec2c64a5c91f5b02f0246d17db57fa7fe11eb16ec9c745b9ae40",
-        "sha1": "d425f77706d8f6499aae64eb804b3802dad111d4"
-      },
-      "env": {
-        "server": "unsupported",
-        "client": "required"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/51shyZVL/versions/wUYbHzXF/moreculling-fabric-1.21.1-1.0.10.jar"
-      ],
-      "fileSize": 332266
-    },
-    {
-      "path": "mods/Ixeris-4.6.8+1.21.1-fabric.jar",
-      "hashes": {
-        "sha1": "c83c96b48e8885dda6e5c3f1a6d7d244740b3b6f",
-        "sha512": "5b284351f91e60741d392be55a704d31d81b387df3f905fd5b62effde136f0c5e2a545b89d0ed4e2367c5c04a743240884930797e16d75068da3dde4a7d978e3"
-      },
-      "env": {
-        "server": "unsupported",
-        "client": "required"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/p8RJPJIC/versions/MySe2ICq/Ixeris-4.6.8%2B1.21.1-fabric.jar"
-      ],
-      "fileSize": 776079
-    },
-    {
-      "path": "mods/no-resource-pack-warnings-1.3.1.jar",
-      "hashes": {
-        "sha512": "d745582794be5103cd8d5c562f97e0d9001d36bc5421dbfa63b417cbf439d12ec2c0844a47da0c4c06d8c1c9224939d296285fb02216a7e86410765f4b2165ef",
-        "sha1": "7a21f4604fab946201e2cfc1a9a8f526f5581cdf"
-      },
-      "env": {
-        "client": "required",
-        "server": "unsupported"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/6xKUDQcB/versions/73nzTFDd/no-resource-pack-warnings-1.3.1.jar"
-      ],
-      "fileSize": 5002
-    },
-    {
-      "path": "mods/Platform-fabric-1.21.1-1.3.3.jar",
-      "hashes": {
-        "sha512": "ba5d968f08531d3cd1eac53bb6a02a0870a79e4b3a265c80aaf73b0f1836706b8a5fa099b43c7f1c81b2ebc9d223db5c74aa004e579dbbdfaa44a80d701d4dbe",
-        "sha1": "b3302ad9158171874d01e863d69c8bf4db8faef9"
-      },
-      "env": {
-        "client": "required",
-        "server": "required"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/i6fiqm5y/versions/BbIdNbF1/Platform-fabric-1.21.1-1.3.3.jar"
-      ],
-      "fileSize": 735744
-    },
-    {
-      "path": "mods/entityculling-fabric-1.11.3-mc1.21.1.jar",
-      "hashes": {
-        "sha512": "51cc760b886f53a8469f5f87098688c8e00a70e9499f4146908f676dc95c78bbfd6de6ddab124e5ba8c1057335c3727c24243af2807497c6e4b05cb2da811364",
-        "sha1": "5a65a3944e32cc57b73b0f208d15d16fe9df4ed1"
-      },
-      "env": {
-        "server": "unsupported",
-        "client": "required"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/NNAgCjsB/versions/yllJFBpU/entityculling-fabric-1.11.3-mc1.21.1.jar"
-      ],
-      "fileSize": 1519243
-    },
-    {
-      "path": "mods/sodium-fabric-0.8.13+mc1.21.1.jar",
-      "hashes": {
-        "sha512": "8614a374593698069a80ac74de8cd9c28f3928d16819a0e0d6320b538e823f7e54e8be06d5ea5a9c268beb0e02073209d1f831a02dede851588b972367680853",
-        "sha1": "003c114c85ca88ef3362e018deb6aca0c682d6a1"
-      },
-      "env": {
-        "server": "unsupported",
-        "client": "required"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/AANobbMI/versions/SMxNOGZ6/sodium-fabric-0.8.13%2Bmc1.21.1.jar"
-      ],
-      "fileSize": 1574609
-    },
-    {
-      "path": "mods/modernfix-fabric-5.25.1+mc1.21.1.jar",
-      "hashes": {
-        "sha1": "4ab39e9c736e7204146792c545ec5b29fc0a3872",
-        "sha512": "dc67d6e023e1fcdeaf7837917c477cba212c611dfc2463c6ea021319c644087c79b477e0ea8194e113ddd7332fd5c6d82baa47c291eaac7f4a86252507b4e19f"
-      },
-      "env": {
-        "client": "required",
-        "server": "required"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/nmDcB62a/versions/NnNX8LBn/modernfix-fabric-5.25.1%2Bmc1.21.1.jar"
-      ],
-      "fileSize": 471258
-    },
-    {
-      "path": "mods/architectury-13.0.11-fabric.jar",
-      "hashes": {
-        "sha512": "53314eb34890b11ad3c06c6f3ba2d01ae1ca756235ce4f0574e4b0544952a2ab3c628c81b521653d6487d62c5dc3055e06fed6367a3a499bafad909512f0c716",
-        "sha1": "18200609d4c3571c4237b50884966f6fd82431ea"
-      },
-      "env": {
-        "server": "required",
-        "client": "required"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/lhGA9TYQ/versions/Pzc2FP5K/architectury-13.0.11-fabric.jar"
-      ],
-      "fileSize": 600921
-    },
-    {
-      "path": "mods/structure_layout_optimizer-fabric-1.0.12.jar",
-      "hashes": {
-        "sha512": "658db517456e7b9ce1b92b34cf8e7e411ca2d8004cccbb2608e3cd278f79846eafa176c40d1e6666d23a7dff6e1f2bc4ad97a8bfc168976168effce42979333b",
-        "sha1": "2ca2f8650794b271d439fc8cb703ed85f1fde068"
-      },
-      "env": {
-        "client": "required",
-        "server": "required"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/ayPU0OHc/versions/522Wudew/structure_layout_optimizer-fabric-1.0.12.jar"
-      ],
-      "fileSize": 62580
-    },
-    {
-      "path": "mods/lithostitched-1.8.1-fabric-21.1.jar",
-      "hashes": {
-        "sha512": "4854c2bccc969c0a84d9600825d899b391353917e26eb5ce8dc190d666c10b59bdbe1c8a63e900c7473d7f774e71e63a2c0e6f9efa7f5577ed90710295bd2cd7",
-        "sha1": "f295e89ad7f18a2ba20da2deb33efabfbe63ed43"
-      },
-      "env": {
-        "client": "required",
-        "server": "required"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/XaDC71GB/versions/GZFp8lnS/lithostitched-1.8.1-fabric-21.1.jar"
-      ],
-      "fileSize": 1015426
-    },
-    {
-      "path": "mods/reeses-sodium-options-fabric-2.2.4+mc1.21.1.jar",
-      "hashes": {
-        "sha512": "7784880c4dedae15e3e03c6de4cfa67a9ed242006f90b764c0fa6fda8679e219ca6c9987aae76ec9b0fff6f8cc38fff86b16e2836aaa0200998c9de938617d3e",
-        "sha1": "552c80c3113ad346c3abcdf7c5c6cc3a02a5fb62"
-      },
-      "env": {
-        "server": "unsupported",
-        "client": "required"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/Bh37bMuy/versions/XtuPOKUN/reeses-sodium-options-fabric-2.2.4%2Bmc1.21.1.jar"
-      ],
-      "fileSize": 257229
-    },
-    {
-      "path": "resourcepacks/PixelatedSky_BetterEnd_1.0-1.20.1.zip",
-      "hashes": {
-        "sha512": "e6542b4b15f4ddc20e7e448551e9516dea19490104731e38dba877b0de7d829d1e11767c4f274ed7257e36d97ef799a9419ccdcaa4bee8be38e26b9e73ac3897",
-        "sha1": "ed14bd902101954109dc327cc5b57af6cce76885"
-      },
-      "env": {
-        "server": "required",
-        "client": "required"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/nadYBTPe/versions/lgqeiru5/PixelatedSky_BetterEnd_1.0-1.20.1.zip"
-      ],
-      "fileSize": 492668
-    },
-    {
-      "path": "mods/CleanF3-0.4.10.jar",
-      "hashes": {
-        "sha512": "a96b2c88c0d630512bd101cb51e850637dfff5d5875da68de7729bbab519217661a37d21e6b77f727a0d950dff90a16ef43b898fc47fcfbb9a19a2fc15c0c06f",
-        "sha1": "e4b2e232713bfceacb7c2c6a3745fe42a40be368"
-      },
-      "env": {
-        "client": "required",
-        "server": "unsupported"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/5lvjfaRs/versions/sONVk6J8/CleanF3-0.4.10.jar"
-      ],
-      "fileSize": 18863
-    },
-    {
-      "path": "mods/lithium-fabric-0.15.4+mc1.21.1.jar",
-      "hashes": {
-        "sha512": "182064b00e6315e2255b857eaab8eb759e6b042ebd4cc8b855ff0d93f875a5a7188fac49f878d7b29d4ef7e6b6341190ad7f6f6f39f4a6d2c62003468b08e4c6",
-        "sha1": "7d82a004403b7780d4443d8e40361a55cfd0ae63"
-      },
-      "env": {
-        "client": "required",
-        "server": "required"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/gvQqBUqZ/versions/N08Z8wog/lithium-fabric-0.15.4%2Bmc1.21.1.jar"
-      ],
-      "fileSize": 797454
-    },
-    {
-      "path": "mods/AsyncParticles-21.1.4.7+1.21.1.jar",
-      "hashes": {
-        "sha512": "27db0b2daeb1046aca8d0981ea0c0b9b17846b5bbd5b4286cf7febe913cdd98da788021d16ce1b691e70bf1611c1fa3fcd80874eb39ced6f2424a57ecbb0cbfa",
-        "sha1": "d399a3467d453abf4f69c065163f2dfcee2d3062"
-      },
-      "env": {
-        "server": "unsupported",
-        "client": "required"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/c3onkd5k/versions/fLWPOIJX/AsyncParticles-21.1.4.7%2B1.21.1.jar"
-      ],
-      "fileSize": 1256682
-    },
-    {
-      "path": "mods/cloth-config-15.0.140-fabric.jar",
-      "hashes": {
-        "sha512": "1b3f5db4fc1d481704053db9837d530919374bf7518d7cede607360f0348c04fc6347a3a72ccfef355559e1f4aef0b650cd58e5ee79c73b12ff0fc2746797a00",
-        "sha1": "5d82342a2df53fd6df712bfdd583a811572918a4"
-      },
-      "env": {
-        "client": "required",
-        "server": "required"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/9s6osm5g/versions/HpMb5wGb/cloth-config-15.0.140-fabric.jar"
-      ],
-      "fileSize": 1157166
-    },
-    {
-      "path": "mods/obe+1.21.1-1.1.52.jar",
-      "hashes": {
-        "sha1": "01cd35904b464ef0363480f6bdf0fbc9a030fe8c",
-        "sha512": "e1139b4ce45eae6bf43bc920bb46ffdb23abeed300f15eb13188a705f23a1bc80fb71269d6d2c43fe7abd1167e86b51caeb459924ec34b03a1e95801c5ad7187"
-      },
-      "env": {
-        "server": "unsupported",
-        "client": "required"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/AtOSAunf/versions/xM58y6hq/obe%2B1.21.1-1.1.52.jar"
-      ],
-      "fileSize": 209265
-    },
-    {
-      "path": "mods/better-end-sky-0.3.0+1.21.jar",
-      "hashes": {
-        "sha512": "ad644691a516a168155d2ae5fcae28db6c7e4e21a8c1f28aa6c904d895fc5e50cfe0e3c3ed5aad93f4c8be1d4bc95d62652433acac1fe72dcd591576bfe7e546",
-        "sha1": "c53743d3ffabf65a26ef9f0b9a1d48277bf039c4"
-      },
-      "env": {
-        "server": "unsupported",
-        "client": "required"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/SgJ1iW80/versions/Zxum0zx8/better-end-sky-0.3.0%2B1.21.jar"
-      ],
-      "fileSize": 1398431
-    },
-    {
-      "path": "mods/cirrus-fabric-1.21.1-1.4.1.jar",
-      "hashes": {
-        "sha1": "000bcc548b7af1a0bf3dea826d5995e8faaa1ef3",
-        "sha512": "948c6ae6298fee3a6cdf75dd99373e4b552efc3d2715610769483dbbd8183bc4f56158fc810ccea22032e91f522b32be20b01bcc8a57f4c496e24e66f9070df5"
-      },
-      "env": {
-        "server": "unsupported",
-        "client": "required"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/SJDzFJH7/versions/lxmciEpD/cirrus-fabric-1.21.1-1.4.1.jar"
-      ],
-      "fileSize": 6443903
-    },
-    {
-      "path": "mods/Searchables-fabric-1.21.1-1.0.2.jar",
-      "hashes": {
-        "sha512": "1d57bd196a1122953a4f80d18af660be7ad791b9264e46666b273172c448df4de9acf2630fae7d196a4da8168c829fad18756c86b2cd3dd1068a0b453d8ec222",
-        "sha1": "2777db0b967e80e0659053154f32f14a0e99a7a7"
-      },
-      "env": {
-        "server": "unsupported",
-        "client": "required"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/fuuu3xnx/versions/tRdr8Bg3/Searchables-fabric-1.21.1-1.0.2.jar"
-      ],
-      "fileSize": 79531
-    },
     {
       "path": "mods/ferritecore-7.0.3-fabric.jar",
       "hashes": {
@@ -635,184 +35,79 @@
       "fileSize": 405552
     },
     {
-      "path": "mods/centered-crosshair+1.21-1.0.8.jar",
+      "path": "mods/no-resource-pack-warnings-1.3.1.jar",
       "hashes": {
-        "sha1": "09b6464435cd8db59d17da6351329ee30cbb56aa",
-        "sha512": "106f39b42c00b957199450cdf8b176cba70c6e945cd6356e53c27dfa26ab174ae29fc38a7f846de7ad1e30f6267fefd37c351f16f566155070dc2bee96c3e9ca"
+        "sha512": "d745582794be5103cd8d5c562f97e0d9001d36bc5421dbfa63b417cbf439d12ec2c0844a47da0c4c06d8c1c9224939d296285fb02216a7e86410765f4b2165ef",
+        "sha1": "7a21f4604fab946201e2cfc1a9a8f526f5581cdf"
       },
       "env": {
         "client": "required",
         "server": "unsupported"
       },
       "downloads": [
-        "https://cdn.modrinth.com/data/xUTHly0N/versions/Orfi1Sh5/centered-crosshair%2B1.21-1.0.8.jar"
+        "https://cdn.modrinth.com/data/6xKUDQcB/versions/73nzTFDd/no-resource-pack-warnings-1.3.1.jar"
       ],
-      "fileSize": 8630
+      "fileSize": 5002
     },
     {
-      "path": "mods/screenshot_viewer-1.3.3-fabric-mc1.21.jar",
+      "path": "mods/modernfix-fabric-5.25.1+mc1.21.1.jar",
       "hashes": {
-        "sha512": "4fe76b8c21a3c769c043445cc3bb160ad8f73d1e3364b074c6c3088dcbe388fa74b51da70cfce344536b7e9869892021b40f45f9b364e4954c32f27039a69926",
-        "sha1": "1f986d3f9e15e6962c13d7f9c3c511e11df250c1"
-      },
-      "env": {
-        "server": "unsupported",
-        "client": "required"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/laNoi025/versions/OPtoNGCV/screenshot_viewer-1.3.3-fabric-mc1.21.jar"
-      ],
-      "fileSize": 281554
-    },
-    {
-      "path": "mods/globalnarrationtoggle-1.21.1-1.5.jar",
-      "hashes": {
-        "sha1": "effebdbc23c691d7fa99e3878efc3de7e4992b2a",
-        "sha512": "05c7e3f7d641d5a64f893fdc49ba76c56978b5484a8e895547c49f2c270ccea5e05c4ae91c9ba2b6295fe64d630ec2b2542bb3fdf6d0d6d73007a7be05672f2b"
-      },
-      "env": {
-        "server": "unsupported",
-        "client": "required"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/UxJVewrJ/versions/7FdDgPtT/globalnarrationtoggle-1.21.1-1.5.jar"
-      ],
-      "fileSize": 39888
-    },
-    {
-      "path": "mods/resourcefulconfig-fabric-1.21-3.0.11.jar",
-      "hashes": {
-        "sha1": "f6a0df7cf464d1c94458ef075bead82033add9c9",
-        "sha512": "11189c68626404bef5021bae51bcec1840dba0c3356ca275e9b3439e20ba474fb9ba6f6bf4b4f08b3e9a43c58ac553e2e0d182429bd606948d8211bd49c1d0e7"
-      },
-      "env": {
-        "client": "required",
-        "server": "required"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/M1953qlQ/versions/dQh99ERC/resourcefulconfig-fabric-1.21-3.0.11.jar"
-      ],
-      "fileSize": 345396
-    },
-    {
-      "path": "resourcepacks/Tweaked Pale Garden.zip",
-      "hashes": {
-        "sha512": "8d192a94ee1759656d60ea0e64fc76716c9dfba3cc3e9389abe0693d71dfb7cd21572908562a95d7f0e37649c1a2a448f5969ecd64806a895d9c94d8e66fabb4",
-        "sha1": "9de0d2d11dd8fbe3aaeb95c4aedab8ce8aaa2c7e"
-      },
-      "env": {
-        "client": "required",
-        "server": "required"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/Rcd8VycJ/versions/mj6ItjFV/Tweaked%20Pale%20Garden.zip"
-      ],
-      "fileSize": 27116
-    },
-    {
-      "path": "mods/ImmediatelyFast-Fabric-1.6.15+1.21.1.jar",
-      "hashes": {
-        "sha512": "d4ac2d574d80000cd59b0b362706a6f86778bfc717748dca854f05ee8d09ce158738488e58c6b8ee05d5e54017f05b6c66c3bcaa3fa357d38cbfd75893dda9f4",
-        "sha1": "5067bdff1d5cc6d2dd89986f98bd8bd7ae62fb98"
-      },
-      "env": {
-        "server": "unsupported",
-        "client": "required"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/5ZwdcRci/versions/aLnBqxFW/ImmediatelyFast-Fabric-1.6.15%2B1.21.1.jar"
-      ],
-      "fileSize": 342235
-    },
-    {
-      "path": "mods/BorderlessFullscreen-v2.4.1-mc1.21.1.jar",
-      "hashes": {
-        "sha1": "5adf7fa41c4b0e17ea705aae2fa9ab965f982c9a",
-        "sha512": "e0e41bbc246e8ff35165ab29e73fcd48245cd625da9f64a36a1871c412bc3a963ba6320ed427b8170c16a3ec8a9cc1ae6d5f1527d26ce17922ccd2833fa22643"
-      },
-      "env": {
-        "client": "required",
-        "server": "unsupported"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/UIexcMP1/versions/a7RyAE2L/BorderlessFullscreen-v2.4.1-mc1.21.1.jar"
-      ],
-      "fileSize": 206310
-    },
-    {
-      "path": "mods/sodium-extra-fabric-0.9.4+mc1.21.1.jar",
-      "hashes": {
-        "sha512": "824b06ddaa7ab697ff252ee47c6278725fc2ed6eeaaa027c32c0ee8bbb9ab416c23dfdd3c89a2ca7f4618cb106ef55694a6163cd09abc248219d14e9eca3d7d3",
-        "sha1": "628487b330c9589d26cada5c4a51ac457af80a1f"
-      },
-      "env": {
-        "client": "required",
-        "server": "unsupported"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/PtjYWJkn/versions/YEWu6red/sodium-extra-fabric-0.9.4%2Bmc1.21.1.jar"
-      ],
-      "fileSize": 472019
-    },
-    {
-      "path": "mods/WhitePumpkins-fabric-1.21.1-1.2.3.jar",
-      "hashes": {
-        "sha512": "9e7d3dfe46b27e062a5625e844442e23ac66e75f01c5f087b4b128279f51f6d0408fbcdf7dddf8bb834ad2ff42a17d02c021c636f7ae8e196c456a525ab754fd",
-        "sha1": "831fbec88ce7e9622d23ae5dab7303782b881abe"
-      },
-      "env": {
-        "client": "required",
-        "server": "required"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/lIw0R1DW/versions/aAabTuRk/WhitePumpkins-fabric-1.21.1-1.2.3.jar"
-      ],
-      "fileSize": 136351
-    },
-    {
-      "path": "mods/zfastnoise-1.0.14+1.21.jar",
-      "hashes": {
-        "sha1": "7e9ce65d3e1e92940449fcab815563cb1e7ca1a8",
-        "sha512": "e19081e664d4fd731d985642279ae2f0e0774eb2da7d92f144a4e34b098d2a5c990cb92ed1f94793129798d75f17fe19450ca277c00d002dbf6734a6bda906b0"
+        "sha512": "dc67d6e023e1fcdeaf7837917c477cba212c611dfc2463c6ea021319c644087c79b477e0ea8194e113ddd7332fd5c6d82baa47c291eaac7f4a86252507b4e19f",
+        "sha1": "4ab39e9c736e7204146792c545ec5b29fc0a3872"
       },
       "env": {
         "server": "required",
         "client": "required"
       },
       "downloads": [
-        "https://cdn.modrinth.com/data/OnlVIpq5/versions/73DMCY3S/zfastnoise-1.0.14%2B1.21.jar"
+        "https://cdn.modrinth.com/data/nmDcB62a/versions/NnNX8LBn/modernfix-fabric-5.25.1%2Bmc1.21.1.jar"
       ],
-      "fileSize": 36201
+      "fileSize": 471258
     },
     {
-      "path": "mods/Controlling-fabric-1.21.1-19.0.5.jar",
+      "path": "resourcepacks/§d§lGlowy Nether Portals.zip",
       "hashes": {
-        "sha1": "22d2407311298d0185b606aa1dd03ae33b98dff3",
-        "sha512": "2b172371037bdac4d37332f1fcfbd09c6e083524ba02ea62d980aab937c79cef4eeeea4e05353cbb0428dcb1d31f04ce0f6f148619d15db74587b983c6d04bc8"
-      },
-      "env": {
-        "client": "required",
-        "server": "unsupported"
-      },
-      "downloads": [
-        "https://cdn.modrinth.com/data/xv94TkTM/versions/hGJDoW2W/Controlling-fabric-1.21.1-19.0.5.jar"
-      ],
-      "fileSize": 83679
-    },
-    {
-      "path": "mods/Ksyxis-1.4.6.jar",
-      "hashes": {
-        "sha1": "6de6271329e0c83e3ccc0512a0d3cfcc3e790d3f",
-        "sha512": "1571cd9b15b6733002dd164beab4ad1022fab2c904414b39db6fb609a41c48cca394f1751e5634ebc555795d9bd9dba48c2c280c152d9e0f570795d47a91c1d5"
+        "sha1": "18d275d55cd16cea624796d0206d00ca6e983bd4",
+        "sha512": "a6cbeb6a9e1c525a73ed18e2e86bb8a3a2ad88fde6ca0bca9501d9a1ce5618deb36083418890bfd6b9751676203439b2189dfabf1ecbbb94e9c418219aac4ffa"
       },
       "env": {
         "client": "required",
         "server": "required"
       },
       "downloads": [
-        "https://cdn.modrinth.com/data/2ecVyZ49/versions/kzLBJQLn/Ksyxis-1.4.6.jar"
+        "https://cdn.modrinth.com/data/k7um3II4/versions/bbL23zQU/%C2%A7d%C2%A7lGlowy%20Nether%20Portals.zip"
       ],
-      "fileSize": 23873
+      "fileSize": 274561
+    },
+    {
+      "path": "mods/hideexperimentalwarning-1.21.1-1.3.jar",
+      "hashes": {
+        "sha1": "0c18b1e2534fd1dd633ae438a51206651fe46d6d",
+        "sha512": "a45d6aa619670a64594c04ea59efb031aec92a84952106b2375e1667a9b445da4e4a6ed81557c99f9017e338f30b208812b0a0983907c9d094fab1ee661b73fb"
+      },
+      "env": {
+        "client": "required",
+        "server": "unsupported"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/Rm4OOdHd/versions/tJbfSalt/hideexperimentalwarning-1.21.1-1.3.jar"
+      ],
+      "fileSize": 18664
+    },
+    {
+      "path": "mods/sodium-fabric-0.8.13+mc1.21.1.jar",
+      "hashes": {
+        "sha512": "8614a374593698069a80ac74de8cd9c28f3928d16819a0e0d6320b538e823f7e54e8be06d5ea5a9c268beb0e02073209d1f831a02dede851588b972367680853",
+        "sha1": "003c114c85ca88ef3362e018deb6aca0c682d6a1"
+      },
+      "env": {
+        "client": "required",
+        "server": "unsupported"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/AANobbMI/versions/SMxNOGZ6/sodium-fabric-0.8.13%2Bmc1.21.1.jar"
+      ],
+      "fileSize": 1574609
     },
     {
       "path": "mods/geckolib-fabric-1.21.1-4.9.3.jar",
@@ -830,14 +125,449 @@
       "fileSize": 664463
     },
     {
-      "path": "mods/betterbiomeblend-fabric-1.21.1-1.4.1.jar",
+      "path": "mods/tt20-0.8.5+mc1.21.1-fabric.jar",
       "hashes": {
-        "sha1": "c48f566c3b342c7426089a2f29377dafd9335439",
-        "sha512": "77bea694a5f641f4ecac16b69f5abe86768df02f73381c4f3cdf9793b3b1532bb097d9d280e708d3a22d12a416bb9de5bea094c0f84dc185b2d14bac0bf0c585"
+        "sha512": "06a396d21ba1ae5693ea269a3711474c156eb19d4f8978011ebfba9246536c4a61e770ebf361d30c37fb8ee0e73dffe6ddf222e139aa51f8c0f22f321e81bc74",
+        "sha1": "47654d3c7d5abd9314613be56d9341067406229e"
+      },
+      "env": {
+        "client": "required",
+        "server": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/YS3ZignI/versions/P5J8Io1f/tt20-0.8.5%2Bmc1.21.1-fabric.jar"
+      ],
+      "fileSize": 52252
+    },
+    {
+      "path": "mods/reeses-sodium-options-fabric-2.2.4+mc1.21.1.jar",
+      "hashes": {
+        "sha1": "552c80c3113ad346c3abcdf7c5c6cc3a02a5fb62",
+        "sha512": "7784880c4dedae15e3e03c6de4cfa67a9ed242006f90b764c0fa6fda8679e219ca6c9987aae76ec9b0fff6f8cc38fff86b16e2836aaa0200998c9de938617d3e"
+      },
+      "env": {
+        "server": "unsupported",
+        "client": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/Bh37bMuy/versions/XtuPOKUN/reeses-sodium-options-fabric-2.2.4%2Bmc1.21.1.jar"
+      ],
+      "fileSize": 257229
+    },
+    {
+      "path": "mods/architectury-13.0.11-fabric.jar",
+      "hashes": {
+        "sha1": "18200609d4c3571c4237b50884966f6fd82431ea",
+        "sha512": "53314eb34890b11ad3c06c6f3ba2d01ae1ca756235ce4f0574e4b0544952a2ab3c628c81b521653d6487d62c5dc3055e06fed6367a3a499bafad909512f0c716"
+      },
+      "env": {
+        "client": "required",
+        "server": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/lhGA9TYQ/versions/Pzc2FP5K/architectury-13.0.11-fabric.jar"
+      ],
+      "fileSize": 600921
+    },
+    {
+      "path": "mods/placeholder-api-2.4.2+1.21.jar",
+      "hashes": {
+        "sha512": "fc13d3a5c048dbaab86318edaf8b6c6b46ef9f1d367e8f063d19f5a9b0da66c5ae419d92c8c4608edc89a01eb44d91ffcf017fea73f39b222cbd85e82f70a233",
+        "sha1": "aa1b9a49f9f190dfe4825c502b150817dd2998c3"
+      },
+      "env": {
+        "server": "required",
+        "client": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/eXts2L7r/versions/U5bhVym2/placeholder-api-2.4.2%2B1.21.jar"
+      ],
+      "fileSize": 232325
+    },
+    {
+      "path": "mods/vmp-fabric-mc1.21.1-0.2.0+beta.7.172-all.jar",
+      "hashes": {
+        "sha1": "267975777ba52a23d4423a60e9288f9ce288344e",
+        "sha512": "39731bb9a2eb844f156a0c2ddfe5fe97a811c3e5e854c074d3aa142bca1c746c0cb749315440ddfa6bebe3c49ce88bbb7902440aea84ca3689a2c2168803d6d9"
+      },
+      "env": {
+        "client": "required",
+        "server": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/wnEe9KBa/versions/VmlY7QTx/vmp-fabric-mc1.21.1-0.2.0%2Bbeta.7.172-all.jar"
+      ],
+      "fileSize": 433667
+    },
+    {
+      "path": "mods/better-end-sky-0.3.0+1.21.jar",
+      "hashes": {
+        "sha512": "ad644691a516a168155d2ae5fcae28db6c7e4e21a8c1f28aa6c904d895fc5e50cfe0e3c3ed5aad93f4c8be1d4bc95d62652433acac1fe72dcd591576bfe7e546",
+        "sha1": "c53743d3ffabf65a26ef9f0b9a1d48277bf039c4"
+      },
+      "env": {
+        "server": "unsupported",
+        "client": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/SgJ1iW80/versions/Zxum0zx8/better-end-sky-0.3.0%2B1.21.jar"
+      ],
+      "fileSize": 1398431
+    },
+    {
+      "path": "mods/BorderlessFullscreen-v2.4.1-mc1.21.1.jar",
+      "hashes": {
+        "sha1": "5adf7fa41c4b0e17ea705aae2fa9ab965f982c9a",
+        "sha512": "e0e41bbc246e8ff35165ab29e73fcd48245cd625da9f64a36a1871c412bc3a963ba6320ed427b8170c16a3ec8a9cc1ae6d5f1527d26ce17922ccd2833fa22643"
       },
       "env": {
         "client": "required",
         "server": "unsupported"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/UIexcMP1/versions/a7RyAE2L/BorderlessFullscreen-v2.4.1-mc1.21.1.jar"
+      ],
+      "fileSize": 206310
+    },
+    {
+      "path": "mods/c2me-fabric-mc1.21.1-0.4.0-alpha.0.30.jar",
+      "hashes": {
+        "sha512": "6fa50f7d626c0d0f9b877c76a2b176d8d22db17bf0530aa07ddd2a7d2f65a6328eb5326376aa28ae474d6c08610842c975548db4efc253f8386fdaefc60e08db",
+        "sha1": "7ce266eb1d7ff617751ed1f0ebb203662ed641b3"
+      },
+      "env": {
+        "server": "required",
+        "client": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/VSNURh3q/versions/KxcgERSN/c2me-fabric-mc1.21.1-0.4.0-alpha.0.30.jar"
+      ],
+      "fileSize": 3810456
+    },
+    {
+      "path": "mods/Controlling-fabric-1.21.1-19.0.5.jar",
+      "hashes": {
+        "sha1": "22d2407311298d0185b606aa1dd03ae33b98dff3",
+        "sha512": "2b172371037bdac4d37332f1fcfbd09c6e083524ba02ea62d980aab937c79cef4eeeea4e05353cbb0428dcb1d31f04ce0f6f148619d15db74587b983c6d04bc8"
+      },
+      "env": {
+        "client": "required",
+        "server": "unsupported"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/xv94TkTM/versions/hGJDoW2W/Controlling-fabric-1.21.1-19.0.5.jar"
+      ],
+      "fileSize": 83679
+    },
+    {
+      "path": "mods/fabric-api-0.116.17+1.21.1.jar",
+      "hashes": {
+        "sha512": "98c478217da19181f0e4df3ea6c2da6bdbda271c7544a4aea048513a49b444f1ff5b71dc0df6303017c48e8ff69b7bb6af6179bdf0d0e09ab3c1ee08411857a8",
+        "sha1": "810b2b0195371a012906241d8b85a32a1d6de53c"
+      },
+      "env": {
+        "client": "required",
+        "server": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/P7dR8mSH/versions/Mys3P7lK/fabric-api-0.116.17%2B1.21.1.jar"
+      ],
+      "fileSize": 2452735
+    },
+    {
+      "path": "mods/lithium-fabric-0.15.4+mc1.21.1.jar",
+      "hashes": {
+        "sha512": "182064b00e6315e2255b857eaab8eb759e6b042ebd4cc8b855ff0d93f875a5a7188fac49f878d7b29d4ef7e6b6341190ad7f6f6f39f4a6d2c62003468b08e4c6",
+        "sha1": "7d82a004403b7780d4443d8e40361a55cfd0ae63"
+      },
+      "env": {
+        "client": "required",
+        "server": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/gvQqBUqZ/versions/N08Z8wog/lithium-fabric-0.15.4%2Bmc1.21.1.jar"
+      ],
+      "fileSize": 797454
+    },
+    {
+      "path": "mods/entityculling-fabric-1.11.3-mc1.21.1.jar",
+      "hashes": {
+        "sha1": "5a65a3944e32cc57b73b0f208d15d16fe9df4ed1",
+        "sha512": "51cc760b886f53a8469f5f87098688c8e00a70e9499f4146908f676dc95c78bbfd6de6ddab124e5ba8c1057335c3727c24243af2807497c6e4b05cb2da811364"
+      },
+      "env": {
+        "client": "required",
+        "server": "unsupported"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/NNAgCjsB/versions/yllJFBpU/entityculling-fabric-1.11.3-mc1.21.1.jar"
+      ],
+      "fileSize": 1519243
+    },
+    {
+      "path": "mods/modmenu-11.0.5.jar",
+      "hashes": {
+        "sha1": "2321d890a25b5985eba576d7cd8fe9a9c136e33d",
+        "sha512": "92e8e96267ff18d320903090f2ad9b32408a218919f5a0d578e232ad774c89d49a34a8271806652be7d6283f24e98432bc4af7f95855e78b843f9100d68696c7"
+      },
+      "env": {
+        "client": "required",
+        "server": "unsupported"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/mOgUt4GM/versions/6lgOkclV/modmenu-11.0.5.jar"
+      ],
+      "fileSize": 975846
+    },
+    {
+      "path": "mods/resourcefullib-fabric-1.21-3.0.12.jar",
+      "hashes": {
+        "sha512": "df8a9586eaa0e2f8e1e6a5651ba79ff6c95327b0ab89cdab4708cc6ed51c3da6829d00e8f176e7e7b7b37d4af8c5bd9e3df047f3a8a04fd1af925d80c774185b",
+        "sha1": "cb67e1302b5116953f45556cc61dbcf40d986ecd"
+      },
+      "env": {
+        "client": "required",
+        "server": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/G1hIVOrD/versions/Hf91FuVF/resourcefullib-fabric-1.21-3.0.12.jar"
+      ],
+      "fileSize": 485586
+    },
+    {
+      "path": "mods/zfastnoise-1.0.14+1.21.jar",
+      "hashes": {
+        "sha512": "e19081e664d4fd731d985642279ae2f0e0774eb2da7d92f144a4e34b098d2a5c990cb92ed1f94793129798d75f17fe19450ca277c00d002dbf6734a6bda906b0",
+        "sha1": "7e9ce65d3e1e92940449fcab815563cb1e7ca1a8"
+      },
+      "env": {
+        "client": "required",
+        "server": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/OnlVIpq5/versions/73DMCY3S/zfastnoise-1.0.14%2B1.21.jar"
+      ],
+      "fileSize": 36201
+    },
+    {
+      "path": "mods/ImmediatelyFast-Fabric-1.6.15+1.21.1.jar",
+      "hashes": {
+        "sha1": "5067bdff1d5cc6d2dd89986f98bd8bd7ae62fb98",
+        "sha512": "d4ac2d574d80000cd59b0b362706a6f86778bfc717748dca854f05ee8d09ce158738488e58c6b8ee05d5e54017f05b6c66c3bcaa3fa357d38cbfd75893dda9f4"
+      },
+      "env": {
+        "client": "required",
+        "server": "unsupported"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/5ZwdcRci/versions/aLnBqxFW/ImmediatelyFast-Fabric-1.6.15%2B1.21.1.jar"
+      ],
+      "fileSize": 342235
+    },
+    {
+      "path": "mods/moreculling-fabric-1.21.1-1.0.10.jar",
+      "hashes": {
+        "sha1": "d425f77706d8f6499aae64eb804b3802dad111d4",
+        "sha512": "7f8f33e09a7b1952c4ae77843a28a5220fe9dd6436fda4b14edeb261a5ceb5468630c54ab3b8ec2c64a5c91f5b02f0246d17db57fa7fe11eb16ec9c745b9ae40"
+      },
+      "env": {
+        "server": "unsupported",
+        "client": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/51shyZVL/versions/wUYbHzXF/moreculling-fabric-1.21.1-1.0.10.jar"
+      ],
+      "fileSize": 332266
+    },
+    {
+      "path": "mods/Ixeris-4.6.10+1.21.1-fabric.jar",
+      "hashes": {
+        "sha512": "0d808b84c3de7ba9892e9e366c6ac461ebadf60893de55a5bc1bbe260b038658811b016765488730096868ec9cd1927975f38f9cc29e2c99ffc04206d204c93c",
+        "sha1": "f790481f85221c74176e7660ea48e4fe514869ab"
+      },
+      "env": {
+        "server": "unsupported",
+        "client": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/p8RJPJIC/versions/j3X1nxNK/Ixeris-4.6.10%2B1.21.1-fabric.jar"
+      ],
+      "fileSize": 785330
+    },
+    {
+      "path": "mods/globalnarrationtoggle-1.21.1-1.5.jar",
+      "hashes": {
+        "sha1": "effebdbc23c691d7fa99e3878efc3de7e4992b2a",
+        "sha512": "05c7e3f7d641d5a64f893fdc49ba76c56978b5484a8e895547c49f2c270ccea5e05c4ae91c9ba2b6295fe64d630ec2b2542bb3fdf6d0d6d73007a7be05672f2b"
+      },
+      "env": {
+        "client": "required",
+        "server": "unsupported"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/UxJVewrJ/versions/7FdDgPtT/globalnarrationtoggle-1.21.1-1.5.jar"
+      ],
+      "fileSize": 39888
+    },
+    {
+      "path": "mods/sodium-extra-fabric-0.9.4+mc1.21.1.jar",
+      "hashes": {
+        "sha512": "824b06ddaa7ab697ff252ee47c6278725fc2ed6eeaaa027c32c0ee8bbb9ab416c23dfdd3c89a2ca7f4618cb106ef55694a6163cd09abc248219d14e9eca3d7d3",
+        "sha1": "628487b330c9589d26cada5c4a51ac457af80a1f"
+      },
+      "env": {
+        "client": "required",
+        "server": "unsupported"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/PtjYWJkn/versions/YEWu6red/sodium-extra-fabric-0.9.4%2Bmc1.21.1.jar"
+      ],
+      "fileSize": 472019
+    },
+    {
+      "path": "mods/fabric-language-kotlin-1.14.2+kotlin.2.4.21.jar",
+      "hashes": {
+        "sha1": "f1d4ab6ecd54d9782521333a87eb50724ecb03e0",
+        "sha512": "7fb475c4a7e7bdf8d0aca4b5798a58a354c51443d5b1fbde3e8cf34dfbf7191ef4238b5f07d08ec9490ec180b371624523326c3ad45d4ed2b2be541de9407e5d"
+      },
+      "env": {
+        "client": "required",
+        "server": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/Ha28R6CL/versions/SKW1BTL3/fabric-language-kotlin-1.14.2%2Bkotlin.2.4.21.jar"
+      ],
+      "fileSize": 8142878
+    },
+    {
+      "path": "mods/collective-1.21.1-8.61.jar",
+      "hashes": {
+        "sha512": "93298d7d78f2af9a7788e5adcd18eb6c6ced99f2af0eebf0dde9b28b0b838bd07345ad7f8ff917d7bde65928204c304b6ca9ec8f926767557cb53eba4a6cf2b9",
+        "sha1": "cb8f9ba3d86f944cee4d127705851efe642bceaf"
+      },
+      "env": {
+        "server": "required",
+        "client": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/e0M1UDsY/versions/lWtufjcJ/collective-1.21.1-8.61.jar"
+      ],
+      "fileSize": 1283603
+    },
+    {
+      "path": "resourcepacks/§a§lVocal Villagers §r§71.4.zip",
+      "hashes": {
+        "sha1": "a80f9bf96570575cae80b55b30b34b9e9406436d",
+        "sha512": "eae2c0f3875d6402c3e60afb85a9dccec972a6709c94d4ee55ffea2912b1a6505a7a902bbbaa1c59631256aca9135a04aea853f9030901126ba434ee0c882e73"
+      },
+      "env": {
+        "client": "required",
+        "server": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/SEt2q8cl/versions/B0ExDjpO/%C2%A7a%C2%A7lVocal%20Villagers%20%C2%A7r%C2%A771.4.zip"
+      ],
+      "fileSize": 1148298
+    },
+    {
+      "path": "mods/packforge-fabric-1.4.1-beta.1-mc1.21.1.jar",
+      "hashes": {
+        "sha1": "3cd910c2a3afa3757f7d10391ad593c8f668aa78",
+        "sha512": "16a4214dad2d56a9efa313ba096f9a3727ec7349528850f59037f21ffdd2c9fa4b4c138de9321000d4f9d703144d6da8323fcc9d79dd7ccb0f8fb5c497dc487f"
+      },
+      "env": {
+        "server": "unsupported",
+        "client": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/NimDX7iQ/versions/B7tZiPV2/packforge-fabric-1.4.1-beta.1-mc1.21.1.jar"
+      ],
+      "fileSize": 398866
+    },
+    {
+      "path": "mods/cristellib-fabric-1.21.1-3.1.7.jar",
+      "hashes": {
+        "sha512": "7a71a8f409d14268461bebb8d7c45a1e15e82f379d92c6f6938eb20cc480cc6bbb763affc1ac582c3733eac2c403788f1cf43edcb4abe345054b0acc5c4c045d",
+        "sha1": "4f966c3efd6ecfe679aac64ba7c6f4d4a648ad5b"
+      },
+      "env": {
+        "client": "required",
+        "server": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/cl223EMc/versions/K1dyr5gj/cristellib-fabric-1.21.1-3.1.7.jar"
+      ],
+      "fileSize": 584853
+    },
+    {
+      "path": "resourcepacks/Tweaked Pale Garden.zip",
+      "hashes": {
+        "sha1": "9de0d2d11dd8fbe3aaeb95c4aedab8ce8aaa2c7e",
+        "sha512": "8d192a94ee1759656d60ea0e64fc76716c9dfba3cc3e9389abe0693d71dfb7cd21572908562a95d7f0e37649c1a2a448f5969ecd64806a895d9c94d8e66fabb4"
+      },
+      "env": {
+        "server": "required",
+        "client": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/Rcd8VycJ/versions/mj6ItjFV/Tweaked%20Pale%20Garden.zip"
+      ],
+      "fileSize": 27116
+    },
+    {
+      "path": "mods/Resourcify (1.21.1-fabric)-1.8.7.jar",
+      "hashes": {
+        "sha512": "26b4a1940bc6f472f595c5047df4baddf2f5864d0113f5e5f691145dc933762aa1250296ab3bd971967e800fc00d741a646fd784be9ba7f1ed9ee542da267087",
+        "sha1": "c7f5aafe2ecca5e7a9e882533229bc16ae78cba0"
+      },
+      "env": {
+        "client": "required",
+        "server": "unsupported"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/RLzHAoZe/versions/w6UrJgmO/Resourcify%20%281.21.1-fabric%29-1.8.7.jar"
+      ],
+      "fileSize": 2946833
+    },
+    {
+      "path": "mods/NoChatReports-FABRIC-1.21.1-v2.9.1.jar",
+      "hashes": {
+        "sha1": "789cabd9b1fed079af87f675d1d6c1c95b603e19",
+        "sha512": "23bb4a8a6a3f7071281cf97560e12f37e1f5f638a156e3fcb92a50ff0091f1fcfa3e090e7745e4b1175e7c2c784e38d73536a1044db1bf225a182fab758a5a29"
+      },
+      "env": {
+        "server": "required",
+        "client": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/qQyHxfxd/versions/D8K0KJXM/NoChatReports-FABRIC-1.21.1-v2.9.1.jar"
+      ],
+      "fileSize": 309410
+    },
+    {
+      "path": "mods/zoomify-2.15.2+1.21.1.jar",
+      "hashes": {
+        "sha1": "9ec9c47e1d3465ea0cbd595b6d9d12227239c9a6",
+        "sha512": "ce8db36e77f089f091986b6e8bea1c33433bbcffc7a47fa18d04dea5ecd4910286943600a85b4773fdf4ed5405f52f3c0dc08fea8b1551d7725a26e1f6ef2879"
+      },
+      "env": {
+        "client": "required",
+        "server": "unsupported"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/w7ThoJFB/versions/6jrMC48Z/zoomify-2.15.2%2B1.21.1.jar"
+      ],
+      "fileSize": 872937
+    },
+    {
+      "path": "mods/betterbiomeblend-fabric-1.21.1-1.4.1.jar",
+      "hashes": {
+        "sha512": "77bea694a5f641f4ecac16b69f5abe86768df02f73381c4f3cdf9793b3b1532bb097d9d280e708d3a22d12a416bb9de5bea094c0f84dc185b2d14bac0bf0c585",
+        "sha1": "c48f566c3b342c7426089a2f29377dafd9335439"
+      },
+      "env": {
+        "server": "unsupported",
+        "client": "required"
       },
       "downloads": [
         "https://cdn.modrinth.com/data/Rs6c7WyL/versions/eDX2L0GQ/betterbiomeblend-fabric-1.21.1-1.4.1.jar"
@@ -845,19 +575,139 @@
       "fileSize": 73085
     },
     {
-      "path": "mods/yet_another_config_lib_v3-3.8.2+1.21.1-fabric.jar",
+      "path": "mods/cloth-config-15.0.140-fabric.jar",
       "hashes": {
-        "sha512": "353169f85fa63e73ce9bdd0d4ddce54e3cbc4d71153a93c982f74c68fd93325986663f94fc2f2b10f4427e8b15a0485c608c5587b3840d933204b50ea4cb6d4c",
-        "sha1": "e075503382f70715ab9fc6f66d603397a86eb3e0"
+        "sha512": "1b3f5db4fc1d481704053db9837d530919374bf7518d7cede607360f0348c04fc6347a3a72ccfef355559e1f4aef0b650cd58e5ee79c73b12ff0fc2746797a00",
+        "sha1": "5d82342a2df53fd6df712bfdd583a811572918a4"
+      },
+      "env": {
+        "client": "required",
+        "server": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/9s6osm5g/versions/HpMb5wGb/cloth-config-15.0.140-fabric.jar"
+      ],
+      "fileSize": 1157166
+    },
+    {
+      "path": "mods/guiscaler-1.21.1-1.1.3-fabric.jar",
+      "hashes": {
+        "sha1": "d2ee22217ec5227ddc7877af1a5f326464188f5f",
+        "sha512": "454d1fc26b83cbf32450e9aa922b4bde98f290c1c6e595fed8de6b4210184f0053a390dd46dd14cab85b498f1bb80aa544c40092eadeb740c23ba69cb528e136"
+      },
+      "env": {
+        "client": "required",
+        "server": "unsupported"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/fM4mOw7u/versions/rmiJoUQl/guiscaler-1.21.1-1.1.3-fabric.jar"
+      ],
+      "fileSize": 435243
+    },
+    {
+      "path": "resourcepacks/§dnotandvm's§0-§bsculk§0-§bemissives!.zip",
+      "hashes": {
+        "sha1": "c2494c4458a0d96452a90dd1cbdde8153cc49614",
+        "sha512": "e0822d7ac555d915aed7d9ef1ce493494183ea7aed6a92d7cc8f76d50a29cf0759b3fd93b629df3111d33907c1e149ac9cbd93db348159abcdfe69bdd38097e3"
       },
       "env": {
         "server": "required",
         "client": "required"
       },
       "downloads": [
-        "https://cdn.modrinth.com/data/1eAoo2KR/versions/o3cDn8Vp/yet_another_config_lib_v3-3.8.2%2B1.21.1-fabric.jar"
+        "https://cdn.modrinth.com/data/d4Vebidc/versions/SW6ozYeV/%C2%A7dnotandvm%27s%C2%A70-%C2%A7bsculk%C2%A70-%C2%A7bemissives%21.zip"
       ],
-      "fileSize": 1131265
+      "fileSize": 73638
+    },
+    {
+      "path": "mods/AsyncParticles-21.1.4.10+1.21.1.jar",
+      "hashes": {
+        "sha512": "0b07cdbf6cf88c75e8c5fdedcf5d754579ec37e59294f22a45437cfa02b47e5af621827b3e001135b1f45765c80fb40582944788d63a9a06d2097baf23c9fafe",
+        "sha1": "ebc10f9aafc284df334e7cc2e986013c027d9450"
+      },
+      "env": {
+        "server": "unsupported",
+        "client": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/c3onkd5k/versions/qLpoOaqY/AsyncParticles-21.1.4.10%2B1.21.1.jar"
+      ],
+      "fileSize": 1303563
+    },
+    {
+      "path": "resourcepacks/PixelatedSky_BetterEnd_1.0-1.20.1.zip",
+      "hashes": {
+        "sha1": "ed14bd902101954109dc327cc5b57af6cce76885",
+        "sha512": "e6542b4b15f4ddc20e7e448551e9516dea19490104731e38dba877b0de7d829d1e11767c4f274ed7257e36d97ef799a9419ccdcaa4bee8be38e26b9e73ac3897"
+      },
+      "env": {
+        "client": "required",
+        "server": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/nadYBTPe/versions/lgqeiru5/PixelatedSky_BetterEnd_1.0-1.20.1.zip"
+      ],
+      "fileSize": 492668
+    },
+    {
+      "path": "mods/Searchables-fabric-1.21.1-1.0.2.jar",
+      "hashes": {
+        "sha1": "2777db0b967e80e0659053154f32f14a0e99a7a7",
+        "sha512": "1d57bd196a1122953a4f80d18af660be7ad791b9264e46666b273172c448df4de9acf2630fae7d196a4da8168c829fad18756c86b2cd3dd1068a0b453d8ec222"
+      },
+      "env": {
+        "client": "required",
+        "server": "unsupported"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/fuuu3xnx/versions/tRdr8Bg3/Searchables-fabric-1.21.1-1.0.2.jar"
+      ],
+      "fileSize": 79531
+    },
+    {
+      "path": "mods/continuity-3.0.0+1.21.jar",
+      "hashes": {
+        "sha512": "3601ddb50f19142c087d32525bc0afcfb5f49a2e7477b6645a98ec191218739fdf3c6ac95cd298e826eb34fc533af43bb0e78c64e51292866ecabade4d14b13a",
+        "sha1": "c7f09b53512604c2ba6803b1247bc70e4d0f8f8c"
+      },
+      "env": {
+        "server": "unsupported",
+        "client": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/1IjD5062/versions/kSPJ4hQv/continuity-3.0.0%2B1.21.jar"
+      ],
+      "fileSize": 1014044
+    },
+    {
+      "path": "mods/biomecleaner-mc1.21.1-1.1.8-fabric.jar",
+      "hashes": {
+        "sha512": "ab7ac850d7043080fd6fa15e22790b208884f7b1e20ad0fc9033f61e786b19fdb366465b43f484119ac9dd1168781c480508cb30b878e030e8347431a370e327",
+        "sha1": "2cd5691a6f82d702eb4f295797682292ddd059f7"
+      },
+      "env": {
+        "client": "required",
+        "server": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/mzuh1rlR/versions/d0gtrv25/biomecleaner-mc1.21.1-1.1.8-fabric.jar"
+      ],
+      "fileSize": 399253
+    },
+    {
+      "path": "resourcepacks/Vintage Panorama 1.1.1.zip",
+      "hashes": {
+        "sha1": "2e18ef9303f6661bf46f86c5f83c8ef6fb84b157",
+        "sha512": "e154ac4d449f90d04124f914f2d268b51b3928a876a34354a3ed5a1ca1de01704a02ca1f4fce09028592594d6f3054a621cdbdd5d6d178105e303ac57361377a"
+      },
+      "env": {
+        "server": "required",
+        "client": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/1kx02Ah7/versions/qxs0J0lL/Vintage%20Panorama%201.1.1.zip"
+      ],
+      "fileSize": 5279504
     },
     {
       "path": "mods/Clumps-fabric-1.21.1-19.0.0.1.jar",
@@ -866,164 +716,119 @@
         "sha512": "0aa8e3508d0a40ef814d4064c0b6cadba6326128dd878fe69f30677c889cec4ccb8f639c22bdd7083a73ae8fa76e1c115b5e4b1885904dc1244b02ab2f728e78"
       },
       "env": {
-        "server": "required",
-        "client": "required"
+        "client": "required",
+        "server": "required"
       },
       "downloads": [
         "https://cdn.modrinth.com/data/Wnxd13zP/versions/3ene3W1l/Clumps-fabric-1.21.1-19.0.0.1.jar"
       ],
       "fileSize": 20723
+    },
+    {
+      "path": "mods/servercore-fabric-1.5.19+1.21.1.jar",
+      "hashes": {
+        "sha512": "d1c3dd6abb70ae89b125fac649503524bc179b551e352f34cbc43d7ef31b7d0decb170c99c8e7275fe18a1f208c826e4484a0d74fc16ef8d11fb1725fd64fbb5",
+        "sha1": "a6982d25211a307416c6c050e41b087306caf6e8"
+      },
+      "env": {
+        "client": "required",
+        "server": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/4WWQxlQP/versions/GQ2a51Rl/servercore-fabric-1.5.19%2B1.21.1.jar"
+      ],
+      "fileSize": 897353
+    },
+    {
+      "path": "mods/Ksyxis-1.4.6.jar",
+      "hashes": {
+        "sha512": "1571cd9b15b6733002dd164beab4ad1022fab2c904414b39db6fb609a41c48cca394f1751e5634ebc555795d9bd9dba48c2c280c152d9e0f570795d47a91c1d5",
+        "sha1": "6de6271329e0c83e3ccc0512a0d3cfcc3e790d3f"
+      },
+      "env": {
+        "client": "required",
+        "server": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/2ecVyZ49/versions/kzLBJQLn/Ksyxis-1.4.6.jar"
+      ],
+      "fileSize": 23873
+    },
+    {
+      "path": "mods/ScalableLux-fabric-0.3.0-alpha.0.7-all.jar",
+      "hashes": {
+        "sha512": "e3c098b5136101575fe852d7d967f1be1c29a26ec687118e01a3efcea9ea1b8367d3b3be63ab7fa5029c12b478dcd764ad362980317e998674ddad4e0573349f",
+        "sha1": "ff6baa9ab1f2aecf0eba5b72595085551adddc7a"
+      },
+      "env": {
+        "server": "required",
+        "client": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/Ps1zyz6x/versions/AodeMVa6/ScalableLux-fabric-0.3.0-alpha.0.7-all.jar"
+      ],
+      "fileSize": 196331
+    },
+    {
+      "path": "mods/yet_another_config_lib_v3-3.8.2+1.21.1-fabric.jar",
+      "hashes": {
+        "sha512": "353169f85fa63e73ce9bdd0d4ddce54e3cbc4d71153a93c982f74c68fd93325986663f94fc2f2b10f4427e8b15a0485c608c5587b3840d933204b50ea4cb6d4c",
+        "sha1": "e075503382f70715ab9fc6f66d603397a86eb3e0"
+      },
+      "env": {
+        "client": "required",
+        "server": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/1eAoo2KR/versions/o3cDn8Vp/yet_another_config_lib_v3-3.8.2%2B1.21.1-fabric.jar"
+      ],
+      "fileSize": 1131265
+    },
+    {
+      "path": "mods/cirrus-fabric-1.21.1-1.4.1.jar",
+      "hashes": {
+        "sha1": "000bcc548b7af1a0bf3dea826d5995e8faaa1ef3",
+        "sha512": "948c6ae6298fee3a6cdf75dd99373e4b552efc3d2715610769483dbbd8183bc4f56158fc810ccea22032e91f522b32be20b01bcc8a57f4c496e24e66f9070df5"
+      },
+      "env": {
+        "server": "unsupported",
+        "client": "required"
+      },
+      "downloads": [
+        "https://cdn.modrinth.com/data/SJDzFJH7/versions/lxmciEpD/cirrus-fabric-1.21.1-1.4.1.jar"
+      ],
+      "fileSize": 6443903
     }
   ],
   "forks": [
     {
-      "id": "biome_cloud_transitions",
-      "version": "1.0.1",
-      "file": "biome-cloud-transitions-fabric-1.21.1-1.0.1.jar",
-      "repo": "dfgdrfgh/Biome-Cloud-Transitions",
-      "ref": "8b9705d174931157141b335de02ec3b23c613d09",
-      "kind": "cloud",
-      "sha256": "026556cf7e11283a88a4c5c4751dc122aaa1976f4491341936f89d9be019a608",
-      "artifact": 11864225538
-    },
-    {
-      "id": "the_sift",
-      "version": "1.1.2+fabric.1.21.1.14",
-      "file": "mielons-the-sift-1.21.1-1.1.2-fabric-backport.14.jar",
-      "repo": "dfgdrfgh/Mielon-s-The-Sift-1.21.1-Patch",
-      "ref": "d9c9a887f0c9e47a075683d3771d4c01c9351650",
-      "kind": "sift",
-      "sha256": "b02dcc65370f2d908da1870787bcaa54187052d6a553efb16b5136228be9a274",
-      "artifact": 12124998490
-    },
-    {
-      "id": "slabbed",
-      "version": "0.9.1-rewrite-alpha+1.21.1-fabric",
-      "file": "slabbed-0.9.1-rewrite-alpha+1.21.1-fabric.jar",
-      "repo": "dfgdrfgh/reslabbed",
-      "kind": "control",
-      "sha256": "e332102bc888fae2c35db7f416837c70f8ca312386a236fcb9ca96cfc1cbb63c",
-      "artifact": 12073160198
-    },
-    {
       "id": "vanillabackport",
-      "version": "1.2.0.2639.2",
-      "file": "VanillaBackport-fabric-1.21.1-1.2.0.2639.2.jar",
+      "version": "1.2",
+      "file": "VanillaBackport-fabric-1.21.1-1.2.jar",
       "repo": "dfgdrfgh/TrueVanillaBackport",
-      "ref": "3fafeea8c11d10092d70959ba4c3cf8265e4b619",
+      "ref": "88761b024b2125f65e777cc6524e5a3677d4498f",
       "kind": "backport",
-      "sha256": "295ecf8f8e7218765ab9def612173929210e5fe9fc799cf4bcef797df2d9b7c0",
-      "artifact": 11688988703
-    },
-    {
-      "id": "wwoo",
-      "version": "3.0.1+backport.1.21.1.6",
-      "file": "wwoo-fabric-1.21.1-3.0.1-backport.jar",
-      "repo": "dfgdrfgh/wwoo-3.0.1-backport",
-      "ref": "d8be782f4f856522bcbcf71fe1e21d2cf486c543",
-      "kind": "worldgen",
-      "sha256": "12580feeebf6cb3f49a2dc19df596e24e056e0b672d37c2ef56e55e60a46b042",
-      "artifact": 11785258216
-    },
-    {
-      "id": "friendsandfoes",
-      "version": "5.0.2",
-      "file": "friendsandfoes-fabric-5.0.2+mc1.21.1.jar",
-      "repo": "dfgdrfgh/friends-and-enemies",
-      "ref": "48538014ae6ddf76ee21f58f8d9326ca4af9b2db",
-      "kind": "mobs",
-      "sha256": "19d9ddbb8a09c924027e6ceb2625031f98b8bd8245835e04346db2b8b51b7590",
-      "artifact": 12140858582
+      "sha256": "9787eb24ac37d331ba9a6fedac17d21e392d6710f8af35286dfe1a8868d1bb9b",
+      "artifact": 12319783504
     }
   ],
   "configs": {
-    "config/badoptimizations.txt": "# BadOptimizations configuration\n# Toggle and configure optimizations here.\n# *All* of these require restarts.\n\n# Whether we should cancel updating the lightmap if not needed.\nenable_lightmap_caching: true\n# How much the in-game time must change in ticks (default tick rate = 1/20th of a second)\n# for the lightmap to update.\n# Higher values will result in less frequent updates\n# to block lighting, but slightly better performance.\n# Values below 2 will disable the optimization.\n# Has no effect in Minecraft 1.21.11+ as lightmap caching no longer directly uses time.\nlightmap_time_change_needed_for_update: 80\n\n# Whether the sky's color should be cached unless you're on a biome border.\n# Has no effect in Minecraft 1.21.11+ as the sky color was made data-driven.\nenable_sky_color_caching: true\n# How much the in-game time must change in ticks for the sky color to\n# be recalculated when not between biome borders. Higher values will result in\n# the sky updating less frequently, but slightly better performance.\n# Values below 2 will all have the same effect.\nskycolor_time_change_needed_for_update: 3\n\n# Whether we should avoid calling debug renderers\n# if there are no debug entries to render or process.\nenable_debug_renderer_disable_if_not_needed: true\n\n#\n# Micro optimizations\n#\n\n# Whether we should avoid calling the particle manager\n# and its calculations if there are no particles.\nenable_particle_manager_optimization: true\n# Whether we should avoid calling the toast manager if there are no toasts.\nenable_toast_optimizations: true\n# Whether the result of getSkyAngle should be cached\n# for the entire frame during rendering.\nenable_sky_angle_caching_in_worldrenderer: true\n# Whether entity renderers should be stored directly in EntityType instead of a HashMap.\n# If your entity-adding mod crashes with BadOptimizations, try disabling this first.\nenable_entity_renderer_caching: true\n# Whether block entity renderers should be stored in BlockEntityType instead of a HashMap.\nenable_block_entity_renderer_caching: true\n# Whether entity flags should be cached instead of calling DataTracker.\n# Also removes the unnecessary thread lock in DataTracker.\n# Unneeded with Lithium. Has no effect in Minecraft 1.20.5+.\nenable_entity_flag_caching: true\n# Whether we should avoid calling FOV calculations\n# if the FOV effect scale is zero.\nenable_remove_redundant_fov_calculations: true\n# Don't tick the tutorial if the game is not in demo mode.\nenable_remove_tutorial_if_not_demo: true\n\n#\n# Other\n#\n\n# Whether BadOptimizations <version> should be added onto\n# the left text of the F3 menu.\n# In 1.21.9+, enabling this puts it into the F3 customizer screen.\nshow_f3_text: true\n\n# Some config options will be force-disabled if certain mods are present\n# due to incompatibilities (e.g. entity rendering caching\n# is disabled w/ Twilight Forest / BedrockSkinUtility / SkinShuffle).\n# However, if you still want to use the optimizations, you can override it\n# by setting this to true. Beware of crashes. And Herobrine.\nignore_mod_incompatibilities: false\n\n# Some mods add hooks that add extra conditions to lightmap/skycolor caching.\n# Set this to true to ignore loading them. Enabling may cause issues with\n# lighting mods and is not recommended.\nignore_mod_cache_hooks: false\n\n# Whether to log the entire config into console when booting up.\n# If you plan on reporting an issue, please keep this on.\nlog_config: true\n\n# Do not change this\nconfig_version: 6\n",
-    "config/c2me.toml": "version = 3\r\n# ================================================================\r\n# (Default: \r\n#    max(\r\n#        1,\r\n#        min(\r\n#            if( is_smt_probably_enabled,\r\n#                cores,\r\n#                cores - 1\r\n#            )  - if(is_client, 1, 0),\r\n#            ( ( mem_gb - (if(is_client, 1.0, 0.5)) ) * 3.0 )\r\n#        )\r\n#    )\r\n# )  \r\n#  The expression for the default value of global executor parallelism. \r\n#  This is used when the parallelism isn't overridden.\r\n#  Available variables: is_windows, is_j9vm, is_client, cpus, mem_gb, cores, is_smt_probably_enabled\r\n# \r\ndefaultGlobalExecutorParallelismExpression = \"default\"\r\n# ================================================================\r\n# (Default: LOW) Sets the thread priority preset for worker threads\r\n# \r\n# Available presets:\r\n# - UNSET: do not touch any thread priority settings, restores legacy behavior\r\n# - BELOW_NORMAL:\r\n#   Linux: SCHED_BATCH\r\n#   Windows: Below Normal priority\r\n#   MacOS: priority=30\r\n#   FreeBSD: priority=12\r\n# - LOW:\r\n#   Linux: SCHED_BATCH, nice=3\r\n#   Windows: Below Normal priority, enable power throttling\r\n#   MacOS: priority=28\r\n#   FreeBSD: priority=6\r\n# - LOWER\r\n#   Linux: SCHED_BATCH, nice=8\r\n#   Windows: Lowest priority, enable power throttling\r\n#   MacOS: priority=23\r\n#   FreeBSD: priority=3\r\n# - LOWEST\r\n#   Linux: SCHED_BATCH, nice=16\r\n#   Windows: Idle priority, enable power throttling\r\n#   MacOS: priority=15\r\n#   FreeBSD: priority=0\r\n# \r\n# Defaults to LOW on clients and BELOW_NORMAL for dedicated servers\r\n# \r\n# Please preserve quotes so the config don't break\r\n# \r\nthreadPoolPriorityPreset = \"default\"\r\n# ================================================================\r\n# (Default: 11) Configures the parallelism of global executor\r\nglobalExecutorParallelism = \"default\"\r\n\r\n[fixes]\r\n\t# ================================================================\r\n\t# (Default: true)  \r\n\t#  Whether to disable the shutdown hook of log4j2 on dedicated servers.\r\n\t#  Enabling this also makes the JVM exit when the dedicated server is considered fully shut down.\r\n\t#  This option have no effect on client-side.\r\n\t#  We has historically been doing this, and this config option allows you to disable this behavior.\r\n\t# \r\n\tdisableLoggingShutdownHook = \"default\"\r\n\t# ================================================================\r\n\t# (Default: true) Enforces safe world random access.  \r\n\t# This feature detects unsafe off-thread world random access, helping to find the causes  \r\n\t# of mysterious \"Accessing LegacyRandomSource from multiple threads\" crash.  \r\n\t# The default behavior is to fail hard when such bad things happens.  \r\n\t# Disabling this option will replace this behavior with a warning.  \r\n\t# \r\n\t# It is generally not recommended to disable this settings unless you know what you are doing  \r\n\t# \r\n\t# \r\n\tenforceSafeWorldRandomAccess = \"default\"\r\n\r\n\t[clientSideConfig.modifyMaxVDConfig]\r\n\t\t# ================================================================\r\n\t\t# (Default: true) Whether to modify maximum view distance\r\n\t\tenabled = \"default\"\r\n\t\t# ================================================================\r\n\t\t# (Default: 56) Max render distance allowed in game options\r\n\t\tmaxViewDistance = \"default\"\r\n\t\t# ================================================================\r\n\t\t# (Default: true) Enable client-side support for extended render distance protocol (c2me:ext_render_distance_v1)\r\n\t\t# This allows requesting render distances higher than 127 chunks from the server\r\n\t\t# \r\n\t\t# Requires Fabric API (currently available)\r\n\t\t# \r\n\t\t# Note: The server must advertise support this protocol for this to work\r\n\t\t# \r\n\t\tenableExtRenderDistanceProtocol = \"default\"\r\n\r\n[noTickViewDistance]\r\n\t# ================================================================\r\n\t# (Default: 33) No-tick view distance max concurrent chunk loads \r\n\t#  Lower this for a better latency and higher this for a faster loading\r\n\tmaxConcurrentChunkLoads = \"default\"\r\n\t# ================================================================\r\n\t# (Default: true) Enable server-side support for extended render distance protocol (c2me:ext_render_distance_v1)\r\n\t# This allows requesting render distances higher than 127 chunks from the server\r\n\t# \r\n\t# Requires Fabric API (currently available)\r\n\t# \r\n\tenableExtRenderDistanceProtocol = \"default\"\r\n\t# ================================================================\r\n\t# (Default: false) Whether to ensure correct chunks within normal render distance \r\n\t#  This will send chunks twice increasing network load\r\n\tensureChunkCorrectness = \"default\"\r\n\t# ================================================================\r\n\t# (Default: 200) Applies a multiplier *in percentage* to the target chunk sending rate from vanilla\r\n\t# Setting this to 0 disables rate limiting\r\n\t# \r\n\t# Defaults to 200, which is 200%\r\n\t# \r\n\tchunkSendingSpeedMultiplierPercentage = \"default\"\r\n\r\n[ioSystem]\r\n\t# ================================================================\r\n\t# (Default: 8192) Soft limit for io worker nbt cache\r\n\tchunkDataCacheSoftLimit = \"default\"\r\n\t# ================================================================\r\n\t# (Default: 32678) Hard limit for io worker nbt cache\r\n\tchunkDataCacheLimit = \"default\"\r\n\t# ================================================================\r\n\t# (Default: true) Whether to use the optimized implementation of IO system\r\n\treplaceImpl = \"default\"\r\n\r\n[vanillaWorldGenOptimizations]\r\n\t# ================================================================\r\n\t# (Default: true) Whether to use density function compiler to accelerate world generation\r\n\t# \r\n\t# Density function: https://minecraft.wiki/w/Density_function\r\n\t# \r\n\t# This functionality compiles density functions from world generation\r\n\t# datapacks (including vanilla generation) to JVM bytecode to increase\r\n\t# performance by allowing JVM JIT to better optimize the code\r\n\t# \r\n\t# Currently, all functions provided by vanilla are implemented.\r\n\t# Chunk upgrades from pre-1.18 versions are not implemented and will\r\n\t# fall back to the unoptimized version of density functions.\r\n\t# \r\n\tuseDensityFunctionCompiler = \"default\"\r\n\t# ================================================================\r\n\t# (Default: true) Enables the built-in integrations with other worldgen mods in density function compiler.\r\n\t# \r\n\t# Depends on vanillaWorldGenOptimizations.useDensityFunctionCompiler\r\n\t# \r\n\tenableBuiltinDFCIntegrations = \"default\"\r\n\t# ================================================================\r\n\t# (Default: true) Whether to enable aquifer optimizations to accelerate overworld worldgen\r\n\t# (may cause incompatibility with other mods)\r\n\toptimizeAquifer = \"default\"\r\n\t# ================================================================\r\n\t# (Default: true) Whether to enable End Biome Cache to accelerate The End worldgen \r\n\t# This is no longer included in lithium-fabric \r\n\t# (may cause incompatibility with other mods)\r\n\t# \r\n\tuseEndBiomeCache = \"default\"\r\n\t# ================================================================\r\n\t# (Default: true) Whether to enable StructureWeightSampler optimizations to accelerate world generation\r\n\t# \r\n\toptimizeStructureWeightSampler = \"default\"\r\n\r\n\t[vanillaWorldGenOptimizations.nativeAcceleration]\r\n\t\t# ================================================================\r\n\t\t# (Default: false) Enable the use of AVX512 for native acceleration\r\n\t\t# \r\n\t\t# Currently, AVX512 implementation is generally slower than AVX2 implementations.\r\n\t\t# If you ever decide to enable this, make sure you have verified that\r\n\t\t# AVX512 implementations are faster on your machine.\r\n\t\t# \r\n\t\tallowAVX512 = \"default\"\r\n\t\t# ================================================================\r\n\t\t# (Default: true) Enable the use of bundled native libraries to accelerate world generation\r\n\t\t# \r\n\t\tenabled = \"default\"\r\n\r\n[generalOptimizations]\r\n\t# ================================================================\r\n\t# (Default: -1) The task interval of mid-tick chunk tasks in nanoseconds (-1 to disable)  \r\n\t# Mid-tick chunk tasks is to execute chunk tasks during server tick loop  \r\n\t# to speed up chunk loading and generation  \r\n\t# This helps chunks loading and generating under high MSPT but may raise  \r\n\t# MSPT when chunks are loading or generating  \r\n\t#  \r\n\t# It is generally not recommended to adjust this value unless you know  \r\n\t# what you are doing  \r\n\t#  \r\n\t# Incompatible with Dimensional Threading (dimthread)\r\n\t# \r\n\tmidTickChunkTasksInterval = \"default\"\r\n\r\n\t[generalOptimizations.autoSave]\r\n\t\t# ================================================================\r\n\t\t# (Default: ENHANCED) Defines how auto save should be handled  \r\n\t\t# VANILLA: Use vanilla auto-save behavior (auto-save performed every tick during ticking)  \r\n\t\t# ENHANCED: Use C2ME enhanced auto-save (auto-save performed when the server have spare time after ticking)  \r\n\t\t# PERIODIC: Use pre-1.18 vanilla auto-save behavior (auto-save performed every 6000 ticks during ticking)  \r\n\t\t#  \r\n\t\t# Please preserve quotes so this config don't break\r\n\t\t# \r\n\t\tmode = \"default\"\r\n\r\n[chunkSystem]\r\n\t# ================================================================\r\n\t# (Default: true) Whether to enable async serialization\r\n\t# \r\n\tasyncSerialization = \"default\"\r\n\t# ================================================================\r\n\t# (Default: false) Whether to recover from errors when loading chunks \r\n\t#  This will cause errored chunk to be regenerated entirely, which may cause data loss \r\n\t#  Only applies when async chunk loading is enabled\r\n\t# \r\n\trecoverFromErrors = \"default\"\r\n\t# ================================================================\r\n\t# (Default: true) Whether to allow POIs (Point of Interest) to be unloaded\r\n\t# Unloaded POIs are reloaded on-demand or when the corresponding chunks are loaded again,\r\n\t# which should not cause any behavior change\r\n\t#  \r\n\t# Note:\r\n\t# Vanilla never unloads POIs when chunks unload, causing small memory leaks\r\n\t# These leaks adds up and eventually cause issues after generating millions of chunks\r\n\t# in a single world instance\r\n\t# \r\n\tallowPOIUnloading = \"default\"\r\n\t# ================================================================\r\n\t# (Default: true) This option workarounds MC-276863, a bug that makes mushrooms appear in non-postprocessed chunks\r\n\t# This bug is amplified with notickvd as it exposes non-postprocessed chunks to players\r\n\t# \r\n\t# This should not affect other worldgen behavior and game mechanics in general\r\n\t# \r\n\tsuppressGhostMushrooms = \"default\"\r\n\t# ================================================================\r\n\t# (Default: true) Whether to synchronize the management of player tickets\r\n\t# \r\n\t# In vanilla Minecraft, player tickets are not always removed immediately when players leave an area.\r\n\t# The delay in removal increases with the chunk system\u2019s throughput, but due to vanilla\u2019s typically\r\n\t# slow chunk loading, tickets are almost always removed immediately. However, some contraptions rely\r\n\t# on this immediate removal behavior and tend to be broken with the increased chunk throughput.\r\n\t# Enabling this option synchronizes player ticket handling, making it more predictable and\r\n\t# thus improving compatibility with these contraptions.\r\n\t# \r\n\tsyncPlayerTickets = \"default\"\r\n\t# ================================================================\r\n\t# (Default: true) Whether to turn fluid postprocessing into scheduled tick\r\n\t# \r\n\t# Fluid post-processing is very expensive when loading in new chunks, and this can affect\r\n\t# MSPT significantly. This option delays fluid post-processing to scheduled tick to hopefully\r\n\t# mitigate this issue.\r\n\t# \r\n\tfluidPostProcessingToScheduledTick = \"default\"\r\n\t# ================================================================\r\n\t# (Default: true) Whether to filter fluid post-processing on worldgen threads\r\n\t# \r\n\t# The worldgen processes creates a lot of unnecessary fluid post-processing tasks,\r\n\t# which can overload the server thread and cause stutters.\r\n\t# This applies a rough filter to filter out fluids that are definitely not going to flow\r\n\t# \r\n\tfilterFluidPostProcessing = \"default\"\r\n\t# ================================================================\r\n\t# (Default: false) Whether to use legacy scheduling for neighbor chunks\r\n\t# \r\n\t# Enabling this restores the behavior of always loading in neighbor chunks when a chunk is loaded.\r\n\t# \r\n\t# This is currently deprecated and will be removed in the future.\r\n\t# \r\n\tuseLegacyScheduling = \"default\"\r\n\t# ================================================================\r\n\t# (Default: false) Whether to enable low memory mode\r\n\t# \r\n\t# This option will attempt to aggressively unload unused chunks.\r\n\t# Only applies when useLegacyScheduling is disabled.\r\n\t# \r\n\tlowMemoryMode = \"default\"\r\n\t# ================================================================\r\n\t# (Default: false) Whether to delay full chunk events to after full chunk future have been completed\r\n\t# This restores the buggy behavior in NeoForge that the ecosystem have been relying on\r\n\t# \r\n\t# Enabling this will almost certainly break vanilla behavior, disabled by default on fabric\r\n\t# Do not change this unless you know what you are doing\r\n\t# \r\n\tdelayFullChunkEvents = \"default\"\r\n",
-    "config/cirrus-client.json": "{\n  \"clouds\": {\n    \"enabled\": true,\n    \"dimensions\": {},\n    \"dimensionTints\": {},\n    \"timeTintEnabled\": true,\n    \"dayTint\": 16767152,\n    \"noonTint\": 16777215,\n    \"eveningTint\": 16752768,\n    \"nightTint\": 8820175,\n    \"dayFade\": 0.0,\n    \"dayFadeTransitionOnly\": false,\n    \"noonFade\": 0.0,\n    \"noonFadeTransitionOnly\": false,\n    \"eveningFade\": 0.0,\n    \"eveningFadeTransitionOnly\": false,\n    \"nightFade\": 0.0,\n    \"nightFadeTransitionOnly\": false,\n    \"shaderPackWarningsEnabled\": true,\n    \"distantHorizonsCompatibility\": true,\n    \"syncCloudDistanceWithDistantHorizons\": false,\n    \"translucentLayerOverlap\": true,\n    \"renderDistanceChunks\": 64,\n    \"detailedCloudRadiusChunks\": 64,\n    \"rainCloudCoverage\": 0.55,\n    \"thunderCloudCoverage\": 0.75,\n    \"customLightningEnabled\": true,\n    \"lightningBoltIntensity\": 1.0,\n    \"hideLightningCloudFlashes\": false,\n    \"lightningCloudFlashOpacity\": 0.75,\n    \"lowerLayerStyle\": \"fast\",\n    \"lowerLayerHeightOffset\": 128.0,\n    \"lowerLayerSpeed\": 2.0,\n    \"lowerLayerOpacity\": 0.25,\n    \"upperLayerEnabled\": true,\n    \"upperLayerStyle\": \"fast\",\n    \"upperLayerHeightOffset\": 256.0,\n    \"upperLayerSpeed\": 1.0,\n    \"upperLayerOpacity\": 0.5,\n    \"topLayerEnabled\": true,\n    \"topLayerStyle\": \"fast\",\n    \"topLayerHeightOffset\": 256.0,\n    \"topLayerSpeed\": 0.5,\n    \"topLayerOpacity\": 0.15\n  },\n  \"sky\": {\n    \"smoothTimeTransitions\": false,\n    \"timeTransitionSpeed\": 1.0,\n    \"sunAngledOrbit\": false,\n    \"moonAngledOrbit\": false,\n    \"starsAngledOrbit\": false,\n    \"milkyWayAngledOrbit\": true,\n    \"customStarsEnabled\": true,\n    \"starDensity\": 2000,\n    \"starMinimumOpacity\": 0.25,\n    \"starMaximumOpacity\": 1.0,\n    \"starMinimumSize\": 0.55,\n    \"starMaximumSize\": 2.0,\n    \"starTwinkleStrength\": 1.0,\n    \"starTwinkleSpeed\": 1.0,\n    \"starColorVariation\": 1.0,\n    \"shootingStarsEnabled\": true,\n    \"shootingStarPixelatedTrail\": true,\n    \"shootingStarFrequency\": 1.0,\n    \"shootingStarOpacity\": 0.85,\n    \"shootingStarMinimumSize\": 0.75,\n    \"shootingStarMaximumSize\": 1.5,\n    \"shootingStarMinimumSpeed\": 0.8,\n    \"shootingStarMaximumSpeed\": 1.8,\n    \"shootingStarSpeedVariation\": 0.65,\n    \"shootingStarTrailLength\": 3.0,\n    \"shootingStarBloom\": 2.0,\n    \"shootingStarColorVariation\": 1.0,\n    \"skyGradientsEnabled\": true,\n    \"fogUsesHorizonColor\": true,\n    \"fogHorizonTintStrength\": 0.6,\n    \"skyGradientOpacity\": 1.0,\n    \"skyGradientTransitionTicks\": 1800.0,\n    \"skyGradientHeight\": 0.9,\n    \"morningHorizonColor\": 16752248,\n    \"morningZenithColor\": 7575500,\n    \"morningGradientStrength\": 1.0,\n    \"dayHorizonColor\": 12180210,\n    \"dayZenithColor\": 5081290,\n    \"dayGradientStrength\": 1.0,\n    \"eveningHorizonColor\": 15759458,\n    \"eveningZenithColor\": 6052766,\n    \"eveningGradientStrength\": 1.0,\n    \"nightHorizonColor\": 4204111,\n    \"nightZenithColor\": 1514312,\n    \"nightGradientStrength\": 1.0,\n    \"milkyWayEnabled\": false,\n    \"milkyWayPixelationEnabled\": true,\n    \"milkyWayPixelationResolution\": 320,\n    \"milkyWayOpacity\": 0.65,\n    \"auroraEnabled\": false,\n    \"auroraPixelationEnabled\": true,\n    \"auroraPixelationResolution\": 320,\n    \"auroraColdBiomesOnly\": true,\n    \"auroraOpacity\": 1.0,\n    \"auroraCustomColors\": true,\n    \"auroraLowerColor\": 2030194,\n    \"auroraMiddleColor\": 2014970,\n    \"auroraUpperColor\": 14372853,\n    \"auroraAnimationSpeed\": 5.0,\n    \"auroraMovement\": 2.0,\n    \"auroraRibbonWidth\": 1.0,\n    \"auroraHeightDegrees\": -10.0,\n    \"auroraNightlyVariation\": 1.0,\n    \"endSkyEnabled\": false,\n    \"endGlassEnabled\": true,\n    \"endSkyQuality\": \"low\",\n    \"endSkyPixelationEnabled\": true,\n    \"endSkyPixelationResolution\": 64,\n    \"endSkyIntensity\": 1.0,\n    \"endSkyAnimationSpeed\": 1.0,\n    \"endSkyMorphSpeed\": 3.0,\n    \"endSkyVoidCoverage\": 2.0,\n    \"endSkyVoidDarkness\": 1.0,\n    \"endSkyLightningFrequency\": 3.0,\n    \"endSkyLightningIntensity\": 2.0,\n    \"endSkySurgeFrequency\": 3.0,\n    \"endSkySurgeStrength\": 1.0\n  }\n}\r\n",
-    "config/clean-debug.json": "{\n  \"hardwareMode\": \"REDUCED\",\n  \"hideActiveRenderer\": true,\n  \"hideTags\": true,\n  \"hideDebugHints\": true,\n  \"shyFluids\": true,\n  \"hideHelpShortcut\": true,\n  \"hideNoiseRouter\": true,\n  \"onlyShowNecessary\": true,\n  \"hideCoordinates\": false,\n  \"hideSodium\": true,\n  \"hideIris\": true,\n  \"hideLitematica\": true,\n  \"hideEntityCulling\": true,\n  \"hideViaFabric\": true,\n  \"hidePresenceFootsteps\": true,\n  \"hideDistantHorizons\": true,\n  \"hideModernFix\": true,\n  \"hideJourneyMap\": true,\n  \"hideLambDynamicLights\": true,\n  \"hideDynamicFps\": true,\n  \"hideCaveDust\": true,\n  \"hideFigura\": true\n}",
-    "config/continuity.json": "{\n  \"connected_textures\": true,\n  \"emissive_textures\": true,\n  \"custom_block_layers\": true,\n  \"use_manual_culling\": true\n}",
-    "config/dynamic_fps.json": "{}\n",
-    "config/entityculling.json": "{\n  \"configVersion\": 9,\n  \"safeMode\": true,\n  \"renderNametagsThroughWalls\": true,\n  \"blockEntityWhitelist\": [\n    \"botania:flame_ring\",\n    \"create:rope_pulley\",\n    \"minecraft:beacon\",\n    \"create:hose_pulley\",\n    \"betterend:eternal_pedestal\",\n    \"botania:magic_missile\",\n    \"botania:falling_star\"\n  ],\n  \"entityWhitelist\": [\n    \"botania:mana_burst\",\n    \"drg_flares:drg_flares\",\n    \"quark:soul_bead\"\n  ],\n  \"tracingDistance\": 128,\n  \"debugMode\": false,\n  \"sleepDelay\": 10,\n  \"hitboxLimit\": 50,\n  \"captureRate\": 5,\n  \"tickCulling\": true,\n  \"tickCullingWhitelist\": [\n    \"cinematiccataclysm:scylla_cutscene\",\n    \"minecraft:block_display\",\n    \"alexscaves:gum_worm\",\n    \"cinematiccataclysm:maledictus_cutscene\",\n    \"minecraft:jungle_boat\",\n    \"minecraft:spruce_boat\",\n    \"mts:builder_rendering\",\n    \"drg_flares:drg_flares\",\n    \"minecraft:mangrove_boat\",\n    \"mts:builder_existing\",\n    \"minecraft:acacia_boat\",\n    \"minecraft:birch_chest_boat\",\n    \"create:contraption\",\n    \"drg_flares:drg_flare\",\n    \"cinematiccataclysm:leviathan_cutscene\",\n    \"minecraft:birch_boat\",\n    \"minecraft:boat\",\n    \"mts:builder_seat\",\n    \"minecraft:cherry_boat\",\n    \"alexscaves:gum_worm_segment\",\n    \"cinematiccataclysm:ancient_remnant_cutscene\",\n    \"minecraft:spruce_chest_boat\",\n    \"minecraft:dark_oak_boat\",\n    \"minecraft:oak_chest_boat\",\n    \"avm_staff:campfire_flame\",\n    \"minecraft:dark_oak_chest_boat\",\n    \"minecraft:text_display\",\n    \"create:gantry_contraption\",\n    \"minecraft:oak_boat\",\n    \"createbigcannons:cannon_carriage\",\n    \"minecraft:pale_oak_boat\",\n    \"minecraft:acacia_chest_boat\",\n    \"minecraft:cherry_chest_boat\",\n    \"createbigcannons:pitch_contraption\",\n    \"minecraft:item_display\",\n    \"cinematiccataclysm:ignis_cutscene\",\n    \"create:stationary_contraption\",\n    \"minecraft:bamboo_raft\",\n    \"create:carriage_contraption\",\n    \"minecraft:firework_rocket\",\n    \"minecraft:jungle_chest_boat\",\n    \"minecraft:pale_oak_chest_boat\",\n    \"minecraft:bamboo_chest_raft\",\n    \"minecraft:mangrove_chest_boat\",\n    \"voidscape:corrupted_pawn\"\n  ],\n  \"disableF3\": false,\n  \"skipEntityCulling\": false,\n  \"skipBlockEntityCulling\": false,\n  \"blockEntityFrustumCulling\": true,\n  \"forceDisplayCulling\": false,\n  \"solidLeaves\": false\n}",
-    "config/ferritecore.mixin.properties": "# Replace the blockstate neighbor table\r\nreplaceNeighborLookup = true\r\n# Do not store the properties of a state explicitly and read themfrom the replace neighbor table instead. Requires replaceNeighborLookup to be enabled\r\nreplacePropertyMap = true\r\n# Cache the predicate instances used in multipart models\r\ncacheMultipartPredicates = true\r\n# Avoid creation of new strings when creating ModelResourceLocations\r\nmodelResourceLocations = true\r\n# Do not create a new MultipartBakedModel instance for each block state using the same multipartmodel. Requires cacheMultipartPredicates to be enabled\r\nmultipartDeduplication = true\r\n# Deduplicate cached data for blockstates, most importantly collision and render shapes\r\nblockstateCacheDeduplication = true\r\n# Deduplicate vertex data of baked quads in the basic model implementations\r\nbakedQuadDeduplication = true\r\n# Use smaller data structures for \"simple\" models, especially models with few side-specific faces\r\nmodelSides = true\r\n# Save memory overhead from empty data component maps/patched\r\ndataComponentPatch = true\r\n# Replace objects used to detect multi-threaded access to chunks by a much smaller field. This option is disabled by default due to very rare and very hard-to-reproduce crashes, use at your own risk!\r\nuseSmallThreadingDetector = true\r\n# Use a slightly more compact, but also slightly slower representation for block states\r\ncompactFastMap = false\r\n# Populate the neighbor table used by vanilla. Enabling this slightly increases memory usage, but can help with issues in the rare case where mods access it directly.\r\npopulateNeighborTable = false\r\n",
-    "config/friendsandfoes.json": "{\n  \"enableBeekeeperVillagerProfession\": true,\n  \"generateBeekeeperAreaStructureInVillages\": true,\n  \"beekeeperAreaStructureWeight\": 2,\n  \"enableBarnacle\": true,\n  \"enableBarnacleSpawn\": true,\n  \"barnacleSpawnWeight\": 4,\n  \"barnacleSpawnMinGroupSize\": 1,\n  \"barnacleSpawnMaxGroupSize\": 1,\n  \"enableCopperGolem\": false,\n  \"generateCopperGolemWorkstationStructureInVillages\": true,\n  \"copperGolemWorkstationStructureWeight\": 1,\n  \"generateCopperGolemInAncientCity\": true,\n  \"copperGolemAncientCityCenterWeight\": 10,\n  \"enableCopperGolemsInTrialChambers\": true,\n  \"copperGolemInTrialChambersWeight\": 4,\n  \"enableLightningRodOxidation\": true,\n  \"enableCrab\": true,\n  \"enableCrabSpawn\": true,\n  \"crabSpawnWeight\": 14,\n  \"crabSpawnMinGroupSize\": 2,\n  \"crabSpawnMaxGroupSize\": 4,\n  \"crabPotionOfReachingDuration\": 180,\n  \"reachingStatusEffectModifier\": 1,\n  \"enableGlare\": true,\n  \"enableGlareSpawn\": true,\n  \"enableGlareGriefing\": true,\n  \"glareSpawnWeight\": 4,\n  \"glareSpawnMinGroupSize\": 1,\n  \"glareSpawnMaxGroupSize\": 1,\n  \"enableIceologer\": true,\n  \"enableIceologerSpawn\": true,\n  \"enableIceologerInRaids\": true,\n  \"fleeAwayFromIronGolems\": true,\n  \"generateIceologerCabinStructure\": true,\n  \"enableIllusioner\": true,\n  \"enableIllusionerSpawn\": true,\n  \"enableIllusionerInRaids\": true,\n  \"replaceVanillaIllusioner\": true,\n  \"useVanillaIllusionerTexture\": false,\n  \"generateIllusionerShackStructure\": true,\n  \"generateIllusionerTrainingGroundsStructure\": true,\n  \"illusionerMaxIllusionsCount\": 9,\n  \"illusionerIllusionLifetimeTicks\": 600,\n  \"illusionerInvisibilityTicks\": 60,\n  \"enableMauler\": true,\n  \"enableMaulerSpawn\": true,\n  \"enableMaulerSpawnInDesert\": true,\n  \"maulerDesertSpawnWeight\": 8,\n  \"maulerDesertSpawnMinGroupSize\": 1,\n  \"maulerDesertSpawnMaxGroupSize\": 1,\n  \"enableMaulerSpawnInBadlands\": true,\n  \"maulerBadlandsSpawnWeight\": 16,\n  \"maulerBadlandsSpawnMinGroupSize\": 1,\n  \"maulerBadlandsSpawnMaxGroupSize\": 1,\n  \"enableMaulerSpawnInSavanna\": true,\n  \"maulerSavannaSpawnWeight\": 32,\n  \"maulerSavannaSpawnMinGroupSize\": 1,\n  \"maulerSavannaSpawnMaxGroupSize\": 1,\n  \"enableMoobloom\": true,\n  \"enableMoobloomSpawn\": true,\n  \"moobloomSpawnWeight\": 4,\n  \"moobloomSpawnMinGroupSize\": 2,\n  \"moobloomSpawnMaxGroupSize\": 4,\n  \"enablePenguin\": true,\n  \"enablePenguinSpawn\": true,\n  \"penguinSpawnWeight\": 4,\n  \"penguinSpawnMinGroupSize\": 4,\n  \"penguinSpawnMaxGroupSize\": 8,\n  \"penguinsGlideStatusEffectModifier\": 0.5,\n  \"penguinPotionOfGlidingDuration\": 180,\n  \"enableRascal\": true,\n  \"enableRascalSpawn\": true,\n  \"rascalSpawnWeight\": 4,\n  \"rascalSpawnMinGroupSize\": 1,\n  \"rascalSpawnMaxGroupSize\": 1,\n  \"rascalGiveRewardInBundle\": true,\n  \"enableTuffGolem\": true,\n  \"generateTuffGolemInStronghold\": true,\n  \"enableWildfire\": true,\n  \"generateCitadelStructure\": true,\n  \"enableZombieHorseTrap\": true,\n  \"enableAcaciaBeehive\": false,\n  \"enableBambooBeehive\": false,\n  \"enableBirchBeehive\": false,\n  \"enableCherryBeehive\": false,\n  \"enableCrimsonBeehive\": false,\n  \"enableDarkOakBeehive\": false,\n  \"enableJungleBeehive\": false,\n  \"enableMangroveBeehive\": false,\n  \"enableSpruceBeehive\": false,\n  \"enablePaleOakBeehive\": true,\n  \"enablePoplarBeehive\": true,\n  \"enableWarpedBeehive\": false,\n  \"enableCopperButtons\": false,\n  \"enableLightningRods\": false\n}",
-    "config/fullscreenfix.properties": "enableMod:true\nexclusiveFullscreen:false\nautoMinimize:false\nstartInFullscreen:true\nreplaceVideoSettingsButton:true\ncaptureCursorInFullscreen:false\nconfigScreenHotkeyEnabled:true\n",
-    "config/guiscaler.json5": "{\n\t\"enableAutoScale\": true,\n\t\"mode\": \"AUTO\",\n\t\"customRules\": {\n\t\t\"2560\": 3,\n\t\t\"1920\": 2,\n\t\t\"1280\": 1\n\t}\n}",
-    "config/immediatelyfast.json": "{\n  \"REGULAR_INFO\": \"----- Regular config values below -----\",\n  \"font_atlas_resizing\": true,\n  \"map_atlas_generation\": true,\n  \"hud_batching\": true,\n  \"fast_text_lookup\": true,\n  \"fast_buffer_upload\": true,\n  \"COSMETIC_INFO\": \"----- Cosmetic only config values below (Does not optimize anything) -----\",\n  \"dont_add_info_into_debug_hud\": false,\n  \"EXPERIMENTAL_INFO\": \"----- Experimental config values below (Rendering glitches may occur) -----\",\n  \"experimental_disable_error_checking\": true,\n  \"experimental_disable_resource_pack_conflict_handling\": true,\n  \"experimental_sign_text_buffering\": true,\n  \"experimental_screen_batching\": true,\n  \"DEBUG_INFO\": \"----- Debug only config values below (Do not touch) -----\",\n  \"debug_only_and_not_recommended_disable_universal_batching\": false,\n  \"debug_only_and_not_recommended_disable_mod_conflict_handling\": false,\n  \"debug_only_and_not_recommended_disable_hardware_conflict_handling\": false,\n  \"debug_only_print_additional_error_information\": false,\n  \"debug_only_use_last_usage_for_batch_ordering\": false,\n  \"debug_only_detailed_memory_leak_detection\": false\n}",
-    "config/instantfeedback.json": "{\n  \"chaseTheSkiesHappyGhastSpeed\": true,\n  \"chaseTheSkiesUndyeBundles\": true,\n  \"theGardenAwakensWorldGen\": true,\n  \"theGardenAwakensAmbientParticles\": true,\n  \"theGardenAwakensRemoveMobSpawn\": true,\n  \"theGardenAwakensBuffCreaking\": true\n}",
-    "config/ixeris.toml": "#Specifies whether to enable the mod on Windows\r\nenabledOnWindows = true\r\n#Specifies whether to enable the mod on macOS\r\nenabledOnMacOS = false\r\n#Specifies whether to enable the mod on Linux\r\nenabledOnLinux = true\r\n#Specifies whether to enable the mod on other platforms\r\nenabledOnOtherPlatforms = true\r\n#Enable to allow busy-waiting in the framerate limiter, which improves FPS stability. Disable for lower CPU usage.\r\n#This option has no effect on 26.1 and above.\r\nallowBusyWaitInFramerateLimiter = true\r\n#Enable to use some experimental GLFW state cache, which may improve performance with some mods\r\naggressiveCaching = false\r\n#Enable to use a more flexible threading model, which improves performance while obeying threading requirements of the underlying operating system.\r\nflexibleThreading = true\r\n#Enable to disallow delaying of any GLFW/SDL call. Might reduce performance considerably.\r\nfullyBlockingMode = false\r\n#Specifies the priority of the event polling thread. Valid values are 0~10, where 0 = auto decide.\r\neventPollingThreadPriority = 0\r\n#Enables logging of GLFW event polling calls and stacktrace. Debug Only.\r\nlogPollingCalls = false\r\n#Enables logging of blocking calls and stacktrace. Debug Only.\r\nlogBlockingCalls = false\r\n#Enables logging of cache issues. Debug Only.\r\nlogCacheIssues = false\r\n\r\n[bufferedRawInput]\r\n\t#Enable to use buffered raw input for the mouse when supported, which can greatly improve event polling performance and reduce CPU usage.\r\n\tmouse = true\r\n\t#Enable to use buffered raw input for the keyboard when supported, which can offer a small performance boost to event polling performance.\r\n\tkeyboard = false\r\n\t#Specifies the initial raw input buffer size.\r\n\tminRawInputBufferSize = 32\r\n\t#Specifies the maximum raw input buffer size.\r\n\tmaxRawInputBufferSize = 1024\r\n\t#Specifies the optimization strategy for legacy messages. Valid values:\r\n\t#DEFAULT: uses the default strategy. Currently, this translates to NOLEGACY.\r\n\t#UNOPTIMIZED: uses a basic event loop.\r\n\t#THROTTLED: similar to UNOPTIMIZED, but with a limit on the number of messages read during each event polling to improve performance.\r\n\t#NOLEGACY: disables legacy messages completely. Best performance.\r\n\t#If you experience compatibility issues with external programs, try setting this to THROTTLED.\r\n\tmessageOptimizationStrategy = \"DEFAULT\"\r\n",
-    "config/libjf-config-core-v2.json5": "{\n    watchForChanges: true\n}",
-    "config/libjf-translate-v1.json5": "{\n    // Valid: [Google, LibreTranslate, Noop]\n    translationService: \"Google\",\n    libreTranslateHost: null\n}",
-    "config/libjf-web-v1.json5": "{\n    serverIp: \"http://127.0.0.1\",\n    port: 35535,\n    portOverride: -1,\n    maxConnections: 20,\n    enableFileHost: false\n}",
-    "config/lithium.properties": "mixin.experimental=true\nmixin.world.raycast=false\n",
-    "config/lithostitched.json": "{\n  // If disabled, some features will be turned off to prioritize parity with vanilla seeds. This includes custom wood type shipwrecks and some optimizations to Jigsaw structures.\n  \"breaks_seed_parity\": true,\n  \"enable_debug_suite\": false,\n  \"log_debug_messages\": false\n}",
-    "config/midnightlib.json": "{\n  \"config_screen_list\": \"MODMENU\"\n}",
-    "config/modernfix-mixins.properties": "# This is the configuration file for ModernFix.\n# In general, prefer using the config screen to editing this file. It can be accessed\n# via the standard mod menu on your respective mod loader. Changes will, however,\n# require restarting the game to take effect.\n#\n# The following options can be enabled or disabled if there is a compatibility issue.\n# Add a line with your option name and =true or =false at the bottom of the file to enable\n# or disable a rule. For example:\n#   mixin.perf.dynamic_resources=true\n# Do not include the #. You may reset to defaults by deleting this file.\n#\n# Available options:\n#  mixin.bugfix.chunk_deadlock=false # (overridden for mod compat)\n#  mixin.bugfix.concurrency=true # (default)\n#  mixin.bugfix.ender_dragon_leak=true # (default)\n#  mixin.bugfix.missing_block_entities=false # (default)\n#  mixin.bugfix.packet_leak=false # (default)\n#  mixin.bugfix.paper_chunk_patches=false # (overridden for mod compat)\n#  mixin.bugfix.restore_old_dragon_movement=false # (default)\n#  mixin.bugfix.world_leaks=true # (default)\n#  mixin.bugfix.world_screen_skipped=true # (default)\n#  mixin.devenv=false # (default)\n#  mixin.feature.blockentity_incorrect_thread=false # (default)\n#  mixin.feature.branding=true # (default)\n#  mixin.feature.cause_lag_by_disabling_threads=false # (default)\n#  mixin.feature.direct_stack_trace=false # (default)\n#  mixin.feature.disable_unihex_font=false # (default)\n#  mixin.feature.integrated_server_watchdog=true # (default)\n#  mixin.feature.log_stdout_in_log_files=true # (default)\n#  mixin.feature.mcfunction_profiling=true # (default)\n#  mixin.feature.measure_time=true # (default)\n#  mixin.feature.remove_chat_signing=false # (default)\n#  mixin.feature.remove_telemetry=true # (default)\n#  mixin.feature.snapshot_easter_egg=true # (default)\n#  mixin.feature.spam_thread_dump=false # (default)\n#  mixin.feature.spark_profile_launch=false # (default)\n#  mixin.feature.spark_profile_world_join=false # (default)\n#  mixin.feature.stalled_chunk_load_detection=false # (default)\n#  mixin.feature.suppress_narrator_stacktrace=true # (default)\n#  mixin.feature.warn_missing_perf_mods=true # (default)\n#  mixin.launch.class_search_cache=true # (default)\n#  mixin.perf.cache_blockstate_cache_arrays=true # (default)\n#  mixin.perf.cache_model_materials=true # (default)\n#  mixin.perf.cache_profile_texture_url=true # (default)\n#  mixin.perf.cache_strongholds=false # (overridden for mod compat)\n#  mixin.perf.chunk_meshing=true # (default)\n#  mixin.perf.clear_fabric_mapping_tables=false # (default)\n#  mixin.perf.clear_mixin_classinfo=false # (default)\n#  mixin.perf.compact_bit_storage=true # (default)\n#  mixin.perf.compact_mojang_registries=true # (default)\n#  mixin.perf.compress_unihex_font=true # (default)\n#  mixin.perf.dedicated_reload_executor=true # (default)\n#  mixin.perf.deduplicate_climate_parameters=false # (default)\n#  mixin.perf.deduplicate_location=false # (default)\n#  mixin.perf.deduplicate_wall_shapes=true # (default)\n#  mixin.perf.dynamic_dfu=true # (default)\n#  mixin.perf.dynamic_entity_renderers=false # (default)\n#  mixin.perf.dynamic_resources=false # (default)\n#  mixin.perf.dynamic_structure_manager=true # (default)\n#  mixin.perf.faster_command_suggestions=true # (default)\n#  mixin.perf.faster_item_rendering=false # (default)\n#  mixin.perf.faster_texture_stitching=true # (default)\n#  mixin.perf.fix_loop_spin_waiting=true # (default)\n#  mixin.perf.ingredient_item_deduplication=false # (default)\n#  mixin.perf.lazy_search_tree_registry=true # (default)\n#  mixin.perf.memoize_creative_tab_build=true # (default)\n#  mixin.perf.model_optimizations=true # (default)\n#  mixin.perf.mojang_registry_size=true # (default)\n#  mixin.perf.reduce_blockstate_cache_rebuilds=true # (default)\n#  mixin.perf.remove_biome_temperature_cache=true # (default)\n#  mixin.perf.resourcepacks=true # (default)\n#  mixin.perf.state_definition_construct=true # (default)\n#  mixin.perf.thread_priorities=true # (default)\n#  mixin.perf.ticking_chunk_alloc=true # (default)\n#  mixin.perf.worldgen_allocation=true # (default)\n#  mixin.safety=true # (default)\n#\n# User overrides go here.\n",
-    "config/modmenu.json": "{\n  \"sorting\": \"ascending\",\n  \"count_libraries\": true,\n  \"compact_list\": false,\n  \"count_children\": true,\n  \"mods_button_style\": \"classic\",\n  \"game_menu_button_style\": \"replace\",\n  \"count_hidden_mods\": true,\n  \"mod_count_location\": \"title_screen\",\n  \"hide_mod_links\": false,\n  \"show_libraries\": false,\n  \"hide_mod_license\": false,\n  \"hide_badges\": false,\n  \"hide_mod_credits\": false,\n  \"easter_eggs\": true,\n  \"random_java_colors\": false,\n  \"translate_names\": true,\n  \"translate_descriptions\": true,\n  \"update_checker\": true,\n  \"button_update_badge\": true,\n  \"update_channel\": \"release\",\n  \"quick_configure\": true,\n  \"modify_title_screen\": true,\n  \"modify_game_menu\": true,\n  \"hide_config_buttons\": false,\n  \"config_mode\": false,\n  \"disable_drag_and_drop\": false,\n  \"hidden_mods\": [],\n  \"hidden_configs\": [],\n  \"disable_update_checker\": []\n}",
-    "config/moreculling.toml": "version = 1\nenableSodiumMenu = true\ncloudCulling = true\nsignTextCulling = true\nrainCulling = true\ndontCull = []\nuseBlockStateCulling = true\nuseCustomItemFrameRenderer = true\nitemFrameMapCulling = true\nuseItemFrameLOD = true\nitemFrameLODRange = 16\nuseItemFrame3FaceCulling = true\nitemFrame3FaceCullingRange = 2.0\npaintingCulling = true\nleavesCullingMode = \"DEPTH\"\nleavesCullingAmount = 4\nincludeMangroveRoots = true\nendGatewayCulling = true\nbeaconBeamCulling = true\nuseOnModdedBlocksByDefault = true\n\n[modCompatibility]\nseamlesssleep = true\nterrain_slabs = true\nwhite_pumpkins = true\nthe_sift = true\nminecraft = true\n",
-    "config/quick-pack.json": "{\n  \"removeLoadingOverlayFadeOut\": true,\n  \"parallelMipmapGeneration\": true\n}",
-    "config/resourceful-config-web.json": "{\n  \"enabled\": false,\n  \"port\": 7903,\n  \"validator\": {\n    \"uuids\": [],\n    \"if\": {\n      \"password\": \"ff394089-7c68-470a-af50-518ae122fa59\",\n      \"type\": \"password\"\n    },\n    \"type\": \"if\"\n  }\n}",
-    "config/resourcify.json": "{\n  \"defaultService\": \"Modrinth\",\n  \"guiScale\": -1,\n  \"fullResThumbnail\": false,\n  \"openLinkInResourcify\": true,\n  \"adsEnabled\": false,\n  \"resourcePacksEnabled\": true,\n  \"dataPacksEnabled\": true,\n  \"shaderPacksEnabled\": true,\n  \"worldsEnabled\": true,\n  \"gifsDisabled\": false\n}",
-    "config/seamless_sleep-server.toml": "config_version = 1\nmod_version = \"2.5.3\"\n\n\n[sleep]\n    #Clear rain/thunder after sleeping. Range: true | false. Default: true\n    sleepClearsWeather = true\n\n    #Sleep animation duration multiplier. Range: 0.25 to 8.0. Default: 1.0\n    sleepAnimationDurationMultiplier = 1.0\n",
-    "config/seamless_sleep.toml": "config_version = 1\nmod_version = \"2.5.3\"\n\n\n[overlay]\n    #Enable sleep overlay. Range: true | false. Default: true\n    sleepOverlayEnabled = true\n\n    #Overlay darkness. Range: 0.0 to 1.0. Default: 0.35\n    sleepOverlayDarknessMultiplier = 0.35\n\n\n\n[chat]\n    #Chat text opacity multiplier. Range: 0.0 to 1.0. Default: 0.5\n    sleepChatTextOpacityMultiplier = 0.5\n\n    #Chat background opacity multiplier. Range: 0.0 to 1.0. Default: 0.4\n    sleepChatBackgroundOpacityMultiplier = 0.4\n\n    #Global chat opacity multiplier. Range: 0.1 to 2.0. Default: 1.0\n    sleepChatOpacityMultiplier = 1.0\n\n    #Max chat lines in bed chat. Range: integer 0 to 12. Default: 4\n    sleepChatMaxLines = 4\n\n\n\n[camera]\n    #Camera tilt angle. Range: -90.0 to 90.0. Default: 10.0\n    sleepCameraTiltDegrees = 10.0\n\n\n\n[advanced]\n    #Replay compatibility mode. Range: true | false. Default: true\n    replayCompatibilityEnabled = true\n\n    #Verbose debug logs. Range: true | false. Default: false\n    debugLogsEnabled = false\n",
-    "config/smooth_steps.json": "{\n  \"smoothingAmount\": 0.7,\n  \"useExponentialSmoothing\": true\n}",
-    "config/sodium-extra-options.json": "{\n  \"animation_settings\": {\n    \"animation\": true,\n    \"water\": true,\n    \"lava\": true,\n    \"fire\": true,\n    \"portal\": true,\n    \"block_animations\": true,\n    \"sculk_sensor\": true\n  },\n  \"particle_settings\": {\n    \"particles\": true,\n    \"rain_splash\": true,\n    \"block_break\": true,\n    \"block_breaking\": true,\n    \"other\": {}\n  },\n  \"detail_settings\": {\n    \"sky\": true,\n    \"sun\": true,\n    \"moon\": true,\n    \"stars\": true,\n    \"rain_snow\": true,\n    \"biome_colors\": true,\n    \"sky_colors\": true\n  },\n  \"render_settings\": {\n    \"fog_settings\": {\n      \"advanced\": false,\n      \"multi_dimension_fog_control\": false,\n      \"atmospheric\": {\n        \"distance_chunks\": 0,\n        \"start_percent\": 100,\n        \"shape_mode\": \"VANILLA\",\n        \"cloud_fog_percent\": 100\n      },\n      \"dimension_overrides\": {},\n      \"protected_gameplay\": {\n        \"enabled_when_allowed\": false,\n        \"blindness_distance_blocks\": 0,\n        \"darkness_distance_blocks\": 0,\n        \"lava_distance_blocks\": 0,\n        \"powder_snow_distance_blocks\": 0,\n        \"water_distance_blocks\": 0\n      }\n    },\n    \"light_updates\": true,\n    \"item_frame\": true,\n    \"armor_stand\": true,\n    \"painting\": true,\n    \"piston\": true,\n    \"beacon_beam\": true,\n    \"limit_beacon_beam_height\": false,\n    \"enchanting_table_book\": true,\n    \"item_frame_name_tag\": true,\n    \"player_name_tag\": true\n  },\n  \"extra_settings\": {\n    \"overlay_corner\": \"TOP_LEFT\",\n    \"text_contrast\": \"NONE\",\n    \"show_fps\": false,\n    \"show_f_p_s_extended\": true,\n    \"show_coords\": false,\n    \"reduce_resolution_on_mac\": false,\n    \"wayland_fullscreen_resolution\": false,\n    \"wayland_fullscreen_resolution_recovery_pending\": false,\n    \"use_adaptive_sync\": false,\n    \"cloud_height_override\": true,\n    \"cloud_height\": 319,\n    \"cloud_distance\": 100,\n    \"toasts\": false,\n    \"advancement_toast\": true,\n    \"recipe_toast\": true,\n    \"system_toast\": true,\n    \"tutorial_toast\": true,\n    \"instant_sneak\": false,\n    \"prevent_shaders\": false,\n    \"panini_projection\": false,\n    \"panini_projection_strength\": 25,\n    \"steady_debug_hud\": true,\n    \"steady_debug_hud_refresh_interval\": 1\n  }\n}\r\n",
-    "config/sodium-extra.properties": "# This is the configuration file for Sodium Extra.\n# This file exists for debugging purposes and should not be configured otherwise.\n#\n# You can find information on editing this file and all the available options here:\n# https://github.com/FlashyReese/sodium-extra-fabric/wiki/Configuration-File\n#\n# By default, this file will be empty except for this notice.\n",
-    "config/sodium-fingerprint.json": "{\"v\":1,\"s\":\"497ac8b27a19c620e7ab0a877f2d1bde382a06b4ef315a88d8bee417f35c864fc60717beeeffb96a7df2ebb9f5abb43dc6f55358987a08b67625960a4783b188\",\"u\":\"fd120ec243e4fe0258c1125640536a12305196705ba3292da7436956abebad95b600a5a3b1afd6240b41758bc9b72ae35da77d57b5d65a6a6f92c3c6c70e3cb7\",\"p\":\"5676fcadea14bbe51f00afede18084080623b748d66f2e0e7601889842474ab5b48ec3775dc312b68291893f32c0998e57c661fc487a1136e486af87129c10a9\",\"t\":1791494296}",
-    "config/sodium-mixins.properties": "# This is the configuration file for Sodium.\n#\n# You can find information on editing this file and all the available options here:\n# https://github.com/CaffeineMC/sodium/wiki/Configuration-File\n#\n# By default, this file will be empty except for this notice.\n",
-    "config/sodium-options.json": "{\n  \"quality\": {\n    \"weather_quality\": \"DEFAULT\",\n    \"leaves_quality\": \"DEFAULT\",\n    \"enable_vignette\": true,\n    \"use_closest_point_entity_sort\": false\n  },\n  \"advanced\": {\n    \"enable_memory_tracing\": false,\n    \"use_advanced_staging_buffers\": true,\n    \"cpu_render_ahead_limit\": 3\n  },\n  \"performance\": {\n    \"chunk_builder_threads\": 0,\n    \"chunk_build_defer_mode\": \"ONE_FRAME\",\n    \"animate_only_visible_textures\": true,\n    \"use_entity_culling\": true,\n    \"use_fog_occlusion\": false,\n    \"use_block_face_culling\": true,\n    \"use_no_error_g_l_context\": true,\n    \"quad_splitting_mode\": \"SAFE\"\n  },\n  \"notifications\": {\n    \"has_cleared_donation_button\": false,\n    \"has_seen_donation_prompt\": true\n  },\n  \"debug\": {\n    \"terrain_sorting_enabled\": true\n  }\n}",
-    "config/structure_layout_optimizer.jsonc": "{\n    // The version of the config file. Do not change this unless you know what you are doing.\n    \"rconfig:version\": 0,\n    /*\n     * Whether to use an alternative strategy to make structure layouts generate slightly even faster than\n     * the default optimization this mod has for template pool weights. This alternative strategy works by\n     * changing the list of pieces that structures collect from the template pool to not have duplicate entries.\n     * \n     * This will not break the structure generation, but it will make the structure layout different than\n     * if this config was off (breaking vanilla seed parity). The cost of speed may be worth it in large\n     * modpacks where many structure mods are using very high weight values in their template pools.\n     * \n     * Pros: Get a bit more performance from high weight Template Pool Structures.\n     * Cons: Loses parity with vanilla seeds on the layout of the structure. (Structure layout is not broken, just different)\n     */\n    \"deduplicateShuffledTemplatePoolElementList\": false\n}",
-    "config/tectonic.json": "{\n  \"biomes\": {\n    \"temperature_multiplier\": 1.0,\n    \"temperature_offset\": 0.0,\n    \"temperature_scale\": 0.25,\n    \"vegetation_multiplier\": 1.0,\n    \"vegetation_offset\": 0.0,\n    \"vegetation_scale\": 0.25\n  },\n  \"caves\": {\n    // Whether old caves/ravines should generate. Game restart required!\n    \"carvers_enabled\": true,\n    // Density added to cheese caves. Lower values = bigger cheese caves.\n    \"cheese_additive\": 0.27,\n    // The standard expansive, large cheese-shaped caves.\n    \"cheese_enabled\": true,\n    // The distance in depth between the start and end of the depth cutoff. 0.1 means caves close over ~12 blocks, 0.0 means caves cut off at the `depth_cutoff_start` value immediately.\n    \"depth_cutoff_size\": 0.1,\n    // The depth noise value that caves stop generating. 0.1 cuts off caves ~12 blocks below the surface, 0.5 cuts off caves ~64 blocks below the surface.\n    \"depth_cutoff_start\": 0.1,\n    // Density added to noodle caves. Lower values = bigger noodle caves.\n    \"noodle_additive\": -0.075,\n    // The narrow, claustrophobic noodle-shaped caves.\n    \"noodle_enabled\": true,\n    // Alters ore generation to generate at more acceptable levels when min_y is lowered.\n    \"ore_fix\": false,\n    // The tunneling, medium sized spaghetti-shaped caves.\n    \"spaghetti_enabled\": true\n  },\n  \"continents\": {\n    // Horizontally scales continents. Lower values = larger continents and oceans between them.\n    \"continents_scale\": 0.13,\n    // Horizontally scales erosion, primarily impacting mountains. Lower values = thicker mountain ranges and terrain between them.\n    \"erosion_scale\": 0.25,\n    // The threshold where plateau terrain becomes flatter terrain. Positive numbers favor flat terrain and negative numbers favor plateau terrain.\n    \"flat_terrain_skew\": 0.1,\n    // Some jungles generate massive pillars that can extend upwards of a hundred blocks tall.\n    \"jungle_pillars\": true,\n    // Skews terrain towards or away from oceans. Lower values = more oceans. Above -0.45, deep oceans will not spawn! Above -0.2, oceans will not spawn!\n    \"ocean_offset\": -0.8,\n    // Horizontally scales the ridge noise, primarily impacting rivers and terrain around them like plateaus. Lower values = wider rivers and terrain between them.\n    \"ridge_scale\": 0.25,\n    // Underground rivers under snowy biomes will generate with ice.\n    \"river_ice\": false,\n    // Underground rivers will rarely generate with hanging lanterns.\n    \"river_lanterns\": true,\n    // Some Plains biomes generate very smooth, hilly terrain.\n    \"rolling_hills\": true,\n    // Rivers that reach mountain ranges continue underground, allowing smoother boat exploration.\n    \"underground_rivers\": true\n  },\n  \"experimental\": {\n    \"alternate_continents_scaling\": false,\n    \"alternate_erosion_scaling\": false,\n    \"improved_jungle_pillars\": false\n  },\n  \"general\": {\n    // When disabled, the mod lays dormant and does nothing. Game restart required!\n    \"mod_enabled\": true,\n    // Offsets the y-level snow in cold biomes like Taigas starts at.\n    \"snow_start_offset\": 128\n  },\n  \"global_terrain\": {\n    // Increases the effects of Vertical Scale on mountainous terrain. This will increase the scale of mountains and plateaus faster than lowlands.\n    \"elevation_boost\": 0.0,\n    // Rare, deep underground tunnels of lava sometimes generate at the bottom of the world.\n    \"lava_tunnels\": true,\n    \"max_y\": 320,\n    \"min_y\": -64,\n    // Greatly smoothens out the terrain like Tectonic v2, removing staircasing artifacts at the cost of strange/broken generation in deep oceans and windswept biomes.\n    \"ultrasmooth\": false,\n    // Vertically stretches terrain above sea level. Doubling this value will double the surface's height at a given point from sea level.\n    \"vertical_scale\": 1.125\n  },\n  \"islands\": {\n    \"enabled\": true,\n    \"noise_multiplier\": 1.0,\n    \"noise_offset\": 0.0,\n    \"noise_scale\": 0.11\n  },\n  \"minor_version\": 1,\n  \"oceans\": {\n    // 0 is at sea level, -0.5 is 64 blocks below sea level.\n    \"deep_ocean_depth\": -0.45,\n    // Offsets (vanilla) ocean monuments to adjust for deeper oceans.\n    \"monument_offset\": -30,\n    // 0 is at sea level, -0.5 is 64 blocks below sea level.\n    \"ocean_depth\": -0.22,\n    // Removes the surface ice from Frozen Oceans, making them as navigable as Deep Frozen Oceans.\n    \"remove_frozen_ocean_ice\": false\n  }\n}",
-    "config/terrain_slabs.json": "{\n  \"enableSlabGeneration\": true,\n  \"enableVegetationOnSlabs\": true,\n  \"enableSnowOnSlabs\": true,\n  \"enableExperimentalFeatures\": false,\n  \"enableCornerSlabs\": false,\n  \"slabRunLength\": 1,\n  \"adjustSlabAo\": 0.5\n}",
-    "config/tiny_takeover_backport.json": "{\n  \"enableNameTagRecipe\": true,\n  \"spawnBabyDolphin\": true,\n  \"spawnBabySquid\": true,\n  \"enableTrumpetNoteBlocks\": true,\n  \"enableAnimalSoundVariants\": true,\n  \"enableArmadillo\": true,\n  \"enableAxolotl\": true,\n  \"enableBee\": true,\n  \"enableCamel\": true,\n  \"enableCat\": true,\n  \"enableChicken\": true,\n  \"enableCow\": true,\n  \"enableDolphin\": true,\n  \"enableDonkey\": true,\n  \"enableDrowned\": true,\n  \"enableFox\": true,\n  \"enableGoat\": true,\n  \"enableHoglin\": true,\n  \"enableHorse\": true,\n  \"enableHusk\": true,\n  \"enableLlama\": true,\n  \"enableMule\": true,\n  \"enableOcelot\": true,\n  \"enablePanda\": true,\n  \"enablePig\": true,\n  \"enablePiglin\": true,\n  \"enablePolarBear\": true,\n  \"enableRabbit\": true,\n  \"enableSheep\": true,\n  \"enableSniffer\": true,\n  \"enableSquid\": true,\n  \"enableStrider\": true,\n  \"enableTurtle\": true,\n  \"enableVillager\": true,\n  \"enableWolf\": true,\n  \"enableZombie\": true,\n  \"enableZombieVillager\": true,\n  \"enableZombifiedPiglin\": true,\n  \"replaceAdultRabbit\": true,\n  \"rabbitBoundingBox\": true,\n  \"enableModdedMobs\": false,\n  \"modelBlacklist\": [\n    \"rottencreatures:burned\"\n  ]\n}",
-    "config/transition.json": "{\n  \"version\": 1,\n  \"userConsentedToSendCrashReports\": false,\n  \"disableRecipeBookCodes\": false\n}",
-    "config/trender.json": "{\n  \"version\": 1,\n  \"style\": \"VANILLA_MODERN\"\n}",
-    "config/vanillabackport-client.toml": "\r\n[\"Bundles of Bravery\"]\r\n\t#allow access to all items in a Bundle instead of only the first 12\r\n\tendless_bundle_ui = false\r\n\t#enable modern bundle models\r\n\thas_modern_bundle_models = true\r\n\t#enable modern redstone torch models (also effects repeaters and comparators)\r\n\thas_modern_redstone_torch_models = true\r\n\r\n[\"Spring to Life\"]\r\n\t#use the legacy spawn egg textures\r\n\tuse_legacy_spawn_eggs = false\r\n\t#use the modern colored wool undercoat for sheep\r\n\tuse_sheep_wool_undercoat = false\r\n\t#enable falling leaves particles\r\n\tfalling_leaves = true\r\n\t#chance for falling leaf particles to appear\r\n\t#Range: 0.0 ~ 1.0\r\n\tfalling_leaves_frequency = 0.01\r\n\r\n[\"Chase the Skies\"]\r\n\t#display player heads instead of colored player markers\r\n\tlocator_display_player_heads = false\r\n\t#display compass targets such as Lodestones and death locations\r\n\tlocator_display_compass_info = false\r\n\t#display cardinal directions [N, S, E, W]\r\n\tlocator_display_cardinal_points = false\r\n\t#enable the Locator Bar; disabling it on your client does not make you invisible on the server\r\n\tenable_locator_bar = true\r\n\t#keep the experience bar and jump bar visible\r\n\tlocator_display_info_bar = false\r\n\t#extend cloud rendering to match your render distance\r\n\textended_cloud_reach = true\r\n\r\n[\"Copper Age\"]\r\n\t#enable End Flash terrain effects\r\n\tend_flash_terrain_visuals = true\r\n\t#enable End Flash sky effects\r\n\tend_flash_sky_visuals = true\r\n\t#enable modern dye textures\r\n\tenable_modern_dye_textures = true\r\n\t#enable a brown palette to render for each dye\r\n\tenable_dye_palettes = true\r\n\r\n[\"Wilderness Bound\"]\r\n\t#enable the explorer map redesigns\r\n\texplorer_map_redesign = true\r\n\t#enable modern hay bale texture that is aligned with the straw bed\r\n\thas_modern_hay_bale_texture = true\r\n\r\n",
-    "config/vanillabackport-common.toml": "\r\n[\"Bundles of Bravery\"]\r\n\t#enable the modern bundle interface and controls\r\n\thas_updated_bundles = true\r\n\t#allow bundles to be dyed\r\n\thas_dyeable_bundle_recipe = true\r\n\t#allow Bundles to generate in Village loot chests\r\n\tbundle_loot = true\r\n\r\n[\"The Garden Awakens\"]\r\n\t#primary color of Creaking Heart trail particles\r\n\tcreaking_particle_color = 6250335\r\n\t#allow Resin to be obtained from Creaking Hearts\r\n\tresin = true\r\n\t#secondary color of Creaking Heart trail particles\r\n\tcreaking_particle_reverse_color = 16545810\r\n\t#allow Creaking Hearts to spawn Creakings during the day\r\n\tdo_creaking_hearts_work_on_day = false\r\n\t#Wandering Traders to offer items from The Garden Awakens\r\n\tpale_trades = true\r\n\t#allow Pale Garden biomes to generate\r\n\tpale_garden = true\r\n\t#allow Resin to generate in Woodland Mansion loot chests\r\n\tresin_loot = true\r\n\t#allow Creakings to spawn from Creaking Hearts\r\n\tcreaking = true\r\n\r\n[\"Spring to Life\"]\r\n\t#allow wolves to have sound variants\r\n\twolf_sound_variants = true\r\n\t#allow Wandering Traders to offer items from Spring to Life\r\n\tspring_trades = true\r\n\t#chance for a cactus to generate with a Cactus Flower\r\n\t#Range: 0.0 ~ 1.0\r\n\tcactus_flower_spawn_chance = 0.25\r\n\t#allow Camels to spawn naturally\r\n\tcamel_spawns = true\r\n\t#global spawn chance for mob variants; use datapacks for per-variant weighting\r\n\t#Range: 0.0 ~ 1.0\r\n\tmob_variants_spawn_chance = 1.0\r\n\t#allow Firefly Bushes to generate\r\n\tfirefly_bushes = true\r\n\t#allow Lodestones to generate in Ruined Portal loot chests\r\n\tlodestone_loot = true\r\n\t#allow Cactus Flowers to generate\r\n\tcactus_flowers = true\r\n\t#allow Dry Grass to generate\r\n\tdry_grass = true\r\n\t#allow Wildflowers to generate\r\n\twildflowers = true\r\n\t#allow Bushes to generate\r\n\tbushes = true\r\n\t#allow Fallen Trees to generate\r\n\tfallen_trees = true\r\n\t#allow Chicken, Cow, and Pig variants to spawn\r\n\tfarm_animal_variants = true\r\n\t#allow Leaf Litter to generate\r\n\tleaf_litter = true\r\n\r\n[\"Chase the Skies\"]\r\n\t#drop leash connections when using a Firework Rocket boost\r\n\tleash_drop_connections = true\r\n\t#movement speed multiplier for ridden Happy Ghasts\r\n\thappy_ghast_speed_modifier = 1.0\r\n\t#allow Dried Ghasts to be obtainable through Nether Fossils and Piglin bartering\r\n\tdried_ghasts = true\r\n\t#allow Ghasts to drop the Tears music disc\r\n\ttears_music_disc = true\r\n\r\n[\"Hot as Lava\"]\r\n\t#allow Chicken jockeys to drop the Lava Chicken music disc\r\n\tlava_chicken_music_disc = true\r\n\r\n[\"Copper Age\"]\r\n\t#maximum number of items a Copper Golem can carry\r\n\t#Range: > 1\r\n\tgolem_item_carry_amount = 16\r\n\t#allow Copper Horse Armor to generate in loot chests\r\n\thas_copper_horse_armor_loot = true\r\n\t#maximum ticks before a Copper Golem advances to the next weathering stage\r\n\t#Range: > 0\r\n\tgolem_weathering_tick_to = 552000\r\n\t#allow Copper Armor, Weapons and Tools to be obtainable\r\n\thas_copper_toolset = true\r\n\t#minimum ticks before a Copper Golem advances to the next weathering stage\r\n\t#Range: > 0\r\n\tgolem_weathering_tick_from = 504000\r\n\t#allow Copper Golems to be built using a Carved Pumpkin\r\n\thas_copper_golems = true\r\n\t#allow Copper Nuggets to be obtainable via crafting\r\n\thas_copper_nuggets = true\r\n\r\n[\"Mounts of Mayhem\"]\r\n\t#allow Camel Husks to spawn naturally\r\n\thas_camel_husks = true\r\n\t#chance for a drowned to spawn riding a nautilus\r\n\t#Range: 0.0 ~ 1.0\r\n\tzombie_nautilus_spawn_chance = 0.5\r\n\t#allow Nautilus to spawn naturally\r\n\thas_nautilus = true\r\n\t#allow Zombie Horses to spawn naturally\r\n\thas_zombie_horses = true\r\n\t#allow Parched Skeletons to spawn naturally\r\n\thas_parched_skeletons = true\r\n\t#allow mounts to float while ridden\r\n\tcan_mounts_float_while_ridden = true\r\n\t#allow Nautilus Armor to generate in loot chests\r\n\thas_nautilus_armor_loot = true\r\n\t#allow Spears to be obtainable and allow monsters to spawn holding them\r\n\thas_spears = true\r\n\r\n[\"Chaos Cubed\"]\r\n\t#allow Sulfur Springs to generate in Sulfur Caves\r\n\thas_sulfur_springs = true\r\n\t#allow damaging Sulfur Cube archetypes to deal damage\r\n\tdo_sulfur_cubes_damage = true\r\n\t#allow explosive Sulfur Cube archetypes to explode\r\n\tdo_sulfur_cubes_explode = true\r\n\t#allow Sulfur Cubes to spawn in Sulfur Caves\r\n\thas_sulfur_cubes = true\r\n\t#allow Sulfur Cave biomes to generate\r\n\thas_sulfur_caves = true\r\n\t#allow Potent Sulfur blocks to generate Geysers\r\n\tdo_geysers_erupt = true\r\n\t#allows the Bounce music disc to generate in Abandoned Mineshafts loot chests\r\n\thas_bounce_music_disc = true\r\n\t#allow Wandering Traders to offer items from Chaos Cubed\r\n\tdo_merchant_trade_chaos_cubed_contents = true\r\n\r\n[\"Wilderness Bound\"]\r\n\t#allow Dappled Forest biomes to generate\r\n\thas_dappled_forest = true\r\n\r\n",
-    "config/yacl.json5": "{\n\t// Show the flashing colour picker hint (auto disables after first use)\n\tshowColorPickerIndicator: true,\n\t// Load .webp and .gif during Minecraft resource reload instead of on-demand (can decrease startup time)\n\tpreloadComplexImageFormats: false\n}",
-    "config/zfastnoise.mixin.toml": "\t[mixin.perf]\r\n\t\t# defaultValue: true\r\n\t\t#Replace populateNoise with optimized implementation\r\n\t\t#\r\n\t\tnoise = true\r\n\t\t# defaultValue: true\r\n\t\t#Replace populateBiomes with optimized implementation\r\n\t\t#\r\n\t\tbiome = true\r\n",
-    "config/zoomify.json": "{\n  \"initialZoom\": 4,\n  \"zoomInTime\": 0.5,\n  \"zoomOutTime\": 0.5,\n  \"zoomInTransition\": \"ease_out_exp\",\n  \"zoomOutTransition\": \"ease_out_exp\",\n  \"affectHandFov\": true,\n  \"retainZoomSteps\": false,\n  \"scrollZoom\": true,\n  \"scrollStepCount\": 10,\n  \"zoomPerStep\": 150,\n  \"scrollZoomSmoothness\": 70,\n  \"zoomKeyBehaviour\": \"hold\",\n  \"_keybindScrolling\": false,\n  \"relativeSensitivity\": 100,\n  \"relativeViewBobbing\": true,\n  \"cinematicCamera\": 0,\n  \"spyglassBehaviour\": \"combine\",\n  \"spyglassOverlayVisibility\": \"holding\",\n  \"spyglassSoundBehaviour\": \"with_overlay\",\n  \"secondaryZoomAmount\": 4,\n  \"secondaryZoomInTime\": 10.0,\n  \"secondaryZoomOutTime\": 1.0,\n  \"secondaryHideHUDOnZoom\": true,\n  \"_firstLaunch\": false\n}",
-    "config/wwoo/biome_size.json5": "/*\nBiome Size\nGlobal map scale and individual Overworld biome scales. Natural size variation remains.\n*/\n{\n\t// Range: 0.25 to 8.0. 1.0 = unchanged, 2.0 = generally twice as wide, 0.5 = generally half as wide. Biomes still vary naturally; this does not set tree counts or a minimum size. Restart/reopen the world to apply. Only newly generated chunks change. Changing this for an existing world can create terrain seams.\n\t\"sizeMultiplier\": 1.0,\n\t// Each biome has its own relative scale: 1.0 = unchanged, above 1.0 = expand, below 1.0 = shrink. Range: 0.25 to 8.0. Expanding a biome takes space from its neighbors and can make it more common. These are relative boundary controls, not exact block widths. Restart/reopen the world to apply; only new chunks change.\n\t\"biomeScales\": {\n\t\t\"minecraft:badlands\": 1.0,\n\t\t\"minecraft:bamboo_jungle\": 1.0,\n\t\t\"minecraft:beach\": 1.0,\n\t\t\"minecraft:birch_forest\": 1.0,\n\t\t\"minecraft:cherry_grove\": 1.0,\n\t\t\"minecraft:cold_ocean\": 1.0,\n\t\t\"minecraft:dappled_forest\": 1.0,\n\t\t\"minecraft:dark_forest\": 1.0,\n\t\t\"minecraft:deep_cold_ocean\": 1.0,\n\t\t\"minecraft:deep_dark\": 1.0,\n\t\t\"minecraft:deep_frozen_ocean\": 1.0,\n\t\t\"minecraft:deep_lukewarm_ocean\": 1.0,\n\t\t\"minecraft:deep_ocean\": 1.0,\n\t\t\"minecraft:desert\": 1.0,\n\t\t\"minecraft:dripstone_caves\": 1.0,\n\t\t\"minecraft:eroded_badlands\": 1.0,\n\t\t\"minecraft:flower_forest\": 1.0,\n\t\t\"minecraft:forest\": 1.0,\n\t\t\"minecraft:frozen_ocean\": 1.0,\n\t\t\"minecraft:frozen_peaks\": 1.0,\n\t\t\"minecraft:frozen_river\": 1.0,\n\t\t\"minecraft:grove\": 1.0,\n\t\t\"minecraft:ice_spikes\": 1.0,\n\t\t\"minecraft:jagged_peaks\": 1.0,\n\t\t\"minecraft:jungle\": 1.0,\n\t\t\"minecraft:lukewarm_ocean\": 1.0,\n\t\t\"minecraft:lush_caves\": 1.0,\n\t\t\"minecraft:mangrove_swamp\": 1.0,\n\t\t\"minecraft:meadow\": 1.0,\n\t\t\"minecraft:mushroom_fields\": 1.0,\n\t\t\"minecraft:ocean\": 1.0,\n\t\t\"minecraft:old_growth_birch_forest\": 1.0,\n\t\t\"minecraft:old_growth_pine_taiga\": 1.0,\n\t\t\"minecraft:old_growth_spruce_taiga\": 1.0,\n\t\t\"minecraft:pale_garden\": 1.0,\n\t\t\"minecraft:plains\": 1.0,\n\t\t\"minecraft:river\": 1.0,\n\t\t\"minecraft:savanna\": 1.0,\n\t\t\"minecraft:savanna_plateau\": 1.0,\n\t\t\"minecraft:snowy_beach\": 1.0,\n\t\t\"minecraft:snowy_plains\": 1.0,\n\t\t\"minecraft:snowy_slopes\": 1.0,\n\t\t\"minecraft:snowy_taiga\": 1.0,\n\t\t\"minecraft:sparse_jungle\": 1.0,\n\t\t\"minecraft:stony_peaks\": 1.0,\n\t\t\"minecraft:stony_shore\": 1.0,\n\t\t\"minecraft:sulfur_caves\": 1.0,\n\t\t\"minecraft:sunflower_plains\": 1.0,\n\t\t\"minecraft:swamp\": 1.0,\n\t\t\"minecraft:taiga\": 1.0,\n\t\t\"minecraft:warm_ocean\": 1.0,\n\t\t\"minecraft:windswept_forest\": 1.0,\n\t\t\"minecraft:windswept_gravelly_hills\": 1.0,\n\t\t\"minecraft:windswept_hills\": 1.0,\n\t\t\"minecraft:windswept_savanna\": 1.0,\n\t\t\"minecraft:wooded_badlands\": 1.0\n\t}\n}",
-    "config/wwoo/config.json5": "/*\nWWOO Config\n*/\n{\n\t// Removes underground andesite, diorite, granite, gravel, and dirt patches. Requires a game restart.\n\t\"removeOres\": true\n}",
-    "config/vanilla_structures/placement_structure_config.json5": "/*\nThis config makes it possible to change the spacing, separation, salt (and frequency) of Minecraft's structure sets.\n    SPACING ---  controls how far a structure can be from others of its kind\n\tSEPARATION --- controls how close to each other two structures of the same type can be.\nKEEP IN MIND THAT SPACING ALWAYS NEEDS TO BE HIGHER THAN SEPARATION.\n\n=====\nCreated by Cristel Lib\n*/\n{\n\t\"ancient_cities\": {\n\t\t\"salt\": 20083232,\n\t\t\"separation\": 8,\n\t\t\"spacing\": 24\n\t},\n\t\"buried_treasures\": {\n\t\t\"frequency\": 0.01,\n\t\t\"salt\": 0,\n\t\t\"separation\": 0,\n\t\t\"spacing\": 1\n\t},\n\t\"desert_pyramids\": {\n\t\t\"salt\": 14357617,\n\t\t\"separation\": 8,\n\t\t\"spacing\": 32\n\t},\n\t\"end_cities\": {\n\t\t\"salt\": 10387313,\n\t\t\"separation\": 11,\n\t\t\"spacing\": 20\n\t},\n\t\"igloos\": {\n\t\t\"salt\": 14357618,\n\t\t\"separation\": 8,\n\t\t\"spacing\": 32\n\t},\n\t\"jungle_temples\": {\n\t\t\"salt\": 14357619,\n\t\t\"separation\": 8,\n\t\t\"spacing\": 32\n\t},\n\t\"mineshafts\": {\n\t\t\"frequency\": 0.004,\n\t\t\"salt\": 0,\n\t\t\"separation\": 0,\n\t\t\"spacing\": 1\n\t},\n\t\"nether_complexes\": {\n\t\t\"salt\": 30084232,\n\t\t\"separation\": 4,\n\t\t\"spacing\": 27\n\t},\n\t\"nether_fossils\": {\n\t\t\"salt\": 14357921,\n\t\t\"separation\": 1,\n\t\t\"spacing\": 2\n\t},\n\t\"ocean_monuments\": {\n\t\t\"salt\": 10387313,\n\t\t\"separation\": 5,\n\t\t\"spacing\": 32\n\t},\n\t\"ocean_ruins\": {\n\t\t\"salt\": 14357621,\n\t\t\"separation\": 8,\n\t\t\"spacing\": 20\n\t},\n\t\"pillager_outposts\": {\n\t\t\"frequency\": 0.2,\n\t\t\"salt\": 165745296,\n\t\t\"separation\": 8,\n\t\t\"spacing\": 32\n\t},\n\t\"ruined_portals\": {\n\t\t\"salt\": 34222645,\n\t\t\"separation\": 15,\n\t\t\"spacing\": 40\n\t},\n\t\"shipwrecks\": {\n\t\t\"salt\": 165745295,\n\t\t\"separation\": 4,\n\t\t\"spacing\": 24\n\t},\n\t\"swamp_huts\": {\n\t\t\"salt\": 14357620,\n\t\t\"separation\": 8,\n\t\t\"spacing\": 32\n\t},\n\t\"trail_ruins\": {\n\t\t\"salt\": 83469867,\n\t\t\"separation\": 8,\n\t\t\"spacing\": 34\n\t},\n\t\"trial_chambers\": {\n\t\t\"salt\": 94251327,\n\t\t\"separation\": 12,\n\t\t\"spacing\": 34\n\t},\n\t\"villages\": {\n\t\t\"salt\": 10387312,\n\t\t\"separation\": 8,\n\t\t\"spacing\": 34\n\t},\n\t\"woodland_mansions\": {\n\t\t\"salt\": 10387319,\n\t\t\"separation\": 20,\n\t\t\"spacing\": 80\n\t}\n}",
-    "config/vanilla_structures/toggle_structure_config.json5": "/*\nThis config makes it possible to switch off any Minecraft structure.\nTo disable a structure, simply set the value of that structure to \"false\".\nTo change the rarity of a structure category use the structure placement config.\n\n=====\nCreated by Cristel Lib\n*/\n{\n\t\"ancient_cities\": {\n\t\t\"ancient_city\": true\n\t},\n\t\"buried_treasures\": {\n\t\t\"buried_treasure\": true\n\t},\n\t\"desert_pyramids\": {\n\t\t\"desert_pyramid\": true\n\t},\n\t\"end_cities\": {\n\t\t\"end_city\": true\n\t},\n\t\"igloos\": {\n\t\t\"igloo\": true\n\t},\n\t\"jungle_temples\": {\n\t\t\"jungle_pyramid\": true\n\t},\n\t\"mineshafts\": {\n\t\t\"mineshaft\": true,\n\t\t\"mineshaft_mesa\": true\n\t},\n\t\"nether_complexes\": {\n\t\t\"bastion_remnant\": true,\n\t\t\"fortress\": true\n\t},\n\t\"nether_fossils\": {\n\t\t\"nether_fossil\": true\n\t},\n\t\"ocean_monuments\": {\n\t\t\"monument\": true\n\t},\n\t\"ocean_ruins\": {\n\t\t\"ocean_ruin_cold\": true,\n\t\t\"ocean_ruin_warm\": true\n\t},\n\t\"pillager_outposts\": {\n\t\t\"pillager_outpost\": true\n\t},\n\t\"ruined_portals\": {\n\t\t\"ruined_portal\": true,\n\t\t\"ruined_portal_desert\": true,\n\t\t\"ruined_portal_jungle\": true,\n\t\t\"ruined_portal_mountain\": true,\n\t\t\"ruined_portal_nether\": true,\n\t\t\"ruined_portal_ocean\": true,\n\t\t\"ruined_portal_swamp\": true\n\t},\n\t\"shipwrecks\": {\n\t\t\"shipwreck\": true,\n\t\t\"shipwreck_beached\": true\n\t},\n\t\"strongholds\": {\n\t\t\"stronghold\": true\n\t},\n\t\"swamp_huts\": {\n\t\t\"swamp_hut\": true\n\t},\n\t\"trail_ruins\": {\n\t\t\"trail_ruins\": true\n\t},\n\t\"trial_chambers\": {\n\t\t\"trial_chambers\": true\n\t},\n\t\"villages\": {\n\t\t\"village_desert\": true,\n\t\t\"village_plains\": true,\n\t\t\"village_savanna\": true,\n\t\t\"village_snowy\": true,\n\t\t\"village_taiga\": true\n\t},\n\t\"woodland_mansions\": {\n\t\t\"mansion\": true\n\t}\n}",
-    "config/spark/activity.json": "[\n  {\n    \"user\": {\n      \"type\": \"player\",\n      \"name\": \"RaidBTW\",\n      \"uniqueId\": \"64a25b94-d179-498d-8911-3abf1d239ab8\"\n    },\n    \"time\": 1791520206092,\n    \"type\": \"Profiler\",\n    \"data\": {\n      \"type\": \"url\",\n      \"value\": \"https://spark.lucko.me/hWgE01ZwNB\"\n    }\n  },\n  {\n    \"user\": {\n      \"type\": \"player\",\n      \"name\": \"RaidBTW\",\n      \"uniqueId\": \"64a25b94-d179-498d-8911-3abf1d239ab8\"\n    },\n    \"time\": 1791519086627,\n    \"type\": \"Profiler\",\n    \"data\": {\n      \"type\": \"url\",\n      \"value\": \"https://spark.lucko.me/CsRqFXtJia\"\n    }\n  }\n]",
-    "config/spark/config.json": "{\n  \"_header\": \"spark configuration file - https://spark.lucko.me/docs/Configuration\",\n  \"backgroundProfiler\": true\n}",
-    "config/spark/tmp-client/about.txt": "# What is this directory?\r\n\r\n* In order to perform certain functions, spark sometimes needs to write temporary data to the disk. \r\n* Previously, a temporary directory provided by the operating system was used for this purpose. \r\n* However, this proved to be unreliable in some circumstances, so spark now stores temporary data here instead!\r\n\r\nspark will automatically cleanup the contents of this directory. \r\n(but if for some reason it doesn't, if the server is stopped, you can freely delete any files ending in .tmp)\r\n\r\ntl;dr: spark uses this folder to store some temporary data.\r\n",
-    "config/spark/tmp/about.txt": "# What is this directory?\r\n\r\n* In order to perform certain functions, spark sometimes needs to write temporary data to the disk. \r\n* Previously, a temporary directory provided by the operating system was used for this purpose. \r\n* However, this proved to be unreliable in some circumstances, so spark now stores temporary data here instead!\r\n\r\nspark will automatically cleanup the contents of this directory. \r\n(but if for some reason it doesn't, if the server is stopped, you can freely delete any files ending in .tmp)\r\n\r\ntl;dr: spark uses this folder to store some temporary data.\r\n",
-    "config/Serilum/collective.json": "{\n\t\"//\": \"These settings are easier to change in-game! Mod List -> Collective -> Config\",\n\t\"enableUpdateChecker\": {\n\t\t\"//\": \"Whether Collective should show a message in the console if a dependent mod has an update available. Update checks are optional and async.\",\n\t\t\"value\": true\n\t},\n\t\"transferItemsBetweenReplacedEntities\": {\n\t\t\"//\": \"When enabled, transfer the held items and armour from replaced entities by any of the Entity Spawn mods which depend on Collective.\",\n\t\t\"value\": true\n\t},\n\t\"loopsAmountUsedToGetAllEntityDrops\": {\n\t\t\"//\": \"The amount of times Collective loops through possible mob drops to get them all procedurally. Drops are only generated when a dependent mod uses them. Lowering this can increase world load time but decrease accuracy. min: 1, max: 500\",\n\t\t\"value\": 100\n\t},\n\t\"findABlockCheckAroundEntitiesDelayMs\": {\n\t\t\"//\": \"The delay of the is-there-a-block-around-check around entities in ms. Used in mods which depends on a specific blockstate in the world. Increasing this number can increase TPS if needed. min: 0, max: 3,600,000\",\n\t\t\"value\": 30000\n\t},\n\t\"enablePatronPets\": {\n\t\t\"//\": \"Enables pets for Patrons. Will be added in a future release.\",\n\t\t\"value\": true\n\t},\n\t\"downloadNonEnglishTranslations\": {\n\t\t\"//\": \"Whether Collective should attempt to download translations if the client language is set to something other than English. Uses files from https://github.com/Serilum/.translations, downloaded via https://translations.serilum.com/. Hosted via CloudFlare Pages.\",\n\t\t\"value\": true\n\t},\n\t\"pushTranslationResourcePack\": {\n\t\t\"//\": \"On a server, sends connecting players without Collective a resource pack so custom item names from server-side Serilum mods show up in their own language. Off by default; without it they see the server language instead (see serverLanguage).\",\n\t\t\"value\": false\n\t},\n\t\"requireTranslationResourcePack\": {\n\t\t\"//\": \"Marks the resource pack as required, so an accidental decline only kicks the player and asks again next join instead of being remembered for good. Turn off to make it optional.\",\n\t\t\"value\": true\n\t},\n\t\"serverLanguage\": {\n\t\t\"//\": \"The language Serilum mod text shows in for players without Collective who aren't sent the resource pack. Uses locale codes like en_us or de_de.\",\n\t\t\"value\": \"en_us\"\n\t},\n\t\"itemNameTranslationMode\": {\n\t\t\"//\": \"How custom item names show for players without Collective when the resource pack is off. 'auto' copies the first player to join and remembers it; 'server' always uses the server language; 'client' uses each player's own language, but those without Collective then see raw keys. options: auto, server, client\",\n\t\t\"value\": \"auto\"\n\t},\n\t\"configScreenGuiScale\": {\n\t\t\"//\": \"The GUI scale of the config screens of Serilum's mods, also set with the button next to the ? on those screens. 0 uses the game's own GUI scale. min: 0, max: 10\",\n\t\t\"value\": 0\n\t},\n\t\"updateMinecraftWindowTitleInDevMode\": {\n\t\t\"//\": \"Used in my local development flow. Has no effect in production, only when ran from an IDE with Collective installed.\",\n\t\t\"value\": false\n\t}\n}",
-    "config/respackopts/_respackopts.conf": "{\n    debugCommands: false,\n    // Logs some information useful for debugging packs or the mod itself. (requires restart)\n    debugLogs: false,\n    // Automatically generate names when a resource pack does not provide one\n    generateNames: true,\n    // Enable the validation layer to automatically detect some types of problems\n    validationLayer: false,\n    // Log every resource access. WARNING: This WILL result in giant log files!\n    ioLogs: false\n}",
-    "config/NoChatReports/NCR-Client.json": "{\n  \"defaultSigningMode\": \"ON_DEMAND\",\n  \"enableMod\": true,\n  \"showNCRButton\": true,\n  \"showReloadButton\": false,\n  \"verifiedIconEnabled\": false,\n  \"showServerSafety\": true,\n  \"hideInsecureMessageIndicators\": true,\n  \"hideModifiedMessageIndicators\": true,\n  \"hideSystemMessageIndicators\": true,\n  \"hideWarningToast\": true,\n  \"hideSigningRequestMessage\": false,\n  \"alwaysHideReportButton\": false,\n  \"skipRealmsWarning\": false,\n  \"disableTelemetry\": true,\n  \"removeTelemetryButton\": true,\n  \"demandOnServer\": false,\n  \"verifiedIconOffsetX\": 0,\n  \"verifiedIconOffsetY\": 0\n}",
-    "config/NoChatReports/NCR-Common.json": "{\n  \"demandOnClientMessage\": \"You do not have No Chat Reports, and this server is configured to require it on client!\",\n  \"demandOnClient\": false,\n  \"convertToGameMessage\": true,\n  \"addQueryData\": true,\n  \"enableDebugLog\": false\n}",
-    "config/NoChatReports/NCR-Encryption.json": "{\n  \"skipWarning\": false,\n  \"enableEncryption\": false,\n  \"encryptPublic\": true,\n  \"showEncryptionButton\": true,\n  \"showEncryptionIndicators\": true,\n  \"encryptionKey\": \"blfrngArk3chG6wzncOZ5A\\u003d\\u003d\",\n  \"encryptionPassphrase\": \"\",\n  \"algorithmName\": \"AES/CFB8+Base64\",\n  \"encryptableCommands\": [\n    \"msg:1\",\n    \"w:1\",\n    \"whisper:1\",\n    \"tell:1\",\n    \"r:0\",\n    \"dm:1\",\n    \"me:0\",\n    \"m:1\",\n    \"t:1\",\n    \"pm:1\",\n    \"emsg:1\",\n    \"epm:1\",\n    \"etell:1\",\n    \"ewhisper:1\",\n    \"message:1\",\n    \"reply:0\"\n  ]\n}",
-    "config/NoChatReports/NCR-ServerPreferences.json": "{\n  \"signingModes\": {}\n}",
-    "config/NoChatReports/README.md": "# No Chat Reports\nYou can find updated documentation of configuration files on the wiki:\nhttps://github.com/Aizistral-Studios/No-Chat-Reports/wiki/Configuration-Files\n",
-    "config/fabric/indigo-renderer.properties": "#Indigo properties file\r\n#Fri Oct 16 23:29:49 EDT 2026\r\nalways-tesselate-blocks=auto\r\nambient-occlusion-mode=hybrid\r\ndebug-compare-lighting=auto\r\nfix-exterior-vertex-lighting=auto\r\nfix-luminous-block-ambient-occlusion=auto\r\nfix-mean-light-calculation=auto\r\nfix-smooth-lighting-offset=auto\r\n",
-    "config/cristellib/auto_config_settings.json5": "/*\nAuto-Config Settings\nThe Config for Cristel Lib's automated structure config generation.\n*/\n{\n\t// Mods where automatic structure config generation is disabled.\n\t\"blacklistedMods\": [],\n\t// Mods where automatic screen generation for structure configs is disabled.\n\t\"clientExcludedMods\": [],\n\t/* This list lets you override the default settings provided by mod authors.\n\t   If you add a mod that is blacklisted by default (in the two other lists)\n\t   you can now remove it without it getting added back automatically.\n\t   Proceed at your own risk.\n\t*/\n\t\"modOverrideWhitelist\": [],\n\t// Disable automatic structure config generation.\n\t\"disableAutoConfig\": false,\n\t// Disable automatic screen generation for structure configs.\n\t\"disableAutoConfigScreens\": false,\n\t// Set the default sub path of all automatically generated configs. Requires a RESTART to apply!\n\t\"autoConfigSubPath\": \"cristellib/\"\n}",
-    "config/cristellib/built_in_packs.json5": "/*\nThis config allows disabling built-in packs supplied by Cristel Lib.\nMove entries from 'defaultPacks' to 'disabledPacks' to disable them.\n*/\n{\n\t\"defaultPacks\": [\n\t\t\"wwoo:resources/wwoo_main\",\n\t\t\"wwoo:resources/vanilla_backport_compat\",\n\t\t\"wwoo:resources/wwoo_remove_ores\"\n\t],\n\t\"disabledPacks\": [],\n\t// This option hides all packs provided by Cristel Lib in the pack selection screen to reduce clutter.\n\t\"hideAllPacksInScreen\": false\n}",
-    "config/cristellib/vanillabackport/structure_placement_config.json5": "/*\nAutomatically generated by Cristel Lib\n*/\n{\n\t\"abandoned_camp\": {\n\t\t\"salt\": 91231127,\n\t\t\"separation\": 8,\n\t\t\"spacing\": 37\n\t}\n}",
-    "config/cristellib/vanillabackport/structure_toggle_config.json5": "/*\nAutomatically generated by Cristel Lib\n*/\n{\n\t\"abandoned_camp\": {\n\t\t\"abandoned_camp_bamboo_jungle\": true,\n\t\t\"abandoned_camp_birch_forest\": true,\n\t\t\"abandoned_camp_cherry_grove\": true,\n\t\t\"abandoned_camp_dappled_forest\": true,\n\t\t\"abandoned_camp_flower_forest\": true,\n\t\t\"abandoned_camp_forest\": true,\n\t\t\"abandoned_camp_meadow\": true,\n\t\t\"abandoned_camp_old_growth_birch_forest\": true,\n\t\t\"abandoned_camp_old_growth_pine_taiga\": true,\n\t\t\"abandoned_camp_old_growth_spruce_taiga\": true,\n\t\t\"abandoned_camp_pale_garden\": true,\n\t\t\"abandoned_camp_savanna\": true,\n\t\t\"abandoned_camp_snowy_taiga\": true,\n\t\t\"abandoned_camp_sparse_jungle\": true,\n\t\t\"abandoned_camp_swamp\": true,\n\t\t\"abandoned_camp_taiga\": true,\n\t\t\"abandoned_camp_windswept_forest\": true,\n\t\t\"abandoned_camp_wooded_badlands\": true\n\t}\n}",
-    "config/cristellib/friendsandfoes/structure_placement_config.json5": "/*\nAutomatically generated by Cristel Lib\n*/\n{\n\t\"citadel\": {\n\t\t\"salt\": 878514152,\n\t\t\"separation\": 8,\n\t\t\"spacing\": 16\n\t},\n\t\"iceologer_cabin\": {\n\t\t\"salt\": 516979219,\n\t\t\"separation\": 10,\n\t\t\"spacing\": 40\n\t},\n\t\"illusioner_shack\": {\n\t\t\"salt\": 365262534,\n\t\t\"separation\": 10,\n\t\t\"spacing\": 40\n\t},\n\t\"illusioner_training_grounds\": {\n\t\t\"salt\": 819729564,\n\t\t\"separation\": 10,\n\t\t\"spacing\": 40\n\t}\n}",
-    "config/cristellib/friendsandfoes/structure_toggle_config.json5": "/*\nAutomatically generated by Cristel Lib\n*/\n{\n\t\"citadel\": {\n\t\t\"citadel\": true\n\t},\n\t\"iceologer_cabin\": {\n\t\t\"iceologer_cabin\": true\n\t},\n\t\"illusioner_shack\": {\n\t\t\"illusioner_shack\": true\n\t},\n\t\"illusioner_training_grounds\": {\n\t\t\"illusioner_training_grounds\": true\n\t}\n}",
-    "config/biomecleaner/advanced.json": "{\n  \"groups\": {\n    \"rare\": [\"minecraft:mushroom_fields\", \"minecraft:stony_peaks\"],\n    \"oceans\": [\n      \"minecraft:ocean\", \"minecraft:warm_ocean\", \"minecraft:lukewarm_ocean\",\n      \"minecraft:cold_ocean\", \"minecraft:frozen_ocean\", \"minecraft:deep_ocean\",\n      \"minecraft:deep_lukewarm_ocean\", \"minecraft:deep_cold_ocean\", \"minecraft:deep_frozen_ocean\"\n    ],\n    \"rivers\": [\"minecraft:river\", \"minecraft:frozen_river\"],\n    \"beaches\": [\"minecraft:beach\", \"minecraft:snowy_beach\", \"minecraft:stony_shore\"]\n  },\n  \"sizeThresholdOverrides\": {\n    \"beaches\": 32,\n    \"minecraft:stony_shore\": [32, 64],\n    \"rivers\": 48\n  },\n  \"intraGroupPreference\": {\n    \"oceans\": {\n      \"mode\": \"preferred\",\n      \"fallbackOutOfGroupBelowSize\": 8\n    }\n  },\n  \"requiredBoundaryGroups\": {\n    \"beaches\": [\"oceans\", \"rivers\"]\n  }\n}\n",
-    "config/biomecleaner/common.json": "{\n  \"enabled\": true,\n  \"sizeThreshold\": 512,\n  \"neverReplace\": [\n    \"rare\"\n  ],\n  \"neverUseAsReplacement\": [\n    \"oceans\",\n    \"rivers\"\n  ],\n  \"allowIntraGroupReplacement\": [],\n  \"preprocessingEnabled\": true,\n  \"preprocessingThreadCount\": 0,\n  \"cacheMemoryMB\": 0\n}",
-    "config/asyncparticles/asyncparticles-mixin.properties": "#safeBlockEntityMap: Boolean. Make 'LevelChunk#blockEntities' thread-safe.\r\n#safeClassInstanceMultiMap: Boolean. Make 'ClassInstanceMultiMap' thread-safe.\r\n#safeLegacyRandomSource: Boolean. Make LegacyRandomSource thread-safe.\r\n#particle$splitTick: Boolean. Enable recursive particle tick.\r\n#particle$noCulling: A comma-separated list of classes extending 'Particle' that should not be culled.\r\n#particle$noLightCache: A comma-separated list of classes extending 'Particle' that should not use the light cache.\r\n#particle$lockRequired: A comma-separated list of classes extending 'Particle' that require a spin lock.\r\n#particle$lockProvider: A comma-separated list of classes extending 'Particle' that provide a spin lock.\r\n#replaceRandom: A comma-separated list of classes that require multithreaded random sources.\r\n#create$contraptionNoParticleCollision: A comma-separated list of classes extending 'AbstractContraptionEntity' that should not collide with particles.\r\n#\r\n#Fri Oct 16 23:29:40 EDT 2026\r\ncreate$contraptionNoParticleCollision=rbasamoyai.createbigcannons.cannon_control.contraption.PitchOrientedContraptionEntity,rbasamoyai.createbigcannons.cannon_control.contraption.AbstractMountedCannonContraption\r\nparticle$lockProvider=yesman.epicfight.client.particle.TrailParticle,yesman.epicfight.client.particle.AbstractTrailParticle,com.lowdragmc.photon.client.gameobject.FXObject\r\nparticle$lockRequired=yesman.epicfight.client.particle.TrailParticle,yesman.epicfight.client.particle.AbstractTrailParticle,com.lowdragmc.photon.client.gameobject.FXObject\r\nparticle$noCulling=com.lowdragmc.photon.client.gameobject.FXObject,net.bettercombat.client.particle.SlashParticle\r\nparticle$noLightCache=dev.shadowsoffire.gateways.client.GatewayParticle,com.chailotl.particular.particles.FireflyParticle,com.lowdragmc.photon.client.gameobject.FXObject,net.diebuddies.minecraft.weather.WeatherParticle\r\nreplaceRandom=appeng.client.render.effects.LightningArcFX,appeng.client.render.effects.LightningFX,de.cheaterpaul.fallingleaves.util.LeafUtil\r\nsafeBlockEntityMap=false\r\nsafeClassInstanceMultiMap=false\r\nsafeLegacyRandomSource=true\r\nversion=3\r\n",
-    "config/asyncparticles/asyncparticles.json": "{\n  \"version\": 2,\n  \"particle\": {\n    \"particleLimit\": 16384,\n    \"cleanupStrategy\": \"PARALLEL_WITH_TICK\",\n    \"parallelQueueRemoval\": false,\n    \"parallelQueueEviction\": false,\n    \"particleLightCache\": true,\n    \"cullUnderwaterParticleType\": true\n  },\n  \"tick\": {\n    \"animationTickMode\": true,\n    \"particleAsyncMode\": \"SEQUENTIAL\",\n    \"gpuOnlyAsyncParticleTick\": false,\n    \"tickWeatherAsync\": true,\n    \"deferredTextureTick\": true,\n    \"failPerSecLimit\": 5,\n    \"failBehavior\": \"RAISE_CRASH\",\n    \"suppressCME\": false,\n    \"syncAnimationClasses\": [],\n    \"syncParticleClasses\": [\n      \"pigcart.particlerain.particle.BlockDisplayParticle\"\n    ]\n  },\n  \"rendering\": {\n    \"particleCulling\": \"SPHERE\",\n    \"gpuAcceleration\": true,\n    \"appendNewParticlesToRenderer\": true,\n    \"computeExecutionStage\": \"LEVEL_RENDERING\",\n    \"tickRendererOnMainThread\": false,\n    \"cullWeathers\": true\n  },\n  \"valkyrienSkies\": {\n    \"rainEffect\": \"STATIONARY\",\n    \"fixParticleLights\": true\n  },\n  \"sable\": {\n    \"fixParticleLights\": true\n  },\n  \"create\": {\n    \"rainEffect\": \"ALWAYS\",\n    \"tickRainBlockingRange\": 16\n  },\n  \"mobile\": {\n    \"multiDrawWorkaround\": true\n  }\n}"
+    "config/lithium.properties": "mixin.experimental=true",
+    "config/moreculling.toml": "version = 1\nenableSodiumMenu = true\ncloudCulling = true\nsignTextCulling = true\nrainCulling = true\ndontCull = []\nuseBlockStateCulling = true\nuseCustomItemFrameRenderer = true\nitemFrameMapCulling = true\nuseItemFrameLOD = true\nitemFrameLODRange = 16\nuseItemFrame3FaceCulling = true\nitemFrame3FaceCullingRange = 2.0\npaintingCulling = true\nleavesCullingMode = \"DEPTH\"\nleavesCullingAmount = 2\nincludeMangroveRoots = true\nendGatewayCulling = true\nbeaconBeamCulling = true\nuseOnModdedBlocksByDefault = true\n\n[modCompatibility]\nminecraft = true\n",
+    "config/vanillabackport-client.toml": "\r\n[\"Bundles of Bravery\"]\r\n\t#allow access to all items in a Bundle instead of only the first 12\r\n\tendless_bundle_ui = false\r\n\t#enable modern bundle models\r\n\thas_modern_bundle_models = true\r\n\t#enable modern redstone torch models (also effects repeaters and comparators)\r\n\thas_modern_redstone_torch_models = true\r\n\t#enable modern banner pattern textures\r\n\thas_modern_banner_pattern_textures = true\r\n\r\n[\"Spring to Life\"]\r\n\t#use the legacy spawn egg textures\r\n\tuse_legacy_spawn_eggs = false\r\n\t#use the modern colored wool undercoat for sheep\r\n\tuse_sheep_wool_undercoat = false\r\n\t#enable falling leaves particles\r\n\tfalling_leaves = true\r\n\t#chance for falling leaf particles to appear\r\n\t#Range: 0.0 ~ 1.0\r\n\tfalling_leaves_frequency = 0.01\r\n\r\n[\"Chase the Skies\"]\r\n\t#display player heads instead of colored player markers\r\n\tlocator_display_player_heads = false\r\n\t#display compass targets such as Lodestones and death locations\r\n\tlocator_display_compass_info = false\r\n\t#display cardinal directions [N, S, E, W]\r\n\tlocator_display_cardinal_points = false\r\n\t#enable the Locator Bar; disabling it on your client does not make you invisible on the server\r\n\tenable_locator_bar = true\r\n\t#keep the experience bar and jump bar visible\r\n\tlocator_display_info_bar = false\r\n\t#extend cloud rendering to match your render distance\r\n\textended_cloud_reach = true\r\n\r\n[\"Copper Age\"]\r\n\t#enable End Flash terrain effects\r\n\tend_flash_terrain_visuals = true\r\n\t#enable End Flash sky effects\r\n\tend_flash_sky_visuals = true\r\n\t#enable modern dye textures\r\n\tenable_modern_dye_textures = true\r\n\t#enable a brown palette to render for each dye\r\n\tenable_dye_palettes = true\r\n\r\n[\"Mounts of Mayhem\"]\r\n\t#toggles the modern Zombie Horse texture\r\n\thas_zombie_horse_retexture = true\r\n\r\n[\"Wilderness Bound\"]\r\n\t#enable modern hay bale texture that is aligned with the straw bed\r\n\thas_modern_hay_bale_texture = true\r\n\r\n",
+    "config/vanillabackport-common.toml": "\r\n[\"Bundles of Bravery\"]\r\n\t#enable the modern bundle interface and controls\r\n\thas_updated_bundles = true\r\n\t#apply the modern recipe for bundles\r\n\t#Allowed Values: APPEND, REPLACE, IGNORE\r\n\tbundle_recipe = \"APPEND\"\r\n\t#allow bundles to be dyed\r\n\thas_dyeable_bundle_recipe = true\r\n\t#invert the bundle click controls\r\n\tinverted_bundle_controls = false\r\n\t#allow Bundles to generate in Village loot chests\r\n\tbundle_loot = true\r\n\r\n[\"The Garden Awakens\"]\r\n\t#primary color of Creaking Heart trail particles\r\n\tcreaking_particle_color = 6250335\r\n\t#allow Resin to be obtained from Creaking Hearts\r\n\tresin = true\r\n\t#secondary color of Creaking Heart trail particles\r\n\tcreaking_particle_reverse_color = 16545810\r\n\t#allow Creaking Hearts to spawn Creakings during the day\r\n\tdo_creaking_hearts_work_on_day = false\r\n\t#Wandering Traders to offer items from The Garden Awakens\r\n\tpale_trades = true\r\n\t#apply the modern recipe for saddles\r\n\t#Allowed Values: APPEND, REPLACE, IGNORE\r\n\tsaddle_recipe = \"APPEND\"\r\n\t#allow Pale Garden biomes to generate\r\n\tpale_garden = true\r\n\t#allow Resin to generate in Woodland Mansion loot chests\r\n\tresin_loot = true\r\n\t#allow Creakings to spawn from Creaking Hearts\r\n\tcreaking = true\r\n\t#apply the modern recipe for leads\r\n\t#Allowed Values: APPEND, REPLACE, IGNORE\r\n\tlead_recipe = \"APPEND\"\r\n\r\n[\"Spring to Life\"]\r\n\t#allow wolves to have sound variants\r\n\twolf_sound_variants = true\r\n\t#allow Wandering Traders to offer items from Spring to Life\r\n\tspring_trades = true\r\n\t#chance for a cactus to generate with a Cactus Flower\r\n\t#Range: 0.0 ~ 1.0\r\n\tcactus_flower_spawn_chance = 0.25\r\n\t#allow Camels to spawn naturally\r\n\tcamel_spawns = true\r\n\t#global spawn chance for mob variants; use datapacks for per-variant weighting\r\n\t#Range: 0.0 ~ 1.0\r\n\tmob_variants_spawn_chance = 1.0\r\n\t#allow Firefly Bushes to generate\r\n\tfirefly_bushes = true\r\n\t#allow Lodestones to generate in Ruined Portal loot chests\r\n\tlodestone_loot = true\r\n\t#apply the modern recipe for lodestones\r\n\t#Allowed Values: APPEND, REPLACE, IGNORE\r\n\tlodestone_recipe = \"APPEND\"\r\n\t#allow Cactus Flowers to generate\r\n\tcactus_flowers = true\r\n\t#allow Dry Grass to generate\r\n\tdry_grass = true\r\n\t#allow Wildflowers to generate\r\n\twildflowers = true\r\n\t#allow Bushes to generate\r\n\tbushes = true\r\n\t#allow Fallen Trees to generate\r\n\tfallen_trees = true\r\n\t#allow Chicken, Cow, and Pig variants to spawn\r\n\tfarm_animal_variants = true\r\n\t#allow Leaf Litter to generate\r\n\tleaf_litter = true\r\n\r\n[\"Chase the Skies\"]\r\n\t#drop leash connections when using a Firework Rocket boost\r\n\tleash_drop_connections = true\r\n\t#movement speed multiplier for ridden Happy Ghasts\r\n\thappy_ghast_speed_modifier = 1.0\r\n\t#allow Leashes to have the modern physics and interactions\r\n\tmodern_leashes = true\r\n\t#allow Dried Ghasts to be obtainable through Nether Fossils and Piglin bartering\r\n\tdried_ghasts = true\r\n\t#allow Ghasts to drop the Tears music disc\r\n\ttears_music_disc = true\r\n\r\n[\"Hot as Lava\"]\r\n\t#allow Chicken jockeys to drop the Lava Chicken music disc\r\n\tlava_chicken_music_disc = true\r\n\r\n[\"Copper Age\"]\r\n\t#maximum number of items a Copper Golem can carry\r\n\t#Range: > 1\r\n\tgolem_item_carry_amount = 16\r\n\t#allow Copper Horse Armor to generate in loot chests\r\n\thas_copper_horse_armor_loot = true\r\n\t#maximum ticks before a Copper Golem advances to the next weathering stage\r\n\t#Range: > 0\r\n\tgolem_weathering_tick_to = 552000\r\n\t#allow Copper Armor, Weapons and Tools to be obtainable\r\n\thas_copper_toolset = true\r\n\t#minimum ticks before a Copper Golem advances to the next weathering stage\r\n\t#Range: > 0\r\n\tgolem_weathering_tick_from = 504000\r\n\t#allow Copper Golems to be built using a Carved Pumpkin\r\n\thas_copper_golems = true\r\n\t#allow Weathering Lightning Rods to be obtainable\r\n\thas_weathering_lightning_rods = true\r\n\t#allow Copper Nuggets to be obtainable via crafting\r\n\thas_copper_nuggets = true\r\n\r\n[\"Mounts of Mayhem\"]\r\n\t#allow Camel Husks to spawn naturally\r\n\thas_camel_husks = true\r\n\t#chance for a drowned to spawn riding a nautilus\r\n\t#Range: 0.0 ~ 1.0\r\n\tzombie_nautilus_spawn_chance = 0.5\r\n\t#allow Nautilus to spawn naturally\r\n\thas_nautilus = true\r\n\t#allow Zombie Horses to spawn naturally\r\n\thas_zombie_horses = true\r\n\t#allow Parched Skeletons to spawn naturally\r\n\thas_parched_skeletons = true\r\n\t#allow mounts to float while ridden\r\n\tcan_mounts_float_while_ridden = true\r\n\t#allow Nautilus Armor to generate in loot chests\r\n\thas_nautilus_armor_loot = true\r\n\t#allow Spears to be obtainable and allow monsters to spawn holding them\r\n\thas_spears = true\r\n\r\n[\"Chaos Cubed\"]\r\n\t#allow Sulfur Springs to generate in Sulfur Caves\r\n\thas_sulfur_springs = true\r\n\t#allow damaging Sulfur Cube archetypes to deal damage\r\n\tdo_sulfur_cubes_damage = true\r\n\t#allow explosive Sulfur Cube archetypes to explode\r\n\tdo_sulfur_cubes_explode = true\r\n\t#allow Sulfur Cubes to spawn in Sulfur Caves\r\n\thas_sulfur_cubes = true\r\n\t#allow Sulfur Cave biomes to generate\r\n\thas_sulfur_caves = true\r\n\t#allow Potent Sulfur blocks to generate Geysers\r\n\tdo_geysers_erupt = true\r\n\t#allows the Bounce music disc to generate in Abandoned Mineshafts loot chests\r\n\thas_bounce_music_disc = true\r\n\t#allow Wandering Traders to offer items from Chaos Cubed\r\n\tdo_merchant_trade_chaos_cubed_contents = true\r\n\r\n[\"Wilderness Bound\"]\r\n\t#allow Dappled Forest biomes to generate\r\n\thas_dappled_forest = true\r\n\r\n",
+    "config/asyncparticles/asyncparticles-mixin.properties": "#safeBlockEntityMap: Boolean. Make 'LevelChunk#blockEntities' thread-safe.\r\n#safeClassInstanceMultiMap: Boolean. Make 'ClassInstanceMultiMap' thread-safe.\r\n#safeLegacyRandomSource: Boolean. Make LegacyRandomSource thread-safe.\r\n#particle$splitTick: Boolean. Enable recursive particle tick.\r\n#particle$noCulling: A comma-separated list of classes extending 'Particle' that should not be culled.\r\n#particle$noLightCache: A comma-separated list of classes extending 'Particle' that should not use the light cache.\r\n#particle$lockRequired: A comma-separated list of classes extending 'Particle' that require a spin lock.\r\n#particle$lockProvider: A comma-separated list of classes extending 'Particle' that provide a spin lock.\r\n#replaceRandom: A comma-separated list of classes that require multithreaded random sources.\r\n#create$contraptionNoParticleCollision: A comma-separated list of classes extending 'AbstractContraptionEntity' that should not collide with particles.\r\n#\r\n#Wed Oct 21 00:34:30 EDT 2026\r\ncreate$contraptionNoParticleCollision=rbasamoyai.createbigcannons.cannon_control.contraption.PitchOrientedContraptionEntity,rbasamoyai.createbigcannons.cannon_control.contraption.AbstractMountedCannonContraption\r\nparticle$lockProvider=yesman.epicfight.client.particle.TrailParticle,yesman.epicfight.client.particle.AbstractTrailParticle,com.lowdragmc.photon.client.gameobject.FXObject\r\nparticle$lockRequired=yesman.epicfight.client.particle.TrailParticle,yesman.epicfight.client.particle.AbstractTrailParticle,com.lowdragmc.photon.client.gameobject.FXObject\r\nparticle$noCulling=com.lowdragmc.photon.client.gameobject.FXObject,net.bettercombat.client.particle.SlashParticle,com.xm666.realisticcruelty.particle.BloodSplatParticle\r\nparticle$noLightCache=dev.shadowsoffire.gateways.client.GatewayParticle,com.chailotl.particular.particles.FireflyParticle,com.lowdragmc.photon.client.gameobject.FXObject,net.diebuddies.minecraft.weather.WeatherParticle\r\npolytone$CompatEnabled=false\r\nreplaceRandom=appeng.client.render.effects.LightningArcFX,appeng.client.render.effects.LightningFX,de.cheaterpaul.fallingleaves.util.LeafUtil\r\nsafeBlockEntityMap=false\r\nsafeClassInstanceMultiMap=false\r\nsafeLegacyRandomSource=true\r\nversion=3\r\n",
+    "config/asyncparticles/asyncparticles.json": "{\n  \"version\": 2,\n  \"particle\": {\n    \"particleLimit\": 16384,\n    \"cleanupStrategy\": \"PARALLEL_WITH_TICK\",\n    \"parallelQueueRemoval\": false,\n    \"parallelQueueEviction\": false,\n    \"particleLightCache\": true,\n    \"cullUnderwaterParticleType\": true\n  },\n  \"tick\": {\n    \"animationTickMode\": true,\n    \"particleAsyncMode\": \"SEQUENTIAL\",\n    \"gpuOnlyAsyncParticleTick\": false,\n    \"tickWeatherAsync\": true,\n    \"deferredTextureTick\": true,\n    \"failPerSecLimit\": 5,\n    \"failBehavior\": \"RAISE_CRASH\",\n    \"suppressCME\": false,\n    \"syncAnimationClasses\": [],\n    \"syncParticleClasses\": [\n      \"pigcart.particlerain.particle.BlockDisplayParticle\"\n    ]\n  },\n  \"rendering\": {\n    \"particleCulling\": \"SPHERE\",\n    \"gpuAcceleration\": true,\n    \"appendNewParticlesToRenderer\": true,\n    \"computeExecutionStage\": \"LEVEL_RENDERING\",\n    \"tickRendererOnMainThread\": false,\n    \"cullWeathers\": true\n  },\n  \"valkyrienSkies\": {\n    \"rainEffect\": \"STATIONARY\",\n    \"fixParticleLights\": true\n  },\n  \"sable\": {\n    \"fixParticleLights\": true\n  },\n  \"polytone\": {\n    \"takeover\": true,\n    \"asyncTick\": true,\n    \"gpuOnlyAsyncTick\": false,\n    \"gpuRendering\": true\n  },\n  \"create\": {\n    \"rainEffect\": \"ALWAYS\",\n    \"tickRainBlockingRange\": 16\n  },\n  \"mobile\": {\n    \"multiDrawWorkaround\": true\n  }\n}"
   },
-  "storedCoreBaseline": {
-    "repo": "dfgdrfgh/reslabbed",
-    "artifact": 11996859131,
-    "file": "slabbed-0.7.0-alpha+1.21.1-fabric.jar",
-    "sha256": "74b52986d6f208d6a79f717279fa3322ee6bf067d49cb891541f72946abef7f0"
-  },
-  "sourcePackSha256": "66c6a1f83c6d31b708b13498d8833e015761755a521fea1db92cf1256a5e47c9",
-  "modCount": 62,
+  "sourcePackSha256": "f2d3b09a71f087a7af2aa84c1af40e5da42dc5fb926311a5a60ddce76db8488c",
+  "modCount": 53,
   "feedbackBaseline": {
     "repo": "dfgdrfgh/reslabbed",
     "artifact": 12062694726,
     "file": "slabbed-0.9.0-rewrite-alpha+1.21.1-fabric.jar",
     "sha256": "079da6b9d5d14ad9e2bb300f010ff187120b1fbc199b0923fc1fb5f42a456e7b"
   },
-  "sourcePackName": "SMP-ModPack-1.0.0-Creative-Fixes-v9.mrpack",
+  "sourcePackName": "SMP ModPack 1.0.1.mrpack",
   "overrides": [
     {
       "path": "resourcepacks/Modded Omelet [120] [171].zip",
@@ -1034,13 +839,38 @@
       "downloads": []
     },
     {
-      "path": "mods/collective-1.21.1-8.55.jar",
+      "path": "mods/biome-cloud-transitions-fabric-1.21.1-1.0.1.jar",
       "hashes": {
-        "sha256": "e85fb0cb39ad9a23d52bda499b1b5ecc9dbbf97fe7fd5575fef99edd43af14a0"
+        "sha256": "026556cf7e11283a88a4c5c4751dc122aaa1976f4491341936f89d9be019a608"
       },
-      "fileSize": 1227998,
+      "fileSize": 18692,
+      "downloads": []
+    },
+    {
+      "path": "mods/friendsandfoes-fabric-5.0.3+mc1.21.1.jar",
+      "hashes": {
+        "sha256": "57d1829ab1144360e45aa7b31a27709b4e098e35116c47687558767191589437"
+      },
+      "fileSize": 5285754,
+      "downloads": []
+    },
+    {
+      "path": "mods/mielons-the-sift-1.21.1-1.1.2-fabric-backport.14.jar",
+      "hashes": {
+        "sha256": "b02dcc65370f2d908da1870787bcaa54187052d6a553efb16b5136228be9a274"
+      },
+      "fileSize": 14552301,
+      "downloads": []
+    },
+    {
+      "path": "mods/wwoo-fabric-1.21.1-3.0.1-backport.jar",
+      "hashes": {
+        "sha256": "2f96ac79e17fbc144aa88774b37b9f24ffa3bc9a98685fae523059410e0af214"
+      },
+      "fileSize": 4018077,
       "downloads": []
     }
   ],
-  "resourcePackCount": 4
+  "resourcePackCount": 7,
+  "sourceModCount": 52
 }
