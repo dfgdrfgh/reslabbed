@@ -11,13 +11,14 @@ import java.util.List;
 /** Watches actual production dust objects from mining and breaking until they reach the soil surface. */
 public final class SlabFeedbackAudit {
     private static final List<BlockDustParticle> DUST=new ArrayList<>();
+    private static volatile BlockDustParticle tracedDust;
     private static boolean capture;
     private static int settled,dark,observations;
     private static double hitY=Double.NaN;
     private static double breakFloor=Double.NaN;
     private static final List<String> ERRORS=new ArrayList<>();
     private SlabFeedbackAudit() {}
-    public static void begin() {DUST.clear();capture=true;settled=0;dark=0;observations=0;hitY=Double.NaN;breakFloor=Double.NaN;}
+    public static void begin() {tracedDust=null;DUST.clear();capture=true;settled=0;dark=0;observations=0;hitY=Double.NaN;breakFloor=Double.NaN;}
     public static void beginHit(double expectedY) {begin();hitY=expectedY;}
     public static void beginBreak(double supportTop) {begin();breakFloor=supportTop;}
     public static void end() {capture=false;}
@@ -54,6 +55,7 @@ public final class SlabFeedbackAudit {
     public static void record(BlockDustParticle dust,BlockState material,double y) {
         if(!capture)return;
         DUST.add(dust);
+        if(DUST.size()==2)tracedDust=dust;
         error(Double.isNaN(hitY) || Math.abs(y-hitY)<1e-5,"slab mining dust has wrong physical height: "+y+" expected="+hitY);
         error(Double.isNaN(breakFloor) || y>=breakFloor,"slab break dust spawned inside its support: y="+y+" surface="+breakFloor);
         if(DUST.size()==1)System.out.println("PHYSICAL_REAL_SLAB_DUST_CREATED material="+material+" y="+y+" light="+dust.getBrightness(1));
@@ -61,7 +63,7 @@ public final class SlabFeedbackAudit {
     public static void error(boolean valid,String message) {if(!valid)ERRORS.add(message);}
     public static void motion(net.minecraft.client.particle.Particle particle,net.minecraft.client.world.ClientWorld world,
                               int age,int maxAge,boolean stopped,double velocityY) {
-        if(Double.isNaN(breakFloor) || DUST.size()<2 || DUST.get(1)!=particle || age>3)return;
+        if(tracedDust!=particle || Double.isNaN(breakFloor) || age>3)return;
         var box=particle.getBoundingBox();var center=box.getCenter();var pos=BlockPos.ofFloored(center.x,box.minY,center.z);
         System.out.println("PHYSICAL_REAL_SLAB_DUST_TICK age="+age+" max="+maxAge+" stopped="+stopped+" vy="+velocityY
                 +" box="+box+" seat="+com.slabbed.nativeblock.NativeSeats.offset(world,pos)
@@ -92,6 +94,6 @@ public final class SlabFeedbackAudit {
         error(dark==0,"actual settled slab dust had "+dark+" dark samples of "+settled);
         if(!ERRORS.isEmpty())throw new AssertionError(String.join("; ",ERRORS));
         System.out.println("PHYSICAL_REAL_SLAB_FEEDBACK_PASS dust="+DUST.size()+" settled_samples="+settled);
-        DUST.clear();
+        tracedDust=null;DUST.clear();
     }
 }

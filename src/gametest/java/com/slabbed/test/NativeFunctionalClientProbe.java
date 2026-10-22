@@ -54,6 +54,7 @@ public final class NativeFunctionalClientProbe {
         if(stage==99)return true;
         NativeRenderAudit.tick(client);
         ticks++;
+        if(ticks-started==220)diagnose(client);
         check(ticks-started<240,"native functional timeout stage="+stage+" screen="+client.currentScreen);
         if(pending)return false;
         if(stage==0) {
@@ -265,6 +266,30 @@ public final class NativeFunctionalClientProbe {
     private static boolean clientLightSource(MinecraftClient client) {
         return client.world.getLightLevel(net.minecraft.world.LightType.BLOCK,LIGHT_OWNER)==15
                 && client.world.getLightLevel(net.minecraft.world.LightType.BLOCK,LIGHT_OWNER.east())==14;
+    }
+    /** Observe a stalled phase without changing its packet or predicate handshake. */
+    private static void diagnose(MinecraftClient client) {
+        int waitingStage=stage;
+        System.out.println("PHYSICAL_NATIVE_FUNCTIONAL_WAIT stage="+waitingStage+" player="+client.player.getPos()
+                +" pending="+pending+" observed="+observed+" screen="+client.currentScreen
+                +" sign="+client.world.getBlockState(SIGN)+" signEntity="+(client.world.getBlockEntity(SIGN) instanceof SignBlockEntity)
+                +" seats="+poseState(client.world)
+                +" source="+lightState(client.world,LIGHT_OWNER)+" neighbor="+lightState(client.world,LIGHT_OWNER.east()));
+        client.getServer().execute(()-> {
+            var world=client.getServer().getOverworld();
+            System.out.println("PHYSICAL_NATIVE_FUNCTIONAL_SERVER_WAIT stage="+waitingStage
+                    +" sign="+(world.isChunkLoaded(SIGN)?world.getBlockState(SIGN):"unloaded")
+                    +" seats="+poseState(world)
+                    +" source="+lightState(world,LIGHT_OWNER)+" neighbor="+lightState(world,LIGHT_OWNER.east())
+                    +" storedEmission="+com.slabbed.cell.SupplementalCells.luminance(world,LIGHT_OWNER));
+        });
+    }
+    private static String lightState(net.minecraft.world.World world,BlockPos pos) {
+        return world.isChunkLoaded(pos)?Integer.toString(world.getLightLevel(net.minecraft.world.LightType.BLOCK,pos)):"unloaded";
+    }
+    private static String poseState(net.minecraft.world.World world) {
+        return java.util.Arrays.toString(java.util.Arrays.stream(new BlockPos[]{SIGN,FOOT,HEAD,TABLE})
+                .mapToDouble(pos->com.slabbed.nativeblock.NativeSeats.offset(world,pos)).toArray());
     }
     private static void next(int value) {stage=value;started=ticks;observed=false;}
     private static void server(MinecraftClient client,Runnable task) {
